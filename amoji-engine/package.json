@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "lab": "npx --yes serve prototypes -p 5173"
+    "lab": "npx --yes serve prototypes -p 5173",
+    "face-live": "npx --yes serve . -p 5174"
   },
   "keywords": [
     "amoji",

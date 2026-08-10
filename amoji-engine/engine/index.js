@@ -31,3 +31,10 @@ export {
   applyMouthToParams,
 } from './layers/resolveMouth.js';
 export { performSpeech } from './layers/performSpeech.js';
+export {
+  EMOTIONS,
+  HI_RECIPES,
+  emotionToMorphWeights,
+  applyMorphWeights,
+  normalizeMorphName,
+} from './layers/emotionMorphs.js';
