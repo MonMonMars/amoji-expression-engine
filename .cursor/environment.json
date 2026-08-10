@@ -1,0 +1,3 @@
+{
+  "install": "cd amoji-engine\nnpm install\nnpm test"
+}
