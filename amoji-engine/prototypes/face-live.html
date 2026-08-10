@@ -456,6 +456,7 @@
           }
         }
 
+        // Naughty Dog: idle motion overlays emotion — does not replace it.
         if (spinOn && model) model.rotation.y += dt * 0.6;
         if (idleOn && model && !mixer) {
           const t = clock.elapsedTime;
@@ -464,19 +465,38 @@
         }
         if (mixer) mixer.update(dt);
 
-        // blink pulse using eyeClosed morphs when present
         if (blinkT > 0) blinkT = Math.max(0, blinkT - dt);
         else if (Math.random() < dt * 0.25) blinkT = 0.14;
 
         const targets = currentTargets();
+        const morphs = availableMorphs();
+
+        // ND/Capcom eyes: micro saccades on top of expression (HI only)
+        if (lod === 'hi' && idleOn) {
+          const t = clock.elapsedTime;
+          const sx = (Math.sin(t * 3.1) * 0.5 + Math.sin(t * 5.7) * 0.5) * 0.12;
+          const sy = Math.sin(t * 2.4 + 1.7) * 0.08;
+          if (morphs.includes('Expressions_eyesHoriz_max') && sx > 0) {
+            targets.Expressions_eyesHoriz_max = Math.max(targets.Expressions_eyesHoriz_max || 0, sx);
+          }
+          if (morphs.includes('Expressions_eyesHoriz_min') && sx < 0) {
+            targets.Expressions_eyesHoriz_min = Math.max(targets.Expressions_eyesHoriz_min || 0, -sx);
+          }
+          if (morphs.includes('Expressions_eyesVert_max') && sy > 0) {
+            targets.Expressions_eyesVert_max = Math.max(targets.Expressions_eyesVert_max || 0, sy);
+          }
+          if (morphs.includes('Expressions_eyesVert_min') && sy < 0) {
+            targets.Expressions_eyesVert_min = Math.max(targets.Expressions_eyesVert_min || 0, -sy);
+          }
+        }
+
         if (blinkT > 0) {
           const w = Math.sin((1 - blinkT / 0.18) * Math.PI);
           for (const name of [
             'Expressions_eyeClosedL_max',
             'Expressions_eyeClosedR_max',
-            'EMO_sad', // soft fallback on LO without eye morphs
           ]) {
-            if (availableMorphs().includes(name) && name.startsWith('Expressions_')) {
+            if (morphs.includes(name)) {
               targets[name] = Math.max(targets[name] || 0, w);
             }
           }

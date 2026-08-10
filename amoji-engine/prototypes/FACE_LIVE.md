@@ -34,3 +34,4 @@ blender -b -P assets/characters/jp-female-v0/export_lod_emotions.py
 
 - UI: `prototypes/face-live.html`
 - Mapping: `engine/layers/emotionMorphs.js`
+- Studio method reference (Capcom / Square Enix / Naughty Dog): `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`
