@@ -1,0 +1,7 @@
+tools/
+research/downloads/
+**/node_modules/
+*.zip
+*.tar.gz
+.venv*/
+tools/.venv-blender-mcp/
