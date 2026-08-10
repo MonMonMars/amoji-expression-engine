@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "uvx",
+      "args": [
+        "--python",
+        "3.11",
+        "blender-mcp"
+      ],
+      "env": {
+        "DISABLE_TELEMETRY": "true",
+        "BLENDER_HOST": "localhost",
+        "BLENDER_PORT": "9876"
+      }
+    },
+    "unreal": {
+      "command": "uvx",
+      "args": [
+        "unreal-mcp"
+      ],
+      "env": {
+        "UE_PROJECT_PATH": "/ABS/PATH/AmojiRealtime/AmojiRealtime.uproject",
+        "UE_ENGINE_PATH": "/ABS/PATH/UE_5.7"
+      }
+    }
+  }
+}

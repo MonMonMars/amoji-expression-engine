@@ -1,8 +1,10 @@
 # Amoji Character Modeling Research Pack — JP Female v0
 
 **Goal:** Own human head + body for Amoji expression engine demos.  
-**First character:** adult East-Asian / Japanese–inspired young female (pretty, soft features — stylized realism, **not** photoreal uncanny).  
-**Generated:** 2026-08-10 via Blender 4.0.2 + MB-Lab `f_as01` + `east_asian` phenotype.
+**Demo character:** **Amoji Sakura** — adult East-Asian / Japanese–inspired young female (soft features). Mood reference only (e.g. soft beauty adjacent to actresses like 今田美櫻). **Not** a celebrity likeness, deepfake, or licensed persona.  
+**Variants:** stylized (`f_an01`) + realistic (`f_as01` + `east_asian`).  
+**Wardrobe:** sailor seifuku + long dark hair + white underlayer (prototype meshes).  
+**Generated:** 2026-08-10 via Blender 4.0.2 + MB-Lab. See also `REALTIME_UNREAL_SETUP.md`.
 
 ---
 
