@@ -1,0 +1,26 @@
+{
+  "name": "amoji-expression-engine",
+  "version": "0.1.0",
+  "description": "Amoji Expression Engine — emotion semantics to facial/body performance (pure generation)",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lab": "npx --yes serve prototypes -p 5173"
+  },
+  "keywords": [
+    "amoji",
+    "expression",
+    "emotion",
+    "aep",
+    "animation"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "three": "^0.178.0"
+  }
+}

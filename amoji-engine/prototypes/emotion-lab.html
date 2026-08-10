@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amoji Emotion Lab — Phase 1</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0f14;
+        --panel: #151b22;
+        --text: #e7eef6;
+        --muted: #8b9aab;
+        --accent: #3ddc97;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, #1a2a33 0%, transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, #243018 0%, transparent 50%),
+          var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .wrap {
+        width: min(920px, 100%);
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+      @media (max-width: 800px) {
+        .wrap { grid-template-columns: 1fr; }
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        background: #0f1419;
+        display: block;
+      }
+      aside {
+        background: color-mix(in oklab, var(--panel) 88%, black);
+        border: 1px solid #2a3542;
+        border-radius: 8px;
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 4px;
+        letter-spacing: 0.02em;
+      }
+      p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+      label { display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+      select, input[type="range"] { width: 100%; }
+      select {
+        background: #0f1419;
+        color: var(--text);
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 8px 10px;
+      }
+      .row { display: flex; justify-content: space-between; gap: 8px; }
+      code { color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+      .note { font-size: 0.78rem; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <canvas id="face" width="640" height="720" aria-label="Amoji face preview"></canvas>
+      <aside>
+        <div>
+          <h1>Amoji Emotion Lab</h1>
+          <p>Phase 1 — 8 basic emotions × intensity. Placeholder face art.</p>
+        </div>
+        <label>
+          Emotion
+          <select id="emotion"></select>
+        </label>
+        <label>
+          <span class="row"><span>Intensity</span><code id="tLabel">0.60</code></span>
+          <input id="intensity" type="range" min="0" max="1" step="0.01" value="0.6" />
+        </label>
+        <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
+          <input id="overdrive" type="checkbox" />
+          Unlock overdrive (&gt;1.0)
+        </label>
+        <p class="note">Pipeline: evaluateEmotion → applyComplianceGate → canvas draw. Pure generation — no biometric input.</p>
+      </aside>
+    </div>
+    <script type="module">
+      import { BASIC_EMOTIONS, evaluateEmotion } from '../engine/layers/emotionFormulas.js';
+      import { applyComplianceGate } from '../engine/compliance/complianceGate.js';
+      import { draw } from '../render/canvasRenderer2D.js';
+
+      const canvas = document.getElementById('face');
+      const ctx = canvas.getContext('2d');
+      const emotionEl = document.getElementById('emotion');
+      const intensityEl = document.getElementById('intensity');
+      const overdriveEl = document.getElementById('overdrive');
+      const tLabel = document.getElementById('tLabel');
+
+      for (const id of BASIC_EMOTIONS) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = id;
+        if (id === 'happy') opt.selected = true;
+        emotionEl.appendChild(opt);
+      }
+
+      function render() {
+        let t = Number(intensityEl.value);
+        if (overdriveEl.checked) {
+          intensityEl.max = '1.6';
+        } else {
+          intensityEl.max = '1';
+          if (t > 1) {
+            t = 1;
+            intensityEl.value = '1';
+          }
+        }
+        tLabel.textContent = t.toFixed(2);
+        const raw = evaluateEmotion(emotionEl.value, t, {
+          unlockOverdrive: overdriveEl.checked,
+        });
+        const gated = applyComplianceGate(raw, { userText: '' });
+        draw(ctx, gated.params ?? {}, {
+          width: canvas.width,
+          height: canvas.height,
+          label: `${gated.emotion} · t=${t.toFixed(2)}`,
+        });
+      }
+
+      emotionEl.addEventListener('change', render);
+      intensityEl.addEventListener('input', render);
+      overdriveEl.addEventListener('change', render);
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,541 @@
+[
+  {
+    "id": "FH-CTR",
+    "region": "forehead",
+    "side": "C",
+    "label": "額頭中央",
+    "description": "兩眉中間正上方"
+  },
+  {
+    "id": "FH-L",
+    "region": "forehead",
+    "side": "L",
+    "label": "左額",
+    "description": "左眉上方"
+  },
+  {
+    "id": "FH-R",
+    "region": "forehead",
+    "side": "R",
+    "label": "右額",
+    "description": "對稱於 FH-L"
+  },
+  {
+    "id": "FH-TOP",
+    "region": "forehead",
+    "side": "C",
+    "label": "額頭上部中點",
+    "description": "近髮際線中央"
+  },
+  {
+    "id": "EB-L1",
+    "region": "eyebrow",
+    "side": "L",
+    "label": "左眉頭",
+    "description": "最靠近鼻樑"
+  },
+  {
+    "id": "EB-L2",
+    "region": "eyebrow",
+    "side": "L",
+    "label": "左眉內中",
+    "description": "眉頭與眉峰之間"
+  },
+  {
+    "id": "EB-L3",
+    "region": "eyebrow",
+    "side": "L",
+    "label": "左眉峰",
+    "description": "眉毛最高點"
+  },
+  {
+    "id": "EB-L4",
+    "region": "eyebrow",
+    "side": "L",
+    "label": "左眉外中",
+    "description": "眉峰與眉尾之間"
+  },
+  {
+    "id": "EB-L5",
+    "region": "eyebrow",
+    "side": "L",
+    "label": "左眉尾",
+    "description": "最靠近太陽穴"
+  },
+  {
+    "id": "EB-R1",
+    "region": "eyebrow",
+    "side": "R",
+    "label": "右眉頭",
+    "description": "對稱於 EB-L1"
+  },
+  {
+    "id": "EB-R2",
+    "region": "eyebrow",
+    "side": "R",
+    "label": "右眉內中",
+    "description": "對稱於 EB-L2"
+  },
+  {
+    "id": "EB-R3",
+    "region": "eyebrow",
+    "side": "R",
+    "label": "右眉峰",
+    "description": "對稱於 EB-L3"
+  },
+  {
+    "id": "EB-R4",
+    "region": "eyebrow",
+    "side": "R",
+    "label": "右眉外中",
+    "description": "對稱於 EB-L4"
+  },
+  {
+    "id": "EB-R5",
+    "region": "eyebrow",
+    "side": "R",
+    "label": "右眉尾",
+    "description": "對稱於 EB-L5"
+  },
+  {
+    "id": "EY-L-IN",
+    "region": "eye",
+    "side": "L",
+    "label": "左眼內眼角",
+    "description": "靠鼻樑"
+  },
+  {
+    "id": "EY-L-UP1",
+    "region": "eye",
+    "side": "L",
+    "label": "左上眼瞼內",
+    "description": "上眼皮偏內"
+  },
+  {
+    "id": "EY-L-UP2",
+    "region": "eye",
+    "side": "L",
+    "label": "左上眼瞼中",
+    "description": "上眼皮最高點"
+  },
+  {
+    "id": "EY-L-UP3",
+    "region": "eye",
+    "side": "L",
+    "label": "左上眼瞼外",
+    "description": "上眼皮偏外"
+  },
+  {
+    "id": "EY-L-LOW1",
+    "region": "eye",
+    "side": "L",
+    "label": "左下眼瞼內",
+    "description": "下眼皮偏內"
+  },
+  {
+    "id": "EY-L-LOW2",
+    "region": "eye",
+    "side": "L",
+    "label": "左下眼瞼外",
+    "description": "下眼皮偏外"
+  },
+  {
+    "id": "EY-L-OUT",
+    "region": "eye",
+    "side": "L",
+    "label": "左眼外眼角",
+    "description": "靠太陽穴"
+  },
+  {
+    "id": "EY-R-IN",
+    "region": "eye",
+    "side": "R",
+    "label": "右眼內眼角",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-UP1",
+    "region": "eye",
+    "side": "R",
+    "label": "右上眼瞼內",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-UP2",
+    "region": "eye",
+    "side": "R",
+    "label": "右上眼瞼中",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-UP3",
+    "region": "eye",
+    "side": "R",
+    "label": "右上眼瞼外",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-LOW1",
+    "region": "eye",
+    "side": "R",
+    "label": "右下眼瞼內",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-LOW2",
+    "region": "eye",
+    "side": "R",
+    "label": "右下眼瞼外",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-R-OUT",
+    "region": "eye",
+    "side": "R",
+    "label": "右眼外眼角",
+    "description": "對稱"
+  },
+  {
+    "id": "CH-L-UP",
+    "region": "cheek",
+    "side": "L",
+    "label": "左顴骨上",
+    "description": "眼睛正下方"
+  },
+  {
+    "id": "CH-L-LOW",
+    "region": "cheek",
+    "side": "L",
+    "label": "左臉頰下",
+    "description": "近嘴角外側"
+  },
+  {
+    "id": "NL-L",
+    "region": "cheek",
+    "side": "L",
+    "label": "左鼻唇溝",
+    "description": "法令紋"
+  },
+  {
+    "id": "CH-R-UP",
+    "region": "cheek",
+    "side": "R",
+    "label": "右顴骨上",
+    "description": "對稱"
+  },
+  {
+    "id": "CH-R-LOW",
+    "region": "cheek",
+    "side": "R",
+    "label": "右臉頰下",
+    "description": "對稱"
+  },
+  {
+    "id": "NL-R",
+    "region": "cheek",
+    "side": "R",
+    "label": "右鼻唇溝",
+    "description": "對稱"
+  },
+  {
+    "id": "NS-BRIDGE",
+    "region": "nose",
+    "side": "C",
+    "label": "鼻樑中點",
+    "description": "兩眼之間"
+  },
+  {
+    "id": "NS-TIP",
+    "region": "nose",
+    "side": "C",
+    "label": "鼻尖",
+    "description": "鼻子最前端"
+  },
+  {
+    "id": "NS-L",
+    "region": "nose",
+    "side": "L",
+    "label": "左鼻翼",
+    "description": "左鼻孔外側"
+  },
+  {
+    "id": "NS-R",
+    "region": "nose",
+    "side": "R",
+    "label": "右鼻翼",
+    "description": "對稱"
+  },
+  {
+    "id": "UL-L",
+    "region": "mouth",
+    "side": "L",
+    "label": "上唇左峰",
+    "description": "上唇左側峰"
+  },
+  {
+    "id": "UL-R",
+    "region": "mouth",
+    "side": "R",
+    "label": "上唇右峰",
+    "description": "對稱"
+  },
+  {
+    "id": "UL-CTR",
+    "region": "mouth",
+    "side": "C",
+    "label": "上唇中點(唇珠)",
+    "description": "唇珠"
+  },
+  {
+    "id": "LL-L",
+    "region": "mouth",
+    "side": "L",
+    "label": "下唇左",
+    "description": "下唇左側"
+  },
+  {
+    "id": "LL-R",
+    "region": "mouth",
+    "side": "R",
+    "label": "下唇右",
+    "description": "對稱"
+  },
+  {
+    "id": "LL-CTR",
+    "region": "mouth",
+    "side": "C",
+    "label": "下唇中點",
+    "description": "下唇中央"
+  },
+  {
+    "id": "MO-L",
+    "region": "mouth",
+    "side": "L",
+    "label": "左嘴角",
+    "description": "嘴唇左端"
+  },
+  {
+    "id": "MO-R",
+    "region": "mouth",
+    "side": "R",
+    "label": "右嘴角",
+    "description": "嘴唇右端"
+  },
+  {
+    "id": "PHIL",
+    "region": "mouth",
+    "side": "C",
+    "label": "人中",
+    "description": "人中溝"
+  },
+  {
+    "id": "JW-L",
+    "region": "jaw",
+    "side": "L",
+    "label": "左頜角",
+    "description": "下頜角"
+  },
+  {
+    "id": "JW-R",
+    "region": "jaw",
+    "side": "R",
+    "label": "右頜角",
+    "description": "對稱"
+  },
+  {
+    "id": "JW-CTR",
+    "region": "jaw",
+    "side": "C",
+    "label": "下巴中點",
+    "description": "下巴最低點"
+  },
+  {
+    "id": "PL-L",
+    "region": "pupil",
+    "side": "L",
+    "label": "左瞳孔",
+    "description": "眼球方向"
+  },
+  {
+    "id": "PL-R",
+    "region": "pupil",
+    "side": "R",
+    "label": "右瞳孔",
+    "description": "眼球方向"
+  },
+  {
+    "id": "MO-UP",
+    "region": "mouth",
+    "side": "C",
+    "label": "上唇中點(輕量相容)",
+    "description": "相容 light-24"
+  },
+  {
+    "id": "MO-LOW",
+    "region": "mouth",
+    "side": "C",
+    "label": "下唇中點(輕量相容)",
+    "description": "相容 light-24"
+  },
+  {
+    "id": "MO-CTR",
+    "region": "mouth",
+    "side": "C",
+    "label": "嘴部中心(輕量相容)",
+    "description": "相容 light-24"
+  },
+  {
+    "id": "CH-L",
+    "region": "cheek",
+    "side": "L",
+    "label": "左臉頰(輕量相容)",
+    "description": "相容 light-24"
+  },
+  {
+    "id": "CH-R",
+    "region": "cheek",
+    "side": "R",
+    "label": "右臉頰(輕量相容)",
+    "description": "相容 light-24"
+  },
+  {
+    "id": "TM-L",
+    "region": "temple",
+    "side": "L",
+    "label": "左太陽穴",
+    "description": "髮際與眼尾之間"
+  },
+  {
+    "id": "TM-R",
+    "region": "temple",
+    "side": "R",
+    "label": "右太陽穴",
+    "description": "對稱"
+  },
+  {
+    "id": "EAR-L-TOP",
+    "region": "ear",
+    "side": "L",
+    "label": "左耳上緣",
+    "description": "靜態參考/風格動態"
+  },
+  {
+    "id": "EAR-L-LOBE",
+    "region": "ear",
+    "side": "L",
+    "label": "左耳垂",
+    "description": "靜態參考"
+  },
+  {
+    "id": "EAR-R-TOP",
+    "region": "ear",
+    "side": "R",
+    "label": "右耳上緣",
+    "description": "靜態參考"
+  },
+  {
+    "id": "EAR-R-LOBE",
+    "region": "ear",
+    "side": "R",
+    "label": "右耳垂",
+    "description": "靜態參考"
+  },
+  {
+    "id": "JW-L-MID",
+    "region": "jaw",
+    "side": "L",
+    "label": "左下頜中段",
+    "description": "頜角與下巴之間"
+  },
+  {
+    "id": "JW-R-MID",
+    "region": "jaw",
+    "side": "R",
+    "label": "右下頜中段",
+    "description": "對稱"
+  },
+  {
+    "id": "CHIN-L",
+    "region": "jaw",
+    "side": "L",
+    "label": "下巴左側凹陷",
+    "description": "酒窩位"
+  },
+  {
+    "id": "CHIN-R",
+    "region": "jaw",
+    "side": "R",
+    "label": "下巴右側凹陷",
+    "description": "對稱"
+  },
+  {
+    "id": "PHIL-L",
+    "region": "mouth",
+    "side": "L",
+    "label": "左人中脊",
+    "description": "人中左側嵴"
+  },
+  {
+    "id": "PHIL-R",
+    "region": "mouth",
+    "side": "R",
+    "label": "右人中脊",
+    "description": "對稱"
+  },
+  {
+    "id": "CUPID-L",
+    "region": "mouth",
+    "side": "L",
+    "label": "左唇峰內側",
+    "description": "UL-L 與 UL-CTR 之間"
+  },
+  {
+    "id": "CUPID-R",
+    "region": "mouth",
+    "side": "R",
+    "label": "右唇峰內側",
+    "description": "對稱"
+  },
+  {
+    "id": "GLB-CTR",
+    "region": "glabella",
+    "side": "C",
+    "label": "眉間中點",
+    "description": "兩眉中間"
+  },
+  {
+    "id": "GLB-LOW",
+    "region": "glabella",
+    "side": "C",
+    "label": "眉間下點",
+    "description": "GLB-CTR 與 NS-BRIDGE 之間"
+  },
+  {
+    "id": "FH-L2",
+    "region": "forehead",
+    "side": "L",
+    "label": "左額外側",
+    "description": "FH-L 外側"
+  },
+  {
+    "id": "FH-R2",
+    "region": "forehead",
+    "side": "R",
+    "label": "右額外側",
+    "description": "對稱"
+  },
+  {
+    "id": "EY-L-UP",
+    "region": "eye",
+    "side": "L",
+    "label": "左上眼瞼中(相容)",
+    "description": "light相容"
+  },
+  {
+    "id": "EY-R-UP",
+    "region": "eye",
+    "side": "R",
+    "label": "右上眼瞼中(相容)",
+    "description": "light相容"
+  }
+]

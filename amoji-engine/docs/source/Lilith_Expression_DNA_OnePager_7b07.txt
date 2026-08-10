@@ -1,0 +1,37 @@
+LILITH EXPRESSION DNA
+A Universal Emotion & Behavior Engine for AI Characters and Robots
+The Problem
+AI characters, digital humans, and social robots increasingly need to express emotion — but most systems either detect emotion (input side) or apply generic, static expression templates. Very few systems generate psychologically grounded, time-aware, personality-consistent facial performance. The result: AI faces that feel flat, robotic, or "uncanny" during pauses, transitions, and processing delays.
+The Solution
+A layered engine that converts an AI-generated "script" (dialogue + emotion + mood) into full facial performance data — combining professional animation expertise (20 years of character facial performance) with published psychology and performance-capture research:
+Compound Emotion Engine — blends two base emotions by facial region (e.g. "happily surprised"), based on published FACS research rather than naive averaging.
+Mood Engine — a slow-moving background state that subtly biases and "leaks" into every displayed emotion, without explicit AI instruction.
+Temporal Authenticity Layer — natural blinking, micro-expression leakage (eyes-before-mouth timing), and Alba Emoting–inspired "step-out" transitions between emotions.
+Latency Bridging System — persona-aware filler dialogue and gaze-aversion behavior that fills AI/robot processing delays naturally, grounded in HRI filler-word research.
+Persona Parameter System — five trait weights (warmth, formality, expressiveness, playfulness, assertiveness) mathematically derive intensity caps, allowed emotions, and behavior for any character — no per-character redesign needed.
+Why It's Different
+Current emotion-AI companies (e.g. Hume AI, Affectiva) focus on detecting emotion from input. Character-AI engines (e.g. Inworld, Convai) focus on dialogue generation and NPC behavior. Digital human platforms (e.g. Soul Machines) focus on rendering fidelity. None of the reviewed competitors combine psychologically-grounded compound emotion generation, mood-based leakage, and performance-trained transition timing into a single, persona-configurable engine.
+Product Lines
+Persona
+Target Customer
+Notes
+Home Service
+Smart home / domestic robot makers
+Warm, moderate range, low-risk emotions only
+Corporate Document
+Enterprise software / RPA / document AI
+Restrained, professional, near-zero negative affect
+Companion (Mate)
+Companion apps / desktop robots
+Full emotional range incl. compound emotions & leakage
+Educational
+EdTech / children's robots & toys
+Exaggerated, clear, consistent — pedagogy-first
+Medical / Care
+Eldercare / hospital assistant robots
+Calm baseline, custom "Concerned" compound emotion
+Status
+Full architecture specification complete across 13 documents (facial point-mapping, emotion tables, compound emotion logic, mood engine, actor's-discretion engine, latency bridging, persona system). Five working interactive prototypes built (HTML/Canvas), demonstrating the full pipeline from AI script input to rendered facial performance in real time.
+About the Founder
+20 years of professional experience in character animation, human body and facial performance across animation, illustration, and video production, now applied to building a technical standard for AI/robot emotional expression.
+Contact: [add contact details]

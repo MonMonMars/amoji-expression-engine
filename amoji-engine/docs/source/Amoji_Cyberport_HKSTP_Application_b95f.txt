@@ -1,0 +1,61 @@
+AMOJI
+A Bridge Between AI and Human — Technology Incubation Application
+1. Executive Summary
+Amoji is a rule-based expression and behavior engine that converts AI-generated emotional intent into full facial, body, and gesture performance data for digital characters and robots. Built on 20 years of professional character animation expertise combined with published psychology, performance-capture, and human-computer-interaction research, Amoji addresses a gap in the current AI-character market: existing systems either detect human emotion or apply generic, static expression templates — very few generate psychologically grounded, personality-consistent performance.
+The engine is architecturally separated from any biometric user-detection function, positioning it as a pure generation layer that is licensable to LLM platforms, robotics manufacturers, and consumer application developers without inheriting the regulatory burden associated with emotion-detection systems.
+2. Problem & Solution
+The Problem
+AI characters, digital humans, and social robots increasingly need to express emotion, but most current systems produce flat, robotic, or inconsistent performance — particularly during conversational pauses, emotional transitions, and AI processing delays. Recent high-profile robotics launches (2025-2026) have received mixed critical reception specifically on this point, with some described as "climbing out of" the uncanny valley and others as "unsettling" despite similar underlying hardware specifications.
+The Solution
+Amoji provides a layered, deterministic engine spanning: compound emotion generation (region-specific blending rather than naive averaging), a background "mood" system that subtly biases displayed emotion over time, natural micro-expression timing, eye-gaze and micro-saccade behavior, breathing and postural systems, gesture layering, gait, and a persona parameter system that mathematically derives behavioral limits for any character archetype — human, animal, anthropomorphized object, or mechanical robot — without per-character redesign.
+3. Technology & Innovation
+The engine's architecture separates an abstract "emotion intensity" layer from a concrete "rendering" layer, allowing the identical decision logic to drive outputs ranging from a minimal glowing-orb interface (comparable to existing voice-assistant UI) through stylized 2D/3D characters to photorealistic digital humans and physical robot actuators — a single backend, fully pluggable presentation layer.
+Core technical assets (summarized; full specification retained as trade secret):
+A 77-point facial expression system and 117-point full-body marker system, each cross-referenced to specific anatomical muscle groups and nerve pathways
+A compound-emotion engine grounded in published affective-science research (Du & Martinez, 2014) rather than linear parameter averaging
+A viseme (lip-sync) override architecture resolving conflicts between speech articulation and emotional expression using a locked/clamped/open state model, addressing a documented weakness in prior industry dominance models
+A "character archetype" adapter layer generalizing the engine beyond human faces to animals, anthropomorphized objects, and mechanical systems
+Built-in compliance modules for AI-disclosure, anti-addiction, and crisis-intervention behavior, designed against current EU, US, and Mainland China regulatory requirements for anthropomorphic AI interaction services
+The engine deliberately uses deterministic, auditable rule logic rather than a black-box machine-learning model for the core expression-generation step, prioritizing reproducibility, regulatory auditability, and defensible intellectual property over a purely data-driven approach.
+4. Market Opportunity
+The market for expressive AI characters and social robots has accelerated sharply through 2025-2026, with multiple manufacturers — spanning Mainland China, the UK, and North America — shipping or piloting hyper-realistic humanoid and desktop robot products aimed at elder-care companionship, hospitality, education, and customer service. Several of these products are hardware- and base-AI-strong but lack a differentiated, research-grounded expression layer, representing a direct B2B licensing opportunity.
+Separately, major LLM platforms have begun shipping animated 3D companion features directly to consumers, with public reception noting a lack of character customization depth and emotional consistency — a gap Amoji's architecture is designed to address.
+5. Business Model
+Segment
+Model
+Target Customer
+B2B — AI/LLM platforms
+Usage-based API subscription
+Conversational AI and companion-app providers
+B2B — Robotics manufacturers
+Integration fee + annual maintenance subscription
+Humanoid/social robot manufacturers
+B2C — Creator tooling
+Freemium + subscription
+Independent animators, VTuber creators
+B2C — Consumer app
+Freemium + subscription
+General consumers via mobile app store
+6. Team
+Founder: 20 years of professional experience in character animation and facial/body performance across animation, illustration, and video production, now applied to building a technical and psychological standard for AI and robot emotional expression. Bilingual (English / Traditional Chinese), Hong Kong-based.
+7. Development Status
+The engine's full architecture specification is complete, spanning facial and body anatomy, compound emotion logic, mood modeling, eye/gaze systems, gait, gesture, viseme coarticulation, multi-species/object adaptation, and uncanny-valley risk management, informed by both academic literature and current industry case studies. Over two dozen working interactive prototypes (2D and WebGL/Three.js) demonstrate the pipeline from abstract emotional intent to rendered performance in real time, including an initial working 3D character build.
+8. Use of Funds & Milestones
+Milestone
+Approx. Timing
+Funding Priority
+Core engine implementation (Phases 0-6: rendering, muscle/viseme, script, persona, compliance)
+Months 1-4
+Primary
+First B2C creator-tool MVP launch
+Months 4-6
+Primary
+First B2B pilot integration (LLM platform or robotics manufacturer)
+Months 6-10
+Secondary
+IP audit and provisional patent filing
+Pre-fundraise, 90 days before next round
+Secondary
+Appendix: Contact
+Further technical documentation, working prototypes, and detailed specifications are available on request under a mutual non-disclosure agreement, given the trade-secret status of core parameter tables and formulas.
+Contact: [add contact details]
