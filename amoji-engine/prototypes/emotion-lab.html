@@ -78,7 +78,7 @@
       <aside>
         <div>
           <h1>Amoji Emotion Lab</h1>
-          <p>Phase 1 — 8 basic emotions × intensity. Placeholder face art.</p>
+          <p>Phase 2 — emotions + viseme override (LOCKED/CLAMPED/OPEN). Placeholder face art.</p>
         </div>
         <label>
           Emotion
@@ -88,16 +88,26 @@
           <span class="row"><span>Intensity</span><code id="tLabel">0.60</code></span>
           <input id="intensity" type="range" min="0" max="1" step="0.01" value="0.6" />
         </label>
+        <label>
+          Speech text
+          <input id="speech" type="text" value="mama papa" style="background:#0f1419;color:var(--text);border:1px solid #334155;border-radius:6px;padding:8px 10px;width:100%;font:inherit;" />
+        </label>
+        <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
+          <input id="speak" type="checkbox" checked />
+          Play speech (discrete visemes)
+        </label>
         <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
           <input id="overdrive" type="checkbox" />
           Unlock overdrive (&gt;1.0)
         </label>
-        <p class="note">Pipeline: evaluateEmotion → applyComplianceGate → canvas draw. Pure generation — no biometric input.</p>
+        <p class="note">Upper face = emotion. Mouth = viseme override. MBP forces jaw=0. Coarticulation TODO.</p>
+        <code id="frameMeta"></code>
       </aside>
     </div>
     <script type="module">
       import { BASIC_EMOTIONS, evaluateEmotion } from '../engine/layers/emotionFormulas.js';
       import { applyComplianceGate } from '../engine/compliance/complianceGate.js';
+      import { performSpeech } from '../engine/layers/performSpeech.js';
       import { draw } from '../render/canvasRenderer2D.js';
 
       const canvas = document.getElementById('face');
@@ -105,7 +115,10 @@
       const emotionEl = document.getElementById('emotion');
       const intensityEl = document.getElementById('intensity');
       const overdriveEl = document.getElementById('overdrive');
+      const speechEl = document.getElementById('speech');
+      const speakEl = document.getElementById('speak');
       const tLabel = document.getElementById('tLabel');
+      const frameMeta = document.getElementById('frameMeta');
 
       for (const id of BASIC_EMOTIONS) {
         const opt = document.createElement('option');
@@ -115,7 +128,27 @@
         emotionEl.appendChild(opt);
       }
 
-      function render() {
+      let timer = null;
+      let frameIdx = 0;
+      let frames = [];
+
+      function drawFrame(params, label) {
+        draw(ctx, params ?? {}, {
+          width: canvas.width,
+          height: canvas.height,
+          label,
+        });
+      }
+
+      function stopSpeech() {
+        if (timer) clearInterval(timer);
+        timer = null;
+        frames = [];
+        frameIdx = 0;
+      }
+
+      function renderStatic() {
+        stopSpeech();
         let t = Number(intensityEl.value);
         if (overdriveEl.checked) {
           intensityEl.max = '1.6';
@@ -131,17 +164,41 @@
           unlockOverdrive: overdriveEl.checked,
         });
         const gated = applyComplianceGate(raw, { userText: '' });
-        draw(ctx, gated.params ?? {}, {
-          width: canvas.width,
-          height: canvas.height,
-          label: `${gated.emotion} · t=${t.toFixed(2)}`,
-        });
+        frameMeta.textContent = 'emotion-only';
+        drawFrame(gated.params, `${gated.emotion} · t=${t.toFixed(2)}`);
       }
 
-      emotionEl.addEventListener('change', render);
-      intensityEl.addEventListener('input', render);
-      overdriveEl.addEventListener('change', render);
-      render();
+      function playSpeech() {
+        stopSpeech();
+        let t = Number(intensityEl.value);
+        tLabel.textContent = t.toFixed(2);
+        const perf = performSpeech(speechEl.value || 'mama papa', emotionEl.value, t);
+        frames = perf.frames;
+        frameIdx = 0;
+        timer = setInterval(() => {
+          if (!frames.length) return;
+          const f = frames[frameIdx % frames.length];
+          frameIdx += 1;
+          const mouth = f.meta?.mouth;
+          frameMeta.textContent = `${f.meta?.char ?? ''} → ${f.meta?.viseme ?? ''} · jaw=${mouth?.jaw?.toFixed?.(2) ?? '?'}`;
+          drawFrame(f.params, `${f.emotion} · ${f.meta?.viseme} · "${f.meta?.char}"`);
+        }, 140);
+      }
+
+      function refresh() {
+        if (speakEl.checked && speechEl.value.trim()) playSpeech();
+        else renderStatic();
+      }
+
+      emotionEl.addEventListener('change', refresh);
+      intensityEl.addEventListener('input', refresh);
+      overdriveEl.addEventListener('change', refresh);
+      speechEl.addEventListener('change', refresh);
+      speechEl.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') refresh();
+      });
+      speakEl.addEventListener('change', refresh);
+      refresh();
     </script>
   </body>
 </html>

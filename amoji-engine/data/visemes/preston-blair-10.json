@@ -1,0 +1,75 @@
+{
+  "standard": "Preston Blair Phoneme Series (10 visemes)",
+  "params": ["jaw", "width", "corner"],
+  "states": {
+    "LOCKED": "Viseme owns 100% — emotion ignored",
+    "CLAMPED": "Emotion may offset within ±range of viseme base",
+    "OPEN": "Emotion owns the parameter"
+  },
+  "visemes": {
+    "AI": {
+      "label": "A / wide open",
+      "examples": ["hi", "time", "father"],
+      "jaw":    { "state": "OPEN", "value": 0.75 },
+      "width":  { "state": "CLAMPED", "value": 1.0, "range": 0.1 },
+      "corner": { "state": "OPEN", "value": 0 }
+    },
+    "E": {
+      "label": "E / mid open wide",
+      "examples": ["way", "get"],
+      "jaw":    { "state": "CLAMPED", "value": 0.35, "range": 0.05 },
+      "width":  { "state": "CLAMPED", "value": 1.15, "range": 0.15 },
+      "corner": { "state": "OPEN", "value": 0 }
+    },
+    "O": {
+      "label": "O / rounded",
+      "examples": ["go", "boat"],
+      "jaw":    { "state": "CLAMPED", "value": 0.5, "range": 0.05 },
+      "width":  { "state": "LOCKED", "value": 0.75 },
+      "corner": { "state": "CLAMPED", "value": 0, "range": 0.2 }
+    },
+    "U": {
+      "label": "U / WQ / pout",
+      "examples": ["you", "queen", "wet"],
+      "aliases": ["WQ"],
+      "jaw":    { "state": "CLAMPED", "value": 0.15, "range": 0.03 },
+      "width":  { "state": "LOCKED", "value": 0.6 },
+      "corner": { "state": "CLAMPED", "value": 0, "range": 0.15 }
+    },
+    "FV": {
+      "label": "F / V / lip on teeth",
+      "examples": ["fish", "very"],
+      "jaw":    { "state": "LOCKED", "value": 0.08 },
+      "width":  { "state": "LOCKED", "value": 1.0 },
+      "corner": { "state": "CLAMPED", "value": 0, "range": 0.1 }
+    },
+    "L": {
+      "label": "L",
+      "examples": ["let", "love"],
+      "jaw":    { "state": "CLAMPED", "value": 0.3, "range": 0.05 },
+      "width":  { "state": "CLAMPED", "value": 1.0, "range": 0.15 },
+      "corner": { "state": "OPEN", "value": 0 }
+    },
+    "MBP": {
+      "label": "M / B / P bilabial closure",
+      "examples": ["mom", "bob", "pop"],
+      "jaw":    { "state": "LOCKED", "value": 0 },
+      "width":  { "state": "LOCKED", "value": 1.0 },
+      "corner": { "state": "CLAMPED", "value": 0, "range": 0.15 }
+    },
+    "CONS": {
+      "label": "Generic consonant",
+      "examples": ["c", "d", "g", "k", "n", "s", "t"],
+      "jaw":    { "state": "CLAMPED", "value": 0.1, "range": 0.05 },
+      "width":  { "state": "OPEN", "value": 1.0 },
+      "corner": { "state": "OPEN", "value": 0 }
+    },
+    "REST": {
+      "label": "Silence / neutral rest",
+      "examples": [" ", ".", ",", "!"],
+      "jaw":    { "state": "OPEN", "value": 0.03 },
+      "width":  { "state": "OPEN", "value": 1.0 },
+      "corner": { "state": "OPEN", "value": 0 }
+    }
+  }
+}

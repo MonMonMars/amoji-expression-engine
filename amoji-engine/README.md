@@ -11,8 +11,9 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase | Scope | Status |
 |---|---|---|
 | Phase 0 | Repo skeleton + compliance gate (pure-generation boundary) | Done |
-| Phase 1 | 8 basic emotions + 2D canvas lab + point catalogs (24/57/77) | Done (MVP) |
-| Phase 2+ | Viseme LOCKED/CLAMPED/OPEN, muscle table, persona, Layer T… | Specced in `docs/source/` |
+| Phase 1 | 8 basic emotions + 2D canvas lab + point catalogs (24/57/77) | Done |
+| Phase 2 | Muscle M1–M21 perimeter + Preston Blair visemes + LOCKED/CLAMPED/OPEN mouth resolve | Done (MVP discrete) |
+| Phase 3+ | Blink / micro-leak / Step-Out timeline, personas, Layer T… | Specced in `docs/source/` |
 
 ## Quick start
 
@@ -38,6 +39,16 @@ npx --yes serve . -p 5173
 4. Lab dropdown picks it up automatically
 
 Do **not** special-case the renderer for the new emotion.
+
+## Add a viseme
+
+1. Add one entry to `data/visemes/preston-blair-10.json` with `jaw` / `width` / `corner` rules
+2. Optionally extend `charToViseme()` mapping
+3. `resolveMouth()` needs no code change for new keys
+
+Mouth override is LOCKED / CLAMPED / OPEN (not additive). MBP always forces `jaw = 0`.
+
+**TODO:** Cohen–Massaro coarticulation (continuous blend) — MVP uses discrete per-character visemes. See `docs/source` coarticulation spec.
 
 ## Docs
 

@@ -1,0 +1,171 @@
+[
+  {
+    "id": "M1",
+    "nameZh": "額肌",
+    "nameEn": "Frontalis",
+    "points": ["FH-CTR", "FH-L", "FH-R", "FH-TOP", "EB-L1", "EB-L2", "EB-L3", "EB-R1", "EB-R2", "EB-R3"],
+    "action": "提眉、額頭橫紋",
+    "nerve": "facial_temporal"
+  },
+  {
+    "id": "M2",
+    "nameZh": "皺眉肌",
+    "nameEn": "Corrugator Supercilii",
+    "points": ["EB-L1", "EB-R1"],
+    "action": "雙眉內聚下壓",
+    "nerve": "facial_temporal"
+  },
+  {
+    "id": "M3",
+    "nameZh": "降眉間肌",
+    "nameEn": "Procerus",
+    "points": ["NS-BRIDGE", "FH-CTR", "GLB-CTR"],
+    "action": "鼻樑上部下壓(皺鼻根)",
+    "nerve": "facial_temporal"
+  },
+  {
+    "id": "M4",
+    "nameZh": "眼輪匝肌·瞼板部",
+    "nameEn": "Orbicularis Oculi (palpebral)",
+    "points": ["EY-L-UP", "EY-L-LOW", "EY-R-UP", "EY-R-LOW"],
+    "action": "溫和閉眼",
+    "nerve": "facial_zygomatic"
+  },
+  {
+    "id": "M5",
+    "nameZh": "眼輪匝肌·眶部",
+    "nameEn": "Orbicularis Oculi (orbital)",
+    "points": ["EY-L-OUT", "EY-R-OUT", "CH-L", "CH-R", "CH-L-UP", "CH-R-UP"],
+    "action": "用力瞇眼(Duchenne標記)",
+    "nerve": "facial_zygomatic"
+  },
+  {
+    "id": "M6",
+    "nameZh": "上眼瞼提肌",
+    "nameEn": "Levator Palpebrae Superioris",
+    "points": ["EY-L-UP", "EY-R-UP"],
+    "action": "眼睜大",
+    "nerve": "oculomotor"
+  },
+  {
+    "id": "M7",
+    "nameZh": "鼻肌",
+    "nameEn": "Nasalis",
+    "points": ["NS-L", "NS-R"],
+    "action": "鼻孔/鼻樑皺起",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M8",
+    "nameZh": "提上唇鼻翼肌",
+    "nameEn": "Levator Labii Superioris Alaeque Nasi",
+    "points": ["UL-CTR", "NS-L", "NS-R", "MO-UP"],
+    "action": "上唇+鼻翼同步上提(厭惡標記)",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M9",
+    "nameZh": "提上唇肌",
+    "nameEn": "Levator Labii Superioris",
+    "points": ["UL-CTR", "MO-UP"],
+    "action": "上唇中央提升",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M10",
+    "nameZh": "顴大肌",
+    "nameEn": "Zygomaticus Major",
+    "points": ["MO-L", "MO-R", "CH-L", "CH-R"],
+    "action": "嘴角上揚外拉(微笑主肌)",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M11",
+    "nameZh": "顴小肌",
+    "nameEn": "Zygomaticus Minor",
+    "points": ["UL-L", "UL-R"],
+    "action": "上唇輕微提升",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M12",
+    "nameZh": "笑肌",
+    "nameEn": "Risorius",
+    "points": ["MO-L", "MO-R"],
+    "action": "嘴角橫向拉伸(恐懼/緊繃)",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M13",
+    "nameZh": "提口角肌",
+    "nameEn": "Levator Anguli Oris (Caninus)",
+    "points": ["MO-L", "MO-R"],
+    "action": "單邊嘴角上提(輕蔑成分)",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M14",
+    "nameZh": "降口角肌",
+    "nameEn": "Depressor Anguli Oris",
+    "points": ["MO-L", "MO-R"],
+    "action": "嘴角下垂",
+    "nerve": "facial_marginal_mandibular"
+  },
+  {
+    "id": "M15",
+    "nameZh": "降下唇肌",
+    "nameEn": "Depressor Labii Inferioris",
+    "points": ["LL-CTR", "MO-LOW"],
+    "action": "下唇下拉",
+    "nerve": "facial_marginal_mandibular"
+  },
+  {
+    "id": "M16",
+    "nameZh": "頦肌",
+    "nameEn": "Mentalis",
+    "points": ["JW-CTR"],
+    "action": "下巴收縮/顫抖突起",
+    "nerve": "facial_marginal_mandibular"
+  },
+  {
+    "id": "M17",
+    "nameZh": "頰肌",
+    "nameEn": "Buccinator",
+    "points": ["CH-L-LOW", "CH-R-LOW"],
+    "action": "臉頰壓縮貼緊牙齒",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M18",
+    "nameZh": "口輪匝肌",
+    "nameEn": "Orbicularis Oris",
+    "points": ["MO-CTR", "MO-UP", "MO-LOW", "UL-CTR", "LL-CTR"],
+    "action": "嘟嘴/閉唇/唇形",
+    "nerve": "facial_buccal"
+  },
+  {
+    "id": "M19",
+    "nameZh": "頸闊肌",
+    "nameEn": "Platysma",
+    "points": [],
+    "action": "頸部繃緊外顯(恐懼/用力) — Layer B",
+    "nerve": "facial_cervical",
+    "layer": "B"
+  },
+  {
+    "id": "M20",
+    "nameZh": "咬肌/顳肌",
+    "nameEn": "Masseter/Temporalis",
+    "points": ["JW-CTR", "JW-L", "JW-R"],
+    "action": "咬緊牙關(三叉神經,非表情肌)",
+    "nerve": "trigeminal_mandibular"
+  },
+  {
+    "id": "M21",
+    "nameZh": "降眉肌",
+    "nameEn": "Depressor Supercilii",
+    "points": ["EB-L1", "EB-R1"],
+    "action": "眉頭直接下拉(區別於M2內聚)",
+    "nerve": "facial_temporal"
+  }
+]
