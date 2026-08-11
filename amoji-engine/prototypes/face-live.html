@@ -778,6 +778,7 @@
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
+          <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1186,6 +1187,9 @@
         saveDisneyExtremeBaselineHistory,
         loadDisneyExtremeBaselineHistory,
         clearDisneyExtremeBaselineHistoryStorage,
+        saveDisneyExtremeBaselineRedo,
+        loadDisneyExtremeBaselineRedo,
+        clearDisneyExtremeBaselineRedoStorage,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1492,9 +1496,19 @@
       let lastExtremeBaselineSnap = loadDisneyExtremeBaseline();
       let lastExtremeDirty = false;
       let extremeBaselineHistory = loadDisneyExtremeBaselineHistory();
+      let extremeBaselineRedo = loadDisneyExtremeBaselineRedo();
 
       function persistDisneyExtremeBaselineHistory() {
         saveDisneyExtremeBaselineHistory(extremeBaselineHistory);
+      }
+
+      function persistDisneyExtremeBaselineRedo() {
+        saveDisneyExtremeBaselineRedo(extremeBaselineRedo);
+      }
+
+      function clearDisneyExtremeBaselineRedoStack() {
+        extremeBaselineRedo = [];
+        clearDisneyExtremeBaselineRedoStorage();
       }
 
       function setDisneyExtremeBaseline(snap) {
@@ -1505,6 +1519,7 @@
           );
           persistDisneyExtremeBaselineHistory();
         }
+        clearDisneyExtremeBaselineRedoStack();
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
@@ -1784,6 +1799,10 @@
 
       document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
         undoDisneyExtremeBaseline();
+      });
+
+      document.getElementById('btnDisneyExtremeRedoBase')?.addEventListener('click', () => {
+        redoDisneyExtremeBaseline();
       });
 
       function disneyExtremeFactorOpts() {
@@ -2081,6 +2100,7 @@
         extremeBaselineHistory = [];
         clearDisneyExtremeBaselineStorage();
         clearDisneyExtremeBaselineHistoryStorage();
+        clearDisneyExtremeBaselineRedoStack();
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus('cleared · baseline');
@@ -2095,12 +2115,43 @@
           flashDisneyExtremeStatus('undo · no history');
           return false;
         }
+        if (lastExtremeBaselineSnap) {
+          extremeBaselineRedo = pushDisneyExtremeBaselineHistory(
+            extremeBaselineRedo,
+            lastExtremeBaselineSnap,
+          );
+          persistDisneyExtremeBaselineRedo();
+        }
         applyDisneyExtremeSnapshot(popped.snap);
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(popped.snap).snap;
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         const fp = disneyExtremeSnapshotFingerprintShort(popped.snap);
         flashDisneyExtremeStatus(`undone · baseline · fp ${fp}`);
+        return true;
+      }
+
+      function redoDisneyExtremeBaseline() {
+        const popped = popDisneyExtremeBaselineHistory(extremeBaselineRedo);
+        extremeBaselineRedo = popped.history;
+        persistDisneyExtremeBaselineRedo();
+        if (!popped.snap) {
+          flashDisneyExtremeStatus('redo · no stack');
+          return false;
+        }
+        if (lastExtremeBaselineSnap) {
+          extremeBaselineHistory = pushDisneyExtremeBaselineHistory(
+            extremeBaselineHistory,
+            lastExtremeBaselineSnap,
+          );
+          persistDisneyExtremeBaselineHistory();
+        }
+        applyDisneyExtremeSnapshot(popped.snap);
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(popped.snap).snap;
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        const fp = disneyExtremeSnapshotFingerprintShort(popped.snap);
+        flashDisneyExtremeStatus(`redone · baseline · fp ${fp}`);
         return true;
       }
 
@@ -2384,6 +2435,11 @@
         if (resolved.action === 'undoBaseline') {
           ev.preventDefault();
           undoDisneyExtremeBaseline();
+          return;
+        }
+        if (resolved.action === 'redoBaseline') {
+          ev.preventDefault();
+          redoDisneyExtremeBaseline();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -5677,6 +5733,7 @@
               dirty: dirtyHud.dirty,
               fp: dirtyHud.fp,
               historyDepth: extremeBaselineHistory.length,
+              redoDepth: extremeBaselineRedo.length,
             }),
           );
           if (dirtyHud.dirty && !lastExtremeDirty) {

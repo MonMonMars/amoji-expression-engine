@@ -565,6 +565,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
+  { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1233,20 +1234,24 @@ export function popDisneyExtremeBaselineHistory(history) {
 
 /**
  * Tooltip / status summary for Extreme baseline dirty tracking.
- * Optional `historyDepth` appends · hist N when > 0.
- * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, historyDepth?: number }} [opts]
+ * Optional `historyDepth` / `redoDepth` append · hist N / · redo N when > 0.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, historyDepth?: number, redoDepth?: number }} [opts]
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineSummary(opts = {}) {
   const histN = Math.max(0, Math.floor(Number(opts.historyDepth) || 0));
+  const redoN = Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
   const histBit = histN > 0 ? ` · hist ${histN}` : '';
+  const redoBit = redoN > 0 ? ` · redo ${redoN}` : '';
+  const trail =
+    ' · D diff · ⇧D restore · K clear · U undo · ⇧U redo';
   if (!opts.hasBaseline) {
-    return `baseline · none${histBit} · D diff · ⇧D restore · K clear · U undo`;
+    return `baseline · none${histBit}${redoBit}${trail}`;
   }
   const state = opts.dirty ? 'dirty' : 'clean';
   const fp =
     typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
-  return `baseline · ${state}${fp}${histBit} · D diff · ⇧D restore · K clear · U undo`;
+  return `baseline · ${state}${fp}${histBit}${redoBit}${trail}`;
 }
 
 /**
@@ -1428,6 +1433,93 @@ export function clearDisneyExtremeBaselineHistoryStorage(opts = {}) {
   if (storage) {
     try {
       storage.removeItem(DISNEY_EXTREME_BASELINE_HISTORY_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  return { ok: true };
+}
+
+export const DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY =
+  'amoji.disneyExtreme.baselineRedo.v1';
+
+export const DISNEY_EXTREME_BASELINE_REDO_JSON_KIND =
+  'amoji.disneyExtreme.baselineRedo.v1';
+
+/**
+ * Persist Extreme baseline redo stack (sessionStorage by default).
+ * @param {object[]|null|undefined} redo
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, count: number }}
+ */
+export function saveDisneyExtremeBaselineRedo(redo, opts = {}) {
+  const list = Array.isArray(redo) ? redo : [];
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return { ok: true, count: list.length };
+  try {
+    if (!list.length) {
+      storage.removeItem(DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY);
+      return { ok: true, count: 0 };
+    }
+    const items = [];
+    for (const snap of list) {
+      const captured = captureDisneyExtremeBaseline(snap);
+      if (!captured) continue;
+      items.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+    }
+    storage.setItem(
+      DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY,
+      JSON.stringify({
+        kind: DISNEY_EXTREME_BASELINE_REDO_JSON_KIND,
+        items,
+      }),
+    );
+    return { ok: true, count: items.length };
+  } catch {
+    return { ok: false, count: list.length };
+  }
+}
+
+/**
+ * Load Extreme baseline redo from sessionStorage (or injected storage).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {object[]}
+ */
+export function loadDisneyExtremeBaselineRedo(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return [];
+  try {
+    const raw = storage.getItem(DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      parsed.kind !== DISNEY_EXTREME_BASELINE_REDO_JSON_KIND ||
+      !Array.isArray(parsed.items)
+    ) {
+      return [];
+    }
+    const out = [];
+    for (const item of parsed.items) {
+      const snap = parseDisneyExtremeSnapshot(item);
+      if (snap.ok) out.push(snap.snap);
+    }
+    return out.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Clear persisted Extreme baseline redo stack.
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean }}
+ */
+export function clearDisneyExtremeBaselineRedoStorage(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (storage) {
+    try {
+      storage.removeItem(DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY);
     } catch {
       /* ignore */
     }

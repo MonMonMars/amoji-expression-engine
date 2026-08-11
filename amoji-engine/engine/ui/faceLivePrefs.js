@@ -83,6 +83,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+D` → restore Extreme factors from last copy/paste baseline
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `u` / `U` → undo Extreme baseline to previous history entry
+ * - `Shift+U` → redo Extreme baseline from redo stack
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -330,6 +331,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copySummary' && ev.shiftKey) {
       return { ok: true, action: 'copySnapshotDiff' };
+    }
+    if (entry.id === 'undoBaseline' && ev.shiftKey) {
+      return { ok: true, action: 'redoBaseline' };
     }
     return { ok: true, action: entry.id };
   }
