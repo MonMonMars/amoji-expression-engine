@@ -376,7 +376,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 363 | Extreme dirty strip HUD | Done |
 | Phase 364 | Extreme Home dirty strip | Done |
 | Phase 365 | Extreme End copy dirty | Done |
-| Phase 366+ | Further production polish… | Specced |
+| Phase 366 | Extreme collapsible strips panel | Done |
+| Phase 367 | Extreme strips open persistence | Done |
+| Phase 368 | Extreme PageUp toggle strips | Done |
+| Phase 369 | Extreme PageDown strips summary | Done |
+| Phase 370+ | Further production polish… | Specced |
 
 ## Quick start
 

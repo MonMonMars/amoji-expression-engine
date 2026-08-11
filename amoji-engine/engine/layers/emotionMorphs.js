@@ -762,6 +762,19 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'dirtyStrip', help: 'dirty strip · live', kind: 'note' },
+  {
+    id: 'toggleBaselineStrips',
+    keys: ['PageUp'],
+    help: 'PageUp toggle strips',
+    kind: 'action',
+  },
+  {
+    id: 'showBaselineStripsSummary',
+    keys: ['PageDown'],
+    help: 'PageDown strips summary',
+    kind: 'action',
+  },
+  { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -1906,6 +1919,27 @@ export function formatDisneyExtremeBaselineDirtyStripLabel(opts = {}) {
   const drift =
     hud.changeCount > 0 ? `dirty×${hud.changeCount}` : 'dirty';
   return hud.fp ? `dirty · ${drift} · fp ${hud.fp}` : `dirty · ${drift}`;
+}
+
+/**
+ * Compact summary for the Extreme strips `<details>` disclosure.
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, changeCount?: number }} [dirtyOpts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineStripsSummaryLabel(
+  stacks = {},
+  dirtyOpts = {},
+) {
+  const capacity = formatDisneyExtremeBaselineStacksCapacityLabel(
+    stacks,
+  ).replace(/^stacks · /, '');
+  const dirty = formatDisneyExtremeBaselineDirtyStripLabel(dirtyOpts);
+  return `strips · ${capacity} · ${dirty}`;
 }
 
 /**
@@ -3457,6 +3491,46 @@ export function loadDisneyExtremeMoreIoOpen(opts = {}) {
   if (!storage) return false;
   try {
     return storage.getItem(DISNEY_EXTREME_MORE_IO_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export const DISNEY_EXTREME_STRIPS_STORAGE_KEY =
+  'amoji.disneyExtreme.stripsOpen.v1';
+
+/**
+ * Persist whether Extreme strips `<details>` is open.
+ * @param {boolean} open
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, open: boolean }}
+ */
+export function saveDisneyExtremeStripsOpen(open, opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  const next = !!open;
+  if (!storage) return { ok: true, open: next };
+  try {
+    if (!next) {
+      storage.removeItem(DISNEY_EXTREME_STRIPS_STORAGE_KEY);
+      return { ok: true, open: false };
+    }
+    storage.setItem(DISNEY_EXTREME_STRIPS_STORAGE_KEY, '1');
+    return { ok: true, open: true };
+  } catch {
+    return { ok: false, open: next };
+  }
+}
+
+/**
+ * Load Extreme strips open state (sessionStorage by default).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {boolean}
+ */
+export function loadDisneyExtremeStripsOpen(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return false;
+  try {
+    return storage.getItem(DISNEY_EXTREME_STRIPS_STORAGE_KEY) === '1';
   } catch {
     return false;
   }
