@@ -12,7 +12,7 @@ describe('Phase 193 Extreme Face Live Meta drop preview', () => {
     expect(src).toContain('formatDisneyExtremeSnapshotPreviewLabel');
     expect(src).toContain('!!opts.preview || !!ev.metaKey');
     expect(src).toContain(
-      'Drop snapshot / hist / redo / fav JSON · Meta preview · Shift merge · dbl-click paste',
+      'Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · dbl-click paste',
     );
   });
 });

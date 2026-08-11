@@ -23,7 +23,7 @@ describe('Phase 109 Disney Extreme hotkey X', () => {
         { key: 'x', target: { tagName: 'INPUT' } },
       ).reason,
     ).toBe('typing');
-    expect(resolveDisneyExtremeHotkey({ key: 'z' }).ok).toBe(false);
+    expect(resolveDisneyExtremeHotkey({ key: 'q' }).ok).toBe(false);
     expect(typeof engine.resolveDisneyExtremeHotkey).toBe('function');
   });
 

@@ -101,13 +101,15 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+G` → paste Extreme baseline favorites JSON from clipboard
  * - `Alt+G` → merge Extreme baseline favorites JSON into current favorites
  * - `t` / `T` → copy Extreme baseline favorites share link (`#dxf=`)
+ * - `z` / `Z` → copy Extreme baseline stacks JSON (hist + redo + fav)
+ * - `Shift+Z` → paste Extreme baseline stacks JSON from clipboard
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Shift+I` → merge Extreme baseline history JSON into current stack
  * - `1`–`8` → jump to Extreme baseline history entry by index
  * - `Shift+1`–`8` → jump to Extreme baseline redo entry by index
- * - `Escape` → clear sticky status flash (only when a hold is active)
+ * - `Escape` → clear sticky status flash (and chip compare memory when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
  * - `r` / `R` → reset × defaults
@@ -115,9 +117,9 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
- * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
+ * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
  */
 export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
@@ -312,7 +314,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   if (ev.metaKey || ev.ctrlKey) return { ok: false, reason: 'modifier' };
   const key = String(ev.key || '');
   if (key === 'Escape') {
-    if (opts.holdingStatus) return { ok: true, action: 'clearStatusHold' };
+    if (opts.holdingStatus || opts.holdingChipCompare) {
+      return { ok: true, action: 'clearStatusHold' };
+    }
     return { ok: false, reason: 'no_hold' };
   }
   const tag = String(opts.targetTag || ev.target?.tagName || '').toUpperCase();
@@ -394,6 +398,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copyBaselineFavoritesJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteBaselineFavoritesJson' };
+    }
+    if (entry.id === 'copyBaselineStacksJson' && ev.shiftKey) {
+      return { ok: true, action: 'pasteBaselineStacksJson' };
     }
     return { ok: true, action: entry.id };
   }

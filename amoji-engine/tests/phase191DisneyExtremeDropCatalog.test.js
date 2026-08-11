@@ -6,7 +6,7 @@ import {
 describe('Phase 191 Extreme drop JSON catalog note', () => {
   it('documents drop JSON · Meta preview in hotkey help', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain(
-      'drop JSON · hist/redo/fav/snap · Meta preview · Shift merge · dbl-click paste',
+      'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste',
     );
   });
 });

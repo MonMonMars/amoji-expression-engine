@@ -22,7 +22,7 @@ describe('Phase 255 Extreme favorites drop + preview wiring', () => {
     expect(src).toContain("resolved.action === 'mergeBaselineFavoritesJson'");
     expect(src).toContain('${verb} · fav');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain(
-      'drop JSON · hist/redo/fav/snap',
+      'drop JSON · hist/redo/fav/stacks/snap',
     );
   });
 });

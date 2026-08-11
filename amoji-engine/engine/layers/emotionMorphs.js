@@ -596,8 +596,11 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
+  { id: 'starBaselineChip', help: 'Shift+click chip star', kind: 'note' },
   { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
-  { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
+  { id: 'copyBaselineStacksJson', keys: ['z', 'Z'], help: 'Z copy stacks', kind: 'action' },
+  { id: 'pasteBaselineStacksJson', help: 'Shift+Z paste stacks', kind: 'note' },
+  { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1722,24 +1725,26 @@ export function popDisneyExtremeBaselineHistory(history) {
 
 /**
  * Tooltip / status summary for Extreme baseline dirty tracking.
- * Optional `historyDepth` / `redoDepth` append · hist N / · redo N when > 0.
- * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, historyDepth?: number, redoDepth?: number }} [opts]
+ * Optional `historyDepth` / `redoDepth` / `favoritesDepth` append · hist N / · redo N / · fav N when > 0.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, historyDepth?: number, redoDepth?: number, favoritesDepth?: number }} [opts]
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineSummary(opts = {}) {
   const histN = Math.max(0, Math.floor(Number(opts.historyDepth) || 0));
   const redoN = Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
+  const favN = Math.max(0, Math.floor(Number(opts.favoritesDepth) || 0));
   const histBit = histN > 0 ? ` · hist ${histN}` : '';
   const redoBit = redoN > 0 ? ` · redo ${redoN}` : '';
+  const favBit = favN > 0 ? ` · fav ${favN}` : '';
   const trail =
     ' · D diff · ⇧D restore · K clear · P pin · U undo · ⇧U redo';
   if (!opts.hasBaseline) {
-    return `baseline · none${histBit}${redoBit}${trail}`;
+    return `baseline · none${histBit}${redoBit}${favBit}${trail}`;
   }
   const state = opts.dirty ? 'dirty' : 'clean';
   const fp =
     typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
-  return `baseline · ${state}${fp}${histBit}${redoBit}${trail}`;
+  return `baseline · ${state}${fp}${histBit}${redoBit}${favBit}${trail}`;
 }
 
 /**
@@ -2545,4 +2550,105 @@ export function clearDisneyExtremeBaselineFavoritesStorage(opts = {}) {
     }
   }
   return { ok: true };
+}
+
+export const DISNEY_EXTREME_BASELINE_STACKS_JSON_KIND =
+  'amoji.disneyExtreme.baselineStacks.v1';
+
+/**
+ * Serialize Extreme hist + redo + favorites stacks to versioned JSON.
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} stacks
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function serializeDisneyExtremeBaselineStacks(stacks = {}, opts = {}) {
+  const history = Array.isArray(stacks?.history) ? stacks.history : [];
+  const redo = Array.isArray(stacks?.redo) ? stacks.redo : [];
+  const favorites = Array.isArray(stacks?.favorites) ? stacks.favorites : [];
+  const histItems = [];
+  for (const snap of history) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    histItems.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  const redoItems = [];
+  for (const snap of redo) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    redoItems.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  const favItems = [];
+  for (const snap of favorites) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    favItems.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  return JSON.stringify(
+    {
+      kind: DISNEY_EXTREME_BASELINE_STACKS_JSON_KIND,
+      history: histItems.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+      redo: redoItems.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+      favorites: favItems.slice(-DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT),
+    },
+    null,
+    opts.pretty ? 2 : 0,
+  );
+}
+
+/**
+ * Parse clipboard / export JSON into Extreme hist + redo + favorites stacks.
+ * @param {string|object|null|undefined} input
+ * @returns {{ ok: true, history: object[], redo: object[], favorites: object[] }|{ ok: false, error: string }}
+ */
+export function parseDisneyExtremeBaselineStacks(input) {
+  let obj = input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return { ok: false, error: 'empty' };
+    try {
+      obj = JSON.parse(trimmed);
+    } catch {
+      return { ok: false, error: 'invalid_json' };
+    }
+  }
+  if (!obj || typeof obj !== 'object') {
+    return { ok: false, error: 'invalid_payload' };
+  }
+  if (obj.kind !== DISNEY_EXTREME_BASELINE_STACKS_JSON_KIND) {
+    return { ok: false, error: 'kind' };
+  }
+  const parseList = (items, limit) => {
+    if (!Array.isArray(items)) return [];
+    const out = [];
+    for (const item of items) {
+      const snap = parseDisneyExtremeSnapshot(item);
+      if (snap.ok) out.push(snap.snap);
+    }
+    return out.slice(-limit);
+  };
+  return {
+    ok: true,
+    history: parseList(obj.history, DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+    redo: parseList(obj.redo, DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+    favorites: parseList(
+      obj.favorites,
+      DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT,
+    ),
+  };
+}
+
+/**
+ * Dry-run preview label for an Extreme stacks payload.
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} stacks
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineStacksPreviewLabel(stacks = {}) {
+  if (!stacks || typeof stacks !== 'object') {
+    return 'preview · stacks · invalid';
+  }
+  const histN = Array.isArray(stacks.history) ? stacks.history.length : 0;
+  const redoN = Array.isArray(stacks.redo) ? stacks.redo.length : 0;
+  const favN = Array.isArray(stacks.favorites) ? stacks.favorites.length : 0;
+  if (!histN && !redoN && !favN) return 'preview · stacks · empty';
+  return `preview · stacks · hist ${histN} · redo ${redoN} · fav ${favN}`;
 }
