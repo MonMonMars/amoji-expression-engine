@@ -15,7 +15,8 @@ const faceLivePath = fileURLToPath(
 describe('Phase 114 Extreme hotkey help + Copy summary', () => {
   it('shares one hotkey legend across help + HUD off status', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('[ ] shape');
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('- = body');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('B body');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('- = body×');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('C copy');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('R reset');
     expect(formatDisneyExtremeHotkeyHelp()).toBe(

@@ -58,6 +58,7 @@ export function disneyExtremeUiDefaults() {
 /**
  * Resolve Face Live Disney Extreme hotkey.
  * - `x` / `X` → toggle master
+ * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
  * - `[` / `]` → nudge shape × (when Extreme is on)
@@ -170,6 +171,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   if (key === 'x' || key === 'X') return { ok: true, action: 'toggle' };
+  if (key === 'b' || key === 'B') return { ok: true, action: 'toggleBodyApply' };
   if (key === 'c' || key === 'C') return { ok: true, action: 'copySummary' };
   if (key === 'r' || key === 'R') return { ok: true, action: 'resetDefaults' };
   if (key === '[' || key === '{') {

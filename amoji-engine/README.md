@@ -126,7 +126,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 113 | Disney Extreme body × nudge hotkeys -/= | Done |
 | Phase 114 | Extreme hotkey help helper + Copy summary | Done |
 | Phase 115 | Extreme C copy + R reset hotkeys | Done |
-| Phase 116+ | Further production polish… | Specced |
+| Phase 116 | Extreme B body-apply toggle hotkey | Done |
+| Phase 117+ | Further production polish… | Specced |
 
 ## Quick start
 

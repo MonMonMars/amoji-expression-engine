@@ -536,7 +536,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd></span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -554,7 +554,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtremeBody" type="checkbox" checked />
-            <span>Apply to body/head</span>
+            <span>Apply to body/head <kbd>B</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeBodyFactorVal">1.60</span></span>
@@ -1443,6 +1443,21 @@
           ev.preventDefault();
           disneyExtremeEl.checked = !disneyExtremeEl.checked;
           disneyExtremeEl.dispatchEvent(new Event('change'));
+          return;
+        }
+        if (resolved.action === 'toggleBodyApply') {
+          ev.preventDefault();
+          if (!disneyExtremeEl.checked) {
+            disneyExtremeEl.checked = true;
+            disneyExtremeEl.dispatchEvent(new Event('change'));
+            if (disneyExtremeBodyEl && !disneyExtremeBodyEl.checked) {
+              disneyExtremeBodyEl.checked = true;
+              disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+            }
+          } else if (disneyExtremeBodyEl) {
+            disneyExtremeBodyEl.checked = !disneyExtremeBodyEl.checked;
+            disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+          }
           return;
         }
         if (resolved.action === 'copySummary') {
