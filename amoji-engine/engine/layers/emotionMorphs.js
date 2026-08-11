@@ -247,9 +247,91 @@ export const DISNEY_EXTREME_DEFAULTS = {
   intensityCap: 2.0,
 };
 
+/** Shared Face Live Extreme hotkey catalog (help legend + key resolve). */
+export const DISNEY_EXTREME_HOTKEY_CATALOG = [
+  { id: 'toggle', keys: ['x', 'X'], help: 'X', kind: 'action' },
+  { id: 'toggleBodyApply', keys: ['b', 'B'], help: 'B body', kind: 'action' },
+  {
+    id: 'nudgeShape',
+    keys: { down: ['[', '{'], up: [']', '}'] },
+    help: '[ ] shape',
+    kind: 'nudge',
+    factor: 'shape',
+  },
+  {
+    id: 'nudgeBody',
+    keys: { down: ['-', '_'], up: ['=', '+'] },
+    help: '- = body×',
+    kind: 'nudge',
+    factor: 'body',
+  },
+  {
+    id: 'nudgeEye',
+    keys: { down: [',', '<'], up: ['.', '>'] },
+    help: ', . eye',
+    kind: 'nudge',
+    factor: 'eye',
+  },
+  {
+    id: 'nudgeMouth',
+    keys: { down: [';', ':'], up: ["'", '"'] },
+    help: "; ' mouth",
+    kind: 'nudge',
+    factor: 'mouth',
+  },
+  { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
+  { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
+  { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
+  { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
+  { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
+  { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
+  { id: 'altCoarser', help: 'Alt coarser', kind: 'note' },
+];
+
+/**
+ * Join catalog help bits into the shared Extreme hotkey legend.
+ * @param {typeof DISNEY_EXTREME_HOTKEY_CATALOG} [catalog]
+ * @returns {string}
+ */
+export function formatDisneyExtremeHotkeyCatalog(
+  catalog = DISNEY_EXTREME_HOTKEY_CATALOG,
+) {
+  return catalog.map((e) => e.help).join(' · ');
+}
+
 /** Shared Face Live Extreme hotkey legend (status / docs). */
-export const DISNEY_EXTREME_HOTKEY_HELP =
-  "X · B body · [ ] shape · - = body× · , . eye · ; ' mouth · C copy · R reset · H help · Esc clear · hold nudges · Shift coarse · Alt coarser";
+export const DISNEY_EXTREME_HOTKEY_HELP = formatDisneyExtremeHotkeyCatalog();
+
+/**
+ * Match a key against the Extreme hotkey catalog.
+ * @param {string} key
+ * @returns {{ entry: object, dir: number }|null}
+ */
+export function matchDisneyExtremeHotkey(key) {
+  const k = String(key || '');
+  for (const entry of DISNEY_EXTREME_HOTKEY_CATALOG) {
+    if (entry.kind === 'note') continue;
+    if (entry.kind === 'nudge') {
+      if (entry.keys.down.includes(k)) return { entry, dir: -1 };
+      if (entry.keys.up.includes(k)) return { entry, dir: 1 };
+      continue;
+    }
+    if (Array.isArray(entry.keys) && entry.keys.includes(k)) {
+      return { entry, dir: 0 };
+    }
+  }
+  return null;
+}
+
+/**
+ * True when `key` is an Extreme factor nudge key (Alt coarser allowed).
+ * @param {string} key
+ * @returns {boolean}
+ */
+export function isDisneyExtremeNudgeHotkeyKey(key) {
+  const m = matchDisneyExtremeHotkey(key);
+  return !!(m && m.entry.kind === 'nudge');
+}
 
 /**
  * Status prefix + hotkey legend for Extreme off/on idle copy.

@@ -2,6 +2,10 @@
  * Face Live UI prefs — session persistence via localStorage (browser) or memory (Node).
  */
 import { applyComplianceGate } from '../compliance/complianceGate.js';
+import {
+  matchDisneyExtremeHotkey,
+  isDisneyExtremeNudgeHotkeyKey,
+} from '../layers/emotionMorphs.js';
 
 export const FACE_LIVE_PREFS_KEY = 'amoji.faceLive.prefs.v1';
 export const FACE_LIVE_PREFS_VERSION = 1;
@@ -263,92 +267,29 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys.
-  if (ev.altKey) {
-    const nudgeKeys = new Set([
-      '[',
-      '{',
-      ']',
-      '}',
-      '-',
-      '_',
-      '=',
-      '+',
-      ',',
-      '<',
-      '.',
-      '>',
-      ';',
-      ':',
-      "'",
-      '"',
-    ]);
-    if (!nudgeKeys.has(key)) return { ok: false, reason: 'modifier' };
+  if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
+    return { ok: false, reason: 'modifier' };
   }
-  if (key === 'x' || key === 'X') return { ok: true, action: 'toggle' };
-  if (key === 'b' || key === 'B') return { ok: true, action: 'toggleBodyApply' };
-  if (key === 'h' || key === 'H' || key === '?') {
-    return { ok: true, action: 'showHelp' };
+  const matched = matchDisneyExtremeHotkey(key);
+  if (!matched) return { ok: false, reason: 'key' };
+  const { entry, dir } = matched;
+  if (entry.kind === 'escape') {
+    return { ok: false, reason: 'no_hold' };
   }
-  if (key === 'c' || key === 'C') return { ok: true, action: 'copySummary' };
-  if (key === 'r' || key === 'R') return { ok: true, action: 'resetDefaults' };
-  const step = disneyExtremeNudgeStep({
-    shiftKey: !!ev.shiftKey,
-    altKey: !!ev.altKey,
-  });
-  if (key === '[' || key === '{') {
+  if (entry.kind === 'action') {
+    return { ok: true, action: entry.id };
+  }
+  if (entry.kind === 'nudge') {
+    const step = disneyExtremeNudgeStep({
+      shiftKey: !!ev.shiftKey,
+      altKey: !!ev.altKey,
+    });
+    const factor = String(entry.factor || 'shape');
+    const cap = factor.charAt(0).toUpperCase() + factor.slice(1);
     return {
       ok: true,
-      action: 'nudgeShapeDown',
-      delta: -step,
-    };
-  }
-  if (key === ']' || key === '}') {
-    return {
-      ok: true,
-      action: 'nudgeShapeUp',
-      delta: step,
-    };
-  }
-  if (key === '-' || key === '_') {
-    return {
-      ok: true,
-      action: 'nudgeBodyDown',
-      delta: -step,
-    };
-  }
-  if (key === '=' || key === '+') {
-    return {
-      ok: true,
-      action: 'nudgeBodyUp',
-      delta: step,
-    };
-  }
-  if (key === ',' || key === '<') {
-    return {
-      ok: true,
-      action: 'nudgeEyeDown',
-      delta: -step,
-    };
-  }
-  if (key === '.' || key === '>') {
-    return {
-      ok: true,
-      action: 'nudgeEyeUp',
-      delta: step,
-    };
-  }
-  if (key === ';' || key === ':') {
-    return {
-      ok: true,
-      action: 'nudgeMouthDown',
-      delta: -step,
-    };
-  }
-  if (key === "'" || key === '"') {
-    return {
-      ok: true,
-      action: 'nudgeMouthUp',
-      delta: step,
+      action: `nudge${cap}${dir < 0 ? 'Down' : 'Up'}`,
+      delta: dir < 0 ? -step : step,
     };
   }
   return { ok: false, reason: 'key' };
