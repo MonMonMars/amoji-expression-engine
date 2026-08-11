@@ -5,6 +5,7 @@
  * Usage:
  *   node tools/capture-bake/cli.mjs --emotion happy --in take.ndjson --out baked/
  *   node tools/capture-bake/cli.mjs --demo
+ *   node tools/capture-bake/cli.mjs --demo --apply-temporal
  *
  * Input: Live Link NDJSON / JSON array / { frames: [...] } from video tracking.
  * Output: recipe fragment + temporal envelope JSON (hand-tune before merge).
@@ -16,8 +17,11 @@ import {
   bakeCaptureTake,
   mergeRecipeFragment,
 } from '../../engine/capture/captureBake.js';
+import { mergeTemporalEnvelopes } from '../../engine/capture/temporalMerge.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '../..');
+const DEFAULT_TIMING = join(ROOT, 'data/temporal/emotion-timing.json');
 
 function usage() {
   console.log(`Amoji capture-bake — video ARKit curves → intensity + timing recipes
@@ -29,6 +33,9 @@ Options:
   --fps <n>        Fallback FPS (default 60)
   --overwrite      Allow replacing existing emotion in --merge-into
   --merge-into <path>  Optional intensity-sculpt-recipes.json to merge fragment
+  --apply-temporal     Merge envelope into emotion-timing (writes preview + optional write)
+  --timing-into <path> emotion-timing.json target (default data/temporal/…)
+  --write-timing       Actually overwrite timing file (default: preview only)
   --demo           Bake built-in synthetic happy take
   --help
 `);
@@ -42,6 +49,8 @@ function parseArgs(argv) {
     if (a === '--help' || a === '-h') out.help = true;
     else if (a === '--demo') out.demo = true;
     else if (a === '--overwrite') out.overwrite = true;
+    else if (a === '--apply-temporal') out['apply-temporal'] = true;
+    else if (a === '--write-timing') out['write-timing'] = true;
     else if (a.startsWith('--')) {
       const key = a.slice(2);
       out[key] = argv[++i];
@@ -114,7 +123,11 @@ async function main() {
   console.log(
     `  onset=${bake.envelope.onsetSec}s apex=${bake.envelope.apexSec}s offset=${bake.envelope.offsetSec}s`,
   );
-  console.log(`  stepOut≈${bake.envelope.suggestedStepOutSec}s blinks=${bake.envelope.blinks.length}`);
+  console.log(
+    `  stepOut≈${bake.envelope.suggestedStepOutSec}s attack≈${(
+      bake.envelope.apexSec - bake.envelope.onsetSec
+    ).toFixed(3)}s blinks=${bake.envelope.blinks.length}`,
+  );
   console.log(`  → ${recipePath}`);
   console.log(`  → ${temporalPath}`);
   console.log(`  → ${fullPath}`);
@@ -128,6 +141,32 @@ async function main() {
     const mergedPath = join(outDir, `${stamp}.merged-recipes.json`);
     await writeFile(mergedPath, JSON.stringify(merged, null, 2));
     console.log(`  → ${mergedPath} (review before replacing ${target})`);
+  }
+
+  if (args['apply-temporal']) {
+    const timingPath = resolve(String(args['timing-into'] || DEFAULT_TIMING));
+    const existing = JSON.parse(await readFile(timingPath, 'utf8'));
+    const merged = mergeTemporalEnvelopes(existing, bake, { overwrite: true });
+    // strip compliance meta wrapper fields for clean data file
+    const clean = {
+      version: merged.version,
+      note: existing.note,
+      defaults: merged.defaults || existing.defaults,
+      emotions: merged.emotions,
+    };
+    const previewPath = join(outDir, `${stamp}.merged-timing.json`);
+    await writeFile(previewPath, JSON.stringify(clean, null, 2));
+    console.log(`  → ${previewPath}`);
+    const row = clean.emotions[emotion];
+    console.log(
+      `  timing ${emotion}: stepOut=${row.stepOutSec}s attack=${row.attackSec}s release=${row.releaseSec}s source=${row.source}`,
+    );
+    if (args['write-timing']) {
+      await writeFile(timingPath, `${JSON.stringify(clean, null, 2)}\n`);
+      console.log(`  wrote ${timingPath}`);
+    } else {
+      console.log(`  (preview only — pass --write-timing to overwrite ${timingPath})`);
+    }
   }
 }
 

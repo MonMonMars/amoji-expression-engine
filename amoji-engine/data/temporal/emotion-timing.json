@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "note": "Per-emotion temporal timing for Step-Out, attack (onset→apex), blink, and leak bias. Seeded from hand defaults; update via capture-bake --apply-temporal.",
+  "defaults": {
+    "stepOutSec": 0.5,
+    "attackSec": 0.35,
+    "releaseSec": 0.45,
+    "blinkRate": 0.28,
+    "blinkDurationSec": 0.16,
+    "leakBias": 0.35
+  },
+  "emotions": {
+    "neutral": {
+      "stepOutSec": 0.35,
+      "attackSec": 0.2,
+      "releaseSec": 0.3,
+      "blinkRate": 0.28,
+      "blinkDurationSec": 0.16,
+      "leakBias": 0.2,
+      "source": "hand"
+    },
+    "happy": {
+      "stepOutSec": 0.55,
+      "attackSec": 0.62,
+      "releaseSec": 0.5,
+      "blinkRate": 0.32,
+      "blinkDurationSec": 0.16,
+      "leakBias": 0.12,
+      "source": "hand"
+    },
+    "smile_open": {
+      "stepOutSec": 0.6,
+      "attackSec": 0.55,
+      "releaseSec": 0.55,
+      "blinkRate": 0.34,
+      "blinkDurationSec": 0.15,
+      "leakBias": 0.1,
+      "source": "hand"
+    },
+    "sad": {
+      "stepOutSec": 0.85,
+      "attackSec": 0.75,
+      "releaseSec": 0.7,
+      "blinkRate": 0.22,
+      "blinkDurationSec": 0.18,
+      "leakBias": 0.55,
+      "source": "hand"
+    },
+    "angry": {
+      "stepOutSec": 0.7,
+      "attackSec": 0.4,
+      "releaseSec": 0.55,
+      "blinkRate": 0.35,
+      "blinkDurationSec": 0.14,
+      "leakBias": 0.45,
+      "source": "hand"
+    },
+    "surprised": {
+      "stepOutSec": 0.45,
+      "attackSec": 0.18,
+      "releaseSec": 0.4,
+      "blinkRate": 0.05,
+      "blinkDurationSec": 0.12,
+      "leakBias": 0.35,
+      "source": "hand"
+    },
+    "fear": {
+      "stepOutSec": 0.75,
+      "attackSec": 0.3,
+      "releaseSec": 0.65,
+      "blinkRate": 0.08,
+      "blinkDurationSec": 0.12,
+      "leakBias": 0.85,
+      "source": "hand"
+    },
+    "disgust": {
+      "stepOutSec": 0.65,
+      "attackSec": 0.35,
+      "releaseSec": 0.5,
+      "blinkRate": 0.3,
+      "blinkDurationSec": 0.15,
+      "leakBias": 0.4,
+      "source": "hand"
+    },
+    "thinking": {
+      "stepOutSec": 0.5,
+      "attackSec": 0.45,
+      "releaseSec": 0.4,
+      "blinkRate": 0.16,
+      "blinkDurationSec": 0.17,
+      "leakBias": 0.3,
+      "source": "hand"
+    },
+    "embarrassed": {
+      "stepOutSec": 0.7,
+      "attackSec": 0.5,
+      "releaseSec": 0.55,
+      "blinkRate": 0.26,
+      "blinkDurationSec": 0.16,
+      "leakBias": 0.7,
+      "source": "hand"
+    },
+    "caring": {
+      "stepOutSec": 0.6,
+      "attackSec": 0.5,
+      "releaseSec": 0.5,
+      "blinkRate": 0.28,
+      "blinkDurationSec": 0.16,
+      "leakBias": 0.25,
+      "source": "hand"
+    }
+  }
+}

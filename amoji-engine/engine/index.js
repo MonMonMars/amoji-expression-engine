@@ -237,12 +237,18 @@ export {
 export {
   TemporalLayer,
   stepOutCurve,
+  attackCurve,
   blinkEnvelope,
   blinkIntervalSec,
   planMicroLeak,
   evaluateMicroLeak,
   BLINK_RATE,
   STEP_OUT_DURATION,
+  ATTACK_DURATION,
+  LEAK_BIAS,
+  EMOTION_TIMING,
+  TIMING_DEFAULTS,
+  getEmotionTiming,
 } from './layers/temporalLayer.js';
 export {
   TEX_LODS,
@@ -308,3 +314,7 @@ export {
   MediaPipeCaptureSession,
   arkitHudLines,
 } from './capture/mediapipeArkit.js';
+export {
+  envelopeToTimingRow,
+  mergeTemporalEnvelopes,
+} from './capture/temporalMerge.js';

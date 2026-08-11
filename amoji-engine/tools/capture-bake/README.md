@@ -56,5 +56,15 @@ npm run capture-bake -- --demo --merge-into ./data/emotions/intensity-sculpt-rec
 2. Dump frames as NDJSON (`blendShapes` + `t` or `frame`/`fps`).
 3. `bakeCaptureTake` → review peak morphs vs Sakura `Expression_*`.
 4. Hand-tune taste (asymmetry, eyes-before-mouth).
-5. Merge into `intensity-sculpt-recipes.json`; optionally fold `suggestedStepOutSec` into `STEP_OUT_DURATION`.
+5. Merge into `intensity-sculpt-recipes.json`; fold timing with `--apply-temporal` (optionally `--write-timing`).
 6. Never stream the face video into the production engine.
+
+### Apply timing from a bake
+
+```bash
+npm run capture-bake -- --demo --apply-temporal
+# review tools/capture-bake/out/happy.merged-timing.json
+npm run capture-bake -- --demo --apply-temporal --write-timing
+```
+
+This updates `data/temporal/emotion-timing.json` — Step-Out, attack (onset→apex), release, blink duration/rate. `TemporalLayer` reads that file at runtime.

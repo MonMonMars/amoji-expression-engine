@@ -84,5 +84,6 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
+- Emotion timing: `data/temporal/emotion-timing.json` — Step-Out / attack / blink (updated via `capture-bake --apply-temporal`)
 - Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
 - Studio method reference: `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`
