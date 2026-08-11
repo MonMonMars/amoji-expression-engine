@@ -188,6 +188,9 @@ Amoji engine (ND “systemic emotion”)
 65. ~~**Health poll jitter** (`applyHealthPollJitter` · ±15% schedule)~~ ✓
 66. ~~**Prefs deep-link landing toast** (`describePrefsDeepLink` · Face Live toast)~~ ✓
 67. ~~**Emblem hold/release** (`compoundEmblemLifecycle` · hold then clear emblem)~~ ✓
+68. ~~**Gateway SLA chip history** (`createGatewayHealthHistory` · uptime/p50)~~ ✓
+69. ~~**Prefs link expiry / revoke** (`evaluatePrefsLinkExpiry` · Clear deep-link)~~ ✓
+70. ~~**Cancel compound lifecycle on emotion** (`cancelCompoundEmblemLifecycle`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -219,4 +222,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (gateway SLA chip history, prefs link revoke/expiry hint, compound lifecycle cancel on emotion pick).
+Next code increment: further polish (SLA sparkline HUD, prefs share audit log, compound cancel on emblem manual pick).

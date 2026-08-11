@@ -8,6 +8,7 @@ import {
   encodePrefsHash,
   normalizeFaceLivePrefs,
 } from './faceLivePrefs.js';
+import { stampPrefsForShare, evaluatePrefsLinkExpiry } from './prefsLinkExpiry.js';
 
 export const PREFS_SHARE_DEFAULT_PATH = '/prototypes/face-live';
 
@@ -18,24 +19,34 @@ export const PREFS_SHARE_DEFAULT_PATH = '/prototypes/face-live';
  *   baseUrl?: string,
  *   origin?: string,
  *   path?: string,
+ *   now?: number,
+ *   ttlMs?: number,
+ *   stamp?: boolean,
  * }} [opts]
  */
 export function buildPrefsShortLink(prefs, opts = {}) {
-  const normalized = normalizeFaceLivePrefs(prefs);
-  const hash = encodePrefsHash(normalized);
+  const stamped =
+    opts.stamp === false
+      ? normalizeFaceLivePrefs(prefs)
+      : stampPrefsForShare(prefs, { now: opts.now, ttlMs: opts.ttlMs });
+  const hash = encodePrefsHash(stamped);
   const path = opts.path || PREFS_SHARE_DEFAULT_PATH;
   const origin =
     opts.origin ||
     (typeof location !== 'undefined' ? location.origin : '') ||
     '';
   const shortUrl = origin ? `${origin}${path}#${hash}` : `${path}#${hash}`;
-  const full = buildPrefsShareUrl(normalized, {
+  const full = buildPrefsShareUrl(stamped, {
     baseUrl:
       opts.baseUrl ||
       (origin ? `${origin}${path}` : path) ||
       undefined,
   });
-  const compact = compactPrefsForHash(normalized);
+  const compact = compactPrefsForHash(stamped);
+  const expiry = evaluatePrefsLinkExpiry(stamped, {
+    now: opts.now,
+    ttlMs: opts.ttlMs,
+  });
   return applyComplianceGate(
     {
       kind: 'face_live_prefs_short_link',
@@ -43,8 +54,11 @@ export function buildPrefsShortLink(prefs, opts = {}) {
       shortUrl,
       hash,
       path,
+      prefs: stamped,
       compactKeyCount: Object.keys(compact).length,
       copyText: shortUrl,
+      expiryHint: expiry.hint,
+      expired: expiry.expired,
     },
     {},
   );
@@ -167,6 +181,9 @@ export function buildPrefsShareBundle(prefs, opts = {}) {
       qrImageUrl: qrImage.url,
       qrFingerprintSvg: fingerprint.svg,
       compactKeyCount: short.compactKeyCount,
+      prefs: short.prefs,
+      expiryHint: short.expiryHint,
+      expired: short.expired,
     },
     {},
   );

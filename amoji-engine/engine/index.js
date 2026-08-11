@@ -466,6 +466,13 @@ export {
   stopGatewayHealthPoll,
 } from './tts/ttsHealth.js';
 export {
+  GATEWAY_HEALTH_HISTORY_MAX,
+  normalizeHealthSample,
+  summarizeHealthHistory,
+  formatHealthSlaChip,
+  createGatewayHealthHistory,
+} from './tts/ttsHealthHistory.js';
+export {
   AFFECT_ALIASES,
   resolveAffectKey,
   affectStagingBand,
@@ -486,6 +493,12 @@ export {
   describePrefsDeepLink,
 } from './ui/prefsLandingToast.js';
 export {
+  PREFS_LINK_TTL_MS,
+  stampPrefsForShare,
+  evaluatePrefsLinkExpiry,
+  describePrefsLinkRevoke,
+} from './ui/prefsLinkExpiry.js';
+export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,
   COMPOUND_EMBLEM_RELEASE_SEC,
@@ -494,4 +507,5 @@ export {
   lerpGesture,
   crossfadeCompoundToEmblem,
   compoundEmblemLifecycle,
+  cancelCompoundEmblemLifecycle,
 } from './export/compoundEmblemCrossfade.js';

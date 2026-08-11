@@ -261,3 +261,26 @@ export function compoundEmblemLifecycle(
     {},
   );
 }
+
+/**
+ * Cancel an in-flight compound→emblem lifecycle (e.g. emotion pick).
+ * @param {{ compoundId?: string, emblemId?: string|null }|null|undefined} state
+ * @param {{ reason?: string }} [opts]
+ */
+export function cancelCompoundEmblemLifecycle(state, opts = {}) {
+  const active = !!(state && state.compoundId);
+  return applyComplianceGate(
+    {
+      kind: 'compound_emblem_lifecycle_cancel',
+      ok: true,
+      cancelled: active,
+      reason: opts.reason || (active ? 'user_cancel' : 'idle'),
+      compoundId: state?.compoundId || null,
+      emblemId: state?.emblemId || null,
+      clearEmblem: active,
+      clearCompound: active,
+      scientific: false,
+    },
+    {},
+  );
+}

@@ -3,6 +3,7 @@
  */
 import { applyComplianceGate } from '../compliance/complianceGate.js';
 import { normalizeFaceLivePrefs } from './faceLivePrefs.js';
+import { evaluatePrefsLinkExpiry } from './prefsLinkExpiry.js';
 
 export const PREFS_LANDING_DISMISS_MS = 4200;
 
@@ -25,7 +26,7 @@ export function formatPrefsLandingSummary(prefs) {
 /**
  * Build a landing toast payload from hash-load result.
  * @param {{ ok?: boolean, prefs?: object, error?: string }} hashResult
- * @param {{ dismissMs?: number }} [opts]
+ * @param {{ dismissMs?: number, now?: number, ttlMs?: number }} [opts]
  */
 export function describePrefsDeepLink(hashResult, opts = {}) {
   const dismissMs = opts.dismissMs ?? PREFS_LANDING_DISMISS_MS;
@@ -42,16 +43,24 @@ export function describePrefsDeepLink(hashResult, opts = {}) {
   }
   const prefs = normalizeFaceLivePrefs(hashResult.prefs);
   const summary = formatPrefsLandingSummary(prefs);
+  const expiry = evaluatePrefsLinkExpiry(prefs, {
+    now: opts.now,
+    ttlMs: opts.ttlMs,
+  });
+  const detail = expiry.hint ? `${summary} · ${expiry.hint}` : summary;
   return applyComplianceGate(
     {
       kind: 'prefs_landing_toast',
       show: true,
-      tone: 'ok',
-      title: 'Prefs from link',
-      detail: summary,
-      message: `prefs · from link · ${summary}`,
+      tone: expiry.expired ? 'warn' : 'ok',
+      title: expiry.expired ? 'Prefs from link (expired)' : 'Prefs from link',
+      detail,
+      message: `prefs · from link · ${detail}`,
       prefs,
       dismissMs,
+      expired: !!expiry.expired,
+      expiryHint: expiry.hint,
+      revokeHint: expiry.revokeHint,
     },
     {},
   );

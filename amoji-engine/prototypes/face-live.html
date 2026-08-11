@@ -589,6 +589,7 @@
           <button type="button" id="btnPrefsImport">Import prefs</button>
           <button type="button" id="btnPrefsShare">Copy share link</button>
           <button type="button" id="btnPrefsQr">Show QR</button>
+          <button type="button" id="btnPrefsRevoke">Clear deep-link</button>
         </div>
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
@@ -664,7 +665,7 @@
       import {
         stageAffect,
       } from '/engine/export/affectStaging.js';
-      import { compoundEmblemLifecycle } from '/engine/export/compoundEmblemCrossfade.js';
+      import { compoundEmblemLifecycle, cancelCompoundEmblemLifecycle } from '/engine/export/compoundEmblemCrossfade.js';
       import {
         loadFaceLivePrefs,
         saveFaceLivePrefs,
@@ -674,11 +675,13 @@
       } from '/engine/ui/faceLivePrefs.js';
       import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
       import { describePrefsDeepLink } from '/engine/ui/prefsLandingToast.js';
+      import { describePrefsLinkRevoke } from '/engine/ui/prefsLinkExpiry.js';
       import {
         probeTtsGateway,
         startGatewayHealthPoll,
         stopGatewayHealthPoll,
       } from '/engine/tts/ttsHealth.js';
+      import { createGatewayHealthHistory } from '/engine/tts/ttsHealthHistory.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -845,6 +848,24 @@
       let compoundId = '';
       let compoundCrossfade = null;
       let compoundCrossfadeT0 = 0;
+      const gatewayHealthHistory = createGatewayHealthHistory();
+      function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
+        if (!compoundCrossfade) return null;
+        const cancelled = cancelCompoundEmblemLifecycle(compoundCrossfade, {
+          reason,
+        });
+        if (cancelled.clearEmblem) {
+          gestures.setEmblem(null);
+          if (emblemSel) emblemSel.value = '';
+        }
+        if (cancelled.clearCompound) {
+          compoundId = '';
+          if (compoundSel) compoundSel.value = '';
+        }
+        compoundCrossfade = null;
+        fingerStatus.textContent = `fingers · lifecycle cancelled`;
+        return cancelled;
+      }
       let walkPhase = 0;
       let surfaceLevel = Number(savedPrefs.surfaceLevel) || 6;
       let applySurfaceHints = true;
@@ -1373,6 +1394,7 @@
         b.dataset.emo = e;
         if (e === emotion) b.classList.add('active');
         b.addEventListener('click', () => {
+          cancelActiveCompoundLifecycle('emotion_pick');
           emotion = e;
           const cont = discCtl.ingestLine({
             emotion,
@@ -1855,12 +1877,21 @@
         const ttsHealthChip = document.getElementById('ttsHealthChip');
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
+            gatewayHealthHistory.clear();
             ttsHealthChip.className = 'status';
             ttsHealthChip.textContent = 'gateway · idle';
             return;
           }
-          ttsHealthChip.className = `status ${health.tone || ''}`;
-          ttsHealthChip.textContent = `gateway · ${health.message}`;
+          const sla = gatewayHealthHistory.push(health);
+          const chip = gatewayHealthHistory.formatChip(health);
+          ttsHealthChip.className = `status ${chip.tone || health.tone || sla.tone || ''}`;
+          ttsHealthChip.textContent = chip.text;
+          ttsHealthChip.title =
+            typeof sla.uptimePct === 'number'
+              ? `SLA · ${sla.sampleCount} probes · ${sla.uptimePct}% up · p50 ${
+                  sla.latencyP50Ms != null ? Math.round(sla.latencyP50Ms) : '—'
+                }ms`
+              : health.message || '';
         }
         async function refreshGatewayHealth() {
           const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
@@ -1934,7 +1965,9 @@
               ta.remove();
             }
             prefsStatus.className = 'status ok';
-            prefsStatus.textContent = 'prefs · short link copied';
+            prefsStatus.textContent = bundle.expiryHint
+              ? `prefs · short link copied · ${bundle.expiryHint}`
+              : 'prefs · short link copied';
             if (bundle.hash) {
               try {
                 history.replaceState(null, '', `#${bundle.hash}`);
@@ -1984,12 +2017,17 @@
           prefsStatus.className = 'status ok';
           const landing = describePrefsDeepLink(hashPrefs);
           prefsStatus.textContent = landing.message || 'prefs · loaded from URL hash';
+          if (landing.expired) prefsStatus.className = 'status warn';
           const toast = document.getElementById('prefsLandingToast');
           const titleEl = document.getElementById('prefsToastTitle');
           const detailEl = document.getElementById('prefsToastDetail');
           if (landing.show && toast) {
             if (titleEl) titleEl.textContent = landing.title || 'Prefs from link';
-            if (detailEl) detailEl.textContent = landing.detail || '';
+            if (detailEl) {
+              detailEl.textContent = landing.revokeHint
+                ? `${landing.detail}\n${landing.revokeHint}`
+                : landing.detail || '';
+            }
             toast.classList.add('show');
             const hide = () => toast.classList.remove('show');
             document.getElementById('btnPrefsToastDismiss')?.addEventListener(
@@ -2000,6 +2038,19 @@
             setTimeout(hide, landing.dismissMs || 4200);
           }
         }
+        document.getElementById('btnPrefsRevoke')?.addEventListener('click', () => {
+          const revoke = describePrefsLinkRevoke();
+          if (revoke.canRevoke) {
+            try {
+              history.replaceState(null, '', revoke.nextUrl || location.pathname);
+            } catch {
+              location.hash = '';
+            }
+          }
+          prefsStatus.className = revoke.canRevoke ? 'status ok' : 'status';
+          prefsStatus.textContent = revoke.message;
+          document.getElementById('prefsLandingToast')?.classList.remove('show');
+        });
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
           if (!file) return;
