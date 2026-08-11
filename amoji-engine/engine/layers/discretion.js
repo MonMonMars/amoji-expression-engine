@@ -285,6 +285,22 @@ export function continuityResidualPulseCombinedHud(pulse) {
 }
 
 /**
+ * Resolve combined pulse HUD label bits for continuity status lines.
+ * @param {Parameters<typeof continuityResidualPulseCombinedHud>[0]} pulse
+ */
+export function resolveContinuityResidualPulseBits(pulse) {
+  const combined = continuityResidualPulseCombinedHud(pulse);
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_pulse_bits',
+      ok: combined.ok,
+      label: combined.ok ? combined.label : null,
+    },
+    {},
+  );
+}
+
+/**
  * Exponential decay of continuity residual intensity (half-life based).
  * @param {{ residual?: { emotion?: string, intensity?: number } | null, blend?: number } | null} continuity
  * @param {number} dt seconds since last tick

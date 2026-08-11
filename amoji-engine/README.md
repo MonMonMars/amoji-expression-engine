@@ -87,7 +87,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 74 | endpoint drag cancel hardening (dragover preventDefault) | Done |
 | Phase 75 | Dry-run skip breakdown name-clash test coverage | Done |
 | Phase 76 | Combined pulse HUD engine helper · skip breakdown helper · TTS drag-start cancel | Done |
-| Phase 77+ | Further production polish… | Specced |
+| Phase 77 | Pulse bits engine helper · toast hash dry-run skip test · TTS drag-end cancel | Done |
+| Phase 78+ | Further production polish… | Specced |
 
 ## Quick start
 

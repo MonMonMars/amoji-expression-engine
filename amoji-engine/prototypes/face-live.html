@@ -898,6 +898,7 @@
         continuityResidualPulseDurationHud,
         continuityResidualPulsePeakHud,
         continuityResidualPulseCombinedHud,
+        resolveContinuityResidualPulseBits,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
@@ -1452,6 +1453,7 @@
           reason !== 'tts_endpoint_context_menu_pick' &&
           reason !== 'tts_endpoint_drag_pick' &&
           reason !== 'tts_endpoint_drag_start_pick' &&
+          reason !== 'tts_endpoint_drag_end_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2215,10 +2217,6 @@
           { once: true },
         );
       }
-      function resolveContinuityResidualPulseBits(pulse) {
-        const combined = continuityResidualPulseCombinedHud(pulse);
-        return combined.ok ? combined.label : null;
-      }
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('deliver_pick');
         discContinuityResidualCompoundHandled = false;
@@ -2233,8 +2231,8 @@
           const pulse = continuityResidualDeliverPulseClass(cont);
           if (pulse.pulseClass) pulseDiscResidualBar(pulse);
           const pulseBits = resolveContinuityResidualPulseBits(pulse);
-          discContStatus.textContent = pulseBits
-            ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseBits}`
+          discContStatus.textContent = pulseBits.ok && pulseBits.label
+            ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseBits.label}`
             : `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`;
         } else {
           discContStatus.textContent = `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2978,6 +2976,10 @@
           cancelActiveCompoundLifecycle('tts_endpoint_drag_pick');
           persistPrefs();
           syncGatewayHealthPoll();
+        });
+        ttsEndpointEl?.addEventListener('dragend', () => {
+          ttsEndpointDragActive = false;
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_end_pick');
         });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
@@ -4201,8 +4203,8 @@
         if (discState.continuity?.residual) {
           const pulse = continuityResidualDeliverPulseClass(discState.continuity);
           const pulseBits = resolveContinuityResidualPulseBits(pulse);
-          discContStatus.textContent = pulseBits
-            ? `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount} · ${pulseBits}`
+          discContStatus.textContent = pulseBits.ok && pulseBits.label
+            ? `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount} · ${pulseBits.label}`
             : `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount}`;
         } else if (discState.previous) {
           discContStatus.textContent = `prev ${discState.previous.emotion} @ ${discState.previous.intensity.toFixed(2)} · leak ${discState.leakCount}`;

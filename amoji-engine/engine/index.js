@@ -211,6 +211,7 @@ export {
   continuityResidualPulseDurationHud,
   continuityResidualPulsePeakHud,
   continuityResidualPulseCombinedHud,
+  resolveContinuityResidualPulseBits,
   CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC,
   CONTINUITY_RESIDUAL_PULSE_PEAK_CAP,
   decayContinuityResidual,
