@@ -134,6 +134,27 @@ export function formatDisneyExtremeBodyMixLabel(opts = {}) {
 }
 
 /**
+ * Clipboard bundle: body mix label + SVG (multiline).
+ * @param {{
+ *   enabled?: boolean,
+ *   bodyOn?: boolean,
+ *   markerT?: number,
+ *   width?: number,
+ *   height?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBodyMixBundle(opts = {}) {
+  const label = formatDisneyExtremeBodyMixLabel(opts);
+  const spark = buildDisneyExtremeBodyMixSparkSvg({
+    markerT: opts.bodyOn ? opts.markerT : undefined,
+    width: opts.width ?? 280,
+    height: opts.height ?? 56,
+  });
+  return `${label}\n${spark.svg}`;
+}
+
+/**
  * Inline SVG sparkline for Extreme body-mix (linear to cap, then flat).
  * @param {{
  *   width?: number,

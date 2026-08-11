@@ -135,6 +135,26 @@ export function formatDisneyExtremeEaseCurveLabel(opts = {}) {
 }
 
 /**
+ * Clipboard bundle: ease label + SVG (multiline).
+ * @param {{
+ *   enabled?: boolean,
+ *   markerT?: number,
+ *   width?: number,
+ *   height?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeEaseCurveBundle(opts = {}) {
+  const label = formatDisneyExtremeEaseCurveLabel(opts);
+  const spark = buildDisneyExtremeEaseSparkSvg({
+    markerT: opts.markerT,
+    width: opts.width ?? 280,
+    height: opts.height ?? 56,
+  });
+  return `${label}\n${spark.svg}`;
+}
+
+/**
  * Inline SVG sparkline for the Extreme ease overdrive curve.
  * @param {{
  *   width?: number,
@@ -563,12 +583,15 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'copyHotkeyHelp', help: 'Alt+H copy help', kind: 'note' },
   { id: 'copyBaselineHistoryList', help: 'Shift+H copy hist list', kind: 'note' },
+  { id: 'copyBaselineRedoList', help: '⇧Alt+H copy redo list', kind: 'note' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
   { id: 'copyEaseCurve', help: 'Shift+E copy ease', kind: 'note' },
   { id: 'copyEaseCurveLabel', help: 'Alt+E copy ease label', kind: 'note' },
+  { id: 'copyEaseCurveBundle', help: '⇧Alt+E copy ease+svg', kind: 'note' },
   { id: 'showBodyMix', keys: ['m', 'M'], help: 'M mix', kind: 'action' },
   { id: 'copyBodyMixCurve', help: 'Shift+M copy mix', kind: 'note' },
   { id: 'copyBodyMixLabel', help: 'Alt+M copy mix label', kind: 'note' },
+  { id: 'copyBodyMixBundle', help: '⇧Alt+M copy mix+svg', kind: 'note' },
   { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
   { id: 'copyFactorBarsLabel', help: 'Shift+N copy factors label', kind: 'note' },
@@ -594,6 +617,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'clearBaselineRedo', keys: ['w', 'W'], help: 'W wipe redo', kind: 'action' },
   { id: 'clearBaselineFavorites', help: 'Shift+W wipe favs', kind: 'note' },
   { id: 'clearBaselineStacks', help: 'Alt+W wipe stacks', kind: 'note' },
+  { id: 'wipeBaselineAll', help: '⇧Alt+W wipe all', kind: 'note' },
   { id: 'pinBaseline', keys: ['p', 'P'], help: 'P pin base', kind: 'action' },
   { id: 'replaceBaselinePin', help: 'Shift+P replace pin', kind: 'note' },
   { id: 'copySnapshotFingerprint', help: 'Alt+P copy fp', kind: 'note' },
@@ -1915,6 +1939,25 @@ export function formatDisneyExtremeBaselineHistoryList(history, opts = {}) {
     return `hist · empty${redoBit}${trail}`;
   }
   return `hist ${list.length}${redoBit} · ${parts.join(' · ')}${trail}`;
+}
+
+/**
+ * Format Extreme redo stack list for status / clipboard.
+ * @param {object[]|null|undefined} redo
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineRedoList(redo) {
+  const list = Array.isArray(redo) ? redo : [];
+  const trail = ' · ⇧U redo · Alt+U cycle · ⇧Alt+H copy';
+  if (!list.length) return `redo · empty${trail}`;
+  const parts = list.map((snap, i) =>
+    formatDisneyExtremeBaselineHistoryEntry(snap, {
+      index: i + 1,
+      compact: true,
+      kind: 'redo',
+    }),
+  );
+  return `redo ${list.length} · ${parts.join(' · ')}${trail}`;
 }
 
 /**
