@@ -266,9 +266,15 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        cursor: pointer;
       }
       .pill.pill-x.is-dirty {
         box-shadow: inset 0 0 0 1px color-mix(in oklab, #ffb454 55%, transparent);
+      }
+      .pill.pill-x:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 3px;
       }
       .pill.pill-b {
         display: inline-flex;
@@ -1149,7 +1155,10 @@
         formatDisneyExtremeSnapshotDiffLabel,
         isDisneyExtremeSnapshotDirty,
         formatDisneyExtremeDirtyHudBit,
-        captureDisneyExtremeBaseline,
+        formatDisneyExtremeBaselineSummary,
+        saveDisneyExtremeBaseline,
+        loadDisneyExtremeBaseline,
+        clearDisneyExtremeBaselineStorage,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1474,7 +1483,7 @@
 
       let disneyExtremeStatusHoldUntil = 0;
       let lastExtremeSparkFp = '';
-      let lastExtremeBaselineSnap = null;
+      let lastExtremeBaselineSnap = loadDisneyExtremeBaseline();
       function flashDisneyExtremeStatus(text, holdMs = DISNEY_EXTREME_STATUS_HOLD_MS) {
         if (disneyExtremeStatus) disneyExtremeStatus.textContent = text;
         const ms =
@@ -1814,7 +1823,9 @@
         } catch {
           ok = false;
         }
-        if (ok) lastExtremeBaselineSnap = captureDisneyExtremeBaseline(snap);
+        if (ok) {
+          lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
+        }
         flashDisneyExtremeStatus(
           ok
             ? `copied · snapshot JSON · fp ${fp}`
@@ -1872,7 +1883,7 @@
           return false;
         }
         applyDisneyExtremeSnapshot(parsed.snap);
-        lastExtremeBaselineSnap = captureDisneyExtremeBaseline(parsed.snap);
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
         return true;
@@ -1915,6 +1926,7 @@
           return false;
         }
         lastExtremeBaselineSnap = null;
+        clearDisneyExtremeBaselineStorage();
         flashDisneyExtremeStatus('cleared · baseline');
         return true;
       }
@@ -2029,6 +2041,26 @@
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
           flashDisneyExtremeEaseCurve();
+        }
+      });
+
+      pillExtreme?.addEventListener('click', (ev) => {
+        if (
+          ev.target === hudExtremeSpark ||
+          hudExtremeSpark?.contains(ev.target) ||
+          ev.target === hudExtremeFactors ||
+          hudExtremeFactors?.contains(ev.target)
+        ) {
+          return;
+        }
+        flashDisneyExtremeSnapshotDiff();
+      });
+      pillExtreme?.setAttribute('role', 'button');
+      pillExtreme?.setAttribute('tabindex', '0');
+      pillExtreme?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeSnapshotDiff();
         }
       });
 
@@ -5454,6 +5486,14 @@
           });
           hudExtreme.textContent = `${extremeHud.pill}${dirtyHud.bit}`;
           pillExtreme?.classList.toggle('is-dirty', dirtyHud.dirty);
+          pillExtreme?.setAttribute(
+            'title',
+            formatDisneyExtremeBaselineSummary({
+              hasBaseline: dirtyHud.hasBaseline,
+              dirty: dirtyHud.dirty,
+              fp: dirtyHud.fp,
+            }),
+          );
         }
         const extremeFp = disneyExtremeSnapshotFingerprint(extremeSnap);
         if (extremeFp !== lastExtremeSparkFp) {

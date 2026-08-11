@@ -9,14 +9,12 @@ const faceLivePath = fileURLToPath(
 describe('Phase 173 Extreme Face Live diff baseline wiring', () => {
   it('tracks clipboard baseline and wires D / Diff button', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('let lastExtremeBaselineSnap = null');
+    expect(src).toContain('let lastExtremeBaselineSnap = loadDisneyExtremeBaseline()');
     expect(src).toContain('id="btnDisneyExtremeDiff"');
     expect(src).toContain('function flashDisneyExtremeSnapshotDiff()');
     expect(src).toContain("resolved.action === 'showSnapshotDiff'");
-    expect(src).toContain('lastExtremeBaselineSnap = captureDisneyExtremeBaseline(snap)');
-    expect(src).toContain(
-      'lastExtremeBaselineSnap = captureDisneyExtremeBaseline(parsed.snap)',
-    );
+    expect(src).toContain('saveDisneyExtremeBaseline(snap)');
+    expect(src).toContain('saveDisneyExtremeBaseline(parsed.snap)');
     expect(src).toContain('diff · no baseline');
     expect(src).toContain('formatDisneyExtremeSnapshotDiffLabel');
     expect(src).toContain('<kbd>D</kbd>');

@@ -9,11 +9,12 @@ const faceLivePath = fileURLToPath(
 describe('Phase 181 Extreme Face Live clear baseline + fp pill', () => {
   it('wires capture, clear button, K action, and fp on dirty bit', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('captureDisneyExtremeBaseline');
+    expect(src).toContain('saveDisneyExtremeBaseline');
     expect(src).toContain('id="btnDisneyExtremeClearBase"');
     expect(src).toContain('function clearDisneyExtremeBaseline()');
     expect(src).toContain("resolved.action === 'clearBaseline'");
     expect(src).toContain('cleared · baseline');
+    expect(src).toContain('clearDisneyExtremeBaselineStorage()');
     expect(src).toContain('disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap)');
     expect(src).toContain('<kbd>K</kbd>');
   });

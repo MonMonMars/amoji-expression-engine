@@ -1143,3 +1143,95 @@ export function captureDisneyExtremeBaseline(snapOrOpts) {
     bodyOn: !!snap.bodyOn,
   });
 }
+
+/**
+ * Tooltip / status summary for Extreme baseline dirty tracking.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineSummary(opts = {}) {
+  if (!opts.hasBaseline) {
+    return 'baseline · none · D diff · ⇧D restore · K clear';
+  }
+  const state = opts.dirty ? 'dirty' : 'clean';
+  const fp =
+    typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
+  return `baseline · ${state}${fp} · D diff · ⇧D restore · K clear`;
+}
+
+export const DISNEY_EXTREME_BASELINE_STORAGE_KEY =
+  'amoji.disneyExtreme.baseline.v1';
+
+function resolveDisneyExtremeBaselineStorage(opts = {}) {
+  if (opts.storage) return opts.storage;
+  if (opts.memory) return null;
+  if (typeof sessionStorage !== 'undefined') return sessionStorage;
+  return null;
+}
+
+/**
+ * Persist an Extreme baseline snapshot (sessionStorage by default).
+ * @param {object|null|undefined} snap
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, snap: ReturnType<typeof captureDisneyExtremeBaseline> }}
+ */
+export function saveDisneyExtremeBaseline(snap, opts = {}) {
+  const captured = captureDisneyExtremeBaseline(snap);
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!captured) {
+    if (storage) {
+      try {
+        storage.removeItem(DISNEY_EXTREME_BASELINE_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+    }
+    return { ok: false, snap: null };
+  }
+  if (storage) {
+    try {
+      storage.setItem(
+        DISNEY_EXTREME_BASELINE_STORAGE_KEY,
+        serializeDisneyExtremeSnapshot(captured),
+      );
+    } catch {
+      /* ignore quota */
+    }
+  }
+  return { ok: true, snap: captured };
+}
+
+/**
+ * Load Extreme baseline from sessionStorage (or injected storage).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null}
+ */
+export function loadDisneyExtremeBaseline(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return null;
+  try {
+    const raw = storage.getItem(DISNEY_EXTREME_BASELINE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = parseDisneyExtremeSnapshot(raw);
+    return parsed.ok ? parsed.snap : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear persisted Extreme baseline.
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean }}
+ */
+export function clearDisneyExtremeBaselineStorage(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (storage) {
+    try {
+      storage.removeItem(DISNEY_EXTREME_BASELINE_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  return { ok: true };
+}
