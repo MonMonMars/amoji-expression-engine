@@ -266,6 +266,9 @@ Amoji engine (ND “systemic emotion”)
 143. ~~**Share bundle audit toast hash** (`buildShareBundleAuditPayload` · toast in `#flp=`)~~ ✓
 144. ~~**Cancel on TTS stop/fixture** (`tts_stop_pick` / `tts_fixture_pick`)~~ ✓
 145. ~~**Cancel compound on script deliver** (`deliver_pick` · Deliver line)~~ ✓
+146. ~~**Audit toast hash export filter** (`toastInHashOnly` · Export toast hash)~~ ✓
+147. ~~**Cancel on TTS synth/http** (`tts_synth_pick` / `tts_http_pick`)~~ ✓
+148. ~~**Cancel on script hold/clear** (`script_hold_pick` / `clear_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

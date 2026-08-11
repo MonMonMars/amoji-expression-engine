@@ -87,6 +87,7 @@ export function formatShareAuditLog(entries, opts = {}) {
   }
   if (opts.action && opts.action !== 'all') labelBits.push(String(opts.action));
   if (q) labelBits.push(opts.regex ? `/${q}/` : `“${q}”`);
+  if (opts.toastInHashOnly) labelBits.push('toast hash');
   if (range.label) labelBits.push(range.label);
   return applyComplianceGate(
     {
@@ -159,6 +160,7 @@ export function resolveAuditDateRange(opts = {}) {
  *   toMs?: number|null,
  *   rangePreset?: string|null,
  *   now?: number,
+ *   toastInHashOnly?: boolean,
  * }} [opts]
  */
 export function filterShareAuditEntries(entries, opts = {}) {
@@ -181,6 +183,7 @@ export function filterShareAuditEntries(entries, opts = {}) {
   const q = qRaw && !opts.regex ? qRaw.toLowerCase() : null;
   return list.filter((e) => {
     if (action && e.action !== action) return false;
+    if (opts.toastInHashOnly && !e.toastInHash) return false;
     if (range.active) {
       if (range.fromMs != null && e.at < range.fromMs) return false;
       if (range.toMs != null && e.at > range.toMs) return false;
@@ -219,17 +222,22 @@ export function listShareAuditActions(entries) {
 /**
  * Export audit log as pretty JSON (download-friendly).
  * @param {object[]} entries
- * @param {{ now?: number }} [opts]
+ * @param {{ now?: number, toastInHashOnly?: boolean }} [opts]
  */
 export function exportShareAuditJson(entries, opts = {}) {
-  const list = (Array.isArray(entries) ? entries : []).map((e) =>
+  let list = (Array.isArray(entries) ? entries : []).map((e) =>
     normalizeShareAuditEntry(e),
   );
+  const toastInHashOnly = !!opts.toastInHashOnly;
+  if (toastInHashOnly) {
+    list = filterShareAuditEntries(list, { toastInHashOnly: true });
+  }
   const payload = {
     kind: 'amoji.faceLive.prefsShareAudit',
     version: 1,
     exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
     count: list.length,
+    toastInHashOnly,
     entries: list,
   };
   return applyComplianceGate(
@@ -238,6 +246,8 @@ export function exportShareAuditJson(entries, opts = {}) {
       ok: true,
       json: JSON.stringify(payload, null, 2),
       count: list.length,
+      toastInHashOnly,
+      total: Array.isArray(entries) ? entries.length : 0,
       payload,
     },
     {},
@@ -322,6 +332,8 @@ export function createPrefsShareAudit(opts = {}) {
           expired: payload.expired,
           prefs: payload.prefs,
           summary: payload.summary,
+          toastFeedbackSummary: payload.toastFeedbackSummary,
+          toastInHash: payload.toastInHash,
           at: payload.at,
         },
         { now: payload.now },
