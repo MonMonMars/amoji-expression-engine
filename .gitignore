@@ -1,4 +1,6 @@
 tools/
+!amoji-engine/tools/
+!amoji-engine/tools/**
 research/downloads/
 **/node_modules/
 *.zip

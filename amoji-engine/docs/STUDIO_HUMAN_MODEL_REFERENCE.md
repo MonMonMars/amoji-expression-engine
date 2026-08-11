@@ -147,6 +147,7 @@ Amoji engine (ND “systemic emotion”)
 24. ~~**Layer D Actor Discretion** (continuity / leak / gap improv)~~ ✓
 25. ~~**Easter eggs** isolated namespace (default OFF, persona-locked)~~ ✓
 26. ~~**Robot driver packs** (face-servo-12 → upper-body → humanoid stub)~~ ✓
+27. ~~**Capture→bake** (video ARKit takes → intensity sculpts + onset/apex/offset)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -178,4 +179,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: chassis-specific robot tuning + production polish (TTS wiring, Actor discretion UX depth).
+Next code increment: MediaPipe ingest adapter, chassis-specific robot tuning, production TTS wiring.

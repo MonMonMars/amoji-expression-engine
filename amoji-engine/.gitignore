@@ -7,3 +7,5 @@ coverage/
 *.log
 .vite/
 *.blend1
+
+tools/capture-bake/out/

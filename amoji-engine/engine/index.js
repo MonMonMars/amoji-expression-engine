@@ -281,3 +281,21 @@ export {
   encodeRobotLine,
   RobotDriverPublisher,
 } from './export/robotDriver.js';
+export {
+  CAPTURE_PROTOCOL,
+  BAKE_PROTOCOL,
+  GAZE_CHANNELS,
+  BLINK_CHANNELS,
+  buildArkitToExpression,
+  arkitToMorphWeights,
+  arkitToMuscleHints,
+  normalizeCaptureFrame,
+  parseCaptureTake,
+  expressionEnergy,
+  detectTemporalEnvelope,
+  frameNearTime,
+  sampleIntensityTiers,
+  detectBlinks,
+  bakeCaptureTake,
+  mergeRecipeFragment,
+} from './capture/captureBake.js';

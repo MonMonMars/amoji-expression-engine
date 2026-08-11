@@ -82,5 +82,6 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
 - Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
+- Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
 - Studio method reference: `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`

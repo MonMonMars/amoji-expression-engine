@@ -23,7 +23,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 10 | MoodEngine (Layer -1) + full-body point retarget (B/W/G) | Done |
 | Phase 11 | Layer D Actor Discretion + isolated easter-egg namespace | Done |
 | Phase 12 | Robot driver packs (face / upper-body / humanoid) | Done |
-| Phase 13+ | Production polish, chassis-specific tuning… | Specced |
+| Phase 13 | Capture→bake authoring (video ARKit → sculpts + timing) | Done |
+| Phase 14+ | Production polish, chassis-specific tuning… | Specced |
 
 ## Quick start
 
@@ -59,6 +60,17 @@ Do **not** special-case the renderer for the new emotion.
 Mouth override is LOCKED / CLAMPED / OPEN (not additive). MBP always forces `jaw = 0`.
 
 Continuous speech: `performSpeech(text, emotion, t, { mode: 'coarticulated' })` uses Cohen–Massaro dominance functions (`engine/layers/coarticulation.js`).
+
+## Capture → bake (authoring)
+
+Video ARKit takes → intensity sculpts + onset/apex/offset timing. Offline only — not a runtime biometric path.
+
+```bash
+npm run capture-bake -- --demo
+# npm run capture-bake -- --emotion happy --in ./takes/smile.ndjson
+```
+
+See `tools/capture-bake/README.md`.
 
 ## Docs
 
