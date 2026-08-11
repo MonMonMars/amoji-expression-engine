@@ -111,7 +111,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 98 | Prefs drop refresh order test | Done |
 | Phase 99 | Prefs drop sets preview text before refresh | Done |
 | Phase 100 | Prefs drop sets preview label before refresh | Done |
-| Phase 101+ | Further production polish… | Specced |
+| Phase 101 | Prefs drop summarize inheritExportMeta | Done |
+| Phase 102+ | Further production polish… | Specced |
 
 ## Quick start
 
