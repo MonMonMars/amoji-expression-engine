@@ -550,6 +550,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySnapshotDiff', help: 'Shift+C copy diff', kind: 'note' },
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
+  { id: 'copyHotkeyHelp', help: 'Alt+H copy help', kind: 'note' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
   { id: 'copyEaseCurve', help: 'Shift+E copy ease', kind: 'note' },
   { id: 'showBodyMix', keys: ['m', 'M'], help: 'M mix', kind: 'action' },
@@ -586,6 +587,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pasteBaselineFavoritesJson', help: 'Shift+G paste fav', kind: 'note' },
   { id: 'mergeBaselineFavoritesJson', help: 'Alt+G merge fav', kind: 'note' },
   { id: 'copyBaselineFavoritesShareUrl', keys: ['t', 'T'], help: 'T share fav', kind: 'action' },
+  { id: 'toggleMoreIo', help: 'Alt+T more IO', kind: 'note' },
+  { id: 'persistMoreIo', help: 'More IO · remember open', kind: 'note' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'showBaselineStacks', help: 'Alt+L stacks', kind: 'note' },
@@ -614,6 +617,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pasteBaselineKitShareUrl', help: 'Alt+V paste kit', kind: 'note' },
   { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
   { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
+  { id: 'cycleBaselineHistoryNext', help: 'Alt+Q next hist', kind: 'note' },
+  { id: 'cycleBaselineHistoryPrev', help: '⇧Alt+Q prev hist', kind: 'note' },
   { id: 'activeFavoriteChip', help: 'fav chip · active', kind: 'note' },
   { id: 'activeHistoryChip', help: 'hist/redo chip · active', kind: 'note' },
   { id: 'clearActiveChips', help: 'Esc clear active chips', kind: 'note' },
@@ -2887,6 +2892,61 @@ export function cycleDisneyExtremeBaselineFavoriteIndex(
     return dir > 0 ? len - 1 : 0;
   }
   return (cur + dir + len) % len;
+}
+
+/**
+ * Next/prev history index for Alt+Q / ⇧Alt+Q cycling (same wrap rules as favorites).
+ * @param {number|null|undefined} currentIndex
+ * @param {number} length
+ * @param {{ prev?: boolean }} [opts]
+ * @returns {number|null}
+ */
+export function cycleDisneyExtremeBaselineHistoryIndex(
+  currentIndex,
+  length,
+  opts = {},
+) {
+  return cycleDisneyExtremeBaselineFavoriteIndex(currentIndex, length, opts);
+}
+
+export const DISNEY_EXTREME_MORE_IO_STORAGE_KEY =
+  'amoji.disneyExtreme.moreIo.v1';
+
+/**
+ * Persist whether Extreme More IO `<details>` is open.
+ * @param {boolean} open
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, open: boolean }}
+ */
+export function saveDisneyExtremeMoreIoOpen(open, opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  const next = !!open;
+  if (!storage) return { ok: true, open: next };
+  try {
+    if (!next) {
+      storage.removeItem(DISNEY_EXTREME_MORE_IO_STORAGE_KEY);
+      return { ok: true, open: false };
+    }
+    storage.setItem(DISNEY_EXTREME_MORE_IO_STORAGE_KEY, '1');
+    return { ok: true, open: true };
+  } catch {
+    return { ok: false, open: next };
+  }
+}
+
+/**
+ * Load Extreme More IO open state (sessionStorage by default).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {boolean}
+ */
+export function loadDisneyExtremeMoreIoOpen(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return false;
+  try {
+    return storage.getItem(DISNEY_EXTREME_MORE_IO_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 /**

@@ -288,7 +288,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 275 | Extreme Alt+K clear pin only | Done |
 | Phase 276 | Extreme Alt+V paste kit share | Done |
 | Phase 277 | Extreme Esc clears active chips | Done |
-| Phase 278+ | Further production polish… | Specced |
+| Phase 278 | Extreme Alt+T toggle More IO | Done |
+| Phase 279 | Extreme Alt+H copy hotkey help | Done |
+| Phase 280 | Extreme Alt+Q / ⇧Alt+Q cycle history | Done |
+| Phase 281 | Extreme More IO open persist | Done |
+| Phase 282+ | Further production polish… | Specced |
 
 ## Quick start
 
