@@ -771,6 +771,10 @@
             <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
           </label>
         </div>
+        <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
+          <input id="prefsAuditImportStarredOnly" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Import merge starred only</span>
+        </label>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
           <button type="button" id="btnPrefsAuditRenameView">Rename view</button>
@@ -887,6 +891,7 @@
       import { createProbeToastHistory } from '/engine/ui/probeToastHistory.js';
       import { compareProbeToastDetails } from '/engine/ui/probeToastCompare.js';
       import { createProbeToastSound } from '/engine/ui/probeToastSound.js';
+      import { createProbeToastHaptic } from '/engine/ui/probeToastHaptic.js';
       import {
         createAuditSavedViews,
         buildAuditViewShareSnapshot,
@@ -1073,6 +1078,7 @@
       });
       const probeToastHistory = createProbeToastHistory();
       const probeToastSound = createProbeToastSound({ enabled: true });
+      const probeToastHaptic = createProbeToastHaptic({ enabled: true });
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
@@ -1256,6 +1262,7 @@
         probeToastFocusTrap.activate(el);
         if (!opts.fromHistory && !opts.silent) {
           probeToastSound.play({ tone: toast.tone || 'default', event: 'show' });
+          probeToastHaptic.play({ tone: toast.tone || 'default', event: 'show' });
         }
         if (!probeToastDismiss.pinned) {
           probeToastDismiss.start(toast.dismissMs || 3800);
@@ -1298,7 +1305,8 @@
           reason !== 'leak_pick' &&
           reason !== 'improv_pick' &&
           reason !== 'arousal_pick' &&
-          reason !== 'robotwalk_pick'
+          reason !== 'robotwalk_pick' &&
+          reason !== 'robotslew_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1321,7 +1329,8 @@
           reason === 'leak_pick' ||
           reason === 'improv_pick' ||
           reason === 'arousal_pick' ||
-          reason === 'robotwalk_pick'
+          reason === 'robotwalk_pick' ||
+          reason === 'robotslew_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1616,6 +1625,7 @@
         refreshRobotStatus();
       });
       document.getElementById('btnRobotSlew').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('robotslew_pick');
         robotSlewOn = !robotSlewOn;
         document.getElementById('btnRobotSlew').classList.toggle('primary', robotSlewOn);
         if (!robotSlewOn) robotSlew.reset();
@@ -3217,7 +3227,13 @@
           if (!file) return;
           try {
             const text = await file.text();
-            const imported = auditSavedViews.importJson(text, { merge: true });
+            const mergeStarredOnly = !!document.getElementById(
+              'prefsAuditImportStarredOnly',
+            )?.checked;
+            const imported = auditSavedViews.importJson(text, {
+              merge: true,
+              mergeStarredOnly,
+            });
             if (!imported.ok) {
               prefsStatus.className = 'status bad';
               prefsStatus.textContent = 'prefs · views import failed';
@@ -3225,7 +3241,9 @@
             }
             refreshAuditSavedViewsUi();
             prefsStatus.className = 'status ok';
-            prefsStatus.textContent = `prefs · views imported · ${imported.count}`;
+            prefsStatus.textContent = mergeStarredOnly
+              ? `prefs · starred merge · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
+              : `prefs · views imported · ${imported.count}`;
           } catch (err) {
             prefsStatus.className = 'status bad';
             prefsStatus.textContent = String(err.message || err);

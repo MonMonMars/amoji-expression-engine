@@ -534,6 +534,7 @@ export {
   filterAuditSavedViews,
   clearStarsInFolder,
   pruneUnstarredViews,
+  mergeAuditSavedViewsImport,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
   renameAuditSavedView,
@@ -572,6 +573,11 @@ export {
   resolveProbeToastSound,
   createProbeToastSound,
 } from './ui/probeToastSound.js';
+export {
+  PROBE_TOAST_HAPTIC_PATTERN,
+  resolveProbeToastHaptic,
+  createProbeToastHaptic,
+} from './ui/probeToastHaptic.js';
 export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,

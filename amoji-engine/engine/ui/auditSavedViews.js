@@ -358,6 +358,55 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
 }
 
 /**
+ * Merge imported views into an existing list.
+ * @param {object[]} existing
+ * @param {object[]} incoming
+ * @param {{ mergeStarredOnly?: boolean, max?: number, now?: number }} [opts]
+ */
+export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
+  const list = Array.isArray(existing) ? existing.slice() : [];
+  const incomingList = (Array.isArray(incoming) ? incoming : []).map((v) =>
+    normalizeAuditSavedView(v, { now: opts.now }),
+  );
+  const mergeStarredOnly = !!opts.mergeStarredOnly;
+  let added = 0;
+  let updated = 0;
+  let skipped = 0;
+  for (const v of incomingList) {
+    if (mergeStarredOnly && !v.starred) {
+      skipped += 1;
+      continue;
+    }
+    const idx = list.findIndex(
+      (x) => x.name.toLowerCase() === v.name.toLowerCase(),
+    );
+    if (idx >= 0) {
+      list[idx] = { ...v, id: list[idx].id };
+      updated += 1;
+    } else {
+      list.push(v);
+      added += 1;
+    }
+  }
+  const max = Math.max(2, opts.max ?? AUDIT_SAVED_VIEWS_MAX);
+  while (list.length > max) list.shift();
+  const views = sortAuditViewsByStar(list).views;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_merge',
+      ok: true,
+      views,
+      added,
+      updated,
+      skipped,
+      mergeStarredOnly,
+      count: views.length,
+    },
+    {},
+  );
+}
+
+/**
  * Import saved views from JSON text or object.
  * @param {string|object} raw
  * @param {{ max?: number, now?: number, merge?: boolean }} [opts]
@@ -408,6 +457,7 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
       views,
       count: views.length,
       merge: !!opts.merge,
+      mergeStarredOnly: !!opts.mergeStarredOnly,
     },
     {},
   );
@@ -1154,17 +1204,31 @@ export function createAuditSavedViews(opts = {}) {
         max,
         now: importOpts.now,
         merge: importOpts.merge,
+        mergeStarredOnly: importOpts.mergeStarredOnly,
       });
       if (!imported.ok) return imported;
       if (importOpts.merge) {
-        for (const v of imported.views) {
-          const idx = views.findIndex(
-            (x) => x.name.toLowerCase() === v.name.toLowerCase(),
-          );
-          if (idx >= 0) views[idx] = { ...v, id: views[idx].id };
-          else views.push(v);
-        }
-        while (views.length > max) views.shift();
+        const merged = mergeAuditSavedViewsImport(views, imported.views, {
+          mergeStarredOnly: importOpts.mergeStarredOnly,
+          max,
+          now: importOpts.now,
+        });
+        views = merged.views;
+        save();
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views_import',
+            ok: true,
+            views: views.slice(),
+            count: views.length,
+            merge: true,
+            mergeStarredOnly: !!importOpts.mergeStarredOnly,
+            added: merged.added,
+            updated: merged.updated,
+            skipped: merged.skipped,
+          },
+          {},
+        );
       } else {
         views = imported.views.slice(-max);
       }
@@ -1176,6 +1240,7 @@ export function createAuditSavedViews(opts = {}) {
           views: views.slice(),
           count: views.length,
           merge: !!importOpts.merge,
+          mergeStarredOnly: !!importOpts.mergeStarredOnly,
         },
         {},
       );

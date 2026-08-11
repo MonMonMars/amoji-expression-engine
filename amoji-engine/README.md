@@ -62,7 +62,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 49 | Toast volume · views clear folder stars · improv cancel | Done |
 | Phase 50 | Toast duck on pin · views export starred · arousal cancel | Done |
 | Phase 51 | Toast rate-limit · views prune unstarred · robot walk cancel | Done |
-| Phase 52+ | Further production polish… | Specced |
+| Phase 52 | Toast haptic stub · views import merge starred · robot slew cancel | Done |
+| Phase 53+ | Further production polish… | Specced |
 
 ## Quick start
 
