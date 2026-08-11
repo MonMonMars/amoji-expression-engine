@@ -2961,6 +2961,9 @@
         ttsEndpointEl?.addEventListener('contextmenu', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_context_menu_pick');
         });
+        ttsEndpointEl?.addEventListener('dragover', (ev) => {
+          ev.preventDefault();
+        });
         ttsEndpointEl?.addEventListener('dragenter', (ev) => {
           ev.preventDefault();
           if (ttsEndpointDragActive) return;
