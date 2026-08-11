@@ -74,6 +74,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+M` → copy body mix SVG to clipboard
  * - `f` / `F` → flash factor bars label on status
  * - `Shift+F` → copy factor bars SVG to clipboard
+ * - `n` / `N` → flash neck blend / body mix label on status
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults

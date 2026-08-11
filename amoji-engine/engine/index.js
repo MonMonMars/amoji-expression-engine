@@ -113,6 +113,7 @@ export {
   classifyHeadGazeCombo,
   evaluateBody,
   disneyExtremeBodyMix,
+  formatDisneyExtremeNeckLabel,
   sampleDisneyExtremeBodyMixCurve,
   formatDisneyExtremeBodyMixLabel,
   buildDisneyExtremeBodyMixSparkSvg,

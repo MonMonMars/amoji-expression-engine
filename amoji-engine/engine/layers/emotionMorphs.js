@@ -551,6 +551,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBodyMixCurve', help: 'Shift+M copy mix', kind: 'note' },
   { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
+  { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -681,6 +682,7 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
 /**
  * Format Face Live HUD / status copy for Disney Extreme effective intensities.
  * When enabled, always includes eased shape readout; optional `bodyMix` from Layer B.
+ * Status adds recipe × above peak and optional neck blend when body is on.
  * X pill: `shape · e{ease}` (+ ` · m{mix}` when bodyMix provided).
  * @param {{
  *   enabled?: boolean,
@@ -691,8 +693,16 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
  *   mouthFactor?: number,
  *   ease?: number,
  *   bodyMix?: number,
+ *   neckBlend?: number,
  * }} [opts]
- * @returns {{ pill: string, status: string, ease: number, bodyMix?: number }}
+ * @returns {{
+ *   pill: string,
+ *   status: string,
+ *   ease: number,
+ *   recipe: number,
+ *   bodyMix?: number,
+ *   neckBlend?: number,
+ * }}
  */
 export function formatDisneyExtremeLiveHud(opts = {}) {
   if (!opts.enabled) {
@@ -700,6 +710,7 @@ export function formatDisneyExtremeLiveHud(opts = {}) {
       pill: 'off',
       status: formatDisneyExtremeHotkeyHelp({ enabled: false }),
       ease: 0,
+      recipe: 1,
     };
   }
   const shapeInt = Number(opts.shapeInt);
@@ -718,20 +729,29 @@ export function formatDisneyExtremeLiveHud(opts = {}) {
     typeof opts.ease === 'number' && Number.isFinite(opts.ease)
       ? opts.ease
       : easeEmotionIntensity(s);
+  const recipe = disneyExtremeRecipeOverdriveScale(s);
   const hasMix =
     typeof opts.bodyMix === 'number' && Number.isFinite(opts.bodyMix);
+  const hasNeck =
+    !!opts.bodyOn &&
+    typeof opts.neckBlend === 'number' &&
+    Number.isFinite(opts.neckBlend);
   const bodyBit = opts.bodyOn ? `body ${b.toFixed(2)}` : `body ${b.toFixed(2)} (off)`;
   const mixBit = hasMix ? ` · mix ${opts.bodyMix.toFixed(2)}` : '';
+  const recipeBit = s > 1 + 1e-9 ? ` · recipe ×${recipe.toFixed(2)}` : '';
+  const neckBit = hasNeck ? ` · neck ${opts.neckBlend.toFixed(2)}` : '';
   const pill = hasMix
     ? `${s.toFixed(2)} · e${ease.toFixed(2)} · m${opts.bodyMix.toFixed(2)}`
     : `${s.toFixed(2)} · e${ease.toFixed(2)}`;
-  /** @type {{ pill: string, status: string, ease: number, bodyMix?: number }} */
+  /** @type {{ pill: string, status: string, ease: number, recipe: number, bodyMix?: number, neckBlend?: number }} */
   const out = {
     pill,
     ease,
-    status: `shape ${s.toFixed(2)} · ${bodyBit} · ease ${ease.toFixed(2)}${mixBit} · eye×${eyeFactor.toFixed(2)} · mouth×${mouthFactor.toFixed(2)}`,
+    recipe,
+    status: `shape ${s.toFixed(2)} · ${bodyBit} · ease ${ease.toFixed(2)}${mixBit}${recipeBit}${neckBit} · eye×${eyeFactor.toFixed(2)} · mouth×${mouthFactor.toFixed(2)}`,
   };
   if (hasMix) out.bodyMix = opts.bodyMix;
+  if (hasNeck) out.neckBlend = opts.neckBlend;
   return out;
 }
 

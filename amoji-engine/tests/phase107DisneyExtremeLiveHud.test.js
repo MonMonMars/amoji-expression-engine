@@ -19,6 +19,7 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
       pill: 'off',
       status: formatDisneyExtremeHotkeyHelp({ enabled: false }),
       ease: 0,
+      recipe: 1,
     });
     const on = formatDisneyExtremeLiveHud({
       enabled: true,
@@ -30,8 +31,9 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
     });
     expect(on.pill).toBe(`1.12 · e${easeEmotionIntensity(1.12).toFixed(2)}`);
     expect(on.ease).toBeCloseTo(easeEmotionIntensity(1.12));
+    expect(on.recipe).toBeCloseTo(1 + 0.12 * 0.85);
     expect(on.status).toBe(
-      `shape 1.12 · body 0.98 · ease ${easeEmotionIntensity(1.12).toFixed(2)} · eye×1.40 · mouth×1.50`,
+      `shape 1.12 · body 0.98 · ease ${easeEmotionIntensity(1.12).toFixed(2)} · recipe ×${(1 + 0.12 * 0.85).toFixed(2)} · eye×1.40 · mouth×1.50`,
     );
     const bodyOff = formatDisneyExtremeLiveHud({
       enabled: true,

@@ -35,6 +35,40 @@ export function disneyExtremeBodyMix(intensity) {
 }
 
 /**
+ * Compact Extreme neck-scale / body-mix flash label.
+ * @param {{
+ *   enabled?: boolean,
+ *   bodyOn?: boolean,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ *   bodyInt?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeNeckLabel(opts = {}) {
+  const neck =
+    typeof opts.neckBlend === 'number' && Number.isFinite(opts.neckBlend)
+      ? opts.neckBlend
+      : DISNEY_EXTREME_NECK_SCALE_BLEND;
+  if (!opts.enabled || !opts.bodyOn) {
+    return `neck ${neck.toFixed(2)} · body mix (off)`;
+  }
+  const mix =
+    typeof opts.bodyMix === 'number' && Number.isFinite(opts.bodyMix)
+      ? opts.bodyMix
+      : typeof opts.bodyInt === 'number'
+        ? disneyExtremeBodyMix(opts.bodyInt)
+        : null;
+  const mixBit =
+    mix != null ? ` · mix ${mix.toFixed(2)}` : '';
+  const intBit =
+    typeof opts.bodyInt === 'number' && Number.isFinite(opts.bodyInt)
+      ? ` @ ${opts.bodyInt.toFixed(2)}`
+      : '';
+  return `neck ${neck.toFixed(2)}${mixBit}${intBit}`;
+}
+
+/**
  * Sample body-mix curve across 0..maxT for Extreme UI.
  * @param {{
  *   steps?: number,
