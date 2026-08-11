@@ -256,7 +256,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 243 | Extreme baseline redo JSON serialize/parse | Done |
 | Phase 244 | Extreme O / Shift+O redo JSON hotkeys | Done |
 | Phase 245 | Extreme Face Live chip Alt-diff + redo JSON wiring | Done |
-| Phase 246+ | Further production polish… | Specced |
+| Phase 246 | Extreme W wipe redo stack | Done |
+| Phase 247 | Extreme Alt+O merge redo + Shift-drop redo | Done |
+| Phase 248 | Extreme dbl-click chip pin baseline | Done |
+| Phase 249 | Extreme hist share URL `#dxh=` / Shift+Y | Done |
+| Phase 250+ | Further production polish… | Specced |
 
 ## Quick start
 

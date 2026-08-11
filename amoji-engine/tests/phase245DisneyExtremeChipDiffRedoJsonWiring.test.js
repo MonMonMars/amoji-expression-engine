@@ -18,6 +18,6 @@ describe('Phase 245 Extreme Face Live chip Alt-diff + redo JSON wiring', () => {
     expect(src).toContain('btnDisneyExtremePasteRedo');
     expect(src).toContain("resolved.action === 'copyBaselineRedoJson'");
     expect(src).toContain("resolved.action === 'pasteBaselineRedoJson'");
-    expect(src).toContain('imported · redo');
+    expect(src).toContain('${verb} · redo');
   });
 });

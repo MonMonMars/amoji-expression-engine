@@ -565,12 +565,15 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
+  { id: 'clearBaselineRedo', keys: ['w', 'W'], help: 'W wipe redo', kind: 'action' },
   { id: 'pinBaseline', keys: ['p', 'P'], help: 'P pin base', kind: 'action' },
   { id: 'copyBaselineRedoJson', keys: ['o', 'O'], help: 'O copy redo JSON', kind: 'action' },
   { id: 'pasteBaselineRedoJson', help: 'Shift+O paste redo', kind: 'note' },
+  { id: 'mergeBaselineRedoJson', help: 'Alt+O merge redo', kind: 'note' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
+  { id: 'copyBaselineHistoryShareUrl', help: 'Shift+Y share hist', kind: 'note' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
@@ -584,7 +587,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
-  { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist · dbl-click paste', kind: 'note' },
+  { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
+  { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist/redo · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1101,6 +1105,7 @@ export function parseDisneyExtremeSnapshot(input) {
 }
 
 export const DISNEY_EXTREME_SNAPSHOT_HASH_PARAM = 'dxs';
+export const DISNEY_EXTREME_HISTORY_HASH_PARAM = 'dxh';
 
 function encodeDisneyExtremeBase64Url(json) {
   if (typeof Buffer !== 'undefined') {
@@ -1192,6 +1197,102 @@ export function buildDisneyExtremeSnapshotShareUrl(snapOrOpts = {}, opts = {}) {
           (p) =>
             p &&
             !p.startsWith(`${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=`),
+        );
+      parts.push(frag);
+      hash = parts.join('&');
+    }
+  }
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  return {
+    ok: true,
+    url: base ? `${base}#${hash}` : `#${hash}`,
+    hash,
+  };
+}
+
+/**
+ * Encode Extreme baseline history → URL hash fragment (`#dxh=...` base64url JSON).
+ * @param {object[]|{ history?: object[] }|null|undefined} [historyOrOpts]
+ * @returns {string}
+ */
+export function encodeDisneyExtremeBaselineHistoryHash(historyOrOpts = {}) {
+  const history = Array.isArray(historyOrOpts)
+    ? historyOrOpts
+    : Array.isArray(historyOrOpts?.history)
+      ? historyOrOpts.history
+      : [];
+  const json = serializeDisneyExtremeBaselineHistory(history);
+  return `${DISNEY_EXTREME_HISTORY_HASH_PARAM}=${encodeDisneyExtremeBase64Url(json)}`;
+}
+
+/**
+ * Decode `#dxh=...` or raw dxh= payload → Extreme baseline history stack.
+ * @param {string} hashOrQuery
+ * @returns {{ ok: true, history: object[] }|{ ok: false, error: string }}
+ */
+export function decodeDisneyExtremeBaselineHistoryHash(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return { ok: false, error: 'empty' };
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(
+    new RegExp(`(?:^|&)?${DISNEY_EXTREME_HISTORY_HASH_PARAM}=([^&]+)`),
+  );
+  if (!m) return { ok: false, error: 'no_dxh' };
+  try {
+    const json = decodeDisneyExtremeBase64Url(m[1]);
+    return parseDisneyExtremeBaselineHistory(json);
+  } catch {
+    return { ok: false, error: 'decode_failed' };
+  }
+}
+
+/**
+ * Read Extreme baseline history from location.hash if `dxh=` is present.
+ * @param {{ hash?: string }} [loc]
+ * @returns {{ ok: true, history: object[] }|{ ok: false, error: string }}
+ */
+export function loadDisneyExtremeBaselineHistoryFromHash(loc = {}) {
+  const hash =
+    loc.hash ||
+    (typeof location !== 'undefined' ? location.hash : '') ||
+    '';
+  if (!hash.includes(`${DISNEY_EXTREME_HISTORY_HASH_PARAM}=`)) {
+    return { ok: false, error: 'no_dxh' };
+  }
+  return decodeDisneyExtremeBaselineHistoryHash(hash);
+}
+
+/**
+ * Build share URL with Extreme baseline history in hash (`dxh=`).
+ * Merges with existing hash params by default (replaces prior dxh=).
+ * @param {object[]|{ history?: object[] }|null|undefined} [historyOrOpts]
+ * @param {{ baseUrl?: string, hash?: string, mergeHash?: boolean }} [opts]
+ * @returns {{ ok: boolean, url: string, hash: string }}
+ */
+export function buildDisneyExtremeBaselineHistoryShareUrl(
+  historyOrOpts = {},
+  opts = {},
+) {
+  const frag = encodeDisneyExtremeBaselineHistoryHash(historyOrOpts);
+  let hash = frag;
+  if (opts.mergeHash !== false) {
+    const existing = String(
+      opts.hash ||
+        (typeof location !== 'undefined' ? location.hash : '') ||
+        '',
+    ).replace(/^#/, '');
+    if (existing) {
+      const parts = existing
+        .split('&')
+        .filter(
+          (p) =>
+            p &&
+            !p.startsWith(`${DISNEY_EXTREME_HISTORY_HASH_PARAM}=`),
         );
       parts.push(frag);
       hash = parts.join('&');
@@ -1679,6 +1780,39 @@ export function formatDisneyExtremeBaselineHistoryPreviewLabel(
     compact: true,
   });
   return `preview · hist ${list.length} · tip ${tip}`;
+}
+
+/**
+ * Whether Extreme redo stack has anything to wipe.
+ * @param {{ redoDepth?: number, redo?: object[] }} [opts]
+ * @returns {boolean}
+ */
+export function hasDisneyExtremeBaselineRedo(opts = {}) {
+  const redoLen = Array.isArray(opts.redo)
+    ? opts.redo.length
+    : Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
+  return redoLen > 0;
+}
+
+/**
+ * Dry-run preview label for an Extreme baseline redo payload.
+ * @param {object[]|{ redo?: object[] }|null|undefined} redoOrOpts
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineRedoPreviewLabel(redoOrOpts = {}) {
+  const list = Array.isArray(redoOrOpts)
+    ? redoOrOpts
+    : Array.isArray(redoOrOpts?.redo)
+      ? redoOrOpts.redo
+      : null;
+  if (!list) return 'preview · redo · invalid';
+  if (!list.length) return 'preview · redo · empty';
+  const tip = formatDisneyExtremeBaselineHistoryEntry(list[list.length - 1], {
+    index: list.length,
+    compact: true,
+    kind: 'redo',
+  });
+  return `preview · redo ${list.length} · tip ${tip}`;
 }
 
 /**
