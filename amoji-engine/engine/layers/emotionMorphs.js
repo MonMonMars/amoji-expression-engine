@@ -229,6 +229,9 @@ export const DISNEY_EXTREME_DEFAULTS = {
   eyeFactor: 1.4,
   mouthFactor: 1.5,
   weightCap: 2.0,
+  shapeFactor: 1.6,
+  bodyFactor: 1.6,
+  intensityCap: 2.0,
 };
 
 /**
@@ -317,5 +320,57 @@ export function formatDisneyExtremeLiveHud(opts = {}) {
   return {
     pill: s.toFixed(2),
     status: `shape ${s.toFixed(2)} · ${bodyBit} · eye×${eyeFactor.toFixed(2)} · mouth×${mouthFactor.toFixed(2)}`,
+  };
+}
+
+/**
+ * Compute effective Disney Extreme shape/body intensities from a base intensity.
+ * @param {number} baseIntensity
+ * @param {{
+ *   enabled?: boolean,
+ *   shapeFactor?: number,
+ *   bodyOn?: boolean,
+ *   bodyFactor?: number,
+ *   intensityCap?: number,
+ * }} [opts]
+ * @returns {{
+ *   enabled: boolean,
+ *   shapeFactor: number,
+ *   shapeInt: number,
+ *   bodyOn: boolean,
+ *   bodyFactor: number,
+ *   bodyInt: number,
+ *   intensityCap: number,
+ * }}
+ */
+export function computeDisneyExtremeIntensities(baseIntensity, opts = {}) {
+  const enabled = !!opts.enabled;
+  const intensityCap =
+    typeof opts.intensityCap === 'number' && opts.intensityCap > 0
+      ? opts.intensityCap
+      : DISNEY_EXTREME_DEFAULTS.intensityCap;
+  const raw =
+    typeof baseIntensity === 'number' && Number.isFinite(baseIntensity)
+      ? Math.max(0, baseIntensity)
+      : 0;
+  const shapeFactorIn =
+    typeof opts.shapeFactor === 'number' && opts.shapeFactor > 0
+      ? opts.shapeFactor
+      : DISNEY_EXTREME_DEFAULTS.shapeFactor;
+  const bodyFactorIn =
+    typeof opts.bodyFactor === 'number' && opts.bodyFactor > 0
+      ? opts.bodyFactor
+      : DISNEY_EXTREME_DEFAULTS.bodyFactor;
+  const shapeFactor = enabled ? shapeFactorIn : 1;
+  const bodyOn = enabled && !!opts.bodyOn;
+  const bodyMul = bodyOn ? bodyFactorIn : 1;
+  return {
+    enabled,
+    shapeFactor,
+    shapeInt: Math.min(intensityCap, raw * shapeFactor),
+    bodyOn,
+    bodyFactor: bodyFactorIn,
+    bodyInt: Math.min(intensityCap, raw * bodyMul),
+    intensityCap,
   };
 }

@@ -953,6 +953,7 @@
         mergeMorphOverlays,
         amplifyDisneyExtremeMorphs,
         formatDisneyExtremeLiveHud,
+        computeDisneyExtremeIntensities,
       } from '/engine/layers/emotionMorphs.js';
       import {
         lookToEyeMorphWeights,
@@ -1216,9 +1217,10 @@
 
       function updateTierHintForDisneyExtreme() {
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
-        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
-        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
-        const shapeInt = Math.min(2.0, intensity * shapeFactor);
+        const { shapeInt } = computeDisneyExtremeIntensities(intensity, {
+          enabled: disneyExtremeOn,
+          shapeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+        });
         if (tierHint) {
           const base = tierLabel(shapeInt);
           tierHint.textContent = disneyExtremeOn
@@ -4496,12 +4498,17 @@
           displayInt = Math.max(displayInt * 0.35, latencyState.intensityHint || 0.3);
         }
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
-        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
-        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
-        const shapeInt = Math.min(2.0, displayInt * shapeFactor);
-        const bodyOn = disneyExtremeOn && (disneyExtremeBodyEl?.checked || false);
-        const bodyFactor = Number(disneyExtremeBodyFactorEl?.value || 1.6);
-        const bodyInt = Math.min(2.0, displayInt * (bodyOn ? bodyFactor : 1));
+        const {
+          shapeFactor,
+          shapeInt,
+          bodyOn,
+          bodyInt,
+        } = computeDisneyExtremeIntensities(displayInt, {
+          enabled: disneyExtremeOn,
+          shapeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+          bodyOn: disneyExtremeBodyEl?.checked || false,
+          bodyFactor: Number(disneyExtremeBodyFactorEl?.value || 1.6),
+        });
         const extremeHud = formatDisneyExtremeLiveHud({
           enabled: disneyExtremeOn,
           shapeInt,

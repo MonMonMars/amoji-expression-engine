@@ -256,6 +256,7 @@ export {
   amplifyDisneyExtremeMorphs,
   classifyDisneyExtremeMorphKey,
   formatDisneyExtremeLiveHud,
+  computeDisneyExtremeIntensities,
   DISNEY_EXTREME_DEFAULTS,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';
