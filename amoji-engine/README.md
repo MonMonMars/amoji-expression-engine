@@ -148,7 +148,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 135 | Extreme ease label recipe punch | Done |
 | Phase 136 | Extreme HUD mini ease spark | Done |
 | Phase 137 | Extreme Shift+E copy ease SVG | Done |
-| Phase 138+ | Further production polish… | Specced |
+| Phase 138 | Extreme body mix curve helpers | Done |
+| Phase 139 | Extreme body mix spark panel | Done |
+| Phase 140 | Extreme M hotkey flash body mix | Done |
+| Phase 141 | Extreme HUD spark click flashes ease | Done |
+| Phase 142+ | Further production polish… | Specced |
 
 ## Quick start
 

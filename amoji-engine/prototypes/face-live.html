@@ -216,6 +216,29 @@
         border-radius: 4px;
         background: color-mix(in oklab, #0a1016 70%, transparent);
       }
+      .extreme-body-spark {
+        display: inline-flex;
+        align-items: center;
+        flex: 0 0 auto;
+        opacity: 0.95;
+        cursor: pointer;
+      }
+      .extreme-body-spark.is-off {
+        opacity: 0.38;
+        filter: grayscale(0.35);
+      }
+      .extreme-body-spark:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      .extreme-body-spark svg {
+        display: block;
+        width: 140px;
+        height: 28px;
+        border-radius: 4px;
+        background: color-mix(in oklab, #0a1016 70%, transparent);
+      }
       .pill.pill-x {
         display: inline-flex;
         align-items: center;
@@ -225,10 +248,17 @@
         display: inline-flex;
         align-items: center;
         opacity: 0.9;
+        pointer-events: auto;
+        cursor: pointer;
       }
       .hud-extreme-spark.is-off {
         opacity: 0.35;
         filter: grayscale(0.4);
+      }
+      .hud-extreme-spark:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 3px;
       }
       .hud-extreme-spark svg {
         display: block;
@@ -578,7 +608,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -651,6 +681,14 @@
             title="Ease overdrive curve (marker = shapeInt) · click to flash"
           ></div>
           <div class="status" id="disneyExtremeEaseLabel" style="margin:0;">ease curve</div>
+        </div>
+        <div class="row" style="margin-top:4px;gap:10px;align-items:center;">
+          <div
+            id="disneyExtremeBodySpark"
+            class="extreme-body-spark is-off"
+            title="Body mix curve (marker = bodyInt) · click to flash · M"
+          ></div>
+          <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
       </div>
@@ -1182,6 +1220,8 @@
         BodyController,
         applyBodyBones,
         disneyExtremeBodyMix,
+        formatDisneyExtremeBodyMixLabel,
+        buildDisneyExtremeBodyMixSparkSvg,
       } from '/engine/layers/neckShoulder.js';
       import {
         SmileLaughController,
@@ -1243,6 +1283,12 @@
       );
       const disneyExtremeEaseLabel = document.getElementById(
         'disneyExtremeEaseLabel',
+      );
+      const disneyExtremeBodySpark = document.getElementById(
+        'disneyExtremeBodySpark',
+      );
+      const disneyExtremeBodyMixLabelEl = document.getElementById(
+        'disneyExtremeBodyMixLabel',
       );
       const hudExtreme = document.getElementById('hudExtreme');
       const hudExtremeSpark = document.getElementById('hudExtremeSpark');
@@ -1534,6 +1580,24 @@
         );
       }
 
+      function flashDisneyExtremeBodyMix() {
+        const disneyExtremeOn = !!disneyExtremeEl?.checked;
+        const bodyOn = !!disneyExtremeBodyEl?.checked;
+        const { bodyInt } = computeDisneyExtremeIntensities(intensity, {
+          enabled: disneyExtremeOn,
+          shapeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+          bodyOn,
+          bodyFactor: Number(disneyExtremeBodyFactorEl?.value || 1.6),
+        });
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBodyMixLabel({
+            enabled: disneyExtremeOn,
+            bodyOn: disneyExtremeOn && bodyOn,
+            markerT: disneyExtremeOn && bodyOn ? bodyInt : undefined,
+          }),
+        );
+      }
+
       async function copyDisneyExtremeEaseSvg() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         const { shapeInt } = computeDisneyExtremeIntensities(intensity, {
@@ -1568,6 +1632,30 @@
       disneyExtremeEaseSpark?.setAttribute('role', 'button');
       disneyExtremeEaseSpark?.setAttribute('tabindex', '0');
       disneyExtremeEaseSpark?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeEaseCurve();
+        }
+      });
+
+      disneyExtremeBodySpark?.addEventListener('click', () => {
+        flashDisneyExtremeBodyMix();
+      });
+      disneyExtremeBodySpark?.setAttribute('role', 'button');
+      disneyExtremeBodySpark?.setAttribute('tabindex', '0');
+      disneyExtremeBodySpark?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeBodyMix();
+        }
+      });
+
+      hudExtremeSpark?.addEventListener('click', () => {
+        flashDisneyExtremeEaseCurve();
+      });
+      hudExtremeSpark?.setAttribute('role', 'button');
+      hudExtremeSpark?.setAttribute('tabindex', '0');
+      hudExtremeSpark?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
           flashDisneyExtremeEaseCurve();
@@ -1632,6 +1720,11 @@
         if (resolved.action === 'copyEaseCurve') {
           ev.preventDefault();
           copyDisneyExtremeEaseSvg();
+          return;
+        }
+        if (resolved.action === 'showBodyMix') {
+          ev.preventDefault();
+          flashDisneyExtremeBodyMix();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -4948,6 +5041,26 @@
             peakGuide: 'rgba(255,255,255,0.12)',
           });
           hudExtremeSpark.innerHTML = mini.svg;
+        }
+        if (disneyExtremeBodySpark) {
+          const bodyMixOn = disneyExtremeOn && bodyOn;
+          disneyExtremeBodySpark.classList.toggle('is-off', !bodyMixOn);
+          const bodySpark = buildDisneyExtremeBodyMixSparkSvg({
+            markerT: bodyMixOn ? bodyInt : undefined,
+            width: 140,
+            height: 28,
+            stroke: bodyMixOn ? undefined : 'rgba(157,222,166,0.45)',
+            markerStroke: bodyMixOn ? undefined : 'rgba(255,180,84,0.45)',
+            fill: bodyMixOn ? undefined : 'rgba(157,222,166,0.06)',
+          });
+          disneyExtremeBodySpark.innerHTML = bodySpark.svg;
+        }
+        if (disneyExtremeBodyMixLabelEl) {
+          disneyExtremeBodyMixLabelEl.textContent = formatDisneyExtremeBodyMixLabel({
+            enabled: disneyExtremeOn,
+            bodyOn,
+            markerT: disneyExtremeOn && bodyOn ? bodyInt : undefined,
+          });
         }
         if (disneyExtremeEaseLabel) {
           disneyExtremeEaseLabel.textContent = formatDisneyExtremeEaseCurveLabel({
