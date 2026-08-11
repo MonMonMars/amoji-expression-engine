@@ -101,7 +101,19 @@ export function sampleDisneyExtremeEaseCurve(opts = {}) {
 }
 
 /**
+ * Extreme-band recipe weight scale for intensity t (1 at peak and below).
+ * @param {number} t 0..2
+ * @returns {number}
+ */
+export function disneyExtremeRecipeOverdriveScale(t) {
+  const x = Math.max(0, Math.min(2, Number(t) || 0));
+  if (x <= 1) return 1;
+  return 1 + (x - 1) * DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN;
+}
+
+/**
  * Compact label for the Extreme ease curve readout.
+ * When Extreme is on and markerT > 1, also shows recipe overdrive scale.
  * @param {{ markerT?: number, enabled?: boolean }} [opts]
  * @returns {string}
  */
@@ -110,7 +122,10 @@ export function formatDisneyExtremeEaseCurveLabel(opts = {}) {
   if (!opts.enabled) return `ease curve · od ×${gain.toFixed(2)} (off)`;
   if (typeof opts.markerT === 'number' && Number.isFinite(opts.markerT)) {
     const t = Math.max(0, Math.min(2, opts.markerT));
-    return `ease ${easeEmotionIntensity(t).toFixed(2)} @ ${t.toFixed(2)} · od ×${gain.toFixed(2)}`;
+    const recipe = disneyExtremeRecipeOverdriveScale(t);
+    const recipeBit =
+      t > 1 + 1e-9 ? ` · recipe ×${recipe.toFixed(2)}` : '';
+    return `ease ${easeEmotionIntensity(t).toFixed(2)} @ ${t.toFixed(2)} · od ×${gain.toFixed(2)}${recipeBit}`;
   }
   return `ease curve · od ×${gain.toFixed(2)}`;
 }
@@ -385,6 +400,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
+  { id: 'copyEaseCurve', help: 'Shift+E copy ease', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },

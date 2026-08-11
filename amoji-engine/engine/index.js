@@ -266,6 +266,7 @@ export {
   sampleDisneyExtremeEaseCurve,
   formatDisneyExtremeEaseCurveLabel,
   buildDisneyExtremeEaseSparkSvg,
+  disneyExtremeRecipeOverdriveScale,
   DISNEY_EXTREME_HOTKEY_HELP,
   DISNEY_EXTREME_HOTKEY_CATALOG,
   DISNEY_EXTREME_STATUS_HOLD_MS,

@@ -68,6 +68,7 @@ export function disneyExtremeUiDefaults() {
  * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
  * - `h` / `H` / `?` → flash hotkey help on status
  * - `e` / `E` → flash ease curve label on status
+ * - `Shift+E` → copy ease curve SVG to clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -294,6 +295,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     return { ok: false, reason: 'no_hold' };
   }
   if (entry.kind === 'action') {
+    if (entry.id === 'showEaseCurve' && ev.shiftKey) {
+      return { ok: true, action: 'copyEaseCurve' };
+    }
     return { ok: true, action: entry.id };
   }
   if (entry.kind === 'nudge') {

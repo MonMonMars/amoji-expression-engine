@@ -31,7 +31,7 @@ describe('Phase 130 Extreme ease curve spark UI', () => {
     expect(
       formatDisneyExtremeEaseCurveLabel({ enabled: true, markerT: 1.5 }),
     ).toBe(
-      `ease ${easeEmotionIntensity(1.5).toFixed(2)} @ 1.50 · od ×${DISNEY_EXTREME_EASE_OVERDRIVE_GAIN.toFixed(2)}`,
+      `ease ${easeEmotionIntensity(1.5).toFixed(2)} @ 1.50 · od ×${DISNEY_EXTREME_EASE_OVERDRIVE_GAIN.toFixed(2)} · recipe ×${(1 + 0.5 * 0.85).toFixed(2)}`,
     );
     const spark = buildDisneyExtremeEaseSparkSvg({ markerT: 1.2 });
     expect(spark.empty).toBe(false);
