@@ -228,7 +228,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 215 | Extreme snapshot share URL + loadFromHash | Done |
 | Phase 216 | Extreme Y share link hotkey | Done |
 | Phase 217 | Extreme Face Live share link wiring | Done |
-| Phase 218+ | Further production polish… | Specced |
+| Phase 218 | Extreme baseline history list labels | Done |
+| Phase 219 | Extreme L history list hotkey | Done |
+| Phase 220 | Extreme Face Live history chips UI | Done |
+| Phase 221 | Extreme Face Live history list wiring | Done |
+| Phase 222+ | Further production polish… | Specced |
 
 ## Quick start
 

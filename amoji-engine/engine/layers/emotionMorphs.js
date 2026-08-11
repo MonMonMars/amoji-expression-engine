@@ -567,6 +567,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
+  { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1388,6 +1389,48 @@ export function formatDisneyExtremeBaselineSummary(opts = {}) {
   const fp =
     typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
   return `baseline · ${state}${fp}${histBit}${redoBit}${trail}`;
+}
+
+/**
+ * One-line label for a baseline history entry (list / chip / tooltip).
+ * @param {object|null|undefined} snap
+ * @param {{ index?: number, compact?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHistoryEntry(snap, opts = {}) {
+  const captured = captureDisneyExtremeBaseline(snap);
+  if (!captured) return '—';
+  const fp = disneyExtremeSnapshotFingerprintShort(captured);
+  const n = Math.max(1, Math.floor(Number(opts.index) || 1));
+  if (opts.compact) return `#${n} ${fp}`;
+  if (!captured.enabled) return `#${n} off · fp ${fp}`;
+  const body = captured.bodyOn
+    ? `body×${Number(captured.bodyFactor).toFixed(2)}`
+    : 'body off';
+  return `#${n} fp ${fp} · shape×${Number(captured.shapeFactor).toFixed(2)} · ${body} · eye×${Number(captured.eyeFactor).toFixed(2)} · mouth×${Number(captured.mouthFactor).toFixed(2)}`;
+}
+
+/**
+ * Status flash / legend for Extreme baseline history stack.
+ * Optional `redoDepth` appends · redo N when > 0.
+ * @param {object[]|null|undefined} history
+ * @param {{ redoDepth?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHistoryList(history, opts = {}) {
+  const list = Array.isArray(history) ? history : [];
+  const redoN = Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
+  const redoBit = redoN > 0 ? ` · redo ${redoN}` : '';
+  if (!list.length) {
+    return `hist · empty${redoBit} · U undo · L list`;
+  }
+  const parts = list.map((snap, i) =>
+    formatDisneyExtremeBaselineHistoryEntry(snap, {
+      index: i + 1,
+      compact: true,
+    }),
+  );
+  return `hist ${list.length}${redoBit} · ${parts.join(' · ')} · U undo · L list`;
 }
 
 /**

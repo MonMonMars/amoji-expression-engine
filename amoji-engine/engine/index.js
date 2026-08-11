@@ -303,6 +303,8 @@ export {
   popDisneyExtremeBaselineHistory,
   DISNEY_EXTREME_BASELINE_HISTORY_LIMIT,
   formatDisneyExtremeBaselineSummary,
+  formatDisneyExtremeBaselineHistoryEntry,
+  formatDisneyExtremeBaselineHistoryList,
   formatDisneyExtremeSnapshotPreviewLabel,
   saveDisneyExtremeBaseline,
   loadDisneyExtremeBaseline,

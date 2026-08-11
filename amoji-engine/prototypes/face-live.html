@@ -518,6 +518,31 @@
         opacity: 0.7;
         font-size: 0.85em;
       }
+      #disneyExtremeHistory {
+        margin-top: 6px;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        min-height: 1.6em;
+      }
+      #disneyExtremeHistory .extreme-hist-empty {
+        opacity: 0.65;
+        font-size: 0.85em;
+      }
+      #disneyExtremeHistory button.extreme-hist-chip {
+        font: inherit;
+        font-size: 0.8em;
+        padding: 2px 8px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      #disneyExtremeHistory button.extreme-hist-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -780,6 +805,14 @@
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
+          <button type="button" id="btnDisneyExtremeHistList">History list <kbd>L</kbd></button>
+        </div>
+        <div
+          class="row"
+          id="disneyExtremeHistory"
+          title="Baseline history · click a chip to jump · L list · U undo"
+        >
+          <span class="extreme-hist-empty">hist · empty</span>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1183,6 +1216,8 @@
         isDisneyExtremeSnapshotDirty,
         formatDisneyExtremeDirtyHudBit,
         formatDisneyExtremeBaselineSummary,
+        formatDisneyExtremeBaselineHistoryEntry,
+        formatDisneyExtremeBaselineHistoryList,
         formatDisneyExtremeSnapshotPreviewLabel,
         pushDisneyExtremeBaselineHistory,
         popDisneyExtremeBaselineHistory,
@@ -1516,6 +1551,59 @@
         clearDisneyExtremeBaselineRedoStorage();
       }
 
+      function syncDisneyExtremeHistoryUi() {
+        const el = document.getElementById('disneyExtremeHistory');
+        if (!el) return;
+        el.replaceChildren();
+        if (!extremeBaselineHistory.length) {
+          const empty = document.createElement('span');
+          empty.className = 'extreme-hist-empty';
+          empty.textContent = formatDisneyExtremeBaselineHistoryList([], {
+            redoDepth: extremeBaselineRedo.length,
+          });
+          el.appendChild(empty);
+          return;
+        }
+        for (let i = extremeBaselineHistory.length - 1; i >= 0; i--) {
+          const snap = extremeBaselineHistory[i];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'extreme-hist-chip';
+          btn.textContent = formatDisneyExtremeBaselineHistoryEntry(snap, {
+            index: i + 1,
+            compact: true,
+          });
+          btn.title = formatDisneyExtremeBaselineHistoryEntry(snap, {
+            index: i + 1,
+          });
+          btn.addEventListener('click', () => {
+            jumpDisneyExtremeBaselineHistory(i);
+          });
+          el.appendChild(btn);
+        }
+      }
+
+      function flashDisneyExtremeBaselineHistoryList() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineHistoryList(extremeBaselineHistory, {
+            redoDepth: extremeBaselineRedo.length,
+          }),
+        );
+      }
+
+      function jumpDisneyExtremeBaselineHistory(index) {
+        const snap = extremeBaselineHistory[index];
+        if (!snap) {
+          flashDisneyExtremeStatus('hist · missing');
+          return false;
+        }
+        applyDisneyExtremeSnapshot(snap);
+        setDisneyExtremeBaseline(snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(`hist · jump #${index + 1} · fp ${fp}`);
+        return true;
+      }
+
       function setDisneyExtremeBaseline(snap) {
         if (lastExtremeBaselineSnap) {
           extremeBaselineHistory = pushDisneyExtremeBaselineHistory(
@@ -1528,6 +1616,7 @@
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
         return lastExtremeBaselineSnap;
       }
 
@@ -1832,6 +1921,10 @@
         copyDisneyExtremeSnapshotShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeHistList')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineHistoryList();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1854,6 +1947,7 @@
       if (!applyDisneyExtremeSnapshotFromHash()) {
         maybeAutoBaselineDisneyExtreme({ silent: true });
       }
+      syncDisneyExtremeHistoryUi();
 
       function flashDisneyExtremeEaseCurve() {
         const snap = disneyExtremeSnapshot();
@@ -2179,6 +2273,7 @@
         clearDisneyExtremeBaselineRedoStack();
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
         flashDisneyExtremeStatus('cleared · baseline');
         return true;
       }
@@ -2202,6 +2297,7 @@
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(popped.snap).snap;
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
         const fp = disneyExtremeSnapshotFingerprintShort(popped.snap);
         flashDisneyExtremeStatus(`undone · baseline · fp ${fp}`);
         return true;
@@ -2226,6 +2322,7 @@
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(popped.snap).snap;
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
         const fp = disneyExtremeSnapshotFingerprintShort(popped.snap);
         flashDisneyExtremeStatus(`redone · baseline · fp ${fp}`);
         return true;
@@ -2521,6 +2618,11 @@
         if (resolved.action === 'copySnapshotShareUrl') {
           ev.preventDefault();
           copyDisneyExtremeSnapshotShareUrl();
+          return;
+        }
+        if (resolved.action === 'showBaselineHistory') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineHistoryList();
           return;
         }
         if (resolved.action === 'copySummary') {
