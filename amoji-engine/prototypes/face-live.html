@@ -903,7 +903,10 @@
       import { compareProbeToastDetails } from '/engine/ui/probeToastCompare.js';
       import { createProbeToastSound } from '/engine/ui/probeToastSound.js';
       import { createProbeToastHaptic } from '/engine/ui/probeToastHaptic.js';
-      import { createLinkedProbeToastMute } from '/engine/ui/probeToastFeedback.js';
+      import {
+        createLinkedProbeToastMute,
+        applyProbeToastFeedbackFromPrefs,
+      } from '/engine/ui/probeToastFeedback.js';
       import {
         createAuditSavedViews,
         buildAuditViewShareSnapshot,
@@ -1107,6 +1110,13 @@
       if (savedPrefs.probeToastHapticMuted) probeToastHaptic.setMuted(true);
       if (probeToastFeedback.linked) {
         probeToastHaptic.setMuted(!!probeToastSound.muted);
+      }
+      if (hashPrefs.ok && hashPrefs.prefs) {
+        applyProbeToastFeedbackFromPrefs(hashPrefs.prefs, {
+          sound: probeToastSound,
+          haptic: probeToastHaptic,
+          feedback: probeToastFeedback,
+        });
       }
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
@@ -1339,7 +1349,9 @@
           reason !== 'latency_pick' &&
           reason !== 'threat_pick' &&
           reason !== 'sigh_pick' &&
-          reason !== 'turn_pick'
+          reason !== 'turn_pick' &&
+          reason !== 'speak_pick' &&
+          reason !== 'tts_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2242,6 +2254,7 @@
         }
       });
       document.getElementById('btnSpeak').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('speak_pick');
         gestures.setSpeaking(!gestures.speaking, 0.65);
         e.currentTarget.classList.toggle('primary', gestures.speaking);
       });
@@ -2250,6 +2263,7 @@
         ttsStatus.textContent = msg;
       }
       document.getElementById('btnTtsPlay').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('tts_pick');
         const text = ttsTextEl.value || 'Hello mama';
         speechPlayer.emotion = emotion;
         speechPlayer.intensity = intensity;
@@ -3393,7 +3407,10 @@
             const imported = auditSavedViews.importJson(text, {
               merge: true,
               mergeStarredOnly,
+              mergeStarredOnlyExplicit: mergeStarredOnly,
               folder: folder || null,
+              folderExplicit: folderOnly,
+              inheritExportMeta: true,
             });
             if (!imported.ok) {
               prefsStatus.className = 'status bad';
@@ -3403,8 +3420,9 @@
             refreshAuditSavedViewsUi();
             prefsStatus.className = 'status ok';
             const bits = [];
-            if (mergeStarredOnly) bits.push('starred');
-            if (folder) bits.push(`folder ${folder}`);
+            if (imported.mergeStarredOnly) bits.push('starred');
+            if (imported.folder) bits.push(`folder ${imported.folder}`);
+            if (imported.fromExportMeta && bits.length) bits.push('from export');
             prefsStatus.textContent = bits.length
               ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
               : `prefs · views imported · ${imported.count}`;

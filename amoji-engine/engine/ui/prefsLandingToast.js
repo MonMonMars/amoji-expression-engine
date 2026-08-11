@@ -4,6 +4,7 @@
 import { applyComplianceGate } from '../compliance/complianceGate.js';
 import { normalizeFaceLivePrefs } from './faceLivePrefs.js';
 import { evaluatePrefsLinkExpiry } from './prefsLinkExpiry.js';
+import { formatProbeToastFeedbackSummary } from './probeToastFeedback.js';
 
 export const PREFS_LANDING_DISMISS_MS = 4200;
 
@@ -19,6 +20,7 @@ export function formatPrefsLandingSummary(prefs) {
     p.fingerPresetId ? `✋${p.fingerPresetId}` : null,
     p.chassisId ? p.chassisId : null,
     p.ttsPresetId && p.ttsPresetId !== 'mock' ? `tts:${p.ttsPresetId}` : null,
+    formatProbeToastFeedbackSummary(p),
   ].filter(Boolean);
   return bits.join(' · ') || 'defaults';
 }

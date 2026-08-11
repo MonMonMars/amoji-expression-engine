@@ -79,3 +79,59 @@ export function createLinkedProbeToastMute(sound, haptic, opts = {}) {
     },
   };
 }
+
+/**
+ * One-line summary of probe toast feedback prefs (non-default only).
+ * @param {object} prefs
+ */
+export function formatProbeToastFeedbackSummary(prefs) {
+  if (!prefs || typeof prefs !== 'object') return null;
+  const bits = [];
+  if (prefs.probeToastSoundMuted) bits.push('toast sound off');
+  if (prefs.probeToastHapticMuted) bits.push('haptic off');
+  if (prefs.probeToastLinkMute === false) bits.push('mute unlinked');
+  if (
+    typeof prefs.probeToastVolume === 'number' &&
+    Math.abs(prefs.probeToastVolume - 1) > 0.001
+  ) {
+    bits.push(`vol ${Math.round(prefs.probeToastVolume * 100)}%`);
+  }
+  return bits.length ? bits.join(', ') : null;
+}
+
+/**
+ * Apply stored probe toast feedback prefs onto live players.
+ * @param {object} prefs
+ * @param {{ sound?: object, haptic?: object, feedback?: object }} players
+ */
+export function applyProbeToastFeedbackFromPrefs(prefs, players = {}) {
+  const p = prefs || {};
+  const { sound, haptic, feedback } = players;
+  if (feedback?.setLinked) {
+    feedback.setLinked(p.probeToastLinkMute !== false);
+  }
+  if (sound?.setMuted && p.probeToastSoundMuted) {
+    sound.setMuted(true);
+  }
+  if (haptic?.setMuted && p.probeToastHapticMuted) {
+    haptic.setMuted(true);
+  }
+  if (feedback?.linked && sound && haptic) {
+    haptic.setMuted?.(!!sound.muted);
+  }
+  if (typeof p.probeToastVolume === 'number' && sound?.setVolume) {
+    sound.setVolume(Math.max(0, Math.min(1, p.probeToastVolume)));
+  }
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_feedback',
+      action: 'restore_from_prefs',
+      ok: true,
+      soundMuted: !!sound?.muted,
+      hapticMuted: !!haptic?.muted,
+      linked: feedback?.linked !== false,
+      volume: typeof sound?.volume === 'number' ? sound.volume : null,
+    },
+    {},
+  );
+}

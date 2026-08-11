@@ -370,6 +370,72 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
 }
 
 /**
+ * Resolve merge filters for import — inherit starred+folder from export payload when present.
+ * @param {object|string} raw parsed or JSON text
+ * @param {{
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ * }} [opts]
+ */
+export function resolveAuditViewsImportFilters(raw, opts = {}) {
+  let parsed = raw;
+  if (typeof raw === 'string') {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views_import_filters',
+          ok: false,
+          reason: 'invalid_json',
+          mergeStarredOnly: !!opts.mergeStarredOnly,
+          folder: null,
+          fromExportMeta: false,
+        },
+        {},
+      );
+    }
+  }
+  const payload =
+    parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  const fromExportMeta =
+    payload.kind === 'amoji.faceLive.prefsShareAudit.views' &&
+    (!!payload.starredOnly || !!payload.folder);
+  const inherit = opts.inheritExportMeta !== false;
+
+  let mergeStarredOnly = !!opts.mergeStarredOnly;
+  let folder =
+    opts.folder != null && String(opts.folder).trim() !== ''
+      ? String(opts.folder).trim()
+      : null;
+
+  if (inherit && fromExportMeta) {
+    if (payload.starredOnly && !opts.mergeStarredOnlyExplicit && !opts.folderExplicit) {
+      mergeStarredOnly = true;
+    }
+    if (payload.folder && !opts.folderExplicit && !folder) {
+      folder = String(payload.folder).trim();
+    }
+  }
+
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_filters',
+      ok: true,
+      mergeStarredOnly,
+      folder,
+      fromExportMeta,
+      exportStarredOnly: !!payload.starredOnly,
+      exportFolder: payload.folder || null,
+    },
+    {},
+  );
+}
+
+/**
  * Merge imported views into an existing list.
  * @param {object[]} existing
  * @param {object[]} incoming
@@ -479,6 +545,11 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
   const views = listRaw
     .map((v) => normalizeAuditSavedView(v, { now: opts.now }))
     .slice(-max);
+  const payload =
+    parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  const fromExportMeta =
+    payload.kind === 'amoji.faceLive.prefsShareAudit.views' &&
+    (!!payload.starredOnly || !!payload.folder);
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_views_import',
@@ -487,6 +558,9 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
       count: views.length,
       merge: !!opts.merge,
       mergeStarredOnly: !!opts.mergeStarredOnly,
+      folder: payload.folder || null,
+      starredOnly: !!payload.starredOnly,
+      fromExportMeta,
     },
     {},
   );
@@ -1269,20 +1343,28 @@ export function createAuditSavedViews(opts = {}) {
       });
     },
     importJson(raw, importOpts = {}) {
+      const filters = resolveAuditViewsImportFilters(raw, {
+        mergeStarredOnly: importOpts.mergeStarredOnly,
+        mergeStarredOnlyExplicit: importOpts.mergeStarredOnlyExplicit,
+        folder: importOpts.folder,
+        folderExplicit: importOpts.folderExplicit,
+        inheritExportMeta: importOpts.inheritExportMeta,
+      });
+      if (!filters.ok) return filters;
+
+      const mergeStarredOnly = filters.mergeStarredOnly;
+      const folder = filters.folder;
+
       const imported = importAuditSavedViewsJson(raw, {
         max,
         now: importOpts.now,
         merge: importOpts.merge,
-        mergeStarredOnly: importOpts.mergeStarredOnly,
+        mergeStarredOnly,
       });
       if (!imported.ok) return imported;
       if (importOpts.merge) {
-        const folder =
-          importOpts.folder != null && String(importOpts.folder).trim() !== ''
-            ? String(importOpts.folder).trim()
-            : null;
         const merged = mergeAuditSavedViewsImport(views, imported.views, {
-          mergeStarredOnly: importOpts.mergeStarredOnly,
+          mergeStarredOnly,
           folder,
           max,
           now: importOpts.now,
@@ -1296,8 +1378,9 @@ export function createAuditSavedViews(opts = {}) {
             views: views.slice(),
             count: views.length,
             merge: true,
-            mergeStarredOnly: !!importOpts.mergeStarredOnly,
+            mergeStarredOnly,
             folder,
+            fromExportMeta: filters.fromExportMeta,
             added: merged.added,
             updated: merged.updated,
             skipped: merged.skipped,
@@ -1315,8 +1398,9 @@ export function createAuditSavedViews(opts = {}) {
           views: views.slice(),
           count: views.length,
           merge: !!importOpts.merge,
-          mergeStarredOnly: !!importOpts.mergeStarredOnly,
-          folder: importOpts.folder || null,
+          mergeStarredOnly,
+          folder,
+          fromExportMeta: filters.fromExportMeta,
         },
         {},
       );

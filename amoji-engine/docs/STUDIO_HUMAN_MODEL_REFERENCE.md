@@ -260,6 +260,9 @@ Amoji engine (ND “systemic emotion”)
 137. ~~**Probe toast feedback prefs persist** (`faceLivePrefs` · mute/volume/link)~~ ✓
 138. ~~**Audit views export starred+folder** (`exportStarredFolder` · Export starred folder)~~ ✓
 139. ~~**Cancel compound on turn segment** (Turn state clears lifecycle)~~ ✓
+140. ~~**Toast feedback hash restore** (`applyProbeToastFeedbackFromPrefs` · `#flp=` landing)~~ ✓
+141. ~~**Audit views import starred+folder** (`resolveAuditViewsImportFilters` · export meta)~~ ✓
+142. ~~**Cancel on speak/TTS** (`speak_pick` / `tts_pick` · Speaking / Play TTS)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -291,4 +294,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast feedback hash restore, views import starred+folder, cancel on speak/TTS).
+Next code increment: further polish (share bundle audit for toast hash, cancel on TTS stop/fixture, compound on script deliver).
