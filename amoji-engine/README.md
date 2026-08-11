@@ -368,7 +368,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 355 | Extreme Enter copy active | Done |
 | Phase 356 | Extreme pin strip HUD | Done |
 | Phase 357 | Extreme pin strip flash + clicks | Done |
-| Phase 358+ | Further production polish… | Specced |
+| Phase 358 | Extreme HUD bundle formatters | Done |
+| Phase 359 | Extreme Alt+Enter hud bundle | Done |
+| Phase 360 | Extreme ⇧Alt+Enter copy hud | Done |
+| Phase 361 | Extreme HUD bundle catalog | Done |
+| Phase 362+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -733,6 +733,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'showBaselinePinStrip', help: 'Shift+Enter pin strip', kind: 'note' },
+  { id: 'showBaselineHudBundle', help: 'Alt+Enter hud bundle', kind: 'note' },
+  { id: 'copyBaselineHudBundle', help: '⇧Alt+Enter copy hud', kind: 'note' },
   {
     id: 'showBaselineRoots',
     keys: ['\\', '|'],
@@ -746,6 +748,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
   { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
   { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
+  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -2173,6 +2176,70 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
     index: 1,
     compact: true,
   })}`;
+}
+
+/**
+ * One-line Extreme HUD bundle summary (status flash).
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @param {{
+ *   historyIndex?: number|null,
+ *   redoIndex?: number|null,
+ *   favoriteIndex?: number|null,
+ *   pin?: object|null,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHudBundleSummary(
+  stacks = {},
+  opts = {},
+) {
+  const capacity = formatDisneyExtremeBaselineStacksCapacityLabel(stacks).replace(
+    /^stacks · /,
+    '',
+  );
+  const active = formatDisneyExtremeBaselineActiveLabel({
+    historyIndex: opts.historyIndex,
+    redoIndex: opts.redoIndex,
+    favoriteIndex: opts.favoriteIndex,
+  });
+  const pin = formatDisneyExtremeBaselinePinStripLabel(opts.pin);
+  return `hud · ${capacity} · ${active} · ${pin}`;
+}
+
+/**
+ * Multiline Extreme HUD bundle for clipboard (tips/roots/capacity/active/pin).
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @param {{
+ *   historyIndex?: number|null,
+ *   redoIndex?: number|null,
+ *   favoriteIndex?: number|null,
+ *   pin?: object|null,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHudBundleLabel(
+  stacks = {},
+  opts = {},
+) {
+  return [
+    formatDisneyExtremeBaselineTipsLabel(stacks),
+    formatDisneyExtremeBaselineRootsLabel(stacks),
+    formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
+    formatDisneyExtremeBaselineActiveLabel({
+      historyIndex: opts.historyIndex,
+      redoIndex: opts.redoIndex,
+      favoriteIndex: opts.favoriteIndex,
+    }),
+    formatDisneyExtremeBaselinePinStripLabel(opts.pin),
+  ].join('\n');
 }
 
 /**

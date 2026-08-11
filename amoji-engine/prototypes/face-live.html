@@ -931,6 +931,8 @@
           <button type="button" id="btnDisneyExtremeActive">Active chips <kbd>⇧Alt+Space</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyActive">Copy active <kbd>Enter</kbd></button>
           <button type="button" id="btnDisneyExtremePinStrip">Pin strip <kbd>⇧Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeHudBundle">HUD bundle <kbd>Alt+Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyHudBundle">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -1018,7 +1020,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · Alt+Enter hud · ⇧Alt+Enter copy hud · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · 0/8</span>
         </div>
@@ -1508,6 +1510,8 @@
         formatDisneyExtremeBaselineRootsLabel,
         formatDisneyExtremeBaselineActiveLabel,
         formatDisneyExtremeBaselinePinStripLabel,
+        formatDisneyExtremeBaselineHudBundleSummary,
+        formatDisneyExtremeBaselineHudBundleLabel,
         formatDisneyExtremeBaselineChipPreviewLabel,
         formatDisneyExtremeBaselineChipDiffLabel,
         formatDisneyExtremeBaselineChipCompareLabel,
@@ -2164,6 +2168,57 @@
           formatDisneyExtremeBaselinePinStripLabel(lastExtremeBaselineSnap),
         );
         return true;
+      }
+
+      function disneyExtremeHudBundleOpts() {
+        return {
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        };
+      }
+
+      function disneyExtremeHudBundleActiveOpts() {
+        return {
+          historyIndex: extremeHistoryJumpIndexActive,
+          redoIndex: extremeRedoJumpIndexActive,
+          favoriteIndex: extremeFavoriteCycleIndex,
+          pin: lastExtremeBaselineSnap,
+        };
+      }
+
+      function flashDisneyExtremeBaselineHudBundle() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineHudBundleSummary(
+            disneyExtremeHudBundleOpts(),
+            disneyExtremeHudBundleActiveOpts(),
+          ),
+        );
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineHudBundle() {
+        const text = formatDisneyExtremeBaselineHudBundleLabel(
+          disneyExtremeHudBundleOpts(),
+          disneyExtremeHudBundleActiveOpts(),
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        const summary = formatDisneyExtremeBaselineHudBundleSummary(
+          disneyExtremeHudBundleOpts(),
+          disneyExtremeHudBundleActiveOpts(),
+        );
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${summary}` : `copy failed · ${summary}`,
+        );
+        return ok;
       }
 
       function flashDisneyExtremeBaselineHistoryList() {
@@ -4197,6 +4252,14 @@
         flashDisneyExtremeBaselinePinStrip();
       });
 
+      document.getElementById('btnDisneyExtremeHudBundle')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineHudBundle();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyHudBundle')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineHudBundle();
+      });
+
       document.getElementById('disneyExtremeTips')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineTips();
       });
@@ -6184,6 +6247,16 @@
         if (resolved.action === 'showBaselinePinStrip') {
           ev.preventDefault();
           flashDisneyExtremeBaselinePinStrip();
+          return;
+        }
+        if (resolved.action === 'showBaselineHudBundle') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineHudBundle();
+          return;
+        }
+        if (resolved.action === 'copyBaselineHudBundle') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineHudBundle();
           return;
         }
         if (resolved.action === 'copySummary') {

@@ -207,6 +207,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Alt+Space` → flash active hist/redo/fav chip indices
  * - `Enter` → copy active hist/redo/fav chip indices
  * - `Shift+Enter` → flash Extreme pin strip readout
+ * - `Alt+Enter` → flash Extreme HUD bundle summary
+ * - `Shift+Alt+Enter` → copy Extreme HUD bundle (tips/roots/capacity/active/pin)
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -435,13 +437,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J/C/D/X/A/E/M/N and Alt+1–8 fav jump / Alt+9/0 tip helpers / Alt+/ root jumps / Alt+Space root summary.
+  // except ... / Alt+/ root jumps / Alt+Space root summary / Alt+Enter hud bundle.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-8]$/.test(lower);
     const tipDigit = lower === '9' || lower === '0';
     const rootSlash = lower === '/';
     const rootSpace = key === ' ';
+    const enterKey = key === 'Enter';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -472,7 +475,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !favJumpDigit &&
       !tipDigit &&
       !rootSlash &&
-      !rootSpace
+      !rootSpace &&
+      !enterKey
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -763,6 +767,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'jumpBaselineHistoryRootSummary' && ev.shiftKey) {
       return { ok: true, action: 'jumpBaselineRedoRootSummary' };
+    }
+    if (entry.id === 'copyBaselineActive' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineHudBundle' };
+    }
+    if (entry.id === 'copyBaselineActive' && ev.altKey) {
+      return { ok: true, action: 'showBaselineHudBundle' };
     }
     if (entry.id === 'copyBaselineActive' && ev.shiftKey) {
       return { ok: true, action: 'showBaselinePinStrip' };

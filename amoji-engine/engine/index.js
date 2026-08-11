@@ -353,6 +353,8 @@ export {
   formatDisneyExtremeBaselineRootsLabel,
   formatDisneyExtremeBaselineActiveLabel,
   formatDisneyExtremeBaselinePinStripLabel,
+  formatDisneyExtremeBaselineHudBundleSummary,
+  formatDisneyExtremeBaselineHudBundleLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
   formatDisneyExtremeBaselineChipDiffLabel,
   formatDisneyExtremeBaselineChipCompareLabel,
