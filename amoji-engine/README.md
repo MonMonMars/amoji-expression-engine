@@ -204,7 +204,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 191 | Extreme drop JSON catalog note | Done |
 | Phase 192 | Extreme Face Live drop apply wiring | Done |
 | Phase 193 | Extreme Face Live Meta drop preview | Done |
-| Phase 194+ | Further production polish… | Specced |
+| Phase 194 | Extreme dirty HUD change count | Done |
+| Phase 195 | Extreme Face Live dirty×N pill wiring | Done |
+| Phase 196 | Extreme dbl-click drop hint paste | Done |
+| Phase 197 | Extreme dirty edge flash | Done |
+| Phase 198+ | Further production polish… | Specced |
 
 ## Quick start
 

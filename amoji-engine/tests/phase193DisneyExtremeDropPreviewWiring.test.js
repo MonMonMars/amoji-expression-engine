@@ -11,6 +11,6 @@ describe('Phase 193 Extreme Face Live Meta drop preview', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('formatDisneyExtremeSnapshotPreviewLabel');
     expect(src).toContain('!!opts.preview || !!ev.metaKey');
-    expect(src).toContain('Drop snapshot JSON · Meta preview');
+    expect(src).toContain('Drop snapshot JSON · Meta preview · dbl-click paste');
   });
 });

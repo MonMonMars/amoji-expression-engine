@@ -564,7 +564,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
-  { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview', kind: 'note' },
+  { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1140,8 +1140,9 @@ export function isDisneyExtremeSnapshotDirty(current, baseline) {
 /**
  * Compact dirty/clean bit for Extreme HUD pill / status.
  * Optional `fp` appends the short baseline fingerprint.
- * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string }} [opts]
- * @returns {{ bit: string, dirty: boolean, hasBaseline: boolean, fp: string }}
+ * Optional `changeCount` appends ×N when dirty.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, changeCount?: number }} [opts]
+ * @returns {{ bit: string, dirty: boolean, hasBaseline: boolean, fp: string, changeCount: number }}
  */
 export function formatDisneyExtremeDirtyHudBit(opts = {}) {
   const hasBaseline = !!opts.hasBaseline;
@@ -1151,11 +1152,17 @@ export function formatDisneyExtremeDirtyHudBit(opts = {}) {
       ? String(opts.fp)
       : '';
   const fpBit = fp ? ` ${fp}` : '';
+  const changeCount = dirty
+    ? Math.max(0, Math.floor(Number(opts.changeCount) || 0))
+    : 0;
+  const dirtyWord =
+    changeCount > 0 ? ` · dirty×${changeCount}` : ' · dirty';
   return {
     hasBaseline,
     dirty,
     fp,
-    bit: !hasBaseline ? '' : dirty ? ` · dirty${fpBit}` : ` · clean${fpBit}`,
+    changeCount,
+    bit: !hasBaseline ? '' : dirty ? `${dirtyWord}${fpBit}` : ` · clean${fpBit}`,
   };
 }
 

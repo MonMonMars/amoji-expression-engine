@@ -8,18 +8,21 @@ describe('Phase 174 Extreme dirty HUD bit', () => {
       hasBaseline: false,
       dirty: false,
       fp: '',
+      changeCount: 0,
       bit: '',
     });
     expect(formatDisneyExtremeDirtyHudBit({ hasBaseline: true, dirty: false })).toEqual({
       hasBaseline: true,
       dirty: false,
       fp: '',
+      changeCount: 0,
       bit: ' · clean',
     });
     expect(formatDisneyExtremeDirtyHudBit({ hasBaseline: true, dirty: true })).toEqual({
       hasBaseline: true,
       dirty: true,
       fp: '',
+      changeCount: 0,
       bit: ' · dirty',
     });
     expect(typeof engine.formatDisneyExtremeDirtyHudBit).toBe('function');

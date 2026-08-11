@@ -803,8 +803,8 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint">
-          Drop snapshot JSON · Meta preview
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot JSON · Meta preview · double-click paste from clipboard" style="cursor:pointer;">
+          Drop snapshot JSON · Meta preview · dbl-click paste
         </div>
       </div>
 
@@ -1484,6 +1484,7 @@
       let disneyExtremeStatusHoldUntil = 0;
       let lastExtremeSparkFp = '';
       let lastExtremeBaselineSnap = loadDisneyExtremeBaseline();
+      let lastExtremeDirty = false;
 
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
@@ -1855,6 +1856,7 @@
         }
         if (ok) {
           lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
+          lastExtremeDirty = false;
           syncDisneyExtremePrefsSummary();
         }
         flashDisneyExtremeStatus(
@@ -1915,6 +1917,7 @@
         }
         applyDisneyExtremeSnapshot(parsed.snap);
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
+        lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
@@ -1954,6 +1957,7 @@
         }
         applyDisneyExtremeSnapshot(parsed.snap);
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
+        lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`dropped · snapshot JSON · fp ${fp}`);
@@ -1980,6 +1984,13 @@
         disneyExtremePanel.classList.remove('dragover');
         await handleDisneyExtremeSnapshotDrop(ev);
       });
+
+      document.getElementById('disneyExtremeDropHint')?.addEventListener(
+        'dblclick',
+        () => {
+          pasteDisneyExtremeSnapshotJson();
+        },
+      );
 
       function flashDisneyExtremeSnapshotDiff() {
         const current = disneyExtremeSnapshot();
@@ -2032,6 +2043,7 @@
         }
         applyDisneyExtremeSnapshot(lastExtremeBaselineSnap);
         const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
+        lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus(`restored · baseline · fp ${fp}`);
         return true;
@@ -2044,6 +2056,7 @@
         }
         lastExtremeBaselineSnap = null;
         clearDisneyExtremeBaselineStorage();
+        lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus('cleared · baseline');
         return true;
@@ -5597,12 +5610,13 @@
           disneyExtremeStatus.textContent = extremeHud.status;
         }
         if (hudExtreme) {
+          const extremeDiff = lastExtremeBaselineSnap
+            ? diffDisneyExtremeSnapshots(extremeSnap, lastExtremeBaselineSnap)
+            : { equal: true, changes: [] };
           const dirtyHud = formatDisneyExtremeDirtyHudBit({
             hasBaseline: !!lastExtremeBaselineSnap,
-            dirty: isDisneyExtremeSnapshotDirty(
-              extremeSnap,
-              lastExtremeBaselineSnap,
-            ),
+            dirty: !extremeDiff.equal,
+            changeCount: extremeDiff.changes.length,
             fp: lastExtremeBaselineSnap
               ? disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap)
               : '',
@@ -5617,6 +5631,16 @@
               fp: dirtyHud.fp,
             }),
           );
+          if (dirtyHud.dirty && !lastExtremeDirty) {
+            flashDisneyExtremeStatus(
+              dirtyHud.changeCount > 0
+                ? `dirty×${dirtyHud.changeCount} · baseline drift`
+                : 'dirty · baseline drift',
+            );
+          }
+          lastExtremeDirty = dirtyHud.dirty;
+        } else {
+          lastExtremeDirty = false;
         }
         const extremeFp = disneyExtremeSnapshotFingerprint(extremeSnap);
         if (extremeFp !== lastExtremeSparkFp) {
