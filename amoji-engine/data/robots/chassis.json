@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "note": "Chassis-specific calibration on top of robot packs — scale/offset/invert/deadzone/slew. Pure generation; tune per physical unit.",
+  "defaultChassis": "desktop-buddy",
+  "chassis": {
+    "desktop-buddy": {
+      "id": "desktop-buddy",
+      "label": "Desktop buddy",
+      "packId": "face-servo-12",
+      "productLine": "toy-robot",
+      "description": "Small desk face robot — soft expression gain, camera-mount eye tilt invert.",
+      "gains": {
+        "expression": 0.85,
+        "mouth": 0.9,
+        "eye": 1.05,
+        "body": 1
+      },
+      "joints": {
+        "brow_L": { "scale": 0.9, "deadzone": 0.04 },
+        "brow_R": { "scale": 0.9, "deadzone": 0.04 },
+        "eye_tilt_L": { "invert": true, "scale": 1.05 },
+        "eye_tilt_R": { "invert": true, "scale": 1.05 },
+        "jaw": { "scale": 0.85, "maxDeltaPerSec": 2.5 },
+        "mouth_corner_L": { "scale": 0.95, "deadzone": 0.03 },
+        "mouth_corner_R": { "scale": 0.95, "deadzone": 0.03 },
+        "lid_L": { "maxDeltaPerSec": 4 },
+        "lid_R": { "maxDeltaPerSec": 4 }
+      }
+    },
+    "lobby-companion": {
+      "id": "lobby-companion",
+      "label": "Lobby companion",
+      "packId": "upper-body-companion",
+      "productLine": "companion-robot",
+      "description": "Upper-body greeter — damped neck, soft shoulders, readable mouth.",
+      "gains": {
+        "expression": 1,
+        "mouth": 1.05,
+        "eye": 0.95,
+        "body": 0.75
+      },
+      "joints": {
+        "neck_pitch": { "scale": 0.7, "maxDeltaPerSec": 1.2 },
+        "neck_yaw": { "scale": 0.65, "maxDeltaPerSec": 1.4 },
+        "neck_roll": { "scale": 0.55, "maxDeltaPerSec": 0.9 },
+        "shoulder_L_lift": { "scale": 0.8, "offset": 0.02, "maxDeltaPerSec": 0.8 },
+        "shoulder_R_lift": { "scale": 0.8, "offset": 0.02, "maxDeltaPerSec": 0.8 },
+        "jaw": { "scale": 0.95, "maxDeltaPerSec": 2.2 },
+        "mouth_corner_L": { "scale": 1.05 },
+        "mouth_corner_R": { "scale": 1.05 },
+        "elbow_L": { "scale": 0.85, "maxDeltaPerSec": 1.5 },
+        "elbow_R": { "scale": 0.85, "maxDeltaPerSec": 1.5 }
+      }
+    },
+    "lab-humanoid": {
+      "id": "lab-humanoid",
+      "label": "Lab humanoid",
+      "packId": "humanoid-stub",
+      "productLine": "humanoid",
+      "description": "Full stub chassis — conservative leg slew, balanced face/body.",
+      "gains": {
+        "expression": 0.95,
+        "mouth": 1,
+        "eye": 1,
+        "body": 0.85
+      },
+      "joints": {
+        "hip_L": { "scale": 0.7, "maxDeltaPerSec": 1.1 },
+        "hip_R": { "scale": 0.7, "maxDeltaPerSec": 1.1 },
+        "knee_L": { "scale": 0.75, "maxDeltaPerSec": 1.6 },
+        "knee_R": { "scale": 0.75, "maxDeltaPerSec": 1.6 },
+        "ankle_L": { "scale": 0.6, "maxDeltaPerSec": 1.2 },
+        "ankle_R": { "scale": 0.6, "maxDeltaPerSec": 1.2 },
+        "pelvis_yaw": { "scale": 0.65, "maxDeltaPerSec": 0.8 },
+        "spine_bend": { "scale": 0.7, "maxDeltaPerSec": 0.7 },
+        "neck_pitch": { "scale": 0.8, "maxDeltaPerSec": 1.3 },
+        "jaw": { "maxDeltaPerSec": 2.8 }
+      }
+    }
+  },
+  "regionGainMap": {
+    "brow": "expression",
+    "lid": "expression",
+    "eye": "eye",
+    "mouth": "mouth",
+    "neck": "body",
+    "shoulder": "body",
+    "arm": "body",
+    "spine": "body",
+    "pelvis": "body",
+    "leg": "body"
+  }
+}

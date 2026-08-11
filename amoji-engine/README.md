@@ -26,7 +26,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 13 | Capture→bake authoring (video ARKit → sculpts + timing) | Done |
 | Phase 14 | MediaPipe Capture Studio (webcam/video → NDJSON) | Done |
 | Phase 15 | Bake → emotion-timing (Step-Out / attack / blink) | Done |
-| Phase 16+ | Production polish, chassis-specific tuning… | Specced |
+| Phase 16 | Chassis calibration (scale/slew) on robot packs | Done |
+| Phase 17+ | Production TTS wiring, polish… | Specced |
 
 ## Quick start
 

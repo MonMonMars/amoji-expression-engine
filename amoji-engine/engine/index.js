@@ -288,6 +288,20 @@ export {
   RobotDriverPublisher,
 } from './export/robotDriver.js';
 export {
+  CHASSIS_CATALOG,
+  CHASSIS,
+  DEFAULT_CHASSIS,
+  REGION_GAIN_MAP,
+  listChassis,
+  getChassis,
+  resolvePackForChassis,
+  applyDeadzone,
+  calibrateJointValue,
+  regionGainFor,
+  calibrateRawJoints,
+  ChassisSlewLimiter,
+} from './export/chassisCalibrate.js';
+export {
   CAPTURE_PROTOCOL,
   BAKE_PROTOCOL,
   GAZE_CHANNELS,

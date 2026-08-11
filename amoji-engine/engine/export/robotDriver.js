@@ -8,6 +8,13 @@ import { evaluateEmotion } from '../layers/emotionFormulas.js';
 import { resolveMouth } from '../layers/resolveMouth.js';
 import { evaluateBody, sampleBodyPose } from '../layers/neckShoulder.js';
 import { evaluateGait, sampleWalkPose } from '../layers/gait.js';
+import {
+  calibrateRawJoints,
+  getChassis,
+  resolvePackForChassis,
+  ChassisSlewLimiter,
+  DEFAULT_CHASSIS,
+} from './chassisCalibrate.js';
 
 export const ROBOT_CATALOG = catalog;
 export const ROBOT_PACKS = catalog.packs;
@@ -281,13 +288,24 @@ export function robotJointsNonZero(joints, eps = 0.01) {
  *   gaitPhase?: number,
  *   gesture?: object,
  *   bodyOpts?: object,
+ *   chassisId?: string,
+ *   slew?: ChassisSlewLimiter | null,
+ *   dtSec?: number,
  * }} [opts]
  */
 export function driveRobot(packId, opts = {}) {
-  const pack = getRobotPack(packId);
+  const chassisId = opts.chassisId || null;
+  const resolvedPackId = resolvePackForChassis(packId, chassisId) || packId;
+  const pack = getRobotPack(resolvedPackId);
   if (!pack) {
     return applyComplianceGate(
-      { kind: 'robot_driver', error: 'unknown_pack', packId },
+      { kind: 'robot_driver', error: 'unknown_pack', packId: resolvedPackId },
+      {},
+    );
+  }
+  if (chassisId && !getChassis(chassisId)) {
+    return applyComplianceGate(
+      { kind: 'robot_driver', error: 'unknown_chassis', chassisId, packId: resolvedPackId },
       {},
     );
   }
@@ -318,7 +336,7 @@ export function driveRobot(packId, opts = {}) {
     };
   }
 
-  const raw = mapFrameToJoints(pack, {
+  let raw = mapFrameToJoints(pack, {
     emotion,
     intensity,
     viseme: opts.viseme,
@@ -332,12 +350,32 @@ export function driveRobot(packId, opts = {}) {
     walk,
     gesture: opts.gesture,
   });
-  const joints = clampJoints(pack, raw);
+
+  if (chassisId) {
+    const calibrated = calibrateRawJoints(chassisId, raw, pack);
+    if (!calibrated.error) raw = calibrated.joints;
+  }
+
+  let joints = clampJoints(pack, raw);
+
+  if (opts.slew && typeof opts.dtSec === 'number') {
+    const slewed = opts.slew.step(joints, opts.dtSec);
+    /** @type {typeof joints} */
+    const next = {};
+    for (const [id, j] of Object.entries(joints)) {
+      next[id] = { ...j, value: slewed[id] ?? j.value };
+    }
+    joints = next;
+  }
+
+  const chassis = chassisId ? getChassis(chassisId) : null;
 
   return applyComplianceGate(
     {
       kind: 'robot_driver',
       packId: pack.id,
+      chassisId: chassis?.id || null,
+      chassisLabel: chassis?.label || null,
       label: pack.label,
       protocol: pack.protocol || ROBOT_PROTOCOL,
       rateHz: pack.rateHz,
@@ -369,6 +407,7 @@ export function encodeRobotLine(frame) {
   return JSON.stringify({
     protocol: frame.protocol || ROBOT_PROTOCOL,
     pack: frame.packId,
+    chassis: frame.chassisId || null,
     t: frame.timestamp,
     joints: values,
   });
@@ -380,19 +419,37 @@ export function encodeRobotLine(frame) {
 export class RobotDriverPublisher {
   /**
    * @param {string} [packId]
+   * @param {{ chassisId?: string, slew?: boolean }} [opts]
    */
-  constructor(packId = DEFAULT_ROBOT_PACK) {
+  constructor(packId = DEFAULT_ROBOT_PACK, opts = {}) {
     this.packId = packId;
+    this.chassisId = opts.chassisId || null;
+    this.slew =
+      opts.slew === false
+        ? null
+        : new ChassisSlewLimiter(opts.chassisId || DEFAULT_CHASSIS);
     /** @type {ReturnType<typeof driveRobot>|null} */
     this.latest = null;
     this.enabled = false;
+    this._lastT = null;
   }
 
   /**
    * @param {Parameters<typeof driveRobot>[1]} opts
    */
   publish(opts = {}) {
-    this.latest = driveRobot(this.packId, opts);
+    const timeSec = opts.timeSec ?? 0;
+    const dtSec =
+      this._lastT == null ? 1 / 30 : Math.max(1e-3, timeSec - this._lastT);
+    this._lastT = timeSec;
+    if (this.slew && opts.chassisId) this.slew.setChassis(opts.chassisId);
+    else if (this.slew && this.chassisId) this.slew.setChassis(this.chassisId);
+    this.latest = driveRobot(this.packId, {
+      ...opts,
+      chassisId: opts.chassisId || this.chassisId,
+      slew: this.slew,
+      dtSec,
+    });
     return this.latest;
   }
 

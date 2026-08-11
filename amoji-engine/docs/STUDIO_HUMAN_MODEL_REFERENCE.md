@@ -150,6 +150,7 @@ Amoji engine (ND “systemic emotion”)
 27. ~~**Capture→bake** (video ARKit takes → intensity sculpts + onset/apex/offset)~~ ✓
 28. ~~**MediaPipe Capture Studio** (webcam/video → ARKit NDJSON)~~ ✓
 29. ~~**Bake→emotion-timing** (Step-Out / attack / blink from video envelopes)~~ ✓
+30. ~~**Chassis calibration** (desktop/lobby/lab · scale/deadzone/slew)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -181,4 +182,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: chassis-specific robot tuning; production TTS wiring; Actor discretion UX depth.
+Next code increment: production TTS phoneme wiring; Actor discretion UX depth.

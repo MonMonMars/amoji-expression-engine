@@ -57,6 +57,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
+- **Chassis calib**: desktop-buddy / lobby-companion / lab-humanoid — gains, invert, deadzone, slew
 
 ## Code
 
@@ -82,6 +83,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
 - Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
+- Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
 - Emotion timing: `data/temporal/emotion-timing.json` — Step-Out / attack / blink (updated via `capture-bake --apply-temporal`)

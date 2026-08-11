@@ -455,8 +455,10 @@
       <div class="group">
         <div class="label">Robot driver (L10)</div>
         <select id="robotPackSel" class="ctl"></select>
+        <select id="chassisSel" class="ctl" style="margin-top:8px;"></select>
         <div class="row" style="margin-top:8px;">
           <button type="button" id="btnRobotWalk">Walk hips</button>
+          <button type="button" id="btnRobotSlew" class="primary">Slew</button>
         </div>
         <div class="status" id="robotStatus">robot off</div>
         <pre id="robotDebug">—</pre>
@@ -515,6 +517,12 @@
         driveRobot,
         DEFAULT_ROBOT_PACK,
       } from '/engine/export/robotDriver.js';
+      import {
+        listChassis,
+        getChassis,
+        ChassisSlewLimiter,
+        DEFAULT_CHASSIS,
+      } from '/engine/export/chassisCalibrate.js';
       import {
         texturePackUrls,
         applyTexturePack,
@@ -577,6 +585,7 @@
       const robotDebug = document.getElementById('robotDebug');
       const robotStatus = document.getElementById('robotStatus');
       const robotPackSel = document.getElementById('robotPackSel');
+      const chassisSel = document.getElementById('chassisSel');
       const intensityEl = document.getElementById('intensity');
       const intensityVal = document.getElementById('intensityVal');
       const intensityMeter = document.getElementById('intensityMeter');
@@ -618,6 +627,10 @@
       let applySurfaceHints = true;
       let robotPackId = DEFAULT_ROBOT_PACK;
       let robotWalkOn = false;
+      let chassisId = DEFAULT_CHASSIS;
+      let robotSlewOn = true;
+      const robotSlew = new ChassisSlewLimiter(chassisId);
+      let lastRobotT = performance.now() / 1000;
       /** @type {Record<string, THREE.Object3D>} */
       let boneMap = {};
       /** @type {Record<string, { x: number, y: number, z: number }>} */
@@ -676,18 +689,49 @@
         if (pack.id === robotPackId) opt.selected = true;
         robotPackSel.appendChild(opt);
       }
+      for (const c of listChassis()) {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.label} → ${c.packId}`;
+        if (c.id === chassisId) opt.selected = true;
+        chassisSel.appendChild(opt);
+      }
+      function refreshRobotStatus() {
+        robotStatus.textContent = [
+          `chassis ${chassisId}`,
+          robotWalkOn ? 'walk ON' : null,
+          robotSlewOn ? 'slew ON' : 'slew off',
+        ]
+          .filter(Boolean)
+          .join(' · ');
+      }
       robotPackSel.addEventListener('change', () => {
         robotPackId = robotPackSel.value || DEFAULT_ROBOT_PACK;
-        robotStatus.textContent = `pack ${robotPackId}`;
+        refreshRobotStatus();
+      });
+      chassisSel.addEventListener('change', () => {
+        chassisId = chassisSel.value || DEFAULT_CHASSIS;
+        const c = getChassis(chassisId);
+        if (c) {
+          robotPackId = c.packId;
+          robotPackSel.value = robotPackId;
+        }
+        robotSlew.setChassis(chassisId);
+        robotSlew.reset();
+        refreshRobotStatus();
       });
       document.getElementById('btnRobotWalk').addEventListener('click', () => {
         robotWalkOn = !robotWalkOn;
         document.getElementById('btnRobotWalk').classList.toggle('primary', robotWalkOn);
-        robotStatus.textContent = robotWalkOn
-          ? `pack ${robotPackId} · walk ON`
-          : `pack ${robotPackId}`;
+        refreshRobotStatus();
       });
-      robotStatus.textContent = `pack ${robotPackId}`;
+      document.getElementById('btnRobotSlew').addEventListener('click', () => {
+        robotSlewOn = !robotSlewOn;
+        document.getElementById('btnRobotSlew').classList.toggle('primary', robotSlewOn);
+        if (!robotSlewOn) robotSlew.reset();
+        refreshRobotStatus();
+      });
+      refreshRobotStatus();
 
       function refreshTemporalStatus() {
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
@@ -1554,6 +1598,9 @@
         if (frames % 3 === 0) {
           const blinkW =
             blinkT > 0 ? Math.sin((1 - blinkT / 0.18) * Math.PI) : temporalState?.blink || 0;
+          const nowT = performance.now() / 1000;
+          const dtRobot = Math.max(1e-3, nowT - lastRobotT);
+          lastRobotT = nowT;
           const robotFrame = driveRobot(robotPackId, {
             emotion,
             intensity,
@@ -1561,17 +1608,20 @@
             lookY,
             blinkL: blinkW,
             blinkR: blinkW,
-            timeSec: performance.now() / 1000,
+            timeSec: nowT,
             walking: robotWalkOn,
             gaitPhase: walkPhase,
+            chassisId,
+            slew: robotSlewOn ? robotSlew : null,
+            dtSec: dtRobot,
           });
           const nz = robotFrame.nonzero || {};
           const robotLines = Object.entries(nz)
             .slice(0, 14)
             .map(([k, v]) => `${k}: ${Number(v).toFixed(2)}`);
           robotDebug.textContent = robotLines.length
-            ? `${robotFrame.packId} · ${robotFrame.dof}DOF\n${robotLines.join('\n')}`
-            : `(${robotPackId} rest)`;
+            ? `${robotFrame.chassisId || '—'} · ${robotFrame.packId} · ${robotFrame.dof}DOF\n${robotLines.join('\n')}`
+            : `(${chassisId} rest)`;
         }
 
         if (liveLinkOn && frames % 2 === 0) {
