@@ -269,6 +269,9 @@ Amoji engine (ND “systemic emotion”)
 146. ~~**Audit toast hash export filter** (`toastInHashOnly` · Export toast hash)~~ ✓
 147. ~~**Cancel on TTS synth/http** (`tts_synth_pick` / `tts_http_pick`)~~ ✓
 148. ~~**Cancel on script hold/clear** (`script_hold_pick` / `clear_pick`)~~ ✓
+149. ~~**Toast hash saved views** (`toastInHashOnly` · `#flv=` + saved views)~~ ✓
+150. ~~**Cancel on TTS preset change** (`tts_preset_pick`)~~ ✓
+151. ~~**Cancel compound on disc auto-improv** (`auto_improv_pick` · toggle + auto reaction)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -300,4 +303,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast hash saved views, cancel on TTS preset change, compound on disc auto-improv).
+Next code increment: further polish (toast hash view export filter, cancel on disc stimulus change, compound on script hold release).
