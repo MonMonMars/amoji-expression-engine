@@ -198,6 +198,12 @@
         align-items: center;
         flex: 0 0 auto;
         opacity: 0.95;
+        cursor: pointer;
+      }
+      .extreme-ease-spark:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
       }
       .extreme-ease-spark svg {
         display: block;
@@ -618,7 +624,7 @@
           <div
             id="disneyExtremeEaseSpark"
             class="extreme-ease-spark"
-            title="Ease overdrive curve (marker = shapeInt)"
+            title="Ease overdrive curve (marker = shapeInt) · click to flash"
           ></div>
           <div class="status" id="disneyExtremeEaseLabel" style="margin:0;">ease curve</div>
         </div>
@@ -1481,6 +1487,33 @@
 
       document.getElementById('btnDisneyExtremeCopy')?.addEventListener('click', () => {
         copyDisneyExtremeSummary();
+      });
+
+      function flashDisneyExtremeEaseCurve() {
+        const disneyExtremeOn = !!disneyExtremeEl?.checked;
+        const { shapeInt } = computeDisneyExtremeIntensities(intensity, {
+          enabled: disneyExtremeOn,
+          shapeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+          bodyOn: !!disneyExtremeBodyEl?.checked,
+          bodyFactor: Number(disneyExtremeBodyFactorEl?.value || 1.6),
+        });
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeEaseCurveLabel({
+            enabled: disneyExtremeOn,
+            markerT: disneyExtremeOn ? shapeInt : undefined,
+          }),
+        );
+      }
+      disneyExtremeEaseSpark?.addEventListener('click', () => {
+        flashDisneyExtremeEaseCurve();
+      });
+      disneyExtremeEaseSpark?.setAttribute('role', 'button');
+      disneyExtremeEaseSpark?.setAttribute('tabindex', '0');
+      disneyExtremeEaseSpark?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeEaseCurve();
+        }
       });
 
       let disneyExtremeNudgeHold = null;
@@ -2654,6 +2687,7 @@
         intensityVal.textContent = intensity.toFixed(2);
         intensityMeter.style.width = `${Math.min(100, (intensity / 2) * 100)}%`;
         updateTierHintForDisneyExtreme();
+        syncDisneyExtremePrefsSummary();
         temporal.intensity = intensity;
       });
       intensityEl.addEventListener('change', () => persistPrefs());
