@@ -1454,6 +1454,7 @@
           reason !== 'tts_endpoint_drag_pick' &&
           reason !== 'tts_endpoint_drag_start_pick' &&
           reason !== 'tts_endpoint_drag_end_pick' &&
+          reason !== 'tts_endpoint_drag_leave_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2970,6 +2971,7 @@
         });
         ttsEndpointEl?.addEventListener('dragleave', () => {
           ttsEndpointDragActive = false;
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_leave_pick');
         });
         ttsEndpointEl?.addEventListener('drop', () => {
           ttsEndpointDragActive = false;
