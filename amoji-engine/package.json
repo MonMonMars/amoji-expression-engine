@@ -10,6 +10,7 @@
     "face-live": "npx --yes serve . -p 5174",
     "livelink": "node prototypes/livelink-bridge.mjs",
     "livelink:soak": "node prototypes/livelink-soak.mjs",
+    "tts:smoke": "node prototypes/tts-smoke.mjs",
     "capture-bake": "node tools/capture-bake/cli.mjs",
     "capture-studio": "npx --yes serve . -p 5175",
     "yt-capture": "node tools/yt-capture/cli.mjs",

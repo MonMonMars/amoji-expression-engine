@@ -59,6 +59,72 @@
         "mouthClose": "CTRL_Expressions_mouthClose",
         "tongueOut": "CTRL_Expressions_tongueOut"
       }
+    },
+    "cc4-arkit": {
+      "id": "cc4-arkit",
+      "label": "Character Creator 4 ARKit sample",
+      "description": "Illustrative CC4 / AccuRIG-style morph names. Tune per export preset.",
+      "direction": "arkit_to_morph",
+      "map": {
+        "jawOpen": "V_Open",
+        "mouthSmileLeft": "L_Smile_Open",
+        "mouthSmileRight": "R_Smile_Open",
+        "mouthFrownLeft": "L_Frown",
+        "mouthFrownRight": "R_Frown",
+        "eyeBlinkLeft": "L_Eye_Blink",
+        "eyeBlinkRight": "R_Eye_Blink",
+        "eyeWideLeft": "L_Eye_Widen",
+        "eyeWideRight": "R_Eye_Widen",
+        "browInnerUp": "Brow_Raise_Inner",
+        "browDownLeft": "L_Brow_Drop",
+        "browDownRight": "R_Brow_Drop",
+        "browOuterUpLeft": "L_Brow_Raise",
+        "browOuterUpRight": "R_Brow_Raise",
+        "mouthPucker": "Mouth_Pucker",
+        "mouthFunnel": "Mouth_Funnel",
+        "cheekPuff": "Cheek_Puff",
+        "noseSneerLeft": "L_Nose_Sneer",
+        "noseSneerRight": "R_Nose_Sneer",
+        "mouthClose": "V_Tight",
+        "tongueOut": "Tongue_Out"
+      }
+    },
+    "ue5-morph-flat": {
+      "id": "ue5-morph-flat",
+      "label": "UE5 flat MorphTarget_ sample",
+      "description": "Simple MorphTarget_<ARKit> naming for custom Control Rigs / face boards.",
+      "direction": "arkit_to_morph",
+      "map": {
+        "jawOpen": "MorphTarget_jawOpen",
+        "mouthSmileLeft": "MorphTarget_mouthSmileLeft",
+        "mouthSmileRight": "MorphTarget_mouthSmileRight",
+        "mouthFrownLeft": "MorphTarget_mouthFrownLeft",
+        "mouthFrownRight": "MorphTarget_mouthFrownRight",
+        "eyeBlinkLeft": "MorphTarget_eyeBlinkLeft",
+        "eyeBlinkRight": "MorphTarget_eyeBlinkRight",
+        "eyeWideLeft": "MorphTarget_eyeWideLeft",
+        "eyeWideRight": "MorphTarget_eyeWideRight",
+        "eyeLookUpLeft": "MorphTarget_eyeLookUpLeft",
+        "eyeLookUpRight": "MorphTarget_eyeLookUpRight",
+        "eyeLookDownLeft": "MorphTarget_eyeLookDownLeft",
+        "eyeLookDownRight": "MorphTarget_eyeLookDownRight",
+        "eyeLookInLeft": "MorphTarget_eyeLookInLeft",
+        "eyeLookInRight": "MorphTarget_eyeLookInRight",
+        "eyeLookOutLeft": "MorphTarget_eyeLookOutLeft",
+        "eyeLookOutRight": "MorphTarget_eyeLookOutRight",
+        "browInnerUp": "MorphTarget_browInnerUp",
+        "browDownLeft": "MorphTarget_browDownLeft",
+        "browDownRight": "MorphTarget_browDownRight",
+        "browOuterUpLeft": "MorphTarget_browOuterUpLeft",
+        "browOuterUpRight": "MorphTarget_browOuterUpRight",
+        "mouthPucker": "MorphTarget_mouthPucker",
+        "mouthFunnel": "MorphTarget_mouthFunnel",
+        "cheekPuff": "MorphTarget_cheekPuff",
+        "noseSneerLeft": "MorphTarget_noseSneerLeft",
+        "noseSneerRight": "MorphTarget_noseSneerRight",
+        "mouthClose": "MorphTarget_mouthClose",
+        "tongueOut": "MorphTarget_tongueOut"
+      }
     }
   }
 }

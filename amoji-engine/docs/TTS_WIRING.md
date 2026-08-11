@@ -69,4 +69,12 @@ await playWithProvider(player, http, { text: '你好', emotion: 'happy' });
 
 Face Live: paste endpoint → **HTTP synthesize** (uses `setBrowserTtsConfig`). No secrets committed.
 
-Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js`.
+Smoke (auth round-trip):
+
+```bash
+npm run tts:smoke            # local Bearer echo if no env
+AMOJI_TTS_ENDPOINT=https://… AMOJI_TTS_TOKEN=… npm run tts:smoke
+npm run tts:smoke -- --local
+```
+
+Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js` + `ttsSmoke.js`.

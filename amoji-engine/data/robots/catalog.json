@@ -88,6 +88,26 @@
         "index_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
         "index_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" }
       }
+    },
+    "upper-body-fingers": {
+      "id": "upper-body-fingers",
+      "label": "Upper-body + full fingers",
+      "productLine": "companion-robot",
+      "surfaceLevel": 10,
+      "rateHz": 24,
+      "protocol": "json-joints-v1",
+      "description": "Extends hands pack with middle/ring/pinky curls + finger spread for deeper Layer G articulation.",
+      "extends": "upper-body-hands",
+      "joints": {
+        "middle_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
+        "middle_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
+        "ring_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
+        "ring_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
+        "pinky_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.12, "region": "hand" },
+        "pinky_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.12, "region": "hand" },
+        "spread_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.25, "region": "hand" },
+        "spread_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.25, "region": "hand" }
+      }
     }
   },
   "emotionFaceHints": {

@@ -94,7 +94,7 @@ Pass bar (LAN, same machine): drop rate &lt; 5%, consumer `errors == 0`, jawOpen
 
 ARKit channel names may not match your UE morph / Control Rig controls. Sample profiles live in:
 
-- `data/ue/control-rig-arkit-remap.json` — `identity` · `sakura-expression` · `metahuman-ctrlrig-sample`
+- `data/ue/control-rig-arkit-remap.json` — `identity` · `sakura-expression` · `metahuman-ctrlrig-sample` · `cc4-arkit` · `ue5-morph-flat`
 - `engine/export/controlRigRemap.js` — `remapArkitToMorphs` / `remapLiveLinkFrame`
 
 ```js

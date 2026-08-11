@@ -76,7 +76,7 @@ describe('upper-body-hands pack', () => {
     });
     expect(raw.hand_R_fist).toBeCloseTo(0.7, 5);
     expect(raw.hand_R_open).toBeLessThan(0.9);
-    expect(raw.index_R).toBeGreaterThan(0.5);
+    expect(raw.index_R).toBeGreaterThan(0.4);
   });
 
   it('driveRobot + lobby-companion-hands chassis', () => {

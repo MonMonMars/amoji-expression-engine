@@ -15,6 +15,7 @@ import {
   ChassisSlewLimiter,
   DEFAULT_CHASSIS,
 } from './chassisCalibrate.js';
+import { articulateFingers } from './fingerArticulation.js';
 
 export const ROBOT_CATALOG = catalog;
 export const ROBOT_PACKS = catalog.packs;
@@ -222,35 +223,10 @@ export function mapFrameToJoints(pack, frame = {}) {
   if (has('wrist_L')) raw.wrist_L = armL.wrist ?? 0;
   if (has('wrist_R')) raw.wrist_R = armR.wrist ?? 0;
 
-  // Hands (Layer G fist / handOpen → finger DOF)
-  const fist = typeof g.fist === 'number' ? g.fist : typeof armR.fist === 'number' ? armR.fist : 0;
-  const handOpen =
-    typeof g.handOpen === 'number'
-      ? g.handOpen
-      : typeof armR.handOpen === 'number'
-        ? armR.handOpen
-        : 0.35;
-  if (has('hand_L_fist')) raw.hand_L_fist = typeof armL.fist === 'number' ? armL.fist : fist;
-  if (has('hand_R_fist')) raw.hand_R_fist = typeof armR.fist === 'number' ? armR.fist : fist;
-  if (has('hand_L_open')) {
-    raw.hand_L_open =
-      typeof armL.handOpen === 'number' ? armL.handOpen : Math.max(0, handOpen * (1 - fist));
-  }
-  if (has('hand_R_open')) {
-    raw.hand_R_open =
-      typeof armR.handOpen === 'number' ? armR.handOpen : Math.max(0, handOpen * (1 - fist));
-  }
-  if (has('thumb_L')) {
-    raw.thumb_L = typeof armL.thumb === 'number' ? armL.thumb : 0.2 + fist * 0.55;
-  }
-  if (has('thumb_R')) {
-    raw.thumb_R = typeof armR.thumb === 'number' ? armR.thumb : 0.2 + fist * 0.55;
-  }
-  if (has('index_L')) {
-    raw.index_L = typeof armL.index === 'number' ? armL.index : 0.15 + fist * 0.7;
-  }
-  if (has('index_R')) {
-    raw.index_R = typeof armR.index === 'number' ? armR.index : 0.15 + fist * 0.7;
+  // Hands / fingers (Layer G → articulateFingers)
+  const digits = articulateFingers(g);
+  for (const [id, value] of Object.entries(digits)) {
+    if (has(id)) raw[id] = value;
   }
 
   // Legs / gait (Layer W)

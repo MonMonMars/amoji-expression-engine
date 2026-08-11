@@ -22,13 +22,16 @@ describe('robot pack catalog', () => {
     expect(ids).toContain('upper-body-companion');
     expect(ids).toContain('humanoid-stub');
     expect(ids).toContain('upper-body-hands');
+    expect(ids).toContain('upper-body-fingers');
     const face = packs.find((p) => p.id === 'face-servo-12');
     const upper = packs.find((p) => p.id === 'upper-body-companion');
     const hands = packs.find((p) => p.id === 'upper-body-hands');
+    const fingers = packs.find((p) => p.id === 'upper-body-fingers');
     const human = packs.find((p) => p.id === 'humanoid-stub');
     expect(face.dof).toBe(12);
     expect(upper.dof).toBeGreaterThan(face.dof);
     expect(hands.dof).toBe(upper.dof + 8);
+    expect(fingers.dof).toBe(hands.dof + 8);
     expect(human.dof).toBeGreaterThan(upper.dof);
   });
 

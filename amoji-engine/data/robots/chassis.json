@@ -206,6 +206,32 @@
         "elbow_L": { "scale": 0.9, "maxDeltaPerSec": 1.5 },
         "elbow_R": { "scale": 0.9, "maxDeltaPerSec": 1.5 }
       }
+    },
+    "lobby-companion-fingers": {
+      "id": "lobby-companion-fingers",
+      "label": "Lobby companion · fingers",
+      "packId": "upper-body-fingers",
+      "productLine": "companion-robot",
+      "variantOf": "lobby-companion",
+      "description": "Full finger curls + spread for expressive greeter hands.",
+      "gains": {
+        "expression": 1,
+        "mouth": 1.05,
+        "eye": 0.95,
+        "body": 0.85
+      },
+      "joints": {
+        "hand_L_fist": { "scale": 1.05, "maxDeltaPerSec": 2.4 },
+        "hand_R_fist": { "scale": 1.05, "maxDeltaPerSec": 2.4 },
+        "middle_L": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "middle_R": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "ring_L": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "ring_R": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "pinky_L": { "scale": 1.1, "maxDeltaPerSec": 2.4 },
+        "pinky_R": { "scale": 1.1, "maxDeltaPerSec": 2.4 },
+        "spread_L": { "scale": 1, "maxDeltaPerSec": 1.8 },
+        "spread_R": { "scale": 1, "maxDeltaPerSec": 1.8 }
+      }
     }
   },
   "regionGainMap": {

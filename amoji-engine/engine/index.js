@@ -384,12 +384,6 @@ export {
   DEFAULT_TTS_ENDPOINT,
 } from './tts/ttsProvider.js';
 export {
-  TTS_CONFIG_KEYS,
-  resolveTtsConfig,
-  createTtsProviderFromConfig,
-  setBrowserTtsConfig,
-} from './tts/ttsConfig.js';
-export {
   CONTROL_RIG_REMAP_CATALOG,
   DEFAULT_REMAP_PROFILE,
   listRemapProfiles,
@@ -399,3 +393,18 @@ export {
   remapMorphsToArkit,
   remapLiveLinkFrame,
 } from './export/controlRigRemap.js';
+export {
+  digitCurl,
+  fingerSpread,
+  articulateFingers,
+} from './export/fingerArticulation.js';
+export {
+  TTS_CONFIG_KEYS,
+  resolveTtsConfig,
+  createTtsProviderFromConfig,
+  setBrowserTtsConfig,
+} from './tts/ttsConfig.js';
+export {
+  startAuthEchoServer,
+  runAuthenticatedTtsSmoke,
+} from './tts/ttsSmoke.js';

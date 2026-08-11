@@ -59,8 +59,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
 - **TTS speak**: Mock synthesize / HTTP synthesize (endpoint) / Step fixture WAV / attach audio → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
-- **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
-- **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / humanoid-stub
+- **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
+- **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 
 ## Code
 
@@ -86,9 +86,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `controlRigRemap.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
-- Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json` (incl. `upper-body-hands`)
+- Robot drivers: `engine/export/robotDriver.js` + `fingerArticulation.js` + `data/robots/catalog.json` (hands / fingers packs)
 - Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew + variants)
-- TTS config: `engine/tts/ttsConfig.js` (env / `__AMOJI_TTS__`)
+- TTS config: `engine/tts/ttsConfig.js` · smoke `engine/tts/ttsSmoke.js` (`npm run tts:smoke`)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
 - YT/video batch: `tools/yt-capture/` + `prototypes/yt-capture-batch.html` — prep clip → quality gate → bake
