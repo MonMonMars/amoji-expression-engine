@@ -289,6 +289,7 @@ export {
   parseDisneyExtremeSnapshot,
   diffDisneyExtremeSnapshots,
   formatDisneyExtremeSnapshotDiffLabel,
+  formatDisneyExtremeSnapshotDiffCopyText,
   isDisneyExtremeSnapshotDirty,
   formatDisneyExtremeDirtyHudBit,
   captureDisneyExtremeBaseline,

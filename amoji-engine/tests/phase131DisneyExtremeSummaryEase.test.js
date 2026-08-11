@@ -45,9 +45,10 @@ describe('Phase 131 Extreme summary includes ease + od', () => {
 
   it('Face Live Copy / title pass intensity into summary', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('disneyExtremeMouthFactorEl?.value || 1.5,\n            ),\n            intensity,\n          }');
     expect(src).toContain(
-      'disneyExtremeMouthFactorEl?.value || 1.5,\n          ),\n          intensity,\n        });',
+      'disneyExtremeMouthFactorEl?.value || 1.5,\n            ),\n            intensity,\n          }',
     );
+    expect(src).toContain('{ baseline: lastExtremeBaselineSnap }');
+    expect(src).toContain('summarizeDisneyExtremePrefs(');
   });
 });

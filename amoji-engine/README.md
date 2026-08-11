@@ -196,7 +196,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 183 | Extreme baseline pill title wiring | Done |
 | Phase 184 | Extreme X pill click flashes diff | Done |
 | Phase 185 | Extreme baseline session storage | Done |
-| Phase 186+ | Further production polish… | Specced |
+| Phase 186 | Extreme snapshot diff copy text | Done |
+| Phase 187 | Extreme Shift+C copy snapshot diff | Done |
+| Phase 188 | Extreme Face Live copy diff wiring | Done |
+| Phase 189 | Extreme summary includes baseline dirty | Done |
+| Phase 190+ | Further production polish… | Specced |
 
 ## Quick start
 

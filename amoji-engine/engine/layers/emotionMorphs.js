@@ -547,6 +547,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     factor: 'mouth',
   },
   { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
+  { id: 'copySnapshotDiff', help: 'Shift+C copy diff', kind: 'note' },
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
@@ -1086,6 +1087,42 @@ export function formatDisneyExtremeSnapshotDiffLabel(diff) {
     return 'diff · match';
   }
   return `diff · ${diff.changes.join(' · ')}`;
+}
+
+/**
+ * Clipboard-friendly Extreme snapshot diff (header + per-field lines).
+ * @param {object|null|undefined} current
+ * @param {object|null|undefined} baseline
+ * @returns {string}
+ */
+export function formatDisneyExtremeSnapshotDiffCopyText(current, baseline) {
+  if (!baseline) return 'diff · no baseline';
+  const left =
+    current && typeof current === 'object' && typeof current.shapeInt === 'number'
+      ? current
+      : buildDisneyExtremeLiveSnapshot(current || { enabled: false });
+  const right =
+    baseline &&
+    typeof baseline === 'object' &&
+    typeof baseline.shapeInt === 'number'
+      ? baseline
+      : buildDisneyExtremeLiveSnapshot(baseline || { enabled: false });
+  const diff = diffDisneyExtremeSnapshots(left, right);
+  const fp = disneyExtremeSnapshotFingerprintShort(right);
+  const dirtyBit = diff.equal ? 'clean' : 'dirty';
+  const header = `${formatDisneyExtremeSnapshotDiffLabel(diff)} · ${dirtyBit} · fp ${fp}`;
+  if (diff.equal) return header;
+  const lines = diff.changes.map((key) => {
+    const from = right[key];
+    const to = left[key];
+    if (typeof from === 'boolean' || typeof to === 'boolean') {
+      return `${key}: ${from ? 'on' : 'off'} → ${to ? 'on' : 'off'}`;
+    }
+    const a = Number(from);
+    const b = Number(to);
+    return `${key}: ${a.toFixed(2)} → ${b.toFixed(2)}`;
+  });
+  return [header, ...lines].join('\n');
 }
 
 /**

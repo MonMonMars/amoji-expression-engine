@@ -26,7 +26,9 @@ describe('Phase 115 Extreme C copy + R reset hotkeys', () => {
     ).toBe(false);
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('C copy');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('R reset');
-    expect(formatDisneyExtremeHotkeyHelp()).toContain('C copy · R reset');
+    expect(formatDisneyExtremeHotkeyHelp()).toContain(
+      'C copy · Shift+C copy diff · R reset',
+    );
   });
 
   it('Face Live shares reset/copy helpers with buttons and hotkeys', () => {

@@ -7,6 +7,8 @@ import {
   isDisneyExtremeNudgeHotkeyKey,
   buildDisneyExtremeLiveSnapshot,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
+  isDisneyExtremeSnapshotDirty,
+  disneyExtremeSnapshotFingerprintShort,
 } from '../layers/emotionMorphs.js';
 
 export const FACE_LIVE_PREFS_KEY = 'amoji.faceLive.prefs.v1';
@@ -82,6 +84,7 @@ export function disneyExtremeUiDefaults() {
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
+ * - `Shift+C` → copy Extreme snapshot diff vs baseline
  * - `r` / `R` → reset × defaults
  * - `[` / `]` → nudge shape × (when Extreme is on; Shift = coarse 0.10; Alt = coarser 0.20)
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
@@ -324,6 +327,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showSnapshotDiff' && ev.shiftKey) {
       return { ok: true, action: 'restoreBaseline' };
     }
+    if (entry.id === 'copySummary' && ev.shiftKey) {
+      return { ok: true, action: 'copySnapshotDiff' };
+    }
     return { ok: true, action: entry.id };
   }
   if (entry.kind === 'nudge') {
@@ -345,10 +351,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
 /**
  * One-line summary of Disney Extreme prefs (for landing toast / title tooltips).
  * When on, includes od/ease; overdrive recipe; body-on also appends mix + neck.
+ * Optional `opts.baseline` appends dirty/clean + short fp.
  * @param {object} [prefs]
+ * @param {{ baseline?: object|null }} [opts]
  * @returns {string}
  */
-export function summarizeDisneyExtremePrefs(prefs) {
+export function summarizeDisneyExtremePrefs(prefs, opts = {}) {
   const p = normalizeFaceLivePrefs(prefs);
   if (!p.disneyExtreme) return 'X off';
   const snap = buildDisneyExtremeLiveSnapshot({
@@ -379,6 +387,11 @@ export function summarizeDisneyExtremePrefs(prefs) {
   if (snap.bodyOn) {
     parts.push(`mix ${snap.bodyMix.toFixed(2)}`);
     parts.push(`neck ${snap.neckBlend.toFixed(2)}`);
+  }
+  if (opts.baseline) {
+    const dirty = isDisneyExtremeSnapshotDirty(snap, opts.baseline);
+    const fp = disneyExtremeSnapshotFingerprintShort(opts.baseline);
+    parts.push(dirty ? `dirty ${fp}` : `clean ${fp}`);
   }
   return parts.join(' · ');
 }
