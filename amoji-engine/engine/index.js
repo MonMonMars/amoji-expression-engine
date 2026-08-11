@@ -268,6 +268,8 @@ export {
   matchDisneyExtremeHotkey,
   disneyExtremeHistoryJumpIndex,
   hasDisneyExtremeBaselineHistory,
+  hasDisneyExtremeBaselineStacks,
+  removeDisneyExtremeBaselineStackEntry,
   isDisneyExtremeNudgeHotkeyKey,
   sampleDisneyExtremeEaseCurve,
   formatDisneyExtremeEaseCurveLabel,

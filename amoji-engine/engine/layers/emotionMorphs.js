@@ -567,7 +567,9 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
   { id: 'clearBaselineRedo', keys: ['w', 'W'], help: 'W wipe redo', kind: 'action' },
   { id: 'clearBaselineFavorites', help: 'Shift+W wipe favs', kind: 'note' },
+  { id: 'clearBaselineStacks', help: 'Alt+W wipe stacks', kind: 'note' },
   { id: 'pinBaseline', keys: ['p', 'P'], help: 'P pin base', kind: 'action' },
+  { id: 'copySnapshotFingerprint', help: 'Alt+P copy fp', kind: 'note' },
   { id: 'copyBaselineRedoJson', keys: ['o', 'O'], help: 'O copy redo JSON', kind: 'action' },
   { id: 'pasteBaselineRedoJson', help: 'Shift+O paste redo', kind: 'note' },
   { id: 'mergeBaselineRedoJson', help: 'Alt+O merge redo', kind: 'note' },
@@ -600,6 +602,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
   { id: 'starBaselineChip', help: 'Shift+click chip star', kind: 'note' },
   { id: 'unstarBaselineChip', help: 'Ctrl+click fav chip unstar', kind: 'note' },
+  { id: 'removeBaselineChip', help: 'Ctrl+click hist/redo chip remove', kind: 'note' },
   { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
   { id: 'copyBaselineStacksJson', keys: ['z', 'Z'], help: 'Z copy stacks', kind: 'action' },
   { id: 'pasteBaselineStacksJson', help: 'Shift+Z paste stacks', kind: 'note' },
@@ -609,6 +612,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
   { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
   { id: 'activeFavoriteChip', help: 'fav chip · active', kind: 'note' },
+  { id: 'activeHistoryChip', help: 'hist/redo chip · active', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -629,6 +633,41 @@ export function hasDisneyExtremeBaselineHistory(opts = {}) {
     ? opts.redo.length
     : Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
   return histLen + redoLen > 0;
+}
+
+/**
+ * Whether Extreme hist/redo/fav stacks have anything to wipe.
+ * @param {{
+ *   historyDepth?: number,
+ *   redoDepth?: number,
+ *   favoritesDepth?: number,
+ *   history?: object[],
+ *   redo?: object[],
+ *   favorites?: object[],
+ * }} [opts]
+ * @returns {boolean}
+ */
+export function hasDisneyExtremeBaselineStacks(opts = {}) {
+  return (
+    hasDisneyExtremeBaselineHistory(opts) ||
+    hasDisneyExtremeBaselineFavorites(opts)
+  );
+}
+
+/**
+ * Remove one entry from a hist/redo (or similar) stack by index.
+ * @param {object[]|null|undefined} list
+ * @param {number} index
+ * @returns {{ items: object[], removed: boolean, index: number }}
+ */
+export function removeDisneyExtremeBaselineStackEntry(list, index) {
+  const items = Array.isArray(list) ? list.slice() : [];
+  const i = Number(index);
+  if (!Number.isInteger(i) || i < 0 || i >= items.length) {
+    return { items, removed: false, index: -1 };
+  }
+  items.splice(i, 1);
+  return { items, removed: true, index: i };
 }
 
 /**

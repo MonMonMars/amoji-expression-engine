@@ -280,7 +280,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 267 | Extreme Alt+1–4 favorite jump | Done |
 | Phase 268 | Extreme kit share URL `#dxs=`+`#dxb=` / Shift+V | Done |
 | Phase 269 | Extreme active favorite chip highlight | Done |
-| Phase 270+ | Further production polish… | Specced |
+| Phase 270 | Extreme Alt+W wipe stacks | Done |
+| Phase 271 | Extreme Ctrl+click hist/redo chip remove | Done |
+| Phase 272 | Extreme Alt+P copy fingerprint | Done |
+| Phase 273 | Extreme active hist/redo chip highlight | Done |
+| Phase 274+ | Further production polish… | Specced |
 
 ## Quick start
 
