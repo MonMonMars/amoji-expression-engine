@@ -23,12 +23,12 @@ describe('Disney Extreme eye/mouth factor multipliers', () => {
     expect(src).toContain("k.includes('pupil')");
     expect(src).toContain("k.includes('brow')");
     expect(src).toContain("k.includes('lid')");
-    expect(src).toContain('targets[k] = v * disneyEyeFactor');
+    expect(src).toContain('targets[k] = Math.min(2.0, v * disneyEyeFactor)');
     expect(src).toContain("const isMouth =");
     expect(src).toContain("k.includes('mouth')");
     expect(src).toContain("k.includes('lip')");
     expect(src).toContain("k.includes('jaw')");
-    expect(src).toContain('targets[k] = v * disneyMouthFactor');
+    expect(src).toContain('targets[k] = Math.min(2.0, v * disneyMouthFactor)');
   });
 });
 

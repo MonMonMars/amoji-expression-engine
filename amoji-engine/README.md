@@ -112,7 +112,9 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 99 | Prefs drop sets preview text before refresh | Done |
 | Phase 100 | Prefs drop sets preview label before refresh | Done |
 | Phase 101 | Prefs drop summarize inheritExportMeta | Done |
-| Phase 102+ | Further production polish… | Specced |
+| Phase 102 | Face Live intensity slider max 2.0 | Done |
+| Phase 103 | Disney Extreme tier (face/body/eye/mouth · prefs · morph clamp) | Done |
+| Phase 104+ | Further production polish… | Specced |
 
 ## Quick start
 

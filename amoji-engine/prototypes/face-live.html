@@ -4747,8 +4747,8 @@
               k.includes('lid');
             const isMouth =
               k.includes('mouth') || k.includes('lip') || k.includes('jaw');
-            if (isEye) targets[k] = v * disneyEyeFactor;
-            if (isMouth) targets[k] = v * disneyMouthFactor;
+            if (isEye) targets[k] = Math.min(2.0, v * disneyEyeFactor);
+            if (isMouth) targets[k] = Math.min(2.0, v * disneyMouthFactor);
           }
         }
 
