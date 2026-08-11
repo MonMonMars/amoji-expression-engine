@@ -215,6 +215,18 @@ export function applyBodyBones(boneMap, restRotations, sample, alpha = 1) {
   if (spine?.scale?.setScalar) {
     spine.scale.setScalar(sample.chestScale);
   }
+
+  // Extreme tiers: also scale head + neck for "cartoon swell" feel.
+  // This stays proportional and only applies when bones support scaling.
+  const head = boneMap.head;
+  if (head?.scale?.setScalar) {
+    head.scale.setScalar(sample.chestScale);
+  }
+  const neck = boneMap.neck;
+  if (neck?.scale?.setScalar) {
+    // Slightly damp neck scale so silhouettes stay readable.
+    neck.scale.setScalar(1 + (sample.chestScale - 1) * 0.6);
+  }
 }
 
 /**
