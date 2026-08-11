@@ -72,7 +72,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 59 | Toast hash saved views · TTS preset cancel · disc auto-improv cancel | Done |
 | Phase 60 | Toast hash view export · disc stimulus cancel · script hold release cancel | Done |
 | Phase 61 | Toast hash view import · TTS endpoint cancel · deliver residue cancel | Done |
-| Phase 62+ | Further production polish… | Specced |
+| Phase 62 | Toast hash import inherit hint · TTS endpoint blur/input cancel · continuity residual tick cancel | Done |
+| Phase 63+ | Further production polish… | Specced |
 
 ## Quick start
 

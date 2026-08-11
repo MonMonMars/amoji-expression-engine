@@ -82,6 +82,17 @@ export function applyContinuity(opts) {
 }
 
 /**
+ * Whether continuity state still carries a residual emotion above threshold.
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null } | null} continuity
+ * @param {number} [minIntensity]
+ */
+export function hasContinuityResidual(continuity, minIntensity = 0.02) {
+  const residual = continuity?.residual;
+  if (!residual?.emotion) return false;
+  return (residual.intensity ?? 0) > minIntensity;
+}
+
+/**
  * Passive leakage: mood signature continuously under dialogue emotion.
  * @param {string} moodId
  * @param {number} baseline

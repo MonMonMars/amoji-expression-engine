@@ -795,6 +795,7 @@
           <input id="prefsAuditImportToastHashOnly" type="checkbox" />
           <span style="font-size:0.8rem;color:var(--muted)">Import merge toast hash only</span>
         </label>
+        <div id="prefsAuditImportHint" class="status" style="font-size:0.75rem;margin-top:4px;color:var(--muted);">—</div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
           <button type="button" id="btnPrefsAuditRenameView">Rename view</button>
@@ -850,6 +851,7 @@
       } from '/engine/layers/moodEngine.js';
       import {
         DiscretionController,
+        hasContinuityResidual,
       } from '/engine/layers/discretion.js';
       import {
         personaAllowsEasterEggs,
@@ -922,6 +924,7 @@
         buildAuditViewShareSnapshot,
         decodeAuditViewHash,
         filterAuditSavedViews,
+        formatAuditViewsImportInheritHint,
       } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
@@ -1066,6 +1069,7 @@
       const eyeCtl = new EyeController({ gaze: 'lock', pupilProfile: 'robot' });
       const moodCtl = new MoodController({ state: 'neutral' });
       const discCtl = new DiscretionController({ personaId: 'companion' });
+      let discContinuityResidualCompoundHandled = false;
       let gazeModeUi = 'manual';
       const eggEnabled = {
         nlpGazeConvention: false,
@@ -1380,7 +1384,10 @@
           reason !== 'stimulus_pick' &&
           reason !== 'script_hold_release_pick' &&
           reason !== 'tts_endpoint_pick' &&
-          reason !== 'deliver_residue_pick'
+          reason !== 'tts_endpoint_blur_pick' &&
+          reason !== 'tts_endpoint_input_pick' &&
+          reason !== 'deliver_residue_pick' &&
+          reason !== 'continuity_residual_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2131,6 +2138,7 @@
       document.getElementById('btnDiscClear').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('clear_pick');
         discCtl.clearContinuity();
+        discContinuityResidualCompoundHandled = false;
         discContStatus.textContent = 'continuity cleared';
       });
       discAuto.addEventListener('change', () => {
@@ -2797,6 +2805,16 @@
         });
         document.getElementById('ttsEndpoint')?.addEventListener('change', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
+        document.getElementById('ttsEndpoint')?.addEventListener('blur', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_blur_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
+        document.getElementById('ttsEndpoint')?.addEventListener('input', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_input_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
@@ -3475,11 +3493,59 @@
         document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
           document.getElementById('prefsAuditImportViewsFile')?.click();
         });
+        let prefsAuditImportPreviewText = '';
+        function refreshAuditImportInheritHint() {
+          const hintEl = document.getElementById('prefsAuditImportHint');
+          if (!hintEl) return;
+          if (!prefsAuditImportPreviewText) {
+            hintEl.textContent = '—';
+            return;
+          }
+          const mergeStarredOnly = !!document.getElementById(
+            'prefsAuditImportStarredOnly',
+          )?.checked;
+          const folderOnly = !!document.getElementById(
+            'prefsAuditImportFolderOnly',
+          )?.checked;
+          const toastHashOnly = !!document.getElementById(
+            'prefsAuditImportToastHashOnly',
+          )?.checked;
+          const folderEl = document.getElementById('prefsAuditViewFolder');
+          const folder = folderOnly
+            ? prefsAuditFolderFilter ||
+              folderEl?.value?.trim() ||
+              ''
+            : '';
+          const hinted = formatAuditViewsImportInheritHint(
+            prefsAuditImportPreviewText,
+            {
+              mergeStarredOnly,
+              mergeStarredOnlyExplicit: mergeStarredOnly,
+              toastInHashOnly: toastHashOnly,
+              toastInHashOnlyExplicit: toastHashOnly,
+              folder: folder || null,
+              folderExplicit: folderOnly,
+              inheritExportMeta: true,
+            },
+          );
+          hintEl.textContent = hinted.ok && hinted.hint ? hinted.hint : '—';
+        }
+        for (const id of [
+          'prefsAuditImportStarredOnly',
+          'prefsAuditImportFolderOnly',
+          'prefsAuditImportToastHashOnly',
+        ]) {
+          document.getElementById(id)?.addEventListener('change', () => {
+            refreshAuditImportInheritHint();
+          });
+        }
         document.getElementById('prefsAuditImportViewsFile')?.addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
           if (!file) return;
           try {
             const text = await file.text();
+            prefsAuditImportPreviewText = text;
+            refreshAuditImportInheritHint();
             const mergeStarredOnly = !!document.getElementById(
               'prefsAuditImportStarredOnly',
             )?.checked;
@@ -3526,6 +3592,8 @@
             prefsStatus.textContent = bits.length
               ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
               : `prefs · views imported · ${imported.count}`;
+            prefsAuditImportPreviewText = '';
+            refreshAuditImportInheritHint();
           } catch (err) {
             prefsStatus.className = 'status bad';
             prefsStatus.textContent = String(err.message || err);
@@ -3767,6 +3835,14 @@
           moodBaseline: moodState.baseline,
           availableMorphs: availableMorphs(),
         });
+        if (hasContinuityResidual(discState.continuity)) {
+          if (!discContinuityResidualCompoundHandled && compoundCrossfade) {
+            cancelActiveCompoundLifecycle('continuity_residual_pick');
+            discContinuityResidualCompoundHandled = true;
+          }
+        } else {
+          discContinuityResidualCompoundHandled = false;
+        }
         if (discGapBar) {
           discGapBar.style.width = `${Math.min(100, (discState.gapProgress || 0) * 100)}%`;
         }

@@ -452,6 +452,77 @@ export function resolveAuditViewsImportFilters(raw, opts = {}) {
 }
 
 /**
+ * Human-readable hint for import filters inherited from export metadata.
+ * @param {object|string} raw
+ * @param {{
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ * }} [opts]
+ */
+export function formatAuditViewsImportInheritHint(raw, opts = {}) {
+  const filters = resolveAuditViewsImportFilters(raw, opts);
+  if (!filters.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_hint',
+        ok: false,
+        hint: null,
+        reason: filters.reason || 'invalid',
+      },
+      {},
+    );
+  }
+  /** @type {string[]} */
+  const inherited = [];
+  if (
+    filters.fromExportMeta &&
+    filters.mergeStarredOnly &&
+    filters.exportStarredOnly &&
+    !opts.mergeStarredOnlyExplicit
+  ) {
+    inherited.push('starred');
+  }
+  if (
+    filters.fromExportMeta &&
+    filters.toastInHashOnly &&
+    filters.exportToastInHashOnly &&
+    !opts.toastInHashOnlyExplicit
+  ) {
+    inherited.push('toast hash');
+  }
+  if (
+    filters.fromExportMeta &&
+    filters.folder &&
+    filters.exportFolder &&
+    !opts.folderExplicit
+  ) {
+    inherited.push(`folder ${filters.folder}`);
+  }
+  const hint =
+    inherited.length > 0
+      ? `Inherit from export: ${inherited.join(' · ')}`
+      : filters.fromExportMeta
+        ? 'Export metadata detected (no extra filters to inherit)'
+        : null;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_hint',
+      ok: true,
+      hint,
+      inherited,
+      fromExportMeta: filters.fromExportMeta,
+      filters,
+    },
+    {},
+  );
+}
+
+/**
  * Merge imported views into an existing list.
  * @param {object[]} existing
  * @param {object[]} incoming
