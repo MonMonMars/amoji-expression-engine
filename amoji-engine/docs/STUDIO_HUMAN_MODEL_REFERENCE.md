@@ -230,6 +230,9 @@ Amoji engine (ND “systemic emotion”)
 107. ~~**Probe toast latency spark mini** (`buildProbeToastSparkMini` · inline SVG)~~ ✓
 108. ~~**Audit views drag reorder** (`reorder` / Move up·down · drag list)~~ ✓
 109. ~~**Cancel compound on blink** (Blink clears lifecycle)~~ ✓
+110. ~~**Probe toast copy-as-markdown** (`buildHealthProbeMarkdownPayload` · `m`)~~ ✓
+111. ~~**Audit views star favorites** (`toggleStar` · starred sort)~~ ✓
+112. ~~**Cancel compound on Live Link toggle** (Live Link pub clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -261,4 +264,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast copy-as-markdown, views star favorites, cancel on Live Link toggle).
+Next code increment: further polish (toast sound cue, views bulk star, cancel on step-out).

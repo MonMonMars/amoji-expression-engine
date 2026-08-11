@@ -745,6 +745,9 @@
           <button type="button" id="btnPrefsAuditMoveDown">Move down</button>
         </div>
         <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditStarView">Star / unstar</button>
+        </div>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
             <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
@@ -1109,9 +1112,10 @@
             const opt = document.createElement('option');
             opt.value = v.id;
             opt.textContent =
-              !filterFolder && f.name !== 'Inbox'
+              (v.starred ? '★ ' : '') +
+              (!filterFolder && f.name !== 'Inbox'
                 ? `${f.name} / ${v.name}`
-                : v.name;
+                : v.name);
             if (v.id === current) opt.selected = true;
             sel.appendChild(opt);
           }
@@ -1124,9 +1128,10 @@
             row.draggable = true;
             row.dataset.id = v.id;
             row.textContent =
-              !filterFolder && v._folderLabel !== 'Inbox'
+              (v.starred ? '★ ' : '') +
+              (!filterFolder && v._folderLabel !== 'Inbox'
                 ? `${v._folderLabel} / ${v.name}`
-                : v.name;
+                : v.name);
             dragList.appendChild(row);
           }
         }
@@ -1175,7 +1180,7 @@
             ? ` · ${probeToastHistory.index + 1}/${probeToastHistory.size}`
             : '';
         let title = `${toast.title || 'Probe detail'}${histLabel}`;
-        let detailText = `${toast.detail || ''} · [ ] history · = compare · c r p esc`;
+        let detailText = `${toast.detail || ''} · [ ] history · = compare · c copy · m md · r p esc`;
         const slaBadge = describeProbeToastSlaBadge(gatewayHealthHistory.summarize());
         if (probeToastCompareOn && probeToastHistory.previous) {
           const cmp = compareProbeToastDetails(
@@ -1261,7 +1266,8 @@
           reason !== 'idle_pick' &&
           reason !== 'spin_pick' &&
           reason !== 'cycle_pick' &&
-          reason !== 'blink_pick'
+          reason !== 'blink_pick' &&
+          reason !== 'livelink_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1278,7 +1284,8 @@
           reason === 'idle_pick' ||
           reason === 'spin_pick' ||
           reason === 'cycle_pick' ||
-          reason === 'blink_pick'
+          reason === 'blink_pick' ||
+          reason === 'livelink_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2050,6 +2057,7 @@
         refreshTemporalStatus();
       });
       document.getElementById('btnLiveLink').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('livelink_pick');
         liveLinkOn = !liveLinkOn;
         e.currentTarget.classList.toggle('primary', liveLinkOn);
         refreshTemporalStatus();
@@ -2387,6 +2395,14 @@
             canForward: probeToastHistory.canForward,
             canCompare: probeToastHistory.canCompare,
             compareOn: probeToastCompareOn,
+            sla: gatewayHealthHistory.summarize(),
+            compare:
+              probeToastCompareOn && probeToastHistory.previous
+                ? compareProbeToastDetails(
+                    lastProbeDetail,
+                    probeToastHistory.previous.detail,
+                  )
+                : null,
           });
           if (!resolved.ok) return resolved;
           if (resolved.compare) {
@@ -2422,7 +2438,10 @@
             }
             return resolved;
           }
-          if (resolved.action === 'copy' && resolved.copy?.ok) {
+          if (
+            (resolved.action === 'copy' || resolved.action === 'markdown') &&
+            resolved.copy?.ok
+          ) {
             try {
               if (navigator.clipboard?.writeText) {
                 await navigator.clipboard.writeText(resolved.copy.copyText);
@@ -2434,7 +2453,10 @@
                 document.execCommand('copy');
                 ta.remove();
               }
-              setTtsStatus('probe detail copied', 'ok');
+              setTtsStatus(
+                resolved.markdown ? 'probe markdown copied' : 'probe detail copied',
+                'ok',
+              );
             } catch (err) {
               setTtsStatus(String(err.message || err), 'bad');
             }
@@ -2834,6 +2856,26 @@
             : moved.ok
               ? 'prefs · already at bottom'
               : 'prefs · move failed';
+        });
+        document.getElementById('btnPrefsAuditStarView')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a view to star';
+            return;
+          }
+          const toggled = auditSavedViews.toggleStar(id);
+          if (!toggled.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · star failed';
+            return;
+          }
+          refreshAuditSavedViewsUi(toggled.view?.id || id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = toggled.view?.starred
+            ? `prefs · starred “${toggled.view.name}”`
+            : `prefs · unstarred “${toggled.view?.name}”`;
         });
         (() => {
           const dragList = document.getElementById('prefsAuditViewsDragList');

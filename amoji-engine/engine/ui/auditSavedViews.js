@@ -18,6 +18,7 @@ export function normalizeAuditSavedView(raw, opts = {}) {
     id: raw?.id || `view-${now}-${Math.random().toString(36).slice(2, 7)}`,
     name,
     folder,
+    starred: !!raw?.starred,
     action: raw?.action && raw.action !== 'all' ? String(raw.action) : 'all',
     query: raw?.query != null ? String(raw.query) : '',
     regex: !!raw?.regex,
@@ -29,19 +30,44 @@ export function normalizeAuditSavedView(raw, opts = {}) {
 /**
  * Snapshot current audit UI filters into a saved view payload.
  * @param {object} filters
- * @param {{ name?: string, folder?: string, now?: number }} [opts]
+ * @param {{ name?: string, folder?: string, starred?: boolean, now?: number }} [opts]
  */
 export function snapshotAuditView(filters = {}, opts = {}) {
   return normalizeAuditSavedView(
     {
       name: opts.name,
       folder: opts.folder ?? filters.folder,
+      starred: opts.starred ?? filters.starred,
       action: filters.action,
       query: filters.query,
       regex: filters.regex,
       rangePreset: filters.rangePreset,
     },
     { now: opts.now },
+  );
+}
+
+/**
+ * Sort views with starred favorites first (stable within groups).
+ * @param {object[]} views
+ */
+export function sortAuditViewsByStar(views) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  list.sort((a, b) => {
+    const sa = a?.starred ? 1 : 0;
+    const sb = b?.starred ? 1 : 0;
+    if (sa !== sb) return sb - sa;
+    return 0;
+  });
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_star',
+      ok: true,
+      views: list,
+      starredCount: list.filter((v) => v.starred).length,
+      count: list.length,
+    },
+    {},
   );
 }
 
@@ -330,6 +356,7 @@ export function compactAuditViewForShare(view) {
   const out = {};
   if (v.name && v.name !== 'Untitled') out.n = v.name;
   if (v.folder) out.f = v.folder;
+  if (v.starred) out.s = 1;
   if (v.action && v.action !== 'all') out.a = v.action;
   if (v.query) out.q = v.query;
   if (v.regex) out.r = 1;
@@ -347,6 +374,7 @@ export function expandAuditViewFromShare(compact, opts = {}) {
     {
       name: compact?.n || compact?.name,
       folder: compact?.f || compact?.folder,
+      starred: compact?.s ?? compact?.starred,
       action: compact?.a || compact?.action,
       query: compact?.q ?? compact?.query,
       regex: compact?.r ?? compact?.regex,
@@ -703,10 +731,12 @@ export function createAuditSavedViews(opts = {}) {
           regex: src.regex,
           rangePreset: src.rangePreset,
           folder: dupOpts.folder != null ? dupOpts.folder : src.folder,
+          starred: false,
         },
         {
           name: uniqueRequested,
           folder: dupOpts.folder != null ? dupOpts.folder : src.folder,
+          starred: false,
           now: dupOpts.now,
         },
       );
@@ -757,6 +787,64 @@ export function createAuditSavedViews(opts = {}) {
         },
         {},
       );
+    },
+    setStarred(idOrName, starred, starOpts = {}) {
+      const key = String(idOrName || '');
+      const idx = views.findIndex(
+        (v) =>
+          v.id === key || v.name.toLowerCase() === key.toLowerCase(),
+      );
+      if (idx < 0) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'set_starred',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      const id = views[idx].id;
+      views[idx] = normalizeAuditSavedView(
+        {
+          ...views[idx],
+          starred: !!starred,
+          savedAt: starOpts.now ?? Date.now(),
+        },
+        { now: starOpts.now },
+      );
+      views = sortAuditViewsByStar(views).views;
+      save();
+      const view = views.find((v) => v.id === id) || null;
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'set_starred',
+          ok: true,
+          view,
+          starred: !!view?.starred,
+          count: views.length,
+        },
+        {},
+      );
+    },
+    toggleStar(idOrName, starOpts = {}) {
+      const got = this.get(idOrName);
+      if (!got.ok || !got.view) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'toggle_star',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      return this.setStarred(got.view.id, !got.view.starred, starOpts);
     },
     folders() {
       return groupAuditViewsByFolder(views);

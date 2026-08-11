@@ -473,6 +473,79 @@ export function buildHealthProbeCopyPayload(detail) {
   );
 }
 
+/**
+ * Build a Markdown copy payload for a probe detail (toast / share).
+ * @param {object|string|null} detail
+ * @param {{
+ *   title?: string,
+ *   sla?: object|null,
+ *   compare?: object|null,
+ * }} [opts]
+ */
+export function buildHealthProbeMarkdownPayload(detail, opts = {}) {
+  const base = buildHealthProbeCopyPayload(detail);
+  if (!base.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_markdown',
+        ok: false,
+        copyText: '',
+        message: base.message || 'nothing to copy',
+      },
+      {},
+    );
+  }
+  const sample =
+    detail && typeof detail === 'object' ? detail.sample || null : null;
+  const title = opts.title || (sample?.ok ? 'Probe up' : sample ? 'Probe down' : 'Probe detail');
+  const lines = [];
+  lines.push(`## ${title}`);
+  lines.push('');
+  if (sample) {
+    lines.push(`- **Status:** ${sample.ok ? 'up' : 'down'} · \`${sample.status || '—'}\``);
+    if (typeof sample.latencyMs === 'number') {
+      lines.push(`- **Latency:** ${Math.round(sample.latencyMs)}ms`);
+    }
+    if (sample.httpStatus != null) lines.push(`- **HTTP:** ${sample.httpStatus}`);
+    if (sample.message) lines.push(`- **Message:** ${sample.message}`);
+    if (typeof sample.at === 'number') {
+      lines.push(`- **At:** ${new Date(sample.at).toISOString()}`);
+    }
+  }
+  if (opts.sla && typeof opts.sla.uptimePct === 'number') {
+    lines.push(
+      `- **SLA:** ${opts.sla.uptimePct}%` +
+        (typeof opts.sla.latencyP50Ms === 'number'
+          ? ` · p50 ${Math.round(opts.sla.latencyP50Ms)}ms`
+          : ''),
+    );
+  }
+  if (opts.compare?.ok && opts.compare.detail) {
+    lines.push(`- **Compare:** ${opts.compare.detail}`);
+  }
+  const body =
+    typeof detail === 'object' && Array.isArray(detail.lines) && detail.lines.length
+      ? detail.lines
+      : base.copyText.split('\n');
+  if (body.length) {
+    lines.push('');
+    lines.push('```');
+    lines.push(...body);
+    lines.push('```');
+  }
+  const copyText = lines.join('\n');
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_markdown',
+      ok: true,
+      copyText,
+      format: 'markdown',
+      message: 'probe markdown ready',
+    },
+    {},
+  );
+}
+
 export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
 
 /** Default toast action ids for Face Live probe toast. */
@@ -481,6 +554,7 @@ export const PROBE_TOAST_ACTIONS = [
   { id: 'next', label: 'Next', shortcut: ']' },
   { id: 'compare', label: 'Compare', shortcut: '=' },
   { id: 'copy', label: 'Copy', shortcut: 'c' },
+  { id: 'markdown', label: 'MD', shortcut: 'm' },
   { id: 'reprobe', label: 'Re-probe', shortcut: 'r' },
   { id: 'pin', label: 'Pin', shortcut: 'p' },
   { id: 'dismiss', label: 'Dismiss', shortcut: 'Escape' },
@@ -525,6 +599,7 @@ export function resolveProbeToastShortcut(ev, opts = {}) {
   else if (k === '[') action = 'prev';
   else if (k === ']') action = 'next';
   else if (k === '=' || k === '+') action = 'compare';
+  else if (k === 'm' || k === 'M') action = 'markdown';
   if (!action) {
     return applyComplianceGate(
       {
@@ -660,6 +735,29 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         unpin: false,
         history: null,
         compare: false,
+        markdown: false,
+      },
+      {},
+    );
+  }
+  if (id === 'markdown') {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: true,
+        action: 'markdown',
+        copy: buildHealthProbeMarkdownPayload(ctx.detail || null, {
+          sla: ctx.sla || null,
+          compare: ctx.compare || null,
+          title: ctx.title || null,
+        }),
+        dismiss: false,
+        reprobe: false,
+        pin: false,
+        unpin: false,
+        history: null,
+        compare: false,
+        markdown: true,
       },
       {},
     );
@@ -677,6 +775,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         unpin: false,
         history: null,
         compare: false,
+        markdown: false,
       },
       {},
     );
@@ -696,6 +795,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         sticky: !pinned,
         history: null,
         compare: false,
+        markdown: false,
       },
       {},
     );
@@ -713,6 +813,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         unpin: false,
         history: null,
         compare: false,
+        markdown: false,
       },
       {},
     );
@@ -729,6 +830,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
       unpin: false,
       history: null,
       compare: false,
+      markdown: false,
     },
     {},
   );
