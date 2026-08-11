@@ -319,6 +319,19 @@
         background: color-mix(in oklab, #163328 55%, #0d141a);
         color: var(--accent);
       }
+      #prefsAuditImportViewsDropZone {
+        transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+      }
+      #prefsAuditImportViewsDropZone.dragover {
+        border-color: var(--accent);
+        background: color-mix(in oklab, var(--accent) 14%, #0d141a);
+        color: var(--ink);
+      }
+      #prefsAuditImportViewsDropZone.has-preview {
+        border-style: solid;
+        border-color: color-mix(in oklab, var(--accent) 55%, var(--line));
+        color: var(--accent);
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -787,8 +800,9 @@
           id="prefsAuditImportViewsDropZone"
           class="status"
           style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
+          title="Drop JSON · double-click to import preview"
         >
-          Drag & drop JSON to preview
+          Drag & drop JSON to preview · double-click to import
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
@@ -859,6 +873,7 @@
       import {
         DiscretionController,
         hasContinuityResidual,
+        tuneContinuityResidualIntensity,
       } from '/engine/layers/discretion.js';
       import {
         personaAllowsEasterEggs,
@@ -932,6 +947,7 @@
         decodeAuditViewHash,
         filterAuditSavedViews,
         formatAuditViewsImportInheritHint,
+        summarizeAuditViewsImportPreview,
       } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
@@ -1394,6 +1410,7 @@
           reason !== 'tts_endpoint_blur_pick' &&
           reason !== 'tts_endpoint_input_pick' &&
           reason !== 'tts_endpoint_paste_pick' &&
+          reason !== 'tts_endpoint_enter_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2833,6 +2850,13 @@
           persistPrefs();
           syncGatewayHealthPoll();
         });
+        ttsEndpointEl?.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') {
+            cancelActiveCompoundLifecycle('tts_endpoint_enter_pick');
+            persistPrefs();
+            syncGatewayHealthPoll();
+          }
+        });
         ttsPresetSel.addEventListener('change', () => {
           setTimeout(() => syncGatewayHealthPoll(), 50);
         });
@@ -3513,6 +3537,21 @@
           document.getElementById('prefsAuditImportViewsFile')?.click();
         });
         let prefsAuditImportPreviewText = '';
+        let prefsAuditImportPreviewLabel = '';
+        function refreshAuditImportDropZone() {
+          const dropZone = document.getElementById('prefsAuditImportViewsDropZone');
+          if (!dropZone) return;
+          if (!prefsAuditImportPreviewText) {
+            dropZone.classList.remove('has-preview');
+            dropZone.textContent =
+              'Drag & drop JSON to preview · double-click to import';
+            return;
+          }
+          dropZone.classList.add('has-preview');
+          dropZone.textContent = prefsAuditImportPreviewLabel
+            ? `${prefsAuditImportPreviewLabel} · click Import`
+            : 'Preview ready · click Import';
+        }
         function refreshAuditImportInheritHint() {
           const hintEl = document.getElementById('prefsAuditImportHint');
           if (!hintEl) return;
@@ -3595,6 +3634,8 @@
             ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
             : `prefs · views imported · ${imported.count}`;
           prefsAuditImportPreviewText = '';
+          prefsAuditImportPreviewLabel = '';
+          refreshAuditImportDropZone();
           refreshAuditImportInheritHint();
           return imported;
         }
@@ -3613,6 +3654,12 @@
           try {
             const text = await file.text();
             prefsAuditImportPreviewText = text;
+            const preview = summarizeAuditViewsImportPreview(text, {
+              inheritExportMeta: true,
+              filename: file.name,
+            });
+            prefsAuditImportPreviewLabel = preview.ok ? preview.label : file.name;
+            refreshAuditImportDropZone();
             refreshAuditImportInheritHint();
             await importAuditViewsText(text);
           } catch (err) {
@@ -3648,13 +3695,25 @@
             try {
               const text = await file.text();
               prefsAuditImportPreviewText = text;
+              const preview = summarizeAuditViewsImportPreview(text, {
+                inheritExportMeta: true,
+                filename: file.name,
+              });
+              prefsAuditImportPreviewLabel = preview.ok ? preview.label : file.name;
+              refreshAuditImportDropZone();
               refreshAuditImportInheritHint();
               prefsStatus.className = 'status ok';
-              prefsStatus.textContent = 'prefs · drop preview ready · click import';
+              prefsStatus.textContent = preview.ok
+                ? `prefs · drop preview · ${preview.label}`
+                : 'prefs · drop preview ready · click import';
             } catch (err) {
               prefsStatus.className = 'status bad';
               prefsStatus.textContent = String(err.message || err);
             }
+          });
+          prefsAuditImportViewsDropZone.addEventListener('dblclick', async () => {
+            if (!prefsAuditImportPreviewText) return;
+            await importAuditViewsText(prefsAuditImportPreviewText);
           });
         }
         refreshAuditSavedViewsUi();
@@ -3951,17 +4010,15 @@
           mergeMorphOverlays(targets, discState.leakMorphs);
         }
         // Continuity residual morph overlay: gently carry prior emotion morphs.
-        if (hasContinuityResidual(discState.continuity)) {
-          const residual = discState.continuity?.residual;
-          if (residual?.emotion && typeof residual.intensity === 'number') {
-            const residualMorphs = emotionToMorphWeights(
-              lod,
-              residual.emotion,
-              residual.intensity,
-              morphs,
-            );
-            mergeMorphOverlays(targets, residualMorphs);
-          }
+        const residualTune = tuneContinuityResidualIntensity(discState.continuity);
+        if (residualTune.ok && residualTune.emotion) {
+          const residualMorphs = emotionToMorphWeights(
+            lod,
+            residualTune.emotion,
+            residualTune.intensity,
+            morphs,
+          );
+          mergeMorphOverlays(targets, residualMorphs);
         }
 
         // Smile typology / laughter (happy family subtypes)

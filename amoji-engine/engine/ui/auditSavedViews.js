@@ -523,6 +523,61 @@ export function formatAuditViewsImportInheritHint(raw, opts = {}) {
 }
 
 /**
+ * Short label for drag-drop import preview (view count + toast hash summary).
+ * @param {object|string} raw
+ * @param {{
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ *   filename?: string|null,
+ * }} [opts]
+ */
+export function summarizeAuditViewsImportPreview(raw, opts = {}) {
+  const imported = importAuditSavedViewsJson(raw, { merge: false });
+  if (!imported.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_preview',
+        ok: false,
+        reason: imported.reason || 'invalid',
+        label: null,
+        count: 0,
+      },
+      {},
+    );
+  }
+  const views = imported.views || [];
+  const toastHashCount = views.filter((v) => v.toastInHashOnly).length;
+  const hinted = formatAuditViewsImportInheritHint(raw, opts);
+  const count = views.length;
+  const countLabel =
+    count === 0
+      ? 'empty'
+      : `${count} view${count === 1 ? '' : 's'}${
+          toastHashCount ? ` · ${toastHashCount} toast hash` : ''
+        }`;
+  const filename = opts.filename ? String(opts.filename).trim() : null;
+  const label = filename ? `${filename} · ${countLabel}` : countLabel;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_preview',
+      ok: true,
+      label,
+      count,
+      toastHashCount,
+      filename,
+      hint: hinted.ok ? hinted.hint : null,
+      fromExportMeta: hinted.fromExportMeta,
+    },
+    {},
+  );
+}
+
+/**
  * Merge imported views into an existing list.
  * @param {object[]} existing
  * @param {object[]} incoming

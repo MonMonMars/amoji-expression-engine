@@ -93,6 +93,113 @@ export function hasContinuityResidual(continuity, minIntensity = 0.02) {
 }
 
 /**
+ * Exponential decay of continuity residual intensity (half-life based).
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null, blend?: number } | null} continuity
+ * @param {number} dt seconds since last tick
+ * @param {{ halfLifeSec?: number, minIntensity?: number }} [opts]
+ */
+export function decayContinuityResidual(continuity, dt, opts = {}) {
+  const residual = continuity?.residual;
+  if (!residual?.emotion) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_decay',
+        ok: true,
+        continuity,
+        decayed: false,
+        cleared: false,
+      },
+      {},
+    );
+  }
+  const halfLife = opts.halfLifeSec ?? CONTINUITY_DECAY_HALF_LIFE_SEC;
+  const minIntensity = opts.minIntensity ?? 0.02;
+  const factor = Math.pow(0.5, Math.max(0, dt || 0) / Math.max(1e-6, halfLife));
+  const nextIntensity = (residual.intensity ?? 0) * factor;
+  if (nextIntensity <= minIntensity) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_decay',
+        ok: true,
+        continuity: { ...continuity, residual: null },
+        decayed: true,
+        cleared: true,
+        factor,
+      },
+      {},
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'continuity_decay',
+      ok: true,
+      continuity: {
+        ...continuity,
+        residual: {
+          ...residual,
+          intensity: nextIntensity,
+        },
+      },
+      decayed: true,
+      cleared: false,
+      factor,
+      intensity: nextIntensity,
+    },
+    {},
+  );
+}
+
+/**
+ * Scale residual intensity for morph overlay (blend-aware).
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null, blend?: number } | null} continuity
+ * @param {{ morphScale?: number, minIntensity?: number }} [opts]
+ */
+export function tuneContinuityResidualIntensity(continuity, opts = {}) {
+  const residual = continuity?.residual;
+  if (!residual?.emotion) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_tune',
+        ok: false,
+        emotion: null,
+        intensity: 0,
+      },
+      {},
+    );
+  }
+  const morphScale = opts.morphScale ?? 0.85;
+  const blend = typeof continuity?.blend === 'number' ? continuity.blend : 1;
+  const raw = residual.intensity ?? 0;
+  const intensity = raw * morphScale * blend;
+  const minIntensity = opts.minIntensity ?? 0.02;
+  if (intensity <= minIntensity) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_tune',
+        ok: false,
+        emotion: residual.emotion,
+        intensity: 0,
+        morphScale,
+        blend,
+      },
+      {},
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_tune',
+      ok: true,
+      emotion: residual.emotion,
+      intensity,
+      morphScale,
+      blend,
+      rawIntensity: raw,
+    },
+    {},
+  );
+}
+
+/**
  * Passive leakage: mood signature continuously under dialogue emotion.
  * @param {string} moodId
  * @param {number} baseline
@@ -277,6 +384,15 @@ export class DiscretionController {
     if (!this.scriptPending) this.gapSec += dt;
     else this.gapSec = 0;
     if (this.improvCool > 0) this.improvCool = Math.max(0, this.improvCool - dt);
+
+    if (this.lastContinuity?.residual) {
+      const decayed = decayContinuityResidual(this.lastContinuity, dt, {
+        halfLifeSec: ctx.continuityHalfLifeSec,
+      });
+      if (decayed.ok && decayed.decayed) {
+        this.lastContinuity = decayed.continuity;
+      }
+    }
 
     const leak = ctx.mood
       ? passiveMoodLeak(ctx.mood, ctx.moodBaseline ?? 0.3, ctx.availableMorphs)

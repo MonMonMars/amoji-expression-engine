@@ -284,6 +284,10 @@ Amoji engine (ND “systemic emotion”)
 161. ~~**Toast hash import drag preview** (`prefsAuditImportViewsDropZone` · previewText)~~ ✓
 162. ~~**Cancel on TTS endpoint paste** (`tts_endpoint_paste_pick`)~~ ✓
 163. ~~**Continuity residual morph overlay** (`mergeMorphOverlays` · residual morphs)~~ ✓
+164. ~~**Import drag-drop UX polish** (`summarizeAuditViewsImportPreview` · drop zone label · dbl-click import)~~ ✓
+165. ~~**Continuity residual decay** (`decayContinuityResidual` · half-life tick)~~ ✓
+166. ~~**Residual morph intensity tune** (`tuneContinuityResidualIntensity` · blend-aware overlay)~~ ✓
+167. ~~**Cancel on TTS endpoint Enter** (`tts_endpoint_enter_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -315,4 +319,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (drag-drop UX polish, residual intensity tuning, other Face Live micro-behaviors).
+Next code increment: further production polish (shift-drop auto-import, residual decay HUD bar, endpoint Escape cancel).
