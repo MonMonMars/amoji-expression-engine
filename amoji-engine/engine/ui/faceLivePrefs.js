@@ -67,6 +67,7 @@ export function disneyExtremeUiDefaults() {
  * - `x` / `X` → toggle master
  * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
  * - `h` / `H` / `?` → flash hotkey help on status
+ * - `e` / `E` → flash ease curve label on status
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults

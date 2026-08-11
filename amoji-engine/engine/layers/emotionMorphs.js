@@ -384,6 +384,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
+  { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
