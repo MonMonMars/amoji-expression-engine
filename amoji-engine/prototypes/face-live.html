@@ -965,7 +965,9 @@
           <button type="button" id="btnDisneyExtremeDirtyStrip">Dirty strip <kbd>Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeStripsSummary">Strips summary <kbd>PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyStripsSummary">Copy strips <kbd>⇧PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -1053,7 +1055,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · Alt+Enter hud · ⇧Alt+Enter copy hud · Home dirty · End copy dirty · PageUp toggle strips · PageDown strips summary · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · Alt+Enter hud · ⇧Alt+Enter copy hud · Home dirty · End copy dirty · PageUp toggle strips · ⇧PageUp open · PageDown strips summary · ⇧PageDown copy strips · ↓↑ cycle hist · →← cycle fav · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · 0/8</span>
         </div>
@@ -1066,11 +1068,11 @@
         </div>
         <details
           id="disneyExtremeStrips"
-          title="Extreme strips · tips/capacity/roots/active/pin/dirty · PageUp toggle · PageDown summary · remembered"
+          title="Extreme strips · tips/capacity/roots/active/pin/dirty · PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · remembered"
         >
           <summary
             id="disneyExtremeStripsSummary"
-            title="PageUp toggle · PageDown summary"
+            title="PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy"
           >
             strips · hist 0/8 · redo 0/8 · fav 0/8 · dirty · none
           </summary>
@@ -2275,6 +2277,10 @@
         return true;
       }
 
+      function openDisneyExtremeStrips() {
+        return toggleDisneyExtremeStrips({ open: true });
+      }
+
       function flashDisneyExtremeBaselineStripsSummary(extremeSnap) {
         const text = formatDisneyExtremeBaselineStripsSummaryLabel(
           {
@@ -2286,6 +2292,30 @@
         );
         flashDisneyExtremeStatus(text);
         return true;
+      }
+
+      async function copyDisneyExtremeBaselineStripsSummary(extremeSnap) {
+        const text = formatDisneyExtremeBaselineStripsSummaryLabel(
+          {
+            history: extremeBaselineHistory,
+            redo: extremeBaselineRedo,
+            favorites: extremeBaselineFavorites,
+          },
+          disneyExtremeDirtyStripOpts(extremeSnap),
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
       }
 
       function flashDisneyExtremeBaselinePinStrip() {
@@ -4425,8 +4455,16 @@
         toggleDisneyExtremeStrips();
       });
 
+      document.getElementById('btnDisneyExtremeOpenStrips')?.addEventListener('click', () => {
+        openDisneyExtremeStrips();
+      });
+
       document.getElementById('btnDisneyExtremeStripsSummary')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineStripsSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyStripsSummary')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineStripsSummary();
       });
 
       document.getElementById('disneyExtremeTips')?.addEventListener('click', () => {
@@ -6463,9 +6501,19 @@
           toggleDisneyExtremeStrips();
           return;
         }
+        if (resolved.action === 'openBaselineStrips') {
+          ev.preventDefault();
+          openDisneyExtremeStrips();
+          return;
+        }
         if (resolved.action === 'showBaselineStripsSummary') {
           ev.preventDefault();
           flashDisneyExtremeBaselineStripsSummary();
+          return;
+        }
+        if (resolved.action === 'copyBaselineStripsSummary') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineStripsSummary();
           return;
         }
         if (resolved.action === 'copySummary') {

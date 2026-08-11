@@ -380,7 +380,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 367 | Extreme strips open persistence | Done |
 | Phase 368 | Extreme PageUp toggle strips | Done |
 | Phase 369 | Extreme PageDown strips summary | Done |
-| Phase 370+ | Further production polish… | Specced |
+| Phase 370 | Extreme Shift+PageUp open strips | Done |
+| Phase 371 | Extreme Shift+PageDown copy strips | Done |
+| Phase 372 | Extreme ↓↑ cycle hist | Done |
+| Phase 373 | Extreme →← cycle fav | Done |
+| Phase 374+ | Further production polish… | Specced |
 
 ## Quick start
 

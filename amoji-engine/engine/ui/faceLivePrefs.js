@@ -212,7 +212,11 @@ export function disneyExtremeUiDefaults() {
  * - `Home` → flash Extreme dirty/clean pin-drift strip
  * - `End` → copy Extreme dirty/clean pin-drift strip
  * - `PageUp` → toggle Extreme strips panel
+ * - `Shift+PageUp` → open Extreme strips panel
  * - `PageDown` → flash Extreme strips summary
+ * - `Shift+PageDown` → copy Extreme strips summary
+ * - `ArrowDown` / `ArrowUp` → cycle Extreme history next / previous
+ * - `ArrowRight` / `ArrowLeft` → cycle Extreme favorite next / previous
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -780,6 +784,30 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copyBaselineActive' && ev.shiftKey) {
       return { ok: true, action: 'showBaselinePinStrip' };
+    }
+    if (entry.id === 'toggleBaselineStrips' && ev.shiftKey) {
+      return { ok: true, action: 'openBaselineStrips' };
+    }
+    if (entry.id === 'showBaselineStripsSummary' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineStripsSummary' };
+    }
+    if (entry.id === 'arrowCycleHistory') {
+      return {
+        ok: true,
+        action:
+          key === 'ArrowUp'
+            ? 'cycleBaselineHistoryPrev'
+            : 'cycleBaselineHistoryNext',
+      };
+    }
+    if (entry.id === 'arrowCycleFavorite') {
+      return {
+        ok: true,
+        action:
+          key === 'ArrowLeft'
+            ? 'cycleBaselineFavoritePrev'
+            : 'cycleBaselineFavoriteNext',
+      };
     }
     return { ok: true, action: entry.id };
   }
