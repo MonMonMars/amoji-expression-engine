@@ -15,16 +15,23 @@
     "open-palm": "stopPalm",
     "point": "point"
   },
-  "affectToFinger": {
+    "affectToFinger": {
     "happy": "open-palm",
     "smile_open": "open-palm",
     "sad": "self-hug",
     "angry": "fists",
     "fear": "self-hug",
-    "disgust": "open-palm",
+    "disgust": "pinch",
     "surprised": "open-palm",
     "thinking": "chin-rest",
-    "neutral": "rest"
+    "neutral": "rest",
+    "embarrassed": "self-hug",
+    "anxious": "pinch",
+    "suspicious": "chin-rest",
+    "tired": "self-hug",
+    "content": "open-palm",
+    "irritable": "fists",
+    "melancholy": "self-hug"
   },
   "adaptorToFinger": {
     "fistClench": "fists",

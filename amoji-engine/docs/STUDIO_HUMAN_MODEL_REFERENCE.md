@@ -176,6 +176,9 @@ Amoji engine (ND “systemic emotion”)
 53. ~~**Face Live prefs persistence** (localStorage session restore)~~ ✓
 54. ~~**Affect/adaptor → finger maps** (+ chin-rest / self-hug / fists presets)~~ ✓
 55. ~~**Production gateway smoke docs** (TTS_WIRING pass criteria)~~ ✓
+56. ~~**Prefs export/import JSON** (Face Live download / file restore)~~ ✓
+57. ~~**Affect staging** (intensity bands + mood aliases + look bias)~~ ✓
+58. ~~**Gateway health chip** (`probeTtsGateway` · Probe gateway button)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -207,4 +210,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (prefs export/import JSON, more affect staging, live gateway health chip in Face Live).
+Next code increment: further polish (auto health poll interval, prefs share URL hash, more compound affect staging).

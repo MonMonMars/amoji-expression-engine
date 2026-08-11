@@ -140,3 +140,69 @@ export function clearFaceLivePrefs(opts = {}) {
   memoryStore = null;
   return applyComplianceGate({ kind: 'face_live_prefs_clear', ok: true }, {});
 }
+
+/**
+ * Export prefs as pretty JSON string (no secrets beyond optional endpoint).
+ * @param {{ storage?: Storage|null, memory?: boolean, prefs?: object }} [opts]
+ */
+export function exportFaceLivePrefsJson(opts = {}) {
+  const prefs = opts.prefs
+    ? normalizeFaceLivePrefs(opts.prefs)
+    : loadFaceLivePrefs(opts).prefs;
+  const payload = {
+    kind: 'amoji.faceLive.prefs',
+    version: FACE_LIVE_PREFS_VERSION,
+    exportedAt: new Date().toISOString(),
+    prefs,
+  };
+  return applyComplianceGate(
+    {
+      kind: 'face_live_prefs_export',
+      json: JSON.stringify(payload, null, 2),
+      prefs,
+    },
+    {},
+  );
+}
+
+/**
+ * Import prefs from JSON string or object; optionally persist.
+ * @param {string|object} input
+ * @param {{ storage?: Storage|null, memory?: boolean, persist?: boolean }} [opts]
+ */
+export function importFaceLivePrefsJson(input, opts = {}) {
+  let parsed = input;
+  try {
+    if (typeof input === 'string') parsed = JSON.parse(input);
+  } catch (err) {
+    return applyComplianceGate(
+      {
+        kind: 'face_live_prefs_import',
+        ok: false,
+        error: 'invalid_json',
+        message: String(err?.message || err),
+      },
+      {},
+    );
+  }
+  if (!parsed || typeof parsed !== 'object') {
+    return applyComplianceGate(
+      { kind: 'face_live_prefs_import', ok: false, error: 'invalid_payload' },
+      {},
+    );
+  }
+  const rawPrefs = parsed.prefs && typeof parsed.prefs === 'object' ? parsed.prefs : parsed;
+  const prefs = normalizeFaceLivePrefs(rawPrefs);
+  if (opts.persist !== false) {
+    saveFaceLivePrefs(prefs, opts);
+  }
+  return applyComplianceGate(
+    {
+      kind: 'face_live_prefs_import',
+      ok: true,
+      prefs,
+      persisted: opts.persist !== false,
+    },
+    {},
+  );
+}

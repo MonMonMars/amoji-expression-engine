@@ -486,6 +486,7 @@
         <select id="ttsPresetSel" class="ctl" style="margin-top:8px;"></select>
         <div class="row" style="margin-top:8px;">
           <button type="button" id="btnTtsHttp">HTTP synthesize</button>
+          <button type="button" id="btnTtsHealth">Probe gateway</button>
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:8px;">
           <input id="ttsAudioSync" type="checkbox" checked />
@@ -496,6 +497,7 @@
           <input type="file" id="ttsAudioFile" accept="audio/*" style="display:none" />
         </label>
         <div class="status" id="ttsStatus">tts idle</div>
+        <div class="status" id="ttsHealthChip">gateway · idle</div>
       </div>
 
       <div class="group">
@@ -531,6 +533,12 @@
         </div>
         <div class="status" id="robotStatus">robot off</div>
         <div class="status" id="fingerStatus">fingers · rest</div>
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnPrefsExport">Export prefs</button>
+          <button type="button" id="btnPrefsImport">Import prefs</button>
+        </div>
+        <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
+        <div class="status" id="prefsStatus">prefs · localStorage</div>
         <pre id="robotDebug">—</pre>
       </div>
     </aside>
@@ -597,10 +605,14 @@
         syncAffectToFinger,
         fingerPresetForEmblem,
       } from '/engine/export/emblemFingerSync.js';
+      import { stageAffect } from '/engine/export/affectStaging.js';
       import {
         loadFaceLivePrefs,
         saveFaceLivePrefs,
+        exportFaceLivePrefsJson,
+        importFaceLivePrefsJson,
       } from '/engine/ui/faceLivePrefs.js';
+      import { probeTtsGateway } from '/engine/tts/ttsHealth.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -1278,9 +1290,11 @@
               ? 'Step-Out cleared residual'
               : 'continuity fresh';
           if (affectFingerSyncOn && fingerEmblemSyncOn) {
-            const aff = syncAffectToFinger(emotion);
-            if (aff.synced && aff.fingerPresetId) {
-              applyFingerPreset(aff.fingerPresetId, { fromEmblem: true });
+            const staged = stageAffect(emotion, intensity);
+            if (staged.synced && staged.fingerPresetId) {
+              applyFingerPreset(staged.fingerPresetId, { fromEmblem: true });
+              if (staged.gesture) fingerGesture = staged.gesture;
+              fingerStatus.textContent = `fingers · ${staged.fingerPresetId} · ${staged.band}`;
             }
           }
           persistPrefs();
@@ -1731,6 +1745,92 @@
           setTtsStatus(`TTS config · ${hint.readyForHttp ? 'http ready' : 'saved endpoint'}`);
         }
         ttsAudioSync?.addEventListener('change', () => persistPrefs());
+
+        const ttsHealthChip = document.getElementById('ttsHealthChip');
+        async function refreshGatewayHealth() {
+          const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
+          if (!endpoint) {
+            ttsHealthChip.className = 'status';
+            ttsHealthChip.textContent = 'gateway · idle';
+            return;
+          }
+          ttsHealthChip.textContent = 'gateway · probing…';
+          const health = await probeTtsGateway({ endpoint });
+          ttsHealthChip.className = `status ${health.tone || ''}`;
+          ttsHealthChip.textContent = `gateway · ${health.message}`;
+        }
+        document.getElementById('btnTtsHealth').addEventListener('click', () => {
+          refreshGatewayHealth();
+        });
+        ttsPresetSel.addEventListener('change', () => {
+          const ep = document.getElementById('ttsEndpoint')?.value?.trim();
+          if (ep) setTimeout(() => refreshGatewayHealth(), 50);
+        });
+      }
+
+      // Prefs export / import
+      {
+        const prefsStatus = document.getElementById('prefsStatus');
+        document.getElementById('btnPrefsExport').addEventListener('click', () => {
+          persistPrefs();
+          const exported = exportFaceLivePrefsJson();
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `amoji-face-live-prefs.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsStatus.textContent = 'prefs · exported JSON';
+        });
+        document.getElementById('btnPrefsImport').addEventListener('click', () => {
+          document.getElementById('prefsImportFile').click();
+        });
+        document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
+          const file = ev.target.files?.[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            const imported = importFaceLivePrefsJson(text);
+            if (!imported.ok) {
+              prefsStatus.textContent = `prefs · import failed`;
+              prefsStatus.className = 'status bad';
+              return;
+            }
+            prefsStatus.className = 'status ok';
+            prefsStatus.textContent = `prefs · imported · reload to apply`;
+            // Soft-apply key fields without full reload
+            const p = imported.prefs;
+            if (p.emotion) emotion = p.emotion;
+            if (typeof p.intensity === 'number') {
+              intensity = p.intensity;
+              intensityEl.value = String(intensity);
+              intensityEl.dispatchEvent(new Event('input'));
+            }
+            if (p.fingerPresetId) applyFingerPreset(p.fingerPresetId);
+            if (p.chassisId) {
+              chassisId = p.chassisId;
+              chassisSel.value = chassisId;
+              chassisSel.dispatchEvent(new Event('change'));
+            }
+            if (p.liveLinkRemapId) {
+              liveLinkRemapId = p.liveLinkRemapId;
+              const sel = document.getElementById('liveLinkRemapSel');
+              if (sel) {
+                sel.value = liveLinkRemapId;
+                sel.dispatchEvent(new Event('change'));
+              }
+            }
+            document.querySelectorAll('#emoGrid button').forEach((x) => {
+              x.classList.toggle('active', x.dataset.emo === emotion);
+            });
+            document.getElementById('hudEmo').textContent = emotion;
+            persistPrefs(p);
+          } catch (err) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = String(err.message || err);
+          }
+        });
       }
       document.getElementById('ttsAudioFile').addEventListener('change', async (ev) => {
         const file = ev.target.files?.[0];

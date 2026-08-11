@@ -449,4 +449,17 @@ export {
   loadFaceLivePrefs,
   saveFaceLivePrefs,
   clearFaceLivePrefs,
+  exportFaceLivePrefsJson,
+  importFaceLivePrefsJson,
 } from './ui/faceLivePrefs.js';
+export {
+  healthUrlForEndpoint,
+  probeTtsGateway,
+} from './tts/ttsHealth.js';
+export {
+  AFFECT_ALIASES,
+  resolveAffectKey,
+  affectStagingBand,
+  affectBandScale,
+  stageAffect,
+} from './export/affectStaging.js';
