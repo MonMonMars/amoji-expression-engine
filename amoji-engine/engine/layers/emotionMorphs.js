@@ -284,3 +284,38 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
   }
   return targets;
 }
+
+/**
+ * Format Face Live HUD / status copy for Disney Extreme effective intensities.
+ * @param {{
+ *   enabled?: boolean,
+ *   shapeInt?: number,
+ *   bodyInt?: number,
+ *   bodyOn?: boolean,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ * }} [opts]
+ * @returns {{ pill: string, status: string }}
+ */
+export function formatDisneyExtremeLiveHud(opts = {}) {
+  if (!opts.enabled) {
+    return { pill: 'off', status: 'extreme off' };
+  }
+  const shapeInt = Number(opts.shapeInt);
+  const bodyInt = Number(opts.bodyInt);
+  const eyeFactor =
+    typeof opts.eyeFactor === 'number' && opts.eyeFactor > 0
+      ? opts.eyeFactor
+      : DISNEY_EXTREME_DEFAULTS.eyeFactor;
+  const mouthFactor =
+    typeof opts.mouthFactor === 'number' && opts.mouthFactor > 0
+      ? opts.mouthFactor
+      : DISNEY_EXTREME_DEFAULTS.mouthFactor;
+  const s = Number.isFinite(shapeInt) ? shapeInt : 0;
+  const b = Number.isFinite(bodyInt) ? bodyInt : 0;
+  const bodyBit = opts.bodyOn ? `body ${b.toFixed(2)}` : `body ${b.toFixed(2)} (off)`;
+  return {
+    pill: s.toFixed(2),
+    status: `shape ${s.toFixed(2)} · ${bodyBit} · eye×${eyeFactor.toFixed(2)} · mouth×${mouthFactor.toFixed(2)}`,
+  };
+}

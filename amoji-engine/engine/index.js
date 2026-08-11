@@ -255,6 +255,7 @@ export {
   mergeMorphOverlays,
   amplifyDisneyExtremeMorphs,
   classifyDisneyExtremeMorphKey,
+  formatDisneyExtremeLiveHud,
   DISNEY_EXTREME_DEFAULTS,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';

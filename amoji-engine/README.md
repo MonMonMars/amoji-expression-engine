@@ -117,7 +117,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 104 | Disney Extreme amplify helper (engine) | Done |
 | Phase 105 | Disney Extreme factor value labels + bodyInt HUD | Done |
 | Phase 106 | Disney Extreme Reset × defaults | Done |
-| Phase 107+ | Further production polish… | Specced |
+| Phase 107 | Disney Extreme live HUD (shapeInt pill + status) | Done |
+| Phase 108+ | Further production polish… | Specced |
 
 ## Quick start
 

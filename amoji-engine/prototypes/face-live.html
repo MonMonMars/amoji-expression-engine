@@ -440,6 +440,7 @@
         <div class="pill">E <strong id="hudEyes">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
+        <div class="pill">X <strong id="hudExtreme">off</strong></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
       </div>
     </div>
@@ -599,6 +600,7 @@
         <div class="row" style="margin-top:6px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults</button>
         </div>
+        <div class="status" id="disneyExtremeStatus">extreme off</div>
       </div>
 
       <div class="group">
@@ -950,6 +952,7 @@
         applyMorphWeights,
         mergeMorphOverlays,
         amplifyDisneyExtremeMorphs,
+        formatDisneyExtremeLiveHud,
       } from '/engine/layers/emotionMorphs.js';
       import {
         lookToEyeMorphWeights,
@@ -1165,6 +1168,8 @@
       const disneyExtremeMouthFactorVal = document.getElementById(
         'disneyExtremeMouthFactorVal',
       );
+      const disneyExtremeStatus = document.getElementById('disneyExtremeStatus');
+      const hudExtreme = document.getElementById('hudExtreme');
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
@@ -4497,6 +4502,20 @@
         const bodyOn = disneyExtremeOn && (disneyExtremeBodyEl?.checked || false);
         const bodyFactor = Number(disneyExtremeBodyFactorEl?.value || 1.6);
         const bodyInt = Math.min(2.0, displayInt * (bodyOn ? bodyFactor : 1));
+        const extremeHud = formatDisneyExtremeLiveHud({
+          enabled: disneyExtremeOn,
+          shapeInt,
+          bodyInt,
+          bodyOn,
+          eyeFactor: disneyExtremeEyeFactorEl
+            ? Number(disneyExtremeEyeFactorEl.value || 1.4)
+            : 1.4,
+          mouthFactor: disneyExtremeMouthFactorEl
+            ? Number(disneyExtremeMouthFactorEl.value || 1.5)
+            : 1.5,
+        });
+        if (disneyExtremeStatus) disneyExtremeStatus.textContent = extremeHud.status;
+        if (hudExtreme) hudExtreme.textContent = extremeHud.pill;
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);
