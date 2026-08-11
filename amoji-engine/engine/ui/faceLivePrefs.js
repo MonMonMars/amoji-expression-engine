@@ -82,6 +82,48 @@ export const DISNEY_EXTREME_EYE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_EYE_FACTOR_MAX = 2.2;
 export const DISNEY_EXTREME_MOUTH_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_MOUTH_FACTOR_MAX = 2.2;
+/** Delay before held nudge keys start repeating. */
+export const DISNEY_EXTREME_NUDGE_REPEAT_INITIAL_MS = 320;
+/** Interval between held nudge repeats. */
+export const DISNEY_EXTREME_NUDGE_REPEAT_INTERVAL_MS = 55;
+
+/**
+ * @param {string|undefined} action
+ * @returns {boolean}
+ */
+export function isDisneyExtremeNudgeAction(action) {
+  return typeof action === 'string' && action.startsWith('nudge');
+}
+
+/**
+ * Gate auto-repeat for Extreme factor nudge hotkeys.
+ * First keydown always fires; repeats wait for initial delay then interval.
+ * @param {{
+ *   isRepeat?: boolean,
+ *   startedMs?: number,
+ *   lastFireMs?: number,
+ *   nowMs?: number,
+ *   initialMs?: number,
+ *   intervalMs?: number,
+ * }} [opts]
+ * @returns {boolean}
+ */
+export function shouldRepeatDisneyExtremeNudge(opts = {}) {
+  if (!opts.isRepeat) return true;
+  const now = typeof opts.nowMs === 'number' ? opts.nowMs : 0;
+  const started = typeof opts.startedMs === 'number' ? opts.startedMs : now;
+  const last = typeof opts.lastFireMs === 'number' ? opts.lastFireMs : started;
+  const initial =
+    typeof opts.initialMs === 'number' && opts.initialMs >= 0
+      ? opts.initialMs
+      : DISNEY_EXTREME_NUDGE_REPEAT_INITIAL_MS;
+  const interval =
+    typeof opts.intervalMs === 'number' && opts.intervalMs > 0
+      ? opts.intervalMs
+      : DISNEY_EXTREME_NUDGE_REPEAT_INTERVAL_MS;
+  if (now - started < initial) return false;
+  return now - last >= interval;
+}
 
 /**
  * Nudge / clamp a Disney Extreme factor slider value.

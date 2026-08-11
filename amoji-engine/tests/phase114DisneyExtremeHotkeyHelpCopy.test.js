@@ -21,6 +21,7 @@ describe('Phase 114 Extreme hotkey help + Copy summary', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('R reset');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('H help');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Esc clear');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('hold nudges');
     expect(formatDisneyExtremeHotkeyHelp()).toBe(
       `extreme off · ${DISNEY_EXTREME_HOTKEY_HELP}`,
     );

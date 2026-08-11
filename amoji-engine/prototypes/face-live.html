@@ -1022,6 +1022,8 @@
         loadFaceLivePrefsFromHash,
         disneyExtremeUiDefaults,
         resolveDisneyExtremeHotkey,
+        isDisneyExtremeNudgeAction,
+        shouldRepeatDisneyExtremeNudge,
         nudgeDisneyExtremeShapeFactor,
         nudgeDisneyExtremeBodyFactor,
         nudgeDisneyExtremeEyeFactor,
@@ -1448,6 +1450,7 @@
         copyDisneyExtremeSummary();
       });
 
+      let disneyExtremeNudgeHold = null;
       document.addEventListener('keydown', (ev) => {
         const resolved = resolveDisneyExtremeHotkey(ev, {
           holdingStatus: shouldHoldDisneyExtremeStatus(
@@ -1456,6 +1459,12 @@
           ),
         });
         if (!resolved.ok || !disneyExtremeEl) return;
+        if (
+          ev.repeat &&
+          !isDisneyExtremeNudgeAction(resolved.action)
+        ) {
+          return;
+        }
         if (resolved.action === 'clearStatusHold') {
           ev.preventDefault();
           disneyExtremeStatusHoldUntil = 0;
@@ -1502,6 +1511,29 @@
           return;
         }
         if (!disneyExtremeEl.checked) return;
+        if (!isDisneyExtremeNudgeAction(resolved.action)) return;
+
+        const now = performance.now();
+        if (ev.repeat) {
+          if (
+            !shouldRepeatDisneyExtremeNudge({
+              isRepeat: true,
+              startedMs: disneyExtremeNudgeHold?.startedMs,
+              lastFireMs: disneyExtremeNudgeHold?.lastFireMs,
+              nowMs: now,
+            })
+          ) {
+            return;
+          }
+        } else {
+          disneyExtremeNudgeHold = {
+            key: ev.key,
+            action: resolved.action,
+            startedMs: now,
+            lastFireMs: now,
+          };
+        }
+
         const applyFactorNudge = (el, nudger) => {
           if (!el || el.disabled) return false;
           el.value = String(nudger(Number(el.value), resolved.delta));
@@ -1509,18 +1541,16 @@
           el.dispatchEvent(new Event('change'));
           return true;
         };
+        let applied = false;
         if (
           resolved.action === 'nudgeShapeDown' ||
           resolved.action === 'nudgeShapeUp'
         ) {
-          if (
-            applyFactorNudge(disneyExtremeFactorEl, nudgeDisneyExtremeShapeFactor)
-          ) {
-            ev.preventDefault();
-          }
-          return;
-        }
-        if (
+          applied = applyFactorNudge(
+            disneyExtremeFactorEl,
+            nudgeDisneyExtremeShapeFactor,
+          );
+        } else if (
           resolved.action === 'nudgeBodyDown' ||
           resolved.action === 'nudgeBodyUp'
         ) {
@@ -1529,39 +1559,38 @@
             disneyExtremeBodyEl.checked = true;
             disneyExtremeBodyEl.dispatchEvent(new Event('change'));
           }
-          if (
-            applyFactorNudge(
-              disneyExtremeBodyFactorEl,
-              nudgeDisneyExtremeBodyFactor,
-            )
-          ) {
-            ev.preventDefault();
-          }
-          return;
-        }
-        if (
+          applied = applyFactorNudge(
+            disneyExtremeBodyFactorEl,
+            nudgeDisneyExtremeBodyFactor,
+          );
+        } else if (
           resolved.action === 'nudgeEyeDown' ||
           resolved.action === 'nudgeEyeUp'
         ) {
-          if (
-            applyFactorNudge(disneyExtremeEyeFactorEl, nudgeDisneyExtremeEyeFactor)
-          ) {
-            ev.preventDefault();
-          }
-          return;
-        }
-        if (
+          applied = applyFactorNudge(
+            disneyExtremeEyeFactorEl,
+            nudgeDisneyExtremeEyeFactor,
+          );
+        } else if (
           resolved.action === 'nudgeMouthDown' ||
           resolved.action === 'nudgeMouthUp'
         ) {
-          if (
-            applyFactorNudge(
-              disneyExtremeMouthFactorEl,
-              nudgeDisneyExtremeMouthFactor,
-            )
-          ) {
-            ev.preventDefault();
-          }
+          applied = applyFactorNudge(
+            disneyExtremeMouthFactorEl,
+            nudgeDisneyExtremeMouthFactor,
+          );
+        }
+        if (applied) {
+          ev.preventDefault();
+          if (disneyExtremeNudgeHold) disneyExtremeNudgeHold.lastFireMs = now;
+        }
+      });
+      document.addEventListener('keyup', (ev) => {
+        if (
+          disneyExtremeNudgeHold &&
+          String(ev.key) === String(disneyExtremeNudgeHold.key)
+        ) {
+          disneyExtremeNudgeHold = null;
         }
       });
       let lookX = 0;
