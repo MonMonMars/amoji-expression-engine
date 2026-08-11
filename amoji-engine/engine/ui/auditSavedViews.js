@@ -171,6 +171,23 @@ export function renameAuditSavedView(view, newName, opts = {}) {
 }
 
 /**
+ * Build a unique duplicate name for a saved view.
+ * @param {string} baseName
+ * @param {string[]} existingNames
+ */
+export function nextDuplicateViewName(baseName, existingNames = []) {
+  const base = String(baseName || '').trim() || 'Untitled';
+  const set = new Set(
+    (existingNames || []).map((n) => String(n || '').toLowerCase()),
+  );
+  let candidate = `${base} copy`;
+  if (!set.has(candidate.toLowerCase())) return candidate;
+  let n = 2;
+  while (set.has(`${base} copy ${n}`.toLowerCase())) n += 1;
+  return `${base} copy ${n}`;
+}
+
+/**
  * Create a persisted (or memory) saved-views store.
  * @param {{
  *   max?: number,
@@ -351,6 +368,56 @@ export function createAuditSavedViews(opts = {}) {
           ok: true,
           view: views[idx],
           previousName: renamed.previousName,
+          count: views.length,
+        },
+        {},
+      );
+    },
+    duplicate(idOrName, dupOpts = {}) {
+      const key = String(idOrName || '');
+      const src =
+        views.find((v) => v.id === key) ||
+        views.find((v) => v.name.toLowerCase() === key.toLowerCase()) ||
+        null;
+      if (!src) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'duplicate',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      const requested = String(dupOpts.name || '').trim();
+      const name = nextDuplicateViewName(
+        requested || src.name,
+        views.map((v) => v.name),
+      );
+      // When user supplied a free name, prefer it if unique.
+      const uniqueRequested =
+        requested &&
+        !views.some((v) => v.name.toLowerCase() === requested.toLowerCase())
+          ? requested
+          : name;
+      const saved = this.save(
+        {
+          action: src.action,
+          query: src.query,
+          regex: src.regex,
+          rangePreset: src.rangePreset,
+        },
+        { name: uniqueRequested, now: dupOpts.now },
+      );
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'duplicate',
+          ok: saved.ok,
+          view: saved.view,
+          sourceId: src.id,
           count: views.length,
         },
         {},

@@ -707,6 +707,9 @@
           <button type="button" id="btnPrefsAuditRenameView">Rename view</button>
         </div>
         <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditDuplicateView">Duplicate view</button>
+        </div>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
         </div>
@@ -810,6 +813,7 @@
       import { createAuditSavedViews } from '/engine/ui/auditSavedViews.js';
       import { createProbeToastFocusTrap } from '/engine/ui/probeToastFocusTrap.js';
       import { createProbeToastDismissTimer } from '/engine/ui/probeToastDismiss.js';
+      import { createProbeToastHistory } from '/engine/ui/probeToastHistory.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -988,6 +992,7 @@
           probeToastFocusTrap.deactivate();
         },
       });
+      const probeToastHistory = createProbeToastHistory();
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
@@ -1047,16 +1052,24 @@
         probeToastFocusTrap.deactivate();
         probeToastDismiss.cancel();
       }
-      function showProbeToast(detail) {
+      function showProbeToast(detail, opts = {}) {
         const toast = describeHealthProbeToast(detail);
         const el = document.getElementById('probeDetailToast');
         if (!el || !toast.show) return;
+        if (!opts.fromHistory) {
+          probeToastHistory.push(detail);
+        }
+        lastProbeDetail = detail;
         const titleEl = document.getElementById('probeToastTitle');
         const detailEl = document.getElementById('probeToastDetail');
         const actionsEl = document.getElementById('probeToastActions');
-        if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
+        const histLabel =
+          probeToastHistory.size > 1
+            ? ` · ${probeToastHistory.index + 1}/${probeToastHistory.size}`
+            : '';
+        if (titleEl) titleEl.textContent = `${toast.title || 'Probe detail'}${histLabel}`;
         if (detailEl) {
-          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · p pin · esc dismiss · tab · hover pause`;
+          detailEl.textContent = `${toast.detail || ''} · [ ] history · c copy · r re-probe · p pin · esc`;
         }
         if (actionsEl) {
           actionsEl.innerHTML = '';
@@ -1069,6 +1082,8 @@
             btn.textContent = a.shortcut
               ? `${label} (${a.shortcut === 'Escape' ? 'esc' : a.shortcut})`
               : label;
+            if (a.id === 'prev') btn.disabled = !probeToastHistory.canBack;
+            if (a.id === 'next') btn.disabled = !probeToastHistory.canForward;
             actionsEl.appendChild(btn);
           }
         }
@@ -1077,7 +1092,9 @@
         el.classList.add('show');
         probeToastVisible = true;
         probeToastFocusTrap.activate(el);
-        probeToastDismiss.start(toast.dismissMs || 3800);
+        if (!probeToastDismiss.pinned) {
+          probeToastDismiss.start(toast.dismissMs || 3800);
+        }
       }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
         if (!compoundCrossfade) return null;
@@ -1105,7 +1122,8 @@
           reason !== 'mood_pick' &&
           reason !== 'smile_pick' &&
           reason !== 'laugh_pick' &&
-          reason !== 'gaze_pick'
+          reason !== 'gaze_pick' &&
+          reason !== 'look_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1117,7 +1135,8 @@
           reason === 'mood_pick' ||
           reason === 'smile_pick' ||
           reason === 'laugh_pick' ||
-          reason === 'gaze_pick'
+          reason === 'gaze_pick' ||
+          reason === 'look_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1748,10 +1767,12 @@
         lookYVal.textContent = lookY.toFixed(2);
       });
       document.getElementById('btnLookCam').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('look_pick');
         trackCamera = !trackCamera;
         e.currentTarget.classList.toggle('primary', trackCamera);
       });
       document.getElementById('btnLookCenter').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('look_pick');
         trackCamera = false;
         document.getElementById('btnLookCam').classList.remove('primary');
         lookX = 0;
@@ -2216,8 +2237,32 @@
           const resolved = resolveProbeToastAction(actionId, {
             detail: lastProbeDetail,
             pinned: probeToastDismiss.pinned,
+            canBack: probeToastHistory.canBack,
+            canForward: probeToastHistory.canForward,
           });
           if (!resolved.ok) return resolved;
+          if (resolved.history === 'prev') {
+            const stepped = probeToastHistory.back();
+            if (stepped.ok && stepped.detail) {
+              showProbeToast(stepped.detail, { fromHistory: true });
+              setTtsStatus(
+                `probe history · ${probeToastHistory.index + 1}/${probeToastHistory.size}`,
+                'ok',
+              );
+            }
+            return resolved;
+          }
+          if (resolved.history === 'next') {
+            const stepped = probeToastHistory.forward();
+            if (stepped.ok && stepped.detail) {
+              showProbeToast(stepped.detail, { fromHistory: true });
+              setTtsStatus(
+                `probe history · ${probeToastHistory.index + 1}/${probeToastHistory.size}`,
+                'ok',
+              );
+            }
+            return resolved;
+          }
           if (resolved.action === 'copy' && resolved.copy?.ok) {
             try {
               if (navigator.clipboard?.writeText) {
@@ -2589,6 +2634,26 @@
           refreshAuditSavedViewsUi(renamed.view?.id);
           prefsStatus.className = 'status ok';
           prefsStatus.textContent = `prefs · renamed “${renamed.previousName}” → “${renamed.view?.name}”`;
+        });
+        document.getElementById('btnPrefsAuditDuplicateView')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a saved view to duplicate';
+            return;
+          }
+          const nameEl = document.getElementById('prefsAuditViewName');
+          const custom = nameEl?.value?.trim() || '';
+          const duped = auditSavedViews.duplicate(id, custom ? { name: custom } : {});
+          if (!duped.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · duplicate view failed';
+            return;
+          }
+          refreshAuditSavedViewsUi(duped.view?.id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · duplicated “${duped.view?.name}”`;
         });
         document.getElementById('btnPrefsAuditExportViews')?.addEventListener('click', () => {
           const exported = auditSavedViews.exportJson();

@@ -527,6 +527,7 @@ export {
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
   renameAuditSavedView,
+  nextDuplicateViewName,
   createAuditSavedViews,
 } from './ui/auditSavedViews.js';
 export {
@@ -539,6 +540,11 @@ export {
   computeProbeToastRemainingMs,
   createProbeToastDismissTimer,
 } from './ui/probeToastDismiss.js';
+export {
+  PROBE_TOAST_HISTORY_MAX,
+  normalizeProbeToastHistoryEntry,
+  createProbeToastHistory,
+} from './ui/probeToastHistory.js';
 export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,
