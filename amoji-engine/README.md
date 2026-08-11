@@ -119,7 +119,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 106 | Disney Extreme Reset × defaults | Done |
 | Phase 107 | Disney Extreme live HUD (shapeInt pill + status) | Done |
 | Phase 108 | Disney Extreme intensities helper (shape/body) | Done |
-| Phase 109+ | Further production polish… | Specced |
+| Phase 109 | Disney Extreme hotkey X toggle | Done |
+| Phase 110+ | Further production polish… | Specced |
 
 ## Quick start
 

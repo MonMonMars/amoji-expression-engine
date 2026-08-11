@@ -56,6 +56,29 @@ export function disneyExtremeUiDefaults() {
 }
 
 /**
+ * Resolve Face Live Disney Extreme hotkey (plain `x` / `X` toggles master).
+ * Ignores when typing in form fields or with modifier keys.
+ * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
+ * @param {{ typing?: boolean, targetTag?: string }} [opts]
+ * @returns {{ ok: boolean, action?: 'toggle', reason?: string }}
+ */
+export function resolveDisneyExtremeHotkey(ev, opts = {}) {
+  if (!ev || ev.defaultPrevented) return { ok: false, reason: 'none' };
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return { ok: false, reason: 'modifier' };
+  const key = String(ev.key || '');
+  if (key !== 'x' && key !== 'X') return { ok: false, reason: 'key' };
+  const tag = String(opts.targetTag || ev.target?.tagName || '').toUpperCase();
+  const typing =
+    opts.typing === true ||
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    !!ev.target?.isContentEditable;
+  if (typing) return { ok: false, reason: 'typing' };
+  return { ok: true, action: 'toggle' };
+}
+
+/**
  * @param {any} raw
  */
 export function normalizeFaceLivePrefs(raw) {
