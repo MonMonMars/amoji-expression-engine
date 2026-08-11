@@ -89,6 +89,7 @@
         border-radius: 10px;
         border: 1px solid var(--line);
       }
+      .seg.three { grid-template-columns: 1fr 1fr 1fr; }
       .seg button, .emo button, .row button {
         appearance: none;
         border: 0;
@@ -165,6 +166,7 @@
     <div id="viewport">
       <div class="hud">
         <div class="pill">LOD <strong id="hudLod">—</strong></div>
+        <div class="pill">Tex <strong id="hudTex">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
@@ -181,6 +183,12 @@
         <div class="seg" id="lodSeg">
           <button type="button" data-lod="lo">Low poly</button>
           <button type="button" data-lod="hi" class="active">High poly</button>
+        </div>
+        <div class="label">Texture LOD <span style="text-transform:none;letter-spacing:0">(independent)</span></div>
+        <div class="seg three" id="texSeg">
+          <button type="button" data-tex="lo">512</button>
+          <button type="button" data-tex="mid" class="active">1K</button>
+          <button type="button" data-tex="hi">2K</button>
         </div>
         <div class="status" id="loadStatus">Loading…</div>
       </div>
@@ -259,11 +267,16 @@
         morphWeightsToArkit,
         arkitNonZero,
       } from '/engine/export/arkitExporter.js';
+      import {
+        texturePackUrls,
+        applyTexturePack,
+      } from '/engine/layers/textureLod.js';
 
       const ASSETS = {
         lo: '/assets/characters/jp-female-v0/lod/sakura_lo.glb',
         hi: '/assets/characters/jp-female-v0/lod/sakura_hi.glb',
       };
+      const TEX_BASE = '/assets/characters/jp-female-v0';
 
       const viewport = document.getElementById('viewport');
       const loadStatus = document.getElementById('loadStatus');
@@ -279,6 +292,7 @@
       const lookYVal = document.getElementById('lookYVal');
 
       let lod = 'hi';
+      let texLod = 'mid';
       let emotion = 'happy';
       let intensity = 0.7;
       let lookX = 0;
@@ -404,8 +418,24 @@
         return 'sculpt: peak + overdrive';
       }
 
+      async function applyTexLod(tier) {
+        if (!model) return;
+        texLod = tier;
+        document.querySelectorAll('#texSeg button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.tex === texLod);
+        });
+        document.getElementById('hudTex').textContent = texLod.toUpperCase();
+        const urls = texturePackUrls(TEX_BASE, texLod);
+        const maxAniso = renderer.capabilities.getMaxAnisotropy?.() ?? 4;
+        const result = await applyTexturePack(THREE, model, urls, {
+          anisotropy: Math.min(8, maxAniso),
+        });
+        improveEyeMaterials(model);
+        return result;
+      }
+
       async function loadLod(next) {
-        loadStatus.textContent = `Loading ${next.toUpperCase()}…`;
+        loadStatus.textContent = `Loading mesh ${next.toUpperCase()}…`;
         loadStatus.className = 'status';
         const gltf = await loader.loadAsync(ASSETS[next]);
         if (model) {
@@ -446,7 +476,9 @@
         document.querySelectorAll('#lodSeg button').forEach((b) => {
           b.classList.toggle('active', b.dataset.lod === lod);
         });
-        loadStatus.textContent = `${lod.toUpperCase()} ready · ${morphMeshes.length} morph mesh(es)`;
+
+        const tex = await applyTexLod(texLod);
+        loadStatus.textContent = `mesh ${lod.toUpperCase()} · tex ${texLod.toUpperCase()} · ${tex.applied} maps · ${morphMeshes.length} morph mesh(es)`;
         loadStatus.className = 'status ok';
       }
 
@@ -489,6 +521,20 @@
         if (!btn) return;
         try {
           await loadLod(btn.dataset.lod);
+        } catch (err) {
+          loadStatus.textContent = String(err);
+          loadStatus.className = 'status bad';
+        }
+      });
+
+      document.getElementById('texSeg').addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('button[data-tex]');
+        if (!btn || !model) return;
+        try {
+          loadStatus.textContent = `Loading tex ${btn.dataset.tex.toUpperCase()}…`;
+          const tex = await applyTexLod(btn.dataset.tex);
+          loadStatus.textContent = `mesh ${lod.toUpperCase()} · tex ${texLod.toUpperCase()} · ${tex.applied} maps`;
+          loadStatus.className = 'status ok';
         } catch (err) {
           loadStatus.textContent = String(err);
           loadStatus.className = 'status bad';

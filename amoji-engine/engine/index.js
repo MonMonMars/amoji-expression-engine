@@ -55,3 +55,9 @@ export {
   mergeArkitWeights,
   arkitNonZero,
 } from './export/arkitExporter.js';
+export {
+  TEX_LODS,
+  texturePackUrls,
+  classifyMaterial,
+  applyTexturePack,
+} from './layers/textureLod.js';

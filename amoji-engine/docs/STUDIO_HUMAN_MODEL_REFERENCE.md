@@ -78,7 +78,7 @@ This is a **production reference**, not a copy of their IP. Use it to judge our 
 | Character tiers | Sakura Hero (HI + full morphs) vs NPC (LO + `EMO_*` only) — already matches Face Live LO/HI |
 | Uniform rig/topology | Freeze a face topology contract before more outfits |
 | Expression packages | Face Live can load only active emotion morphs on LO |
-| Independent mesh/texture LOD | Next export: `sakura_hi_mesh_lo_tex` style packages |
+| Independent mesh/texture LOD | ✓ | — | ✓ | Face Live mesh × tex matrix | Done v1 |
 | Eyes as special case | Fix eye shader / multi-iris textures before chasing skin pores |
 
 ---
@@ -125,10 +125,10 @@ Amoji engine (ND “systemic emotion”)
 2. ~~**Emotion overlays on idle** — never zero the face when idle sway runs~~ ✓
 3. ~~**3 intensity sculpts per emotion** (subtle / medium / peak)~~ ✓
 4. ~~**ARKit 52 export map** from Expression_* / M1–M21~~ ✓
-5. **Texture LOD packs** independent of mesh LOD (Capcom)
+5. ~~**Texture LOD packs** independent of mesh LOD (Capcom)~~ ✓
 6. Hand-tune intensity sculpts in Blender (replace linear recipe bake)
 7. Unreal Live Link consumer for ARKit vector
-
+8. Phase 3 timeline layer (blink / leak / Step-Out as engine rules)
 ---
 
 ## 7. What *not* to copy blindly

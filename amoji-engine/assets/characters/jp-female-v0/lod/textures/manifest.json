@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "sourceGlb": "lod/sakura_hi.glb",
+  "note": "Texture LOD packs are independent of mesh LOD (Capcom pattern).",
+  "tiers": {
+    "hi": {
+      "maxEdge": null,
+      "files": {
+        "eyelash": {
+          "file": "lod/textures/hi/eyelash.png",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 296319
+        },
+        "sclera": {
+          "file": "lod/textures/hi/sclera.png",
+          "width": 1630,
+          "height": 815,
+          "bytes": 1233798
+        },
+        "albedo": {
+          "file": "lod/textures/hi/albedo.png",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 3519697
+        },
+        "teeth": {
+          "file": "lod/textures/hi/teeth.png",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 268560
+        },
+        "eyelash_rgb": {
+          "file": "lod/textures/hi/eyelash_rgb.png",
+          "width": 2048,
+          "height": 2048,
+          "bytes": 246380
+        }
+      },
+      "totalBytes": 5564754
+    },
+    "mid": {
+      "maxEdge": 1024,
+      "files": {
+        "eyelash": {
+          "file": "lod/textures/mid/eyelash.png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 143772
+        },
+        "sclera": {
+          "file": "lod/textures/mid/sclera.png",
+          "width": 1024,
+          "height": 512,
+          "bytes": 568037
+        },
+        "albedo": {
+          "file": "lod/textures/mid/albedo.png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 994537
+        },
+        "teeth": {
+          "file": "lod/textures/mid/teeth.png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 87613
+        },
+        "eyelash_rgb": {
+          "file": "lod/textures/mid/eyelash_rgb.png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 114866
+        }
+      },
+      "totalBytes": 1908825
+    },
+    "lo": {
+      "maxEdge": 512,
+      "files": {
+        "eyelash": {
+          "file": "lod/textures/lo/eyelash.png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46557
+        },
+        "sclera": {
+          "file": "lod/textures/lo/sclera.png",
+          "width": 512,
+          "height": 256,
+          "bytes": 170458
+        },
+        "albedo": {
+          "file": "lod/textures/lo/albedo.png",
+          "width": 512,
+          "height": 512,
+          "bytes": 263716
+        },
+        "teeth": {
+          "file": "lod/textures/lo/teeth.png",
+          "width": 512,
+          "height": 512,
+          "bytes": 28197
+        },
+        "eyelash_rgb": {
+          "file": "lod/textures/lo/eyelash_rgb.png",
+          "width": 512,
+          "height": 512,
+          "bytes": 38703
+        }
+      },
+      "totalBytes": 547631
+    }
+  },
+  "materialBindings": {
+    "skin": {
+      "match": [
+        "skin",
+        "mblab_skin"
+      ],
+      "map": "albedo"
+    },
+    "eyelash": {
+      "match": [
+        "eyelash"
+      ],
+      "map": "eyelash"
+    },
+    "sclera": {
+      "match": [
+        "human_eyes",
+        "sclera"
+      ],
+      "map": "sclera"
+    },
+    "teeth": {
+      "match": [
+        "teeth"
+      ],
+      "map": "teeth"
+    },
+    "tongue": {
+      "match": [
+        "tongue"
+      ],
+      "map": "teeth"
+    }
+  }
+}
