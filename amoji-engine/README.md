@@ -83,7 +83,7 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 70 | Meta+Alt dry-run replace hint · residual pulse intensity by emotion · TTS copy cancel | Done |
 | Phase 71 | Meta+Ctrl dry-run append hint · residual pulse duration cap HUD · TTS duplicate cancel | Done |
 | Phase 72 | Meta dry-run filter summary · residual pulse peak cap HUD · TTS context menu cancel | Done |
-| Phase 73+ | Further production polish… | Specced |
+| Phase 73 | Dry-run skip breakdown · residual pulse combined HUD helper · endpoint drag cancel | Done |
 
 ## Quick start
 

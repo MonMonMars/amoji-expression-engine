@@ -1449,6 +1449,7 @@
           reason !== 'tts_endpoint_copy_pick' &&
           reason !== 'tts_endpoint_duplicate_pick' &&
           reason !== 'tts_endpoint_context_menu_pick' &&
+          reason !== 'tts_endpoint_drag_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2212,6 +2213,17 @@
           { once: true },
         );
       }
+      function resolveContinuityResidualPulseBits(pulse) {
+        const pulseHud = continuityResidualPulseDurationHud(pulse);
+        const peakHud = continuityResidualPulsePeakHud(pulse);
+        const bits = [
+          pulseHud.ok ? pulseHud.label : null,
+          peakHud.ok ? peakHud.label : null,
+        ]
+          .filter(Boolean)
+          .join(' · ');
+        return bits || null;
+      }
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('deliver_pick');
         discContinuityResidualCompoundHandled = false;
@@ -2225,11 +2237,7 @@
           cancelActiveCompoundLifecycle('deliver_residue_pick');
           const pulse = continuityResidualDeliverPulseClass(cont);
           if (pulse.pulseClass) pulseDiscResidualBar(pulse);
-          const pulseHud = continuityResidualPulseDurationHud(pulse);
-          const peakHud = continuityResidualPulsePeakHud(pulse);
-          const pulseBits = [pulseHud.ok ? pulseHud.label : null, peakHud.ok ? peakHud.label : null]
-            .filter(Boolean)
-            .join(' · ');
+          const pulseBits = resolveContinuityResidualPulseBits(pulse);
           discContStatus.textContent = pulseBits
             ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseBits}`
             : `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`;
@@ -2911,6 +2919,7 @@
         });
         const ttsEndpointEl = document.getElementById('ttsEndpoint');
         let ttsEndpointTabbing = false;
+        let ttsEndpointDragActive = false;
         ttsEndpointEl?.addEventListener('focus', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_focus_pick');
         });
@@ -2951,6 +2960,23 @@
         });
         ttsEndpointEl?.addEventListener('contextmenu', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_context_menu_pick');
+        });
+        ttsEndpointEl?.addEventListener('dragenter', (ev) => {
+          ev.preventDefault();
+          if (ttsEndpointDragActive) return;
+          ttsEndpointDragActive = true;
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
+        ttsEndpointEl?.addEventListener('dragleave', () => {
+          ttsEndpointDragActive = false;
+        });
+        ttsEndpointEl?.addEventListener('drop', () => {
+          ttsEndpointDragActive = false;
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
         });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
@@ -4172,7 +4198,11 @@
             : `gap ${discState.gapSec.toFixed(1)}/${discState.minGapSec?.toFixed?.(1) || '?'}s · waiting`;
         }
         if (discState.continuity?.residual) {
-          discContStatus.textContent = `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount}`;
+          const pulse = continuityResidualDeliverPulseClass(discState.continuity);
+          const pulseBits = resolveContinuityResidualPulseBits(pulse);
+          discContStatus.textContent = pulseBits
+            ? `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount} · ${pulseBits}`
+            : `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount}`;
         } else if (discState.previous) {
           discContStatus.textContent = `prev ${discState.previous.emotion} @ ${discState.previous.intensity.toFixed(2)} · leak ${discState.leakCount}`;
         } else {

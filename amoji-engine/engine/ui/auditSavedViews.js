@@ -693,19 +693,25 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
   if (replace) {
     let kept = 0;
     let skipped = 0;
+    let skippedByStarredOnly = 0;
+    let skippedByToastInHashOnly = 0;
+    let skippedByFolderFilter = 0;
     for (const v of incoming) {
       if (mergeStarredOnly && !v.starred) {
         skipped += 1;
+        skippedByStarredOnly += 1;
         continue;
       }
       if (toastInHashOnly && !v.toastInHashOnly) {
         skipped += 1;
+        skippedByToastInHashOnly += 1;
         continue;
       }
       if (folder) {
         const vFolder = String(v.folder || '').trim() || 'Inbox';
         if (vFolder !== folder) {
           skipped += 1;
+          skippedByFolderFilter += 1;
           continue;
         }
       }
@@ -716,7 +722,12 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       replace: true,
       altReplace: !!opts.altReplace,
     });
-    let label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}`;
+    const breakdownParts = [];
+    if (skippedByStarredOnly > 0) breakdownParts.push(`starred ${skippedByStarredOnly}`);
+    if (skippedByToastInHashOnly > 0) breakdownParts.push(`toast hash ${skippedByToastInHashOnly}`);
+    if (skippedByFolderFilter > 0) breakdownParts.push(`folder ${skippedByFolderFilter}`);
+    const breakdown = breakdownParts.length ? ` (${breakdownParts.join(' · ')})` : '';
+    let label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}${breakdown}`;
     if (replaceHint.ok && replaceHint.hint && opts.altReplace) {
       label = `${label} · ${replaceHint.hint}`;
     }
@@ -735,6 +746,9 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
         label,
         hint: replaceHint.ok ? replaceHint.hint : null,
         filterSummary: filterSummary.ok ? filterSummary.summary : null,
+        skippedByStarredOnly,
+        skippedByToastInHashOnly,
+        skippedByFolderFilter,
         altReplace: !!opts.altReplace,
         mergeStarredOnly,
         toastInHashOnly,
@@ -759,7 +773,13 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
     shiftMerge: !!opts.shiftMerge,
     ctrlAppend: !!opts.ctrlAppend,
   });
-  let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}`;
+  const breakdownParts = [];
+  if (merged.skippedByStarredOnly > 0) breakdownParts.push(`starred ${merged.skippedByStarredOnly}`);
+  if (merged.skippedByToastInHashOnly > 0) breakdownParts.push(`toast hash ${merged.skippedByToastInHashOnly}`);
+  if (merged.skippedByFolderFilter > 0) breakdownParts.push(`folder ${merged.skippedByFolderFilter}`);
+  if (merged.skippedByAppendOnlyClash > 0) breakdownParts.push(`name clashes ${merged.skippedByAppendOnlyClash}`);
+  const breakdown = breakdownParts.length ? ` (${breakdownParts.join(' · ')})` : '';
+  let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}${breakdown}`;
   if (mergeHint.ok && mergeHint.hint && (opts.shiftMerge || opts.ctrlAppend)) {
     label = `${label} · ${mergeHint.hint}`;
   }
@@ -891,19 +911,26 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
   let added = 0;
   let updated = 0;
   let skipped = 0;
+  let skippedByStarredOnly = 0;
+  let skippedByToastInHashOnly = 0;
+  let skippedByFolderFilter = 0;
+  let skippedByAppendOnlyClash = 0;
   for (const v of incomingList) {
     if (mergeStarredOnly && !v.starred) {
       skipped += 1;
+      skippedByStarredOnly += 1;
       continue;
     }
     if (toastInHashOnly && !v.toastInHashOnly) {
       skipped += 1;
+      skippedByToastInHashOnly += 1;
       continue;
     }
     if (folderFilter) {
       const vFolder = String(v.folder || '').trim() || 'Inbox';
       if (vFolder !== folderFilter) {
         skipped += 1;
+        skippedByFolderFilter += 1;
         continue;
       }
     }
@@ -913,6 +940,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
     if (idx >= 0) {
       if (appendOnly) {
         skipped += 1;
+        skippedByAppendOnlyClash += 1;
         continue;
       }
       list[idx] = { ...v, id: list[idx].id };
@@ -933,6 +961,10 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
       added,
       updated,
       skipped,
+      skippedByStarredOnly,
+      skippedByToastInHashOnly,
+      skippedByFolderFilter,
+      skippedByAppendOnlyClash,
       mergeStarredOnly,
       toastInHashOnly,
       appendOnly,
