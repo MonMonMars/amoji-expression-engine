@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amoji Capture Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0e141a;
+        --panel: #151d26;
+        --line: #2a3644;
+        --ink: #e8eef4;
+        --muted: #8b9aab;
+        --accent: #3d9a7a;
+        --warn: #c4a35a;
+        --bad: #c45c5c;
+        --ok: #5aaf7a;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.45 "IBM Plex Sans", sans-serif;
+      }
+      body {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        min-height: 100%;
+      }
+      @media (max-width: 900px) {
+        body { grid-template-columns: 1fr; }
+      }
+      .stage {
+        position: relative;
+        background:
+          radial-gradient(ellipse at 30% 20%, #1a2834 0%, transparent 55%),
+          radial-gradient(ellipse at 80% 80%, #142018 0%, transparent 50%),
+          var(--bg);
+        display: flex;
+        flex-direction: column;
+        min-height: 70vh;
+      }
+      .stage-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 16px 20px 8px;
+      }
+      .brand {
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        font-size: 15px;
+      }
+      .tag {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .viewport {
+        position: relative;
+        flex: 1;
+        margin: 8px 20px 20px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+        background: #080c10;
+        min-height: 360px;
+      }
+      video, canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      canvas { pointer-events: none; }
+      .rec-dot {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        background: rgba(0,0,0,0.65);
+        border-radius: 4px;
+        font: 12px/1 "IBM Plex Mono", monospace;
+        z-index: 2;
+      }
+      .rec-dot.on { display: flex; }
+      .rec-dot i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--bad);
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        50% { opacity: 0.35; }
+      }
+      aside {
+        background: var(--panel);
+        border-left: 1px solid var(--line);
+        padding: 16px;
+        overflow-y: auto;
+      }
+      .group { margin-bottom: 18px; }
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      button, .file-btn {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        padding: 9px 12px;
+        border-radius: 6px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:hover, .file-btn:hover { border-color: #3d4f62; }
+      button.primary {
+        background: var(--accent);
+        border-color: transparent;
+        color: #04140e;
+        font-weight: 600;
+      }
+      button.danger {
+        background: #3a1c1c;
+        border-color: #6a3030;
+      }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+      select, input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        font: inherit;
+      }
+      .status {
+        margin-top: 8px;
+        font: 12px/1.4 "IBM Plex Mono", monospace;
+        color: var(--muted);
+        white-space: pre-wrap;
+      }
+      .status.ok { color: var(--ok); }
+      .status.warn { color: var(--warn); }
+      .status.bad { color: var(--bad); }
+      pre {
+        margin: 8px 0 0;
+        padding: 10px;
+        background: #0b1016;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 11px/1.35 "IBM Plex Mono", monospace;
+        max-height: 180px;
+        overflow: auto;
+        color: #b7c4d2;
+      }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .file-btn { display: inline-block; }
+      .file-btn input { display: none; }
+      .meter {
+        height: 6px;
+        background: #0b1016;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .meter > span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+        transition: width 80ms linear;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <div class="stage-head">
+        <div class="brand">AMOJI · Capture Studio</div>
+        <div class="tag">MediaPipe → ARKit NDJSON · authoring only</div>
+      </div>
+      <div class="viewport" id="viewport">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="rec-dot" id="recDot"><i></i><span id="recLabel">REC 0.0s</span></div>
+      </div>
+    </main>
+
+    <aside>
+      <div class="group">
+        <div class="label">Source</div>
+        <div class="row">
+          <button type="button" id="btnCam" class="primary">Webcam</button>
+          <label class="file-btn">Video file<input type="file" id="fileVideo" accept="video/*" /></label>
+        </div>
+        <div class="status" id="sourceStatus">load MediaPipe model…</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Emotion label</div>
+        <select id="emotionSel">
+          <option value="happy">happy</option>
+          <option value="sad">sad</option>
+          <option value="angry">angry</option>
+          <option value="fear">fear</option>
+          <option value="disgust">disgust</option>
+          <option value="surprised">surprised</option>
+          <option value="thinking">thinking</option>
+          <option value="smile_open">smile_open</option>
+          <option value="neutral">neutral</option>
+        </select>
+        <input type="text" id="customEmotion" placeholder="or custom id…" style="margin-top:8px" />
+      </div>
+
+      <div class="group">
+        <div class="label">Record</div>
+        <div class="row">
+          <button type="button" id="btnRec" disabled>Record</button>
+          <button type="button" id="btnStop" disabled>Stop</button>
+        </div>
+        <div class="meter"><span id="energyBar"></span></div>
+        <div class="status" id="recStatus">idle</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Export</div>
+        <div class="row">
+          <button type="button" id="btnNdjson" disabled>Download NDJSON</button>
+          <button type="button" id="btnTake" disabled>Download take JSON</button>
+        </div>
+        <div class="row">
+          <button type="button" id="btnBake" disabled>Bake preview</button>
+        </div>
+        <div class="note" style="margin-top:8px">
+          Bake is local preview. Merge recipes only after hand-tune.
+          Never feed this stream into the production runtime.
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="label">Live ARKit (nonzero)</div>
+        <pre id="liveDebug">—</pre>
+      </div>
+
+      <div class="group">
+        <div class="label">Bake preview</div>
+        <pre id="bakeDebug">—</pre>
+      </div>
+    </aside>
+
+    <script type="module">
+      import {
+        FaceLandmarker,
+        FilesetResolver,
+        DrawingUtils,
+      } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm';
+      import {
+        MediaPipeCaptureSession,
+        mediaPipeResultToFrame,
+        arkitHudLines,
+      } from '/engine/capture/mediapipeArkit.js';
+      import { bakeCaptureTake } from '/engine/capture/captureBake.js';
+
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('overlay');
+      const ctx = canvas.getContext('2d');
+      const sourceStatus = document.getElementById('sourceStatus');
+      const recStatus = document.getElementById('recStatus');
+      const liveDebug = document.getElementById('liveDebug');
+      const bakeDebug = document.getElementById('bakeDebug');
+      const recDot = document.getElementById('recDot');
+      const recLabel = document.getElementById('recLabel');
+      const energyBar = document.getElementById('energyBar');
+      const btnCam = document.getElementById('btnCam');
+      const btnRec = document.getElementById('btnRec');
+      const btnStop = document.getElementById('btnStop');
+      const btnNdjson = document.getElementById('btnNdjson');
+      const btnTake = document.getElementById('btnTake');
+      const btnBake = document.getElementById('btnBake');
+      const fileVideo = document.getElementById('fileVideo');
+      const emotionSel = document.getElementById('emotionSel');
+      const customEmotion = document.getElementById('customEmotion');
+
+      /** @type {FaceLandmarker|null} */
+      let landmarker = null;
+      let drawingUtils = null;
+      let running = false;
+      let lastVideoTime = -1;
+      let mode = 'idle'; // webcam | video
+      const session = new MediaPipeCaptureSession({ subject: 'MediaPipeCapture', fps: 30 });
+
+      function emotionId() {
+        const custom = customEmotion.value.trim();
+        return custom || emotionSel.value;
+      }
+
+      function setSource(msg, tone = '') {
+        sourceStatus.className = `status ${tone}`;
+        sourceStatus.textContent = msg;
+      }
+
+      function setRec(msg, tone = '') {
+        recStatus.className = `status ${tone}`;
+        recStatus.textContent = msg;
+      }
+
+      function download(filename, text, type = 'application/json') {
+        const blob = new Blob([text], { type });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      function enableExport(on) {
+        btnNdjson.disabled = !on;
+        btnTake.disabled = !on;
+        btnBake.disabled = !on;
+      }
+
+      async function initMediaPipe() {
+        setSource('loading MediaPipe WASM + face model…');
+        const vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm',
+        );
+        landmarker = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+            delegate: 'GPU',
+          },
+          runningMode: 'VIDEO',
+          numFaces: 1,
+          outputFaceBlendshapes: true,
+          outputFacialTransformationMatrixes: false,
+        });
+        drawingUtils = new DrawingUtils(ctx);
+        setSource('MediaPipe ready — start webcam or pick a video', 'ok');
+        btnCam.disabled = false;
+      }
+
+      async function startWebcam() {
+        if (!landmarker) return;
+        stopTracks();
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+        video.srcObject = stream;
+        video.loop = false;
+        await video.play();
+        mode = 'webcam';
+        running = true;
+        btnRec.disabled = false;
+        setSource('webcam live', 'ok');
+        requestAnimationFrame(loop);
+      }
+
+      function stopTracks() {
+        running = false;
+        const stream = video.srcObject;
+        if (stream && typeof stream.getTracks === 'function') {
+          for (const t of stream.getTracks()) t.stop();
+        }
+        video.srcObject = null;
+      }
+
+      async function loadVideoFile(file) {
+        if (!landmarker) return;
+        stopTracks();
+        const url = URL.createObjectURL(file);
+        video.srcObject = null;
+        video.src = url;
+        video.loop = true;
+        await video.play();
+        mode = 'video';
+        running = true;
+        btnRec.disabled = false;
+        setSource(`video · ${file.name}`, 'ok');
+        requestAnimationFrame(loop);
+      }
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const w = Math.floor(rect.width);
+        const h = Math.floor(rect.height);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      }
+
+      function loop() {
+        if (!running || !landmarker) return;
+        resizeCanvas();
+        if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+          lastVideoTime = video.currentTime;
+          const ts = performance.now();
+          const result = landmarker.detectForVideo(video, ts);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          if (result.faceLandmarks?.length) {
+            for (const landmarks of result.faceLandmarks) {
+              drawingUtils.drawConnectors(
+                landmarks,
+                FaceLandmarker.FACE_LANDMARKS_TESSELATION,
+                { color: '#3d9a7a55', lineWidth: 0.5 },
+              );
+              drawingUtils.drawConnectors(
+                landmarks,
+                FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
+                { color: '#8b9aab', lineWidth: 1 },
+              );
+            }
+          }
+
+          let frame;
+          if (session.recording) {
+            frame = session.pushResult(result);
+            recLabel.textContent = `REC ${session.durationSec.toFixed(1)}s · ${session.frameCount}f`;
+          } else {
+            frame = mediaPipeResultToFrame(result, {
+              t: mode === 'video' ? video.currentTime : 0,
+              frame: 0,
+              fps: session.fps,
+              subject: session.subject,
+            });
+          }
+
+          if (frame) {
+            const lines = arkitHudLines(frame.blendShapes);
+            liveDebug.textContent = lines.length ? lines.join('\n') : '(face rest / no face)';
+            energyBar.style.width = `${Math.min(100, (frame.energy || 0) * 140)}%`;
+          }
+        requestAnimationFrame(loop);
+      }
+
+      btnCam.addEventListener('click', () => {
+        startWebcam().catch((err) => {
+          setSource(String(err.message || err), 'bad');
+        });
+      });
+
+      fileVideo.addEventListener('change', () => {
+        const file = fileVideo.files?.[0];
+        if (!file) return;
+        loadVideoFile(file).catch((err) => {
+          setSource(String(err.message || err), 'bad');
+        });
+      });
+
+      btnRec.addEventListener('click', () => {
+        session.start(emotionId());
+        recDot.classList.add('on');
+        btnRec.disabled = true;
+        btnStop.disabled = false;
+        enableExport(false);
+        setRec(`recording · ${emotionId()}`, 'warn');
+      });
+
+      btnStop.addEventListener('click', () => {
+        session.stop();
+        recDot.classList.remove('on');
+        btnRec.disabled = false;
+        btnStop.disabled = true;
+        enableExport(session.frameCount > 0);
+        setRec(
+          `stopped · ${session.frameCount} frames · ${session.durationSec.toFixed(2)}s · ${session.emotion}`,
+          'ok',
+        );
+      });
+
+      btnNdjson.addEventListener('click', () => {
+        const id = session.emotion || 'take';
+        download(`${id}-capture.ndjson`, session.toNDJSON(), 'application/x-ndjson');
+      });
+
+      btnTake.addEventListener('click', () => {
+        const id = session.emotion || 'take';
+        download(`${id}-capture.json`, JSON.stringify(session.toTake(), null, 2));
+      });
+
+      btnBake.addEventListener('click', () => {
+        try {
+          const bake = bakeCaptureTake(session.toTake(), {
+            emotion: session.emotion || emotionId(),
+            fps: session.fps,
+          });
+          bakeDebug.textContent = [
+            `valid=${bake.envelope.valid}`,
+            `onset=${bake.envelope.onsetSec}s apex=${bake.envelope.apexSec}s offset=${bake.envelope.offsetSec}s`,
+            `stepOut≈${bake.envelope.suggestedStepOutSec}s blinks=${bake.envelope.blinks.length}`,
+            `peak morphs: ${Object.keys(bake.recipeFragment[bake.emotion].peak).length}`,
+            `→ npm run capture-bake -- --emotion ${bake.emotion} --in ${bake.emotion}-capture.ndjson`,
+          ].join('\n');
+        } catch (err) {
+          bakeDebug.textContent = String(err.message || err);
+        }
+      });
+
+      initMediaPipe().catch((err) => {
+        setSource(`MediaPipe failed: ${err.message || err}`, 'bad');
+      });
+    </script>
+  </body>
+</html>

@@ -148,6 +148,7 @@ Amoji engine (ND “systemic emotion”)
 25. ~~**Easter eggs** isolated namespace (default OFF, persona-locked)~~ ✓
 26. ~~**Robot driver packs** (face-servo-12 → upper-body → humanoid stub)~~ ✓
 27. ~~**Capture→bake** (video ARKit takes → intensity sculpts + onset/apex/offset)~~ ✓
+28. ~~**MediaPipe Capture Studio** (webcam/video → ARKit NDJSON)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -179,4 +180,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: MediaPipe ingest adapter, chassis-specific robot tuning, production TTS wiring.
+Next code increment: fold baked temporal envelopes into Step-Out tables; chassis-specific robot tuning; production TTS wiring.

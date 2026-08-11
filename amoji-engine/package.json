@@ -9,7 +9,8 @@
     "lab": "npx --yes serve prototypes -p 5173",
     "face-live": "npx --yes serve . -p 5174",
     "livelink": "node prototypes/livelink-bridge.mjs",
-    "capture-bake": "node tools/capture-bake/cli.mjs"
+    "capture-bake": "node tools/capture-bake/cli.mjs",
+    "capture-studio": "npx --yes serve . -p 5175"
   },
   "keywords": [
     "amoji",

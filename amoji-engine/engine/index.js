@@ -299,3 +299,12 @@ export {
   bakeCaptureTake,
   mergeRecipeFragment,
 } from './capture/captureBake.js';
+export {
+  MEDIAPIPE_CAPTURE_PROTOCOL,
+  MEDIAPIPE_ALIASES,
+  resolveMediaPipeChannel,
+  mediaPipeCategoriesToArkit,
+  mediaPipeResultToFrame,
+  MediaPipeCaptureSession,
+  arkitHudLines,
+} from './capture/mediapipeArkit.js';

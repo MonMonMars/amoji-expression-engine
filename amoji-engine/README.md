@@ -24,7 +24,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 11 | Layer D Actor Discretion + isolated easter-egg namespace | Done |
 | Phase 12 | Robot driver packs (face / upper-body / humanoid) | Done |
 | Phase 13 | Capture→bake authoring (video ARKit → sculpts + timing) | Done |
-| Phase 14+ | Production polish, chassis-specific tuning… | Specced |
+| Phase 14 | MediaPipe Capture Studio (webcam/video → NDJSON) | Done |
+| Phase 15+ | Production polish, chassis-specific tuning… | Specced |
 
 ## Quick start
 
@@ -68,6 +69,10 @@ Video ARKit takes → intensity sculpts + onset/apex/offset timing. Offline only
 ```bash
 npm run capture-bake -- --demo
 # npm run capture-bake -- --emotion happy --in ./takes/smile.ndjson
+
+# Webcam / video file → NDJSON (then bake)
+npm run capture-studio
+# open http://127.0.0.1:5175/prototypes/capture-studio.html
 ```
 
 See `tools/capture-bake/README.md`.

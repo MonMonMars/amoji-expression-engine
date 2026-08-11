@@ -12,12 +12,12 @@ Expressions are continuous muscle motion. Timing (onset → apex → offset) is 
 
 | Source | Output | Notes |
 |---|---|---|
+| **Capture Studio** (webcam / video file) | NDJSON via MediaPipe | `npm run capture-studio` → http://127.0.0.1:5175/prototypes/capture-studio.html |
 | iPhone **Live Link Face** | ARKit 52 stream / recorded JSON | Best mobile quality; matches our Live Link bridge |
 | Unreal Live Link recording | NDJSON / CSV of blendshapes | Reuse `amoji.livelink.arkit.v1` frames |
-| MediaPipe Face Landmarker | landmarks → approximate AUs | Map to ARKit-like channels before bake |
-| Desktop webcam trackers | ARKit-ish or FACS | Convert to our channel names |
+| MediaPipe Face Landmarker | blendshapes → ARKit channels | `engine/capture/mediapipeArkit.js` |
 
-Recommended: act the take on camera → export ARKit frames at 30–60 fps → bake here → **hand-tune** → merge into `data/emotions/`.
+Recommended: act the take on **video** (file or webcam record) → export ARKit NDJSON → bake → **hand-tune** → merge into `data/emotions/`.
 
 ## Run
 
@@ -45,6 +45,8 @@ npm run capture-bake -- --demo --merge-into ./data/emotions/intensity-sculpt-rec
 ## Code
 
 - Library: `engine/capture/captureBake.js`
+- MediaPipe adapter: `engine/capture/mediapipeArkit.js`
+- Capture Studio UI: `prototypes/capture-studio.html` (`npm run capture-studio`)
 - CLI: `tools/capture-bake/cli.mjs`
 - Fixture: `tools/capture-bake/fixtures/sample-happy-take.mjs`
 
