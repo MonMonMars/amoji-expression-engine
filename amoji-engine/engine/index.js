@@ -559,6 +559,11 @@ export {
 } from './ui/probeToastHistory.js';
 export { compareProbeToastDetails } from './ui/probeToastCompare.js';
 export {
+  PROBE_TOAST_SOUND_FREQ,
+  resolveProbeToastSound,
+  createProbeToastSound,
+} from './ui/probeToastSound.js';
+export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,
   COMPOUND_EMBLEM_RELEASE_SEC,

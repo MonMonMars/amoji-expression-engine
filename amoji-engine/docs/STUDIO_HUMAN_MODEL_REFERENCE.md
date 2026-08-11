@@ -233,6 +233,9 @@ Amoji engine (ND “systemic emotion”)
 110. ~~**Probe toast copy-as-markdown** (`buildHealthProbeMarkdownPayload` · `m`)~~ ✓
 111. ~~**Audit views star favorites** (`toggleStar` · starred sort)~~ ✓
 112. ~~**Cancel compound on Live Link toggle** (Live Link pub clears lifecycle)~~ ✓
+113. ~~**Probe toast sound cue** (`createProbeToastSound` · tone beep on show)~~ ✓
+114. ~~**Audit views bulk star** (`starAll` / `unstarAll` · folder-scoped)~~ ✓
+115. ~~**Cancel compound on step-out** (Step-Out next clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -264,4 +267,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast sound cue, views bulk star, cancel on step-out).
+Next code increment: further polish (toast mute toggle, views star-only filter, cancel on mood leak).

@@ -748,6 +748,10 @@
           <button type="button" id="btnPrefsAuditStarView">Star / unstar</button>
         </div>
         <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditStarAll">Star all</button>
+          <button type="button" id="btnPrefsAuditUnstarAll">Unstar all</button>
+        </div>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
             <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
@@ -869,6 +873,7 @@
       import { createProbeToastDismissTimer } from '/engine/ui/probeToastDismiss.js';
       import { createProbeToastHistory } from '/engine/ui/probeToastHistory.js';
       import { compareProbeToastDetails } from '/engine/ui/probeToastCompare.js';
+      import { createProbeToastSound } from '/engine/ui/probeToastSound.js';
       import {
         createAuditSavedViews,
         buildAuditViewShareSnapshot,
@@ -1053,6 +1058,7 @@
         },
       });
       const probeToastHistory = createProbeToastHistory();
+      const probeToastSound = createProbeToastSound({ enabled: true });
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
@@ -1231,6 +1237,9 @@
         el.classList.add('show');
         probeToastVisible = true;
         probeToastFocusTrap.activate(el);
+        if (!opts.fromHistory && !opts.silent) {
+          probeToastSound.play({ tone: toast.tone || 'default', event: 'show' });
+        }
         if (!probeToastDismiss.pinned) {
           probeToastDismiss.start(toast.dismissMs || 3800);
         }
@@ -1267,7 +1276,8 @@
           reason !== 'spin_pick' &&
           reason !== 'cycle_pick' &&
           reason !== 'blink_pick' &&
-          reason !== 'livelink_pick'
+          reason !== 'livelink_pick' &&
+          reason !== 'stepout_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1285,7 +1295,8 @@
           reason === 'spin_pick' ||
           reason === 'cycle_pick' ||
           reason === 'blink_pick' ||
-          reason === 'livelink_pick'
+          reason === 'livelink_pick' ||
+          reason === 'stepout_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2039,6 +2050,7 @@
       });
 
       document.getElementById('btnStepOut').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('stepout_pick');
         stepOutNext = !stepOutNext;
         e.currentTarget.classList.toggle('primary', stepOutNext);
         refreshTemporalStatus();
@@ -2876,6 +2888,24 @@
           prefsStatus.textContent = toggled.view?.starred
             ? `prefs · starred “${toggled.view.name}”`
             : `prefs · unstarred “${toggled.view?.name}”`;
+        });
+        document.getElementById('btnPrefsAuditStarAll')?.addEventListener('click', () => {
+          const folder = prefsAuditFolderFilter || null;
+          const out = auditSavedViews.starAll(folder ? { folder } : {});
+          refreshAuditSavedViewsUi();
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = folder
+            ? `prefs · starred ${out.changed} in ${folder}`
+            : `prefs · starred ${out.changed} views`;
+        });
+        document.getElementById('btnPrefsAuditUnstarAll')?.addEventListener('click', () => {
+          const folder = prefsAuditFolderFilter || null;
+          const out = auditSavedViews.unstarAll(folder ? { folder } : {});
+          refreshAuditSavedViewsUi();
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = folder
+            ? `prefs · unstarred ${out.changed} in ${folder}`
+            : `prefs · unstarred ${out.changed} views`;
         });
         (() => {
           const dragList = document.getElementById('prefsAuditViewsDragList');

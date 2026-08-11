@@ -846,6 +846,55 @@ export function createAuditSavedViews(opts = {}) {
       }
       return this.setStarred(got.view.id, !got.view.starred, starOpts);
     },
+    /**
+     * Star or unstar many views (optional id list; default = all / folder).
+     * @param {boolean} starred
+     * @param {{ ids?: string[], folder?: string|null, now?: number }} [bulkOpts]
+     */
+    bulkStar(starred, bulkOpts = {}) {
+      const want = !!starred;
+      const idSet = Array.isArray(bulkOpts.ids)
+        ? new Set(bulkOpts.ids.map(String))
+        : null;
+      const folderFilter =
+        bulkOpts.folder != null && String(bulkOpts.folder).trim() !== ''
+          ? String(bulkOpts.folder).trim()
+          : null;
+      let changed = 0;
+      views = views.map((v) => {
+        if (idSet && !idSet.has(v.id) && !idSet.has(v.name)) return v;
+        if (folderFilter) {
+          const vFolder = String(v.folder || '').trim() || 'Inbox';
+          if (vFolder !== folderFilter) return v;
+        }
+        if (!!v.starred === want) return v;
+        changed += 1;
+        return normalizeAuditSavedView(
+          { ...v, starred: want, savedAt: bulkOpts.now ?? Date.now() },
+          { now: bulkOpts.now },
+        );
+      });
+      views = sortAuditViewsByStar(views).views;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'bulk_star',
+          ok: true,
+          starred: want,
+          changed,
+          count: views.length,
+          starredCount: views.filter((v) => v.starred).length,
+        },
+        {},
+      );
+    },
+    starAll(bulkOpts = {}) {
+      return this.bulkStar(true, bulkOpts);
+    },
+    unstarAll(bulkOpts = {}) {
+      return this.bulkStar(false, bulkOpts);
+    },
     folders() {
       return groupAuditViewsByFolder(views);
     },

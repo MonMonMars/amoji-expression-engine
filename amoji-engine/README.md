@@ -57,7 +57,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 44 | Toast SLA badge · views folders · spin/cycle cancel | Done |
 | Phase 45 | Toast spark mini · views reorder · blink cancel | Done |
 | Phase 46 | Toast markdown · views star · Live Link cancel | Done |
-| Phase 47+ | Further production polish… | Specced |
+| Phase 47 | Toast sound cue · views bulk star · step-out cancel | Done |
+| Phase 48+ | Further production polish… | Specced |
 
 ## Quick start
 
