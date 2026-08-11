@@ -28,7 +28,7 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
       eyeFactor: 1.4,
       mouthFactor: 1.5,
     });
-    expect(on.pill).toBe('1.12');
+    expect(on.pill).toBe(`1.12 · e${easeEmotionIntensity(1.12).toFixed(2)}`);
     expect(on.ease).toBeCloseTo(easeEmotionIntensity(1.12));
     expect(on.status).toBe(
       `shape 1.12 · body 0.98 · ease ${easeEmotionIntensity(1.12).toFixed(2)} · eye×1.40 · mouth×1.50`,
@@ -40,6 +40,10 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
       bodyOn: false,
       bodyMix: 0.7,
     });
+    expect(bodyOff.pill).toBe(
+      `1.00 · e${easeEmotionIntensity(1).toFixed(2)} · m0.70`,
+    );
+    expect(bodyOff.bodyMix).toBe(0.7);
     expect(bodyOff.status).toContain('body 0.70 (off)');
     expect(bodyOff.status).toContain('mix 0.70');
     expect(bodyOff.status).toContain(

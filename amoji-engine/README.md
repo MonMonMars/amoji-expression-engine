@@ -136,7 +136,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 123 | Extreme nudge hold-to-repeat | Done |
 | Phase 124 | Extreme Shift coarse nudge (0.10) | Done |
 | Phase 125 | Extreme nudge factor value flash | Done |
-| Phase 126+ | Further production polish… | Specced |
+| Phase 126 | Extreme X pill ease + mix | Done |
+| Phase 127+ | Further production polish… | Specced |
 
 ## Quick start
 

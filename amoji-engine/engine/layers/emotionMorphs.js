@@ -330,6 +330,7 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
 /**
  * Format Face Live HUD / status copy for Disney Extreme effective intensities.
  * When enabled, always includes eased shape readout; optional `bodyMix` from Layer B.
+ * X pill: `shape · e{ease}` (+ ` · m{mix}` when bodyMix provided).
  * @param {{
  *   enabled?: boolean,
  *   shapeInt?: number,
@@ -340,7 +341,7 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
  *   ease?: number,
  *   bodyMix?: number,
  * }} [opts]
- * @returns {{ pill: string, status: string, ease: number }}
+ * @returns {{ pill: string, status: string, ease: number, bodyMix?: number }}
  */
 export function formatDisneyExtremeLiveHud(opts = {}) {
   if (!opts.enabled) {
@@ -366,16 +367,21 @@ export function formatDisneyExtremeLiveHud(opts = {}) {
     typeof opts.ease === 'number' && Number.isFinite(opts.ease)
       ? opts.ease
       : easeEmotionIntensity(s);
+  const hasMix =
+    typeof opts.bodyMix === 'number' && Number.isFinite(opts.bodyMix);
   const bodyBit = opts.bodyOn ? `body ${b.toFixed(2)}` : `body ${b.toFixed(2)} (off)`;
-  const mixBit =
-    typeof opts.bodyMix === 'number' && Number.isFinite(opts.bodyMix)
-      ? ` · mix ${opts.bodyMix.toFixed(2)}`
-      : '';
-  return {
-    pill: s.toFixed(2),
+  const mixBit = hasMix ? ` · mix ${opts.bodyMix.toFixed(2)}` : '';
+  const pill = hasMix
+    ? `${s.toFixed(2)} · e${ease.toFixed(2)} · m${opts.bodyMix.toFixed(2)}`
+    : `${s.toFixed(2)} · e${ease.toFixed(2)}`;
+  /** @type {{ pill: string, status: string, ease: number, bodyMix?: number }} */
+  const out = {
+    pill,
     ease,
     status: `shape ${s.toFixed(2)} · ${bodyBit} · ease ${ease.toFixed(2)}${mixBit} · eye×${eyeFactor.toFixed(2)} · mouth×${mouthFactor.toFixed(2)}`,
   };
+  if (hasMix) out.bodyMix = opts.bodyMix;
+  return out;
 }
 
 /**
