@@ -76,6 +76,7 @@ export function disneyExtremeUiDefaults() {
  * - `a` / `A` → flash combined Extreme bundle readout
  * - `Shift+A` → copy Extreme bundle text to clipboard
  * - `j` / `J` → copy Extreme snapshot JSON to clipboard
+ * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -313,6 +314,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBundle' && ev.shiftKey) {
       return { ok: true, action: 'copyBundle' };
+    }
+    if (entry.id === 'copySnapshotJson' && ev.shiftKey) {
+      return { ok: true, action: 'pasteSnapshotJson' };
     }
     return { ok: true, action: entry.id };
   }

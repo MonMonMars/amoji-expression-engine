@@ -748,6 +748,7 @@
           <button type="button" id="btnDisneyExtremeBundle">All readout <kbd>A</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
+          <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1135,7 +1136,9 @@
         formatDisneyExtremeBundleLabel,
         formatDisneyExtremeLiveHudFromSnapshot,
         disneyExtremeSnapshotFingerprint,
+        disneyExtremeSnapshotFingerprintShort,
         serializeDisneyExtremeSnapshot,
+        parseDisneyExtremeSnapshot,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1685,6 +1688,10 @@
         copyDisneyExtremeSnapshotJson();
       });
 
+      document.getElementById('btnDisneyExtremePasteJson')?.addEventListener('click', () => {
+        pasteDisneyExtremeSnapshotJson();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1768,9 +1775,11 @@
       }
 
       async function copyDisneyExtremeSnapshotJson() {
-        const json = serializeDisneyExtremeSnapshot(disneyExtremeSnapshot(), {
+        const snap = disneyExtremeSnapshot();
+        const json = serializeDisneyExtremeSnapshot(snap, {
           pretty: true,
         });
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
         let ok = false;
         try {
           if (navigator.clipboard?.writeText) {
@@ -1781,9 +1790,65 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · snapshot JSON' : 'copy failed · snapshot JSON',
+          ok
+            ? `copied · snapshot JSON · fp ${fp}`
+            : 'copy failed · snapshot JSON',
         );
         return ok;
+      }
+
+      function applyDisneyExtremeSnapshot(snap) {
+        if (!snap) return false;
+        if (disneyExtremeEl) disneyExtremeEl.checked = !!snap.enabled;
+        if (disneyExtremeFactorEl) {
+          disneyExtremeFactorEl.value = String(snap.shapeFactor);
+        }
+        if (disneyExtremeBodyEl) disneyExtremeBodyEl.checked = !!snap.bodyOn;
+        if (disneyExtremeBodyFactorEl) {
+          disneyExtremeBodyFactorEl.value = String(snap.bodyFactor);
+        }
+        if (disneyExtremeEyeFactorEl) {
+          disneyExtremeEyeFactorEl.value = String(snap.eyeFactor);
+        }
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.value = String(snap.mouthFactor);
+        }
+        const masterOn = !!disneyExtremeEl?.checked;
+        if (disneyExtremeFactorEl) disneyExtremeFactorEl.disabled = !masterOn;
+        if (disneyExtremeBodyFactorEl) {
+          disneyExtremeBodyFactorEl.disabled =
+            !masterOn || !disneyExtremeBodyEl?.checked;
+        }
+        if (disneyExtremeEyeFactorEl) disneyExtremeEyeFactorEl.disabled = !masterOn;
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.disabled = !masterOn;
+        }
+        syncDisneyExtremeFactorLabels();
+        syncDisneyExtremePrefsSummary();
+        updateTierHintForDisneyExtreme();
+        persistPrefs();
+        return true;
+      }
+
+      async function pasteDisneyExtremeSnapshotJson() {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · clipboard');
+          return false;
+        }
+        const parsed = parseDisneyExtremeSnapshot(text);
+        if (!parsed.ok) {
+          flashDisneyExtremeStatus(`paste failed · ${parsed.error}`);
+          return false;
+        }
+        applyDisneyExtremeSnapshot(parsed.snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
+        flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
+        return true;
       }
 
       async function copyDisneyExtremeEaseSvg() {
@@ -2021,6 +2086,11 @@
         if (resolved.action === 'copySnapshotJson') {
           ev.preventDefault();
           copyDisneyExtremeSnapshotJson();
+          return;
+        }
+        if (resolved.action === 'pasteSnapshotJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeSnapshotJson();
           return;
         }
         if (resolved.action === 'copySummary') {

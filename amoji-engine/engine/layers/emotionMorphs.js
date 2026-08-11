@@ -559,6 +559,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
   { id: 'copySnapshotJson', keys: ['j', 'J'], help: 'J json', kind: 'action' },
+  { id: 'pasteSnapshotJson', help: 'Shift+J paste json', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -981,4 +982,57 @@ export function serializeDisneyExtremeSnapshot(snapOrOpts = {}, opts = {}) {
     neckBlend: Number(snap.neckBlend),
   };
   return JSON.stringify(payload, null, opts.pretty ? 2 : 0);
+}
+
+/**
+ * Parse clipboard / export JSON into a live Extreme snapshot.
+ * @param {string|object|null|undefined} input
+ * @returns {{ ok: true, snap: ReturnType<typeof buildDisneyExtremeLiveSnapshot> }|{ ok: false, error: string }}
+ */
+export function parseDisneyExtremeSnapshot(input) {
+  let obj = input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return { ok: false, error: 'empty' };
+    try {
+      obj = JSON.parse(trimmed);
+    } catch {
+      return { ok: false, error: 'invalid_json' };
+    }
+  }
+  if (!obj || typeof obj !== 'object') {
+    return { ok: false, error: 'invalid_payload' };
+  }
+  if (obj.kind !== DISNEY_EXTREME_SNAPSHOT_JSON_KIND) {
+    return { ok: false, error: 'kind' };
+  }
+  const snap = buildDisneyExtremeLiveSnapshot({
+    enabled: !!obj.enabled,
+    intensity: Number(obj.intensity) || 0,
+    shapeFactor: Number(obj.shapeFactor),
+    bodyFactor: Number(obj.bodyFactor),
+    eyeFactor: Number(obj.eyeFactor),
+    mouthFactor: Number(obj.mouthFactor),
+    bodyOn: !!obj.bodyOn,
+  });
+  return { ok: true, snap };
+}
+
+/**
+ * Compact fingerprint token for status flashes (stable for equal snaps).
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null|undefined} snap
+ * @param {{ length?: number }} [opts]
+ * @returns {string}
+ */
+export function disneyExtremeSnapshotFingerprintShort(snap, opts = {}) {
+  const fp = disneyExtremeSnapshotFingerprint(snap);
+  if (fp === 'off') return 'off';
+  const length = Math.max(4, Math.min(16, Number(opts.length) || 8));
+  let h = 2166136261;
+  for (let i = 0; i < fp.length; i++) {
+    h ^= fp.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const hex = (h >>> 0).toString(16).padStart(8, '0');
+  return hex.slice(0, length);
 }

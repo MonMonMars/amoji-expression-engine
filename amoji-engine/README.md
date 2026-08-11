@@ -176,7 +176,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 163 | Extreme spark rebuild fingerprint gate | Done |
 | Phase 164 | Extreme snapshot JSON serialize | Done |
 | Phase 165 | Extreme J copy snapshot JSON | Done |
-| Phase 166+ | Further production polish… | Specced |
+| Phase 166 | Extreme parse snapshot JSON | Done |
+| Phase 167 | Extreme short fingerprint | Done |
+| Phase 168 | Extreme Shift+J paste snapshot JSON | Done |
+| Phase 169 | Extreme Face Live paste JSON wiring | Done |
+| Phase 170+ | Further production polish… | Specced |
 
 ## Quick start
 
