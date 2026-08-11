@@ -112,6 +112,9 @@ export const CONTINUITY_RESIDUAL_PULSE_PEAK = {
 /** Max residual deliver pulse duration (seconds). */
 export const CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC = 1;
 
+/** Max residual deliver pulse brightness peak. */
+export const CONTINUITY_RESIDUAL_PULSE_PEAK_CAP = 2;
+
 export function continuityResidualDeliverPulseClass(continuity) {
   const pulse = hasContinuityResidual(continuity);
   if (!pulse) {
@@ -123,6 +126,9 @@ export function continuityResidualDeliverPulseClass(continuity) {
         emotion: continuity?.residual?.emotion ?? null,
         intensity: 0,
         peak: null,
+        rawPeak: null,
+        peakCap: CONTINUITY_RESIDUAL_PULSE_PEAK_CAP,
+        peakCapped: false,
         durationSec: null,
         rawDurationSec: null,
         durationCapSec: CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC,
@@ -136,7 +142,10 @@ export function continuityResidualDeliverPulseClass(continuity) {
   const basePeak =
     CONTINUITY_RESIDUAL_PULSE_PEAK[emotion] ??
     CONTINUITY_RESIDUAL_PULSE_PEAK.neutral;
-  const peak = Math.min(2, basePeak + intensity * 0.2);
+  const peakCap = CONTINUITY_RESIDUAL_PULSE_PEAK_CAP;
+  const rawPeak = basePeak + intensity * 0.25;
+  const peak = Math.min(peakCap, rawPeak);
+  const peakCapped = rawPeak >= peakCap;
   const durationCapSec = CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC;
   const rawDurationSec = 0.55 + intensity * 0.5;
   const durationSec = Math.min(durationCapSec, rawDurationSec);
@@ -149,6 +158,9 @@ export function continuityResidualDeliverPulseClass(continuity) {
       emotion,
       intensity,
       peak,
+      rawPeak,
+      peakCap,
+      peakCapped,
       durationSec,
       rawDurationSec,
       durationCapSec,
@@ -194,6 +206,46 @@ export function continuityResidualPulseDurationHud(pulse) {
       durationCapped: !!pulse.durationCapped,
       durationSec: pulse.durationSec,
       durationCapSec,
+    },
+    {},
+  );
+}
+
+/**
+ * HUD label for residual deliver pulse peak (shows cap when clamped).
+ * @param {{
+ *   ok?: boolean,
+ *   peak?: number|null,
+ *   peakCapped?: boolean,
+ *   peakCap?: number,
+ * }|null} pulse
+ */
+export function continuityResidualPulsePeakHud(pulse) {
+  if (!pulse?.ok || pulse.peak == null) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_pulse_peak_hud',
+        ok: false,
+        label: null,
+        peakCapped: false,
+        peak: null,
+        peakCap: CONTINUITY_RESIDUAL_PULSE_PEAK_CAP,
+      },
+      {},
+    );
+  }
+  const peakCap = pulse.peakCap ?? CONTINUITY_RESIDUAL_PULSE_PEAK_CAP;
+  const label = pulse.peakCapped
+    ? `peak cap ${peakCap.toFixed(1)}`
+    : `peak ${pulse.peak.toFixed(2)}`;
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_pulse_peak_hud',
+      ok: true,
+      label,
+      peakCapped: !!pulse.peakCapped,
+      peak: pulse.peak,
+      peakCap,
     },
     {},
   );

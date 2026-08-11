@@ -896,6 +896,7 @@
         hasContinuityResidual,
         continuityResidualDeliverPulseClass,
         continuityResidualPulseDurationHud,
+        continuityResidualPulsePeakHud,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
@@ -1447,6 +1448,7 @@
           reason !== 'tts_endpoint_select_all_pick' &&
           reason !== 'tts_endpoint_copy_pick' &&
           reason !== 'tts_endpoint_duplicate_pick' &&
+          reason !== 'tts_endpoint_context_menu_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2224,8 +2226,12 @@
           const pulse = continuityResidualDeliverPulseClass(cont);
           if (pulse.pulseClass) pulseDiscResidualBar(pulse);
           const pulseHud = continuityResidualPulseDurationHud(pulse);
-          discContStatus.textContent = pulseHud.ok
-            ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseHud.label}`
+          const peakHud = continuityResidualPulsePeakHud(pulse);
+          const pulseBits = [pulseHud.ok ? pulseHud.label : null, peakHud.ok ? peakHud.label : null]
+            .filter(Boolean)
+            .join(' · ');
+          discContStatus.textContent = pulseBits
+            ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseBits}`
             : `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`;
         } else {
           discContStatus.textContent = `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2942,6 +2948,9 @@
           cancelActiveCompoundLifecycle('tts_endpoint_copy_pick');
           persistPrefs();
           syncGatewayHealthPoll();
+        });
+        ttsEndpointEl?.addEventListener('contextmenu', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_context_menu_pick');
         });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
@@ -3861,9 +3870,7 @@
                 );
                 prefsStatus.className = dry.ok ? 'status ok' : 'status bad';
                 prefsStatus.textContent = dry.ok
-                  ? dry.hint && dropAction.shiftKey
-                    ? `prefs · ${dry.label}`
-                    : `prefs · ${dry.label}`
+                  ? `prefs · ${dry.label}`
                   : 'prefs · dry-run failed';
                 return;
               }

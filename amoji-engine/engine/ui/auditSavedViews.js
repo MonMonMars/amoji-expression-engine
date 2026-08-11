@@ -578,6 +578,54 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
 }
 
 /**
+ * Active import filter summary for Meta dry-run preview.
+ * @param {object|string} raw
+ * @param {{
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ * }} [opts]
+ */
+export function formatAuditViewsImportDryRunFilterSummary(raw, opts = {}) {
+  const filters = resolveAuditViewsImportFilters(raw, opts);
+  if (!filters.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_dry_run_filters',
+        ok: false,
+        summary: null,
+        filters: [],
+        reason: filters.reason || 'invalid',
+      },
+      {},
+    );
+  }
+  /** @type {string[]} */
+  const parts = [];
+  if (filters.mergeStarredOnly) parts.push('starred');
+  if (filters.toastInHashOnly) parts.push('toast hash');
+  if (filters.folder) parts.push(`folder ${filters.folder}`);
+  const summary =
+    parts.length > 0 ? `filters ${parts.join(' · ')}` : 'filters none';
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_dry_run_filters',
+      ok: true,
+      summary,
+      filters: parts,
+      mergeStarredOnly: filters.mergeStarredOnly,
+      toastInHashOnly: filters.toastInHashOnly,
+      folder: filters.folder,
+    },
+    {},
+  );
+}
+
+/**
  * Simulate import merge/replace/append stats without mutating stored views.
  * @param {object[]} existing
  * @param {object|string} raw
@@ -637,6 +685,11 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
   const toastInHashOnly = filters.toastInHashOnly;
   const folder = filters.folder;
   const incoming = imported.views || [];
+  const filterSummary = formatAuditViewsImportDryRunFilterSummary(raw, opts);
+  const appendFilterSummary = (label) =>
+    filterSummary.ok && filterSummary.summary
+      ? `${label} · ${filterSummary.summary}`
+      : label;
   if (replace) {
     let kept = 0;
     let skipped = 0;
@@ -667,6 +720,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
     if (replaceHint.ok && replaceHint.hint && opts.altReplace) {
       label = `${label} · ${replaceHint.hint}`;
     }
+    label = appendFilterSummary(label);
     return applyComplianceGate(
       {
         kind: 'prefs_share_audit_views_import_dry_run',
@@ -680,6 +734,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
         count: kept,
         label,
         hint: replaceHint.ok ? replaceHint.hint : null,
+        filterSummary: filterSummary.ok ? filterSummary.summary : null,
         altReplace: !!opts.altReplace,
         mergeStarredOnly,
         toastInHashOnly,
@@ -708,6 +763,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
   if (mergeHint.ok && mergeHint.hint && (opts.shiftMerge || opts.ctrlAppend)) {
     label = `${label} · ${mergeHint.hint}`;
   }
+  label = appendFilterSummary(label);
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_views_import_dry_run',
@@ -721,6 +777,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       count: incoming.length,
       label,
       hint: mergeHint.ok ? mergeHint.hint : null,
+      filterSummary: filterSummary.ok ? filterSummary.summary : null,
       shiftMerge: !!opts.shiftMerge,
       ctrlAppend: !!opts.ctrlAppend,
       mergeStarredOnly,
