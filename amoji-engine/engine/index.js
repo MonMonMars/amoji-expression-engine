@@ -253,6 +253,9 @@ export {
   easeEmotionIntensity,
   applyMorphWeights,
   mergeMorphOverlays,
+  amplifyDisneyExtremeMorphs,
+  classifyDisneyExtremeMorphKey,
+  DISNEY_EXTREME_DEFAULTS,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';
 export {

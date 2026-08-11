@@ -14,8 +14,8 @@ describe('Disney Extreme eye/mouth UI disable + guard', () => {
     expect(src).toContain('disneyExtremeEyeFactorEl.disabled = !masterOn;');
     expect(src).toContain('disneyExtremeMouthFactorEl.disabled = !masterOn;');
 
-    expect(src).toContain('if (disneyExtremeOn) {');
-    expect(src).toContain('for (const [k, v] of Object.entries(targets || {}))');
+    expect(src).toContain('amplifyDisneyExtremeMorphs(targets');
+    expect(src).toContain('enabled: disneyExtremeOn');
   });
 });
 

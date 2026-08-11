@@ -946,6 +946,7 @@
         emotionToMorphWeights,
         applyMorphWeights,
         mergeMorphOverlays,
+        amplifyDisneyExtremeMorphs,
       } from '/engine/layers/emotionMorphs.js';
       import {
         lookToEyeMorphWeights,
@@ -4728,29 +4729,16 @@
           }
         }
 
-        // Disney Extreme: separate multipliers for final eye vs mouth morphs.
-        // Apply late so gaze-blended eye weights and speech mouth overrides are amplified too.
-        if (disneyExtremeOn) {
-          const disneyEyeFactor = disneyExtremeEyeFactorEl
+        // Disney Extreme: amplify final eye vs mouth morphs (late, after gaze/TTS).
+        amplifyDisneyExtremeMorphs(targets, {
+          enabled: disneyExtremeOn,
+          eyeFactor: disneyExtremeEyeFactorEl
             ? Number(disneyExtremeEyeFactorEl.value || 1.4)
-            : 1.4;
-          const disneyMouthFactor = disneyExtremeMouthFactorEl
+            : 1.4,
+          mouthFactor: disneyExtremeMouthFactorEl
             ? Number(disneyExtremeMouthFactorEl.value || 1.5)
-            : 1.5;
-          for (const [k, v] of Object.entries(targets || {})) {
-            // Morph keys are Expression_* names; use coarse categories.
-            const isEye =
-              k.includes('eye') ||
-              k.includes('iris') ||
-              k.includes('pupil') ||
-              k.includes('brow') ||
-              k.includes('lid');
-            const isMouth =
-              k.includes('mouth') || k.includes('lip') || k.includes('jaw');
-            if (isEye) targets[k] = Math.min(2.0, v * disneyEyeFactor);
-            if (isMouth) targets[k] = Math.min(2.0, v * disneyMouthFactor);
-          }
-        }
+            : 1.5,
+        });
 
         for (const mesh of morphMeshes) {
           applyMorphWeights(mesh, targets, 1 - Math.pow(0.001, dt));

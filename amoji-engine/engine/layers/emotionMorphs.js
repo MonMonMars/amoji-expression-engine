@@ -223,3 +223,64 @@ export function mergeMorphOverlays(base, overlay) {
   }
   return base;
 }
+
+/** Default Disney Extreme eye / mouth morph multipliers. */
+export const DISNEY_EXTREME_DEFAULTS = {
+  eyeFactor: 1.4,
+  mouthFactor: 1.5,
+  weightCap: 2.0,
+};
+
+/**
+ * Classify a morph key as eye-ish or mouth-ish for Disney Extreme amplify.
+ * @param {string} key
+ * @returns {{ isEye: boolean, isMouth: boolean }}
+ */
+export function classifyDisneyExtremeMorphKey(key) {
+  const k = String(key || '');
+  const isEye =
+    k.includes('eye') ||
+    k.includes('iris') ||
+    k.includes('pupil') ||
+    k.includes('brow') ||
+    k.includes('lid');
+  const isMouth =
+    k.includes('mouth') || k.includes('lip') || k.includes('jaw');
+  return { isEye, isMouth };
+}
+
+/**
+ * Amplify final morph targets for Disney Extreme (eye/brow vs mouth/lip/jaw).
+ * Mutates and returns `targets`. Weights are capped at `weightCap` (default 2).
+ * @param {Record<string, number>|null|undefined} targets
+ * @param {{
+ *   enabled?: boolean,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   weightCap?: number,
+ * }} [opts]
+ */
+export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
+  if (!targets || typeof targets !== 'object') return targets || {};
+  if (!opts.enabled) return targets;
+  const eyeFactor =
+    typeof opts.eyeFactor === 'number' && opts.eyeFactor > 0
+      ? opts.eyeFactor
+      : DISNEY_EXTREME_DEFAULTS.eyeFactor;
+  const mouthFactor =
+    typeof opts.mouthFactor === 'number' && opts.mouthFactor > 0
+      ? opts.mouthFactor
+      : DISNEY_EXTREME_DEFAULTS.mouthFactor;
+  const weightCap =
+    typeof opts.weightCap === 'number' && opts.weightCap > 0
+      ? opts.weightCap
+      : DISNEY_EXTREME_DEFAULTS.weightCap;
+
+  for (const [k, v] of Object.entries(targets)) {
+    if (typeof v !== 'number' || !(v > 0)) continue;
+    const { isEye, isMouth } = classifyDisneyExtremeMorphKey(k);
+    if (isEye) targets[k] = Math.min(weightCap, v * eyeFactor);
+    if (isMouth) targets[k] = Math.min(weightCap, v * mouthFactor);
+  }
+  return targets;
+}

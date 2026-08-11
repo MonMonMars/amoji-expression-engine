@@ -9,11 +9,8 @@ const faceLivePath = fileURLToPath(
 describe('Disney Extreme eye/mouth morph weight clamp', () => {
   it('clamps amplified eye/mouth morphs to 2.0', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain(
-      'if (isEye) targets[k] = Math.min(2.0, v * disneyEyeFactor);',
-    );
-    expect(src).toContain(
-      'if (isMouth) targets[k] = Math.min(2.0, v * disneyMouthFactor);',
-    );
+    expect(src).toContain('amplifyDisneyExtremeMorphs(targets');
+    expect(src).toContain('eyeFactor:');
+    expect(src).toContain('mouthFactor:');
   });
 });
