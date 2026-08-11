@@ -13,6 +13,35 @@ export const PERSONA_LAUGH_ALLOWED = smileData.personaLaughAllowed;
 export const LAUGHTER_INTENSITY_GATE = smileData.laughterIntensityGate;
 export const CONTAGION_HALF_LIFE_SEC = smileData.contagionHalfLifeSec;
 export const LAUGH_BODY = smileData.laughBody;
+export const YOUTHFUL_SMILE_BIAS = smileData.youthfulSmileBias || {
+  squintCapSmile: 0.32,
+  squintCapLaugh: 0.26,
+  squintOpenRelief: 0.85,
+  cheekAttenuationOpen: 0.42,
+  openBoostLaugh: 0.1,
+};
+
+/** Morph channels that drive crow's-feet / orbital squeeze (Pixar: keep subtle). */
+export const SMILE_SQUINT_KEYS = [
+  'Expressions_eyeSquintL_max',
+  'Expressions_eyeSquintR_max',
+];
+
+/** Cheek-corner pull — stacks with squint to deepen nasolabial folds. */
+export const SMILE_CHEEK_KEYS = [
+  'Expressions_mouthSmile_max',
+  'Expressions_mouthSmileL_max',
+  'Expressions_mouthSmileR_max',
+];
+
+/** Jaw / open-smile channels — prefer these for big laugh instead of cheek squeeze. */
+export const SMILE_OPEN_KEYS = [
+  'Expressions_mouthSmileOpen_max',
+  'Expressions_mouthSmileOpen2_max',
+  'Expressions_mouthOpenLarge_max',
+  'Expressions_mouthOpen_max',
+  'Expressions_mouthOpenHalf_max',
+];
 
 /**
  * @param {string} [personaId]
@@ -46,12 +75,88 @@ export function contagionFreshness(consecutiveCount, sinceLastSec = 0) {
 }
 
 /**
+ * Mouth-openness 0..1 from morph weights (drives squint relief + cheek attenuation).
+ * @param {Record<string, number>} morphs
+ */
+export function mouthOpennessFromMorphs(morphs) {
+  let open = 0;
+  for (const k of SMILE_OPEN_KEYS) {
+    open = Math.max(open, morphs[k] || 0);
+  }
+  return open;
+}
+
+/**
+ * Pixar-style post-process: cap orbital squint / nasolabial drivers while keeping jaw open.
+ * More mouth openness → less eye squint & cheek stack (face points stay forward, not pulled back).
+ * @param {Record<string, number>} morphs
+ * @param {{ kind?: 'smile'|'laughter', intensity?: number }} [opts]
+ */
+export function applyYouthfulSmileBias(morphs, opts = {}) {
+  if (!morphs || !Object.keys(morphs).length) return morphs || {};
+  const kind = opts.kind || 'smile';
+  const cfg = YOUTHFUL_SMILE_BIAS;
+  const open = mouthOpennessFromMorphs(morphs);
+  /** @type {Record<string, number>} */
+  const out = { ...morphs };
+
+  const squintCap = kind === 'laughter' ? cfg.squintCapLaugh : cfg.squintCapSmile;
+  const openRelief = 1 - open * (cfg.squintOpenRelief ?? 0.85);
+  const effCap = squintCap * Math.max(0.3, openRelief);
+  for (const k of SMILE_SQUINT_KEYS) {
+    if (out[k] != null) out[k] = Math.min(out[k], effCap);
+  }
+
+  const cheekAtten = 1 - open * (cfg.cheekAttenuationOpen ?? 0.42);
+  for (const k of SMILE_CHEEK_KEYS) {
+    if (out[k] != null) out[k] *= Math.max(0.5, cheekAtten);
+  }
+
+  if (kind === 'laughter') {
+    const boost = (cfg.openBoostLaugh ?? 0.1) * Math.max(0, Math.min(1.25, opts.intensity ?? 1));
+    if (out.Expressions_mouthOpenLarge_max != null) {
+      out.Expressions_mouthOpenLarge_max = Math.min(1, out.Expressions_mouthOpenLarge_max + boost);
+    }
+    if (out.Expressions_mouthSmileOpen_max != null) {
+      out.Expressions_mouthSmileOpen_max = Math.min(1, out.Expressions_mouthSmileOpen_max + boost * 0.55);
+    }
+  }
+
+  return out;
+}
+
+/**
+ * Merge happy-family base emotion sculpt with smile typology — avoid double-stacking
+ * wrinkle-prone channels (Math.max was pushing squint/cheek past recipe intent).
+ * @param {Record<string, number>} base
+ * @param {Record<string, number>} overlay smile / laughter morphs
+ * @param {{ kind?: 'smile'|'laughter', intensity?: number }} [opts]
+ */
+export function mergeHappyFamilyMorphs(base, overlay, opts = {}) {
+  /** @type {Record<string, number>} */
+  const out = { ...(base || {}) };
+  if (!overlay || !Object.keys(overlay).length) {
+    return applyYouthfulSmileBias(out, opts);
+  }
+
+  const owned = new Set([...SMILE_SQUINT_KEYS, ...SMILE_CHEEK_KEYS]);
+  const openSet = new Set(SMILE_OPEN_KEYS);
+  for (const [k, v] of Object.entries(overlay)) {
+    if (owned.has(k)) out[k] = v;
+    else if (openSet.has(k)) out[k] = Math.max(out[k] || 0, v);
+    else out[k] = Math.max(out[k] || 0, v);
+  }
+  return applyYouthfulSmileBias(out, opts);
+}
+
+/**
  * Scale a morph recipe by intensity.
  * @param {Record<string, number>} recipe
  * @param {number} intensity
  * @param {string[]} [available]
+ * @param {{ kind?: 'smile'|'laughter' }} [biasOpts]
  */
-export function scaleSmileRecipe(recipe, intensity = 1, available) {
+export function scaleSmileRecipe(recipe, intensity = 1, available, biasOpts) {
   const t = Math.max(0, Math.min(1.25, intensity));
   const allow = available ? new Set(available) : null;
   /** @type {Record<string, number>} */
@@ -60,7 +165,7 @@ export function scaleSmileRecipe(recipe, intensity = 1, available) {
     if (allow && !allow.has(k)) continue;
     out[k] = Math.min(1, Number(v) * t);
   }
-  return out;
+  return applyYouthfulSmileBias(out, { ...biasOpts, intensity: t });
 }
 
 /**
@@ -76,7 +181,7 @@ export function evaluateSmile(smileType, intensity = 0.7, opts = {}) {
   }
   const def = SMILE_TYPES[type];
   const recipe = SMILE_MORPH_RECIPES[type] || SMILE_MORPH_RECIPES.reward;
-  const morphs = scaleSmileRecipe(recipe, intensity, opts.availableMorphs);
+  const morphs = scaleSmileRecipe(recipe, intensity, opts.availableMorphs, { kind: 'smile' });
 
   return applyComplianceGate(
     {
@@ -225,11 +330,9 @@ export function evaluateLaugh(intensity = 1, opts = {}) {
   const allowed = personaAllowsLaugh(personaId);
   const freshness = contagionFreshness(opts.consecutive ?? 0, opts.sinceLastSec ?? 0);
   const effIntensity = intensity * freshness * (allowed ? 1 : 0.35);
-  const morphs = scaleSmileRecipe(
-    SMILE_MORPH_RECIPES.laughter,
-    effIntensity,
-    opts.availableMorphs,
-  );
+  const morphs = scaleSmileRecipe(SMILE_MORPH_RECIPES.laughter, effIntensity, opts.availableMorphs, {
+    kind: 'laughter',
+  });
   const body = sampleLaughBody(opts.timeSec ?? 0, {
     intensity: effIntensity,
     freshness,

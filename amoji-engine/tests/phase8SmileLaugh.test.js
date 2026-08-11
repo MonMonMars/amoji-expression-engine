@@ -10,6 +10,9 @@ import {
   sampleLaughBody,
   SmileLaughController,
   LAUGHTER_INTENSITY_GATE,
+  applyYouthfulSmileBias,
+  mergeHappyFamilyMorphs,
+  mouthOpennessFromMorphs,
 } from '../engine/layers/smileLaugh.js';
 
 describe('smile typology', () => {
@@ -26,7 +29,8 @@ describe('smile typology', () => {
     const aff = evaluateSmile('affiliative', 1);
     expect(reward.duchenne).toBe(true);
     expect(aff.duchenne).toBe(false);
-    expect(reward.morphs.Expressions_eyeSquintL_max).toBeGreaterThan(0.4);
+    expect(reward.morphs.Expressions_eyeSquintL_max).toBeGreaterThan(0.12);
+    expect(reward.morphs.Expressions_eyeSquintL_max).toBeLessThan(0.35);
     expect(aff.morphs.Expressions_eyeSquintL_max || 0).toBe(0);
     expect(aff.morphs.Expressions_mouthClosed_max).toBeGreaterThan(0.2);
   });
@@ -99,6 +103,8 @@ describe('laughter PD body', () => {
     expect(out.kind).toBe('laughter');
     expect(out.meta?.compliance).toBe('passed');
     expect(out.morphs.Expressions_mouthSmileOpen_max).toBeGreaterThan(0.5);
+    expect(out.morphs.Expressions_mouthOpenLarge_max).toBeGreaterThan(0.6);
+    expect(out.morphs.Expressions_eyeSquintL_max).toBeLessThan(0.3);
     expect(out.body.headPitch).toBeDefined();
   });
 
@@ -114,5 +120,40 @@ describe('laughter PD body', () => {
     const b = c.tick(0.05, { emotion: 'happy', intensity: 0.6 });
     expect(b.smileType).toBe('affiliative');
     expect(LAUGHTER_INTENSITY_GATE).toBe(0.8);
+  });
+});
+
+describe('youthful smile bias (Pixar-style laugh)', () => {
+  it('caps orbital squint and attenuates cheek when mouth is open', () => {
+    const raw = {
+      Expressions_eyeSquintL_max: 0.75,
+      Expressions_eyeSquintR_max: 0.75,
+      Expressions_mouthSmile_max: 0.95,
+      Expressions_mouthSmileL_max: 0.7,
+      Expressions_mouthSmileOpen_max: 0.9,
+      Expressions_mouthOpenLarge_max: 0.88,
+    };
+    const biased = applyYouthfulSmileBias(raw, { kind: 'laughter', intensity: 1 });
+    expect(biased.Expressions_eyeSquintL_max).toBeLessThan(0.28);
+    expect(biased.Expressions_mouthSmile_max).toBeLessThan(raw.Expressions_mouthSmile_max);
+    expect(biased.Expressions_mouthOpenLarge_max).toBeGreaterThanOrEqual(raw.Expressions_mouthOpenLarge_max);
+    expect(mouthOpennessFromMorphs(biased)).toBeGreaterThan(0.6);
+  });
+
+  it('mergeHappyFamilyMorphs replaces squint/cheek instead of max-stacking', () => {
+    const base = {
+      Expressions_eyeSquintL_max: 0.35,
+      Expressions_mouthSmile_max: 0.85,
+      Expressions_mouthOpenLarge_max: 0.2,
+    };
+    const overlay = {
+      Expressions_eyeSquintL_max: 0.24,
+      Expressions_mouthSmile_max: 0.78,
+      Expressions_mouthOpenLarge_max: 0.88,
+    };
+    const merged = mergeHappyFamilyMorphs(base, overlay, { kind: 'laughter', intensity: 1 });
+    expect(merged.Expressions_eyeSquintL_max).toBeLessThan(0.28);
+    expect(merged.Expressions_mouthSmile_max).toBeLessThan(0.7);
+    expect(merged.Expressions_mouthOpenLarge_max).toBeGreaterThan(0.85);
   });
 });

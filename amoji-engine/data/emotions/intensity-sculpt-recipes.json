@@ -24,11 +24,11 @@
         "Expressions_browsMidVert_min": 0.12
       },
       "peak": {
-        "Expressions_mouthSmile_max": 0.85,
-        "Expressions_mouthSmileL_max": 0.55,
-        "Expressions_mouthSmileR_max": 0.55,
-        "Expressions_eyeSquintL_max": 0.35,
-        "Expressions_eyeSquintR_max": 0.35,
+        "Expressions_mouthSmile_max": 0.78,
+        "Expressions_mouthSmileL_max": 0.48,
+        "Expressions_mouthSmileR_max": 0.48,
+        "Expressions_eyeSquintL_max": 0.26,
+        "Expressions_eyeSquintR_max": 0.26,
         "Expressions_browsMidVert_min": 0.15
       }
     },
@@ -192,11 +192,12 @@
         "Expressions_eyeSquintR_max": 0.32
       },
       "peak": {
-        "Expressions_mouthSmileOpen_max": 0.85,
-        "Expressions_mouthSmileL_max": 0.5,
-        "Expressions_mouthSmileR_max": 0.5,
-        "Expressions_eyeSquintL_max": 0.45,
-        "Expressions_eyeSquintR_max": 0.45
+        "Expressions_mouthSmileOpen_max": 0.92,
+        "Expressions_mouthSmileL_max": 0.42,
+        "Expressions_mouthSmileR_max": 0.42,
+        "Expressions_eyeSquintL_max": 0.24,
+        "Expressions_eyeSquintR_max": 0.24,
+        "Expressions_mouthOpenLarge_max": 0.42
       }
     }
   }

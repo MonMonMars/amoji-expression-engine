@@ -4,6 +4,7 @@
  * LO crossfades baked EMO_*_{subtle,medium,peak} morphs.
  */
 import sculptData from '../../data/emotions/intensity-sculpt-recipes.json' with { type: 'json' };
+import { applyYouthfulSmileBias } from './smileLaugh.js';
 
 export const EMOTIONS = [
   'happy',
@@ -182,6 +183,10 @@ export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) 
   if (Object.keys(weights).length === 0) {
     const tier = intensityTierWeights(emotion, t, available);
     if (tier) return tier;
+  }
+  if (emotion === 'happy' || emotion === 'smile_open') {
+    const kind = emotion === 'smile_open' && t >= 0.75 ? 'laughter' : 'smile';
+    return applyYouthfulSmileBias(weights, { kind, intensity: t });
   }
   return weights;
 }

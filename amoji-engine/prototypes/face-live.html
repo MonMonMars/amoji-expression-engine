@@ -973,6 +973,7 @@
         SmileLaughController,
         applyLaughBones,
         defaultSmileForPersona,
+        mergeHappyFamilyMorphs,
       } from '/engine/layers/smileLaugh.js';
       import {
         SURFACE_LEVEL_IDS,
@@ -3706,7 +3707,10 @@
         });
         if (smileState.active && smileState.morphs) {
           if (smileState.kind === 'laughter' || displayEmo === 'happy' || displayEmo === 'smile_open') {
-            mergeMorphOverlays(targets, smileState.morphs);
+            targets = mergeHappyFamilyMorphs(targets, smileState.morphs, {
+              kind: smileState.kind === 'laughter' ? 'laughter' : 'smile',
+              intensity: displayInt,
+            });
           }
         }
         if (smileState.kind === 'laughter') {

@@ -51,14 +51,22 @@
   },
   "laughterIntensityGate": 0.8,
   "contagionHalfLifeSec": 4.5,
+  "youthfulSmileBias": {
+    "note": "Pixar-style: jaw-open laugh without heavy orbital squint or nasolabial stack",
+    "squintCapSmile": 0.32,
+    "squintCapLaugh": 0.26,
+    "squintOpenRelief": 0.85,
+    "cheekAttenuationOpen": 0.42,
+    "openBoostLaugh": 0.1
+  },
   "morphRecipes": {
     "reward": {
-      "Expressions_mouthSmile_max": 0.85,
-      "Expressions_mouthSmileL_max": 0.55,
-      "Expressions_mouthSmileR_max": 0.55,
-      "Expressions_eyeSquintL_max": 0.55,
-      "Expressions_eyeSquintR_max": 0.55,
-      "Expressions_mouthSmileOpen_max": 0.25,
+      "Expressions_mouthSmile_max": 0.72,
+      "Expressions_mouthSmileL_max": 0.48,
+      "Expressions_mouthSmileR_max": 0.48,
+      "Expressions_eyeSquintL_max": 0.3,
+      "Expressions_eyeSquintR_max": 0.3,
+      "Expressions_mouthSmileOpen_max": 0.28,
       "Expressions_browsMidVert_min": 0.12
     },
     "affiliative": {
@@ -82,15 +90,16 @@
       "Expressions_mouthOpenHalf_max": 0.15
     },
     "laughter": {
-      "Expressions_mouthSmileOpen_max": 0.9,
-      "Expressions_mouthSmileOpen2_max": 0.7,
-      "Expressions_mouthSmile_max": 0.95,
-      "Expressions_mouthSmileL_max": 0.7,
-      "Expressions_mouthSmileR_max": 0.7,
-      "Expressions_eyeSquintL_max": 0.75,
-      "Expressions_eyeSquintR_max": 0.75,
-      "Expressions_mouthOpenLarge_max": 0.55,
-      "Expressions_browsMidVert_min": 0.2
+      "Expressions_mouthSmileOpen_max": 0.95,
+      "Expressions_mouthSmileOpen2_max": 0.82,
+      "Expressions_mouthSmile_max": 0.78,
+      "Expressions_mouthSmileL_max": 0.52,
+      "Expressions_mouthSmileR_max": 0.52,
+      "Expressions_eyeSquintL_max": 0.24,
+      "Expressions_eyeSquintR_max": 0.24,
+      "Expressions_mouthOpenLarge_max": 0.88,
+      "Expressions_mouthOpen_max": 0.35,
+      "Expressions_browsMidVert_min": 0.18
     }
   },
   "laughBody": {
