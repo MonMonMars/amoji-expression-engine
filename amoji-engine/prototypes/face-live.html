@@ -887,6 +887,9 @@
             <button type="button" id="btnDisneyExtremeWipeFav">Wipe favorites <kbd>⇧W</kbd></button>
             <button type="button" id="btnDisneyExtremeWipeStacks">Wipe stacks <kbd>Alt+W</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFp">Copy fingerprint <kbd>Alt+P</kbd></button>
+            <button type="button" id="btnDisneyExtremeStacksList">Stacks summary <kbd>Alt+L</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearPin">Clear pin only <kbd>Alt+K</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteKit">Paste kit share <kbd>Alt+V</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyStacks">Copy stacks JSON <kbd>Z</kbd></button>
             <button type="button" id="btnDisneyExtremePasteStacks">Paste stacks JSON <kbd>⇧Z</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacks">Merge stacks JSON <kbd>Alt+Z</kbd></button>
@@ -900,7 +903,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · ⇧L copy · ⇧K clear hist · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · G/⇧G/Alt+G fav JSON · T fav share · Z/⇧Z/Alt+Z stacks · V/⇧V stacks/kit share · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · G/⇧G/Alt+G fav JSON · T fav share · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V stacks/kit · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1320,6 +1323,9 @@
         loadDisneyExtremeBaselineStacksFromHash,
         buildDisneyExtremeBaselineStacksShareUrl,
         buildDisneyExtremeBaselineKitShareUrl,
+        decodeDisneyExtremeBaselineKitHash,
+        formatDisneyExtremeBaselineKitPreviewLabel,
+        formatDisneyExtremeBaselineStacksSummaryLabel,
         cycleDisneyExtremeBaselineFavoriteIndex,
         removeDisneyExtremeBaselineFavorite,
         formatDisneyExtremeMultiHashLoadLabel,
@@ -2999,6 +3005,18 @@
         copyDisneyExtremeSnapshotFingerprint();
       });
 
+      document.getElementById('btnDisneyExtremeStacksList')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineStacksSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeClearPin')?.addEventListener('click', () => {
+        clearDisneyExtremeBaselinePinOnly();
+      });
+
+      document.getElementById('btnDisneyExtremePasteKit')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineKitShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeCopyStacks')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineStacksJson();
       });
@@ -3574,6 +3592,8 @@
         }
         lastExtremeBaselineSnap = null;
         extremeBaselineHistory = [];
+        extremeHistoryJumpIndexActive = null;
+        extremeRedoJumpIndexActive = null;
         clearDisneyExtremeBaselineStorage();
         clearDisneyExtremeBaselineHistoryStorage();
         clearDisneyExtremeBaselineRedoStack();
@@ -3582,6 +3602,84 @@
         syncDisneyExtremeHistoryUi();
         flashDisneyExtremeStatus('cleared · baseline');
         return true;
+      }
+
+      function clearDisneyExtremeBaselinePinOnly() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('clear pin · none');
+          return false;
+        }
+        lastExtremeBaselineSnap = null;
+        clearDisneyExtremeBaselineStorage();
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        flashDisneyExtremeStatus('cleared · pin');
+        return true;
+      }
+
+      function flashDisneyExtremeBaselineStacksSummary() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineStacksSummaryLabel({
+            history: extremeBaselineHistory,
+            redo: extremeBaselineRedo,
+            favorites: extremeBaselineFavorites,
+          }),
+        );
+      }
+
+      async function pasteDisneyExtremeBaselineKitShareUrl(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · kit clipboard');
+          return false;
+        }
+        const kit = decodeDisneyExtremeBaselineKitHash(text);
+        if (!kit.ok) {
+          flashDisneyExtremeStatus(`paste failed · kit · ${kit.error}`);
+          return false;
+        }
+        if (opts.preview) {
+          flashDisneyExtremeStatus(formatDisneyExtremeBaselineKitPreviewLabel(kit));
+          return true;
+        }
+        const parts = [];
+        if (kit.hasSnap && kit.snap) {
+          applyDisneyExtremeSnapshot(kit.snap, { applyIntensity: true });
+          setDisneyExtremeBaseline(kit.snap);
+          parts.push(
+            `snapshot · fp ${disneyExtremeSnapshotFingerprintShort(kit.snap)}`,
+          );
+        }
+        if (kit.hasStacks) {
+          applyDisneyExtremeBaselineStacks(kit, {
+            merge: !!opts.merge,
+            silent: true,
+          });
+          parts.push(
+            `stacks · hist ${extremeBaselineHistory.length} · redo ${extremeBaselineRedo.length} · fav ${extremeBaselineFavorites.length}`,
+          );
+        }
+        flashDisneyExtremeStatus(formatDisneyExtremeMultiHashLoadLabel(parts));
+        return true;
+      }
+
+      function clearDisneyExtremeActiveChips() {
+        const had =
+          extremeFavoriteCycleIndex != null ||
+          extremeHistoryJumpIndexActive != null ||
+          extremeRedoJumpIndexActive != null;
+        extremeFavoriteCycleIndex = null;
+        extremeHistoryJumpIndexActive = null;
+        extremeRedoJumpIndexActive = null;
+        if (had) {
+          syncDisneyExtremeHistoryUi();
+          syncDisneyExtremeFavoritesUi();
+        }
+        return had;
       }
 
       function clearDisneyExtremeBaselineHistoryOnly() {
@@ -3836,6 +3934,10 @@
             performance.now(),
           ),
           holdingChipCompare: !!lastExtremeChipCompare,
+          holdingActiveChips:
+            extremeFavoriteCycleIndex != null ||
+            extremeHistoryJumpIndexActive != null ||
+            extremeRedoJumpIndexActive != null,
         });
         if (!resolved.ok || !disneyExtremeEl) return;
         if (
@@ -3847,9 +3949,15 @@
         if (resolved.action === 'clearStatusHold') {
           ev.preventDefault();
           disneyExtremeStatusHoldUntil = 0;
-          if (lastExtremeChipCompare) {
-            lastExtremeChipCompare = null;
+          const clearedCompare = !!lastExtremeChipCompare;
+          if (clearedCompare) lastExtremeChipCompare = null;
+          const clearedActive = clearDisneyExtremeActiveChips();
+          if (clearedCompare && clearedActive) {
+            flashDisneyExtremeStatus('cleared · compare · chips');
+          } else if (clearedCompare) {
             flashDisneyExtremeStatus('cleared · chip compare');
+          } else if (clearedActive) {
+            flashDisneyExtremeStatus('cleared · active chips');
           }
           return;
         }
@@ -3958,6 +4066,11 @@
           clearDisneyExtremeBaselineHistoryOnly();
           return;
         }
+        if (resolved.action === 'clearBaselinePin') {
+          ev.preventDefault();
+          clearDisneyExtremeBaselinePinOnly();
+          return;
+        }
         if (resolved.action === 'clearBaselineRedo') {
           ev.preventDefault();
           clearDisneyExtremeBaselineRedoOnly();
@@ -4043,6 +4156,11 @@
           copyDisneyExtremeBaselineKitShareUrl();
           return;
         }
+        if (resolved.action === 'pasteBaselineKitShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineKitShareUrl();
+          return;
+        }
         if (resolved.action === 'cycleBaselineFavoriteNext') {
           ev.preventDefault();
           cycleDisneyExtremeBaselineFavorite();
@@ -4096,6 +4214,11 @@
         if (resolved.action === 'showBaselineHistory') {
           ev.preventDefault();
           flashDisneyExtremeBaselineHistoryList();
+          return;
+        }
+        if (resolved.action === 'showBaselineStacks') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineStacksSummary();
           return;
         }
         if (resolved.action === 'copyBaselineHistoryJson') {

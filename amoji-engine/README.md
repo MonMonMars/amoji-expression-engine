@@ -284,7 +284,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 271 | Extreme Ctrl+click hist/redo chip remove | Done |
 | Phase 272 | Extreme Alt+P copy fingerprint | Done |
 | Phase 273 | Extreme active hist/redo chip highlight | Done |
-| Phase 274+ | Further production polish… | Specced |
+| Phase 274 | Extreme Alt+L stacks summary | Done |
+| Phase 275 | Extreme Alt+K clear pin only | Done |
+| Phase 276 | Extreme Alt+V paste kit share | Done |
+| Phase 277 | Extreme Esc clears active chips | Done |
+| Phase 278+ | Further production polish… | Specced |
 
 ## Quick start
 

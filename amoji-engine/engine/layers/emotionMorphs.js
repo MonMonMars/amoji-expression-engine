@@ -565,6 +565,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
+  { id: 'clearBaselinePin', help: 'Alt+K clear pin', kind: 'note' },
   { id: 'clearBaselineRedo', keys: ['w', 'W'], help: 'W wipe redo', kind: 'action' },
   { id: 'clearBaselineFavorites', help: 'Shift+W wipe favs', kind: 'note' },
   { id: 'clearBaselineStacks', help: 'Alt+W wipe stacks', kind: 'note' },
@@ -587,6 +588,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineFavoritesShareUrl', keys: ['t', 'T'], help: 'T share fav', kind: 'action' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
+  { id: 'showBaselineStacks', help: 'Alt+L stacks', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
   { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
   {
@@ -609,10 +611,12 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'mergeBaselineStacksJson', help: 'Alt+Z merge stacks', kind: 'note' },
   { id: 'copyBaselineStacksShareUrl', keys: ['v', 'V'], help: 'V share stacks', kind: 'action' },
   { id: 'copyBaselineKitShareUrl', help: 'Shift+V share kit', kind: 'note' },
+  { id: 'pasteBaselineKitShareUrl', help: 'Alt+V paste kit', kind: 'note' },
   { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
   { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
   { id: 'activeFavoriteChip', help: 'fav chip · active', kind: 'note' },
   { id: 'activeHistoryChip', help: 'hist/redo chip · active', kind: 'note' },
+  { id: 'clearActiveChips', help: 'Esc clear active chips', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -2758,6 +2762,19 @@ export function formatDisneyExtremeBaselineStacksPreviewLabel(stacks = {}) {
 }
 
 /**
+ * Live status label for Extreme stacks depths.
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} stacks
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineStacksSummaryLabel(stacks = {}) {
+  const histN = Array.isArray(stacks?.history) ? stacks.history.length : 0;
+  const redoN = Array.isArray(stacks?.redo) ? stacks.redo.length : 0;
+  const favN = Array.isArray(stacks?.favorites) ? stacks.favorites.length : 0;
+  if (!histN && !redoN && !favN) return 'stacks · empty';
+  return `stacks · hist ${histN} · redo ${redoN} · fav ${favN}`;
+}
+
+/**
  * Encode Extreme baseline stacks → URL hash fragment (`#dxb=...` base64url JSON).
  * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} [stacks]
  * @returns {string}
@@ -2933,4 +2950,72 @@ export function buildDisneyExtremeBaselineKitShareUrl(kit = {}, opts = {}) {
     url: base ? `${base}#${hash}` : `#${hash}`,
     hash,
   };
+}
+
+/**
+ * Decode a kit share URL / hash (`dxs=` and/or `dxb=`).
+ * @param {string} hashOrUrl
+ * @returns {{
+ *   ok: true,
+ *   snap: object|null,
+ *   history: object[],
+ *   redo: object[],
+ *   favorites: object[],
+ *   hasSnap: boolean,
+ *   hasStacks: boolean,
+ * }|{ ok: false, error: string }}
+ */
+export function decodeDisneyExtremeBaselineKitHash(hashOrUrl) {
+  if (!hashOrUrl || typeof hashOrUrl !== 'string') {
+    return { ok: false, error: 'empty' };
+  }
+  let raw = hashOrUrl.trim();
+  const hashIdx = raw.indexOf('#');
+  if (hashIdx >= 0) raw = raw.slice(hashIdx + 1);
+  else raw = raw.replace(/^#/, '');
+  const snap = decodeDisneyExtremeSnapshotHash(`#${raw}`);
+  const stacks = decodeDisneyExtremeBaselineStacksHash(`#${raw}`);
+  if (!snap.ok && !stacks.ok) {
+    return { ok: false, error: 'no_kit' };
+  }
+  return {
+    ok: true,
+    snap: snap.ok ? snap.snap : null,
+    history: stacks.ok ? stacks.history : [],
+    redo: stacks.ok ? stacks.redo : [],
+    favorites: stacks.ok ? stacks.favorites : [],
+    hasSnap: !!snap.ok,
+    hasStacks: !!stacks.ok,
+  };
+}
+
+/**
+ * Dry-run preview label for an Extreme kit payload.
+ * @param {{
+ *   snap?: object|null,
+ *   history?: object[],
+ *   redo?: object[],
+ *   favorites?: object[],
+ *   hasSnap?: boolean,
+ *   hasStacks?: boolean,
+ * }|null|undefined} kit
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineKitPreviewLabel(kit = {}) {
+  if (!kit || typeof kit !== 'object') {
+    return 'preview · kit · invalid';
+  }
+  const parts = [];
+  if (kit.snap || kit.hasSnap) {
+    const fp = disneyExtremeSnapshotFingerprintShort(kit.snap);
+    parts.push(`snap ${fp}`);
+  }
+  const histN = Array.isArray(kit.history) ? kit.history.length : 0;
+  const redoN = Array.isArray(kit.redo) ? kit.redo.length : 0;
+  const favN = Array.isArray(kit.favorites) ? kit.favorites.length : 0;
+  if (kit.hasStacks || histN || redoN || favN) {
+    parts.push(`hist ${histN} · redo ${redoN} · fav ${favN}`);
+  }
+  if (!parts.length) return 'preview · kit · empty';
+  return `preview · kit · ${parts.join(' · ')}`;
 }
