@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "note": "Bidirectional hints between Layer G emblems and finger pose presets (catalog emblems only).",
+  "emblemToFinger": {
+    "wave": "wave",
+    "ok": "ok",
+    "thumbsUp": "thumbs-up",
+    "stopPalm": "open-palm",
+    "point": "point"
+  },
+  "fingerToEmblem": {
+    "wave": "wave",
+    "ok": "ok",
+    "thumbs-up": "thumbsUp",
+    "open-palm": "stopPalm",
+    "point": "point"
+  }
+}

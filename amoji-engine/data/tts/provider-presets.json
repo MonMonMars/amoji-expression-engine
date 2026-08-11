@@ -1,7 +1,8 @@
 {
   "version": 1,
-  "note": "Production TTS provider presets — endpoint templates only. Tokens via AMOJI_TTS_TOKEN / Face Live; never commit secrets.",
+  "note": "Production TTS provider presets — endpoint templates only. Tokens via AMOJI_TTS_TOKEN / Face Live; never commit secrets. Gateway presets expand ${AMOJI_TTS_GATEWAY}.",
   "defaultPreset": "mock",
+  "gatewayEnvKey": "AMOJI_TTS_GATEWAY",
   "presets": {
     "mock": {
       "id": "mock",
@@ -19,7 +20,7 @@
       "provider": "step-audio-editx",
       "type": "http",
       "endpoint": "https://api.example.com/v1/tts/step",
-      "description": "Step Audio–shaped phoneme + audioUrl JSON. Replace endpoint with your gateway.",
+      "description": "Step Audio–shaped phoneme + audioUrl JSON. Prefer gateway-step when you have a real base URL.",
       "fixtureKey": "stepAudioEditX",
       "auth": "bearer"
     },
@@ -29,7 +30,7 @@
       "provider": "indextts2",
       "type": "http",
       "endpoint": "https://api.example.com/v1/tts/index",
-      "description": "IndexTTS2 alignment + para tags. Replace endpoint with your gateway.",
+      "description": "IndexTTS2 alignment + para tags. Prefer gateway-index when you have a real base URL.",
       "fixtureKey": "indexTts2",
       "auth": "bearer"
     },
@@ -39,7 +40,7 @@
       "provider": "kokoro",
       "type": "http",
       "endpoint": "https://api.example.com/v1/tts/kokoro",
-      "description": "Kokoro token phonemes. Replace endpoint with your gateway.",
+      "description": "Kokoro token phonemes. Prefer gateway-kokoro when you have a real base URL.",
       "fixtureKey": "kokoro",
       "auth": "bearer"
     },
@@ -53,6 +54,50 @@
       "fixtureKey": "stepAudioEditX",
       "auth": "bearer",
       "defaultTokenHint": "amoji-smoke-token"
+    },
+    "gateway-step": {
+      "id": "gateway-step",
+      "label": "Gateway · Step",
+      "provider": "step-audio-editx",
+      "type": "http",
+      "endpoint": "${AMOJI_TTS_GATEWAY}/v1/tts/step",
+      "description": "Real gateway: set AMOJI_TTS_GATEWAY (e.g. https://tts.yourco.com) + AMOJI_TTS_TOKEN.",
+      "fixtureKey": "stepAudioEditX",
+      "auth": "bearer",
+      "gateway": true
+    },
+    "gateway-index": {
+      "id": "gateway-index",
+      "label": "Gateway · IndexTTS2",
+      "provider": "indextts2",
+      "type": "http",
+      "endpoint": "${AMOJI_TTS_GATEWAY}/v1/tts/index",
+      "description": "Real gateway IndexTTS2 path. Requires AMOJI_TTS_GATEWAY + token.",
+      "fixtureKey": "indexTts2",
+      "auth": "bearer",
+      "gateway": true
+    },
+    "gateway-kokoro": {
+      "id": "gateway-kokoro",
+      "label": "Gateway · Kokoro",
+      "provider": "kokoro",
+      "type": "http",
+      "endpoint": "${AMOJI_TTS_GATEWAY}/v1/tts/kokoro",
+      "description": "Real gateway Kokoro path. Requires AMOJI_TTS_GATEWAY + token.",
+      "fixtureKey": "kokoro",
+      "auth": "bearer",
+      "gateway": true
+    },
+    "gateway-root": {
+      "id": "gateway-root",
+      "label": "Gateway · /synthesize",
+      "provider": "auto",
+      "type": "http",
+      "endpoint": "${AMOJI_TTS_GATEWAY}/synthesize",
+      "description": "Generic gateway synthesize endpoint (smoke-compatible shape).",
+      "fixtureKey": "stepAudioEditX",
+      "auth": "bearer",
+      "gateway": true
     }
   }
 }

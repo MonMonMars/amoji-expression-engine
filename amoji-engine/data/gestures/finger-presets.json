@@ -66,6 +66,18 @@
         "spread": 0.1,
         "armR": { "thumb": 0.8, "index": 0.75, "middle": 0.55, "ring": 0.5, "pinky": 0.45 }
       }
+    },
+    "thumbs-up": {
+      "id": "thumbs-up",
+      "label": "Thumbs up",
+      "description": "Thumb extended, other digits curled (right)",
+      "gesture": {
+        "fist": 0.7,
+        "handOpen": 0.1,
+        "spread": 0.1,
+        "armR": { "thumb": 0.05, "index": 0.85, "middle": 0.9, "ring": 0.9, "pinky": 0.9, "fist": 0.75 },
+        "armL": { "fist": 0.2, "handOpen": 0.4 }
+      }
     }
   }
 }

@@ -51,14 +51,14 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Easter eggs:** multi-toggle (NLP / nose / aversion / arms / chin-think / nape / open-palm) — default off, locked for corporate/care/education, non-science
 - **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
-- **Live Link pub** → `npm run livelink` bridge; soak with `npm run livelink:soak` (+ `/stats`)
+- **Live Link pub** → `npm run livelink` bridge; soak with `npm run livelink:soak`; Face Live **LL remap** picker
 - **Eye look-at / Layer E:** camera track or manual; gaze modes lock/avoid/scan/presentation/camera; Turn-start/end; VOR vs head; pupil scale
 - Idle sway / turntable / cycle emotions / blink
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
-- **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch (drives robot hand DOF)
-- **TTS speak**: Mock / HTTP / provider presets / Step fixture WAV / attach audio → phoneme mouth + sync
+- **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up (emblem sync)
+- **TTS speak**: Mock / HTTP / provider presets / gateway presets / Step fixture WAV / attach audio → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 
@@ -86,7 +86,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `controlRigRemap.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
-- Robot drivers: `engine/export/robotDriver.js` + `fingerArticulation.js` + `fingerPresets.js` + `data/robots/catalog.json` + `data/gestures/finger-presets.json`
+- Robot drivers: `engine/export/robotDriver.js` + `fingerArticulation.js` + `fingerPresets.js` + `emblemFingerSync.js` + `data/robots/catalog.json` + `data/gestures/finger-presets.json`
 - Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew + variants)
 - TTS config: `engine/tts/ttsConfig.js` · presets `ttsPresets.js` · smoke `ttsSmoke.js` (`npm run tts:smoke`)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime

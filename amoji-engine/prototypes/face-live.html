@@ -461,11 +461,13 @@
           <button type="button" id="btnMoodFear">Mood: fear</button>
           <button type="button" id="btnLiveLink">Live Link pub</button>
         </div>
+        <select id="liveLinkRemapSel" class="ctl" style="margin-top:8px;"></select>
         <div class="row">
           <button type="button" id="btnLatency">Sim AI latency</button>
           <button type="button" id="btnImprov">Improv noise</button>
         </div>
         <div class="status" id="temporalStatus">step-out off · livelink off</div>
+        <div class="status" id="liveLinkRemapStatus">livelink remap · identity</div>
         <div class="status" id="latencyStatus">latency idle</div>
       </div>
 
@@ -590,6 +592,15 @@
         DEFAULT_FINGER_PRESET,
       } from '/engine/export/fingerPresets.js';
       import {
+        syncEmblemToFinger,
+        syncFingerToEmblem,
+        fingerPresetForEmblem,
+      } from '/engine/export/emblemFingerSync.js';
+      import {
+        listRemapProfiles,
+        remapLiveLinkFrame,
+      } from '/engine/export/controlRigRemap.js';
+      import {
         listChassis,
         getChassis,
         ChassisSlewLimiter,
@@ -700,6 +711,8 @@
       let cycleT = 0;
       let stepOutNext = false;
       let liveLinkOn = false;
+      let liveLinkRemapId = 'identity';
+      let fingerEmblemSyncOn = true;
       const temporal = new TemporalLayer({ recipes: HI_RECIPES });
       temporal.setEmotion(emotion, intensity);
       const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
@@ -918,13 +931,23 @@
           .filter(Boolean)
           .join(' · ');
       }
-      function applyFingerPreset(id) {
+      function applyFingerPreset(id, { fromEmblem = false } = {}) {
         fingerPresetId = id || DEFAULT_FINGER_PRESET;
         const resolved = resolveFingerPreset(fingerPresetId);
         fingerGesture = resolved.gesture || { fist: 0.05, handOpen: 0.4 };
+        if (fingerPresetSel) fingerPresetSel.value = fingerPresetId;
         fingerStatus.textContent = resolved.error
           ? `fingers · error`
-          : `fingers · ${resolved.label || fingerPresetId}`;
+          : `fingers · ${resolved.label || fingerPresetId}${
+              fromEmblem ? ' · synced' : ''
+            }`;
+        if (fingerEmblemSyncOn && !fromEmblem) {
+          const back = syncFingerToEmblem(fingerPresetId);
+          if (back.emblemId && emblemSel && emblemSel.value !== back.emblemId) {
+            // hint only — do not auto-fire emblem animation from finger pick
+            fingerStatus.textContent += ` · hints ${back.emblemId}`;
+          }
+        }
       }
       applyFingerPreset(fingerPresetId);
       robotPackSel.addEventListener('change', () => {
@@ -962,6 +985,22 @@
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
       }
       refreshTemporalStatus();
+
+      const liveLinkRemapSel = document.getElementById('liveLinkRemapSel');
+      const liveLinkRemapStatus = document.getElementById('liveLinkRemapStatus');
+      for (const p of listRemapProfiles()) {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `LL remap · ${p.label}`;
+        if (p.id === liveLinkRemapId) opt.selected = true;
+        liveLinkRemapSel.appendChild(opt);
+      }
+      liveLinkRemapSel.addEventListener('change', () => {
+        liveLinkRemapId = liveLinkRemapSel.value || 'identity';
+        liveLinkRemapStatus.textContent = `livelink remap · ${liveLinkRemapId}${
+          liveLinkRemapId === 'identity' ? '' : ' · publish remapped'
+        }`;
+      });
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0c1116);
@@ -1447,10 +1486,22 @@
       emblemSel.addEventListener('change', () => {
         const v = emblemSel.value || null;
         gestures.setEmblem(v);
+        if (fingerEmblemSyncOn && v) {
+          const synced = syncEmblemToFinger(v);
+          if (synced.synced && synced.fingerPresetId) {
+            applyFingerPreset(synced.fingerPresetId, { fromEmblem: true });
+          }
+        }
       });
       document.getElementById('btnWave').addEventListener('click', () => {
         gestures.playEmblem('wave');
         emblemSel.value = 'wave';
+        if (fingerEmblemSyncOn) {
+          const synced = syncEmblemToFinger('wave');
+          if (synced.synced && synced.fingerPresetId) {
+            applyFingerPreset(synced.fingerPresetId, { fromEmblem: true });
+          }
+        }
       });
       document.getElementById('btnSpeak').addEventListener('click', (e) => {
         gestures.setSpeaking(!gestures.speaking, 0.65);
@@ -1590,13 +1641,21 @@
         for (const p of listTtsPresets()) {
           const opt = document.createElement('option');
           opt.value = p.id;
-          opt.textContent = `${p.label}${p.type === 'http' ? ' · HTTP' : ''}`;
+          opt.textContent = `${p.label}${p.gateway ? ' · GW' : p.type === 'http' ? ' · HTTP' : ''}`;
           if (p.id === DEFAULT_TTS_PRESET) opt.selected = true;
           ttsPresetSel.appendChild(opt);
         }
         ttsPresetSel.addEventListener('change', () => {
           const applied = applyTtsPreset(ttsPresetSel.value, { persistBrowser: true });
           const el = document.getElementById('ttsEndpoint');
+          if (applied.needsGateway) {
+            if (el) el.value = '';
+            setTtsStatus(
+              `preset · ${applied.label} · set AMOJI_TTS_GATEWAY (or paste endpoint)`,
+              'bad',
+            );
+            return;
+          }
           if (el && applied.config?.endpoint) el.value = applied.config.endpoint;
           else if (el && applied.config?.type === 'mock') el.value = '';
           setTtsStatus(
@@ -2143,7 +2202,13 @@
         }
 
         if (liveLinkOn && frames % 2 === 0) {
-          const frame = morphsToLiveLinkFrame(targets);
+          let frame = morphsToLiveLinkFrame(targets);
+          if (liveLinkRemapId && liveLinkRemapId !== 'identity') {
+            frame = remapLiveLinkFrame(frame, {
+              profileId: liveLinkRemapId,
+              keepUnmapped: true,
+            });
+          }
           fetch(LIVELINK_HTTP, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -20,7 +20,16 @@ describe('Phase 25 finger presets', () => {
     const ids = listFingerPresets().map((p) => p.id);
     expect(DEFAULT_FINGER_PRESET).toBe('rest');
     expect(ids).toEqual(
-      expect.arrayContaining(['rest', 'fist', 'open-palm', 'point', 'ok', 'wave', 'pinch']),
+      expect.arrayContaining([
+        'rest',
+        'fist',
+        'open-palm',
+        'point',
+        'ok',
+        'wave',
+        'pinch',
+        'thumbs-up',
+      ]),
     );
   });
 

@@ -406,6 +406,15 @@ export {
   resolveFingerPreset,
 } from './export/fingerPresets.js';
 export {
+  EMBLEM_FINGER_SYNC,
+  EMBLEM_TO_FINGER,
+  FINGER_TO_EMBLEM,
+  fingerPresetForEmblem,
+  emblemForFingerPreset,
+  syncEmblemToFinger,
+  syncFingerToEmblem,
+} from './export/emblemFingerSync.js';
+export {
   TTS_CONFIG_KEYS,
   resolveTtsConfig,
   createTtsProviderFromConfig,
@@ -414,6 +423,9 @@ export {
 export {
   TTS_PRESET_CATALOG,
   DEFAULT_TTS_PRESET,
+  TTS_GATEWAY_ENV_KEY,
+  expandEndpointTemplate,
+  resolveGatewayBase,
   listTtsPresets,
   getTtsPreset,
   applyTtsPreset,

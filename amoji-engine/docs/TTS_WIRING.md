@@ -67,7 +67,15 @@ const http = new HttpTtsProvider({ endpoint: 'https://your-tts/synthesize' });
 await playWithProvider(player, http, { text: '你好', emotion: 'happy' });
 ```
 
-Face Live: pick a **TTS preset** (mock / Step / Index / Kokoro / local-smoke) or paste endpoint → **HTTP synthesize**. No secrets committed.
+Face Live: pick a **TTS preset** (mock / Step / Index / Kokoro / local-smoke / **Gateway ·***) or paste endpoint → **HTTP synthesize**.
+
+Gateway presets expand `AMOJI_TTS_GATEWAY`:
+
+```bash
+export AMOJI_TTS_GATEWAY=https://tts.yourco.com
+export AMOJI_TTS_TOKEN=…   # optional Bearer
+# Face Live → Gateway · Step  → https://tts.yourco.com/v1/tts/step
+```
 
 Smoke (auth round-trip):
 
