@@ -594,8 +594,13 @@
       import {
         syncEmblemToFinger,
         syncFingerToEmblem,
+        syncAffectToFinger,
         fingerPresetForEmblem,
       } from '/engine/export/emblemFingerSync.js';
+      import {
+        loadFaceLivePrefs,
+        saveFaceLivePrefs,
+      } from '/engine/ui/faceLivePrefs.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -699,8 +704,10 @@
 
       let lod = 'hi';
       let texLod = 'mid';
-      let emotion = 'happy';
-      let intensity = 0.7;
+      const savedPrefs = loadFaceLivePrefs().prefs;
+      let emotion = savedPrefs.emotion || 'happy';
+      let intensity =
+        typeof savedPrefs.intensity === 'number' ? savedPrefs.intensity : 0.7;
       let lookX = 0;
       let lookY = 0;
       let trackCamera = true;
@@ -711,11 +718,15 @@
       let cycleT = 0;
       let stepOutNext = false;
       let liveLinkOn = false;
-      let liveLinkRemapId = 'identity';
-      let fingerEmblemSyncOn = true;
+      let liveLinkRemapId = savedPrefs.liveLinkRemapId || 'identity';
+      let fingerEmblemSyncOn = savedPrefs.fingerEmblemSyncOn !== false;
+      let affectFingerSyncOn = true;
       const temporal = new TemporalLayer({ recipes: HI_RECIPES });
       temporal.setEmotion(emotion, intensity);
-      const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
+      const idle = new IdleController({
+        personaId: savedPrefs.personaId || 'companion',
+        arousal: 'calm',
+      });
       const latency = new LatencyBridge({ personaId: 'companion', lang: 'zh' });
       const gestures = new GestureController({ anxiety: 0.35 });
       const bodyCtl = new BodyController();
@@ -746,18 +757,40 @@
       let eggPoseHint = null;
       let compoundId = '';
       let walkPhase = 0;
-      let surfaceLevel = 6;
+      let surfaceLevel = Number(savedPrefs.surfaceLevel) || 6;
       let applySurfaceHints = true;
-      let robotPackId = DEFAULT_ROBOT_PACK;
+      let robotPackId = savedPrefs.robotPackId || DEFAULT_ROBOT_PACK;
       let robotWalkOn = false;
-      let chassisId = DEFAULT_CHASSIS;
+      let chassisId = savedPrefs.chassisId || DEFAULT_CHASSIS;
       let robotSlewOn = true;
-      let fingerPresetId = DEFAULT_FINGER_PRESET;
+      let fingerPresetId = savedPrefs.fingerPresetId || DEFAULT_FINGER_PRESET;
       /** @type {object|null} */
       let fingerGesture = resolveFingerPreset(fingerPresetId).gesture || { fist: 0.05, handOpen: 0.4 };
       const robotSlew = new ChassisSlewLimiter(chassisId);
       let lastRobotT = performance.now() / 1000;
-      const speechPlayer = new SpeechPlayer({ emotion: 'happy', intensity: 0.7, fps: 30 });
+      const speechPlayer = new SpeechPlayer({ emotion, intensity, fps: 30 });
+
+      function persistPrefs(extra = {}) {
+        try {
+          saveFaceLivePrefs({
+            emotion,
+            intensity,
+            personaId: idle.personaId,
+            chassisId,
+            robotPackId,
+            fingerPresetId,
+            liveLinkRemapId,
+            fingerEmblemSyncOn,
+            surfaceLevel,
+            ttsPresetId: document.getElementById('ttsPresetSel')?.value || 'mock',
+            ttsEndpoint: document.getElementById('ttsEndpoint')?.value || '',
+            audioSync: !!document.getElementById('ttsAudioSync')?.checked,
+            ...extra,
+          });
+        } catch {
+          /* ignore quota */
+        }
+      }
       const ttsStatus = document.getElementById('ttsStatus');
       const ttsTextEl = document.getElementById('ttsText');
       /** @type {Record<string, number>|null} */
@@ -953,6 +986,7 @@
       robotPackSel.addEventListener('change', () => {
         robotPackId = robotPackSel.value || DEFAULT_ROBOT_PACK;
         refreshRobotStatus();
+        persistPrefs();
       });
       chassisSel.addEventListener('change', () => {
         chassisId = chassisSel.value || DEFAULT_CHASSIS;
@@ -964,9 +998,11 @@
         robotSlew.setChassis(chassisId);
         robotSlew.reset();
         refreshRobotStatus();
+        persistPrefs();
       });
       fingerPresetSel.addEventListener('change', () => {
         applyFingerPreset(fingerPresetSel.value);
+        persistPrefs();
       });
       document.getElementById('btnRobotWalk').addEventListener('click', () => {
         robotWalkOn = !robotWalkOn;
@@ -1000,7 +1036,10 @@
         liveLinkRemapStatus.textContent = `livelink remap · ${liveLinkRemapId}${
           liveLinkRemapId === 'identity' ? '' : ' · publish remapped'
         }`;
+        persistPrefs();
       });
+      liveLinkRemapSel.value = liveLinkRemapId;
+      liveLinkRemapSel.dispatchEvent(new Event('change'));
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0c1116);
@@ -1238,6 +1277,13 @@
             : cont.steppedOut
               ? 'Step-Out cleared residual'
               : 'continuity fresh';
+          if (affectFingerSyncOn && fingerEmblemSyncOn) {
+            const aff = syncAffectToFinger(emotion);
+            if (aff.synced && aff.fingerPresetId) {
+              applyFingerPreset(aff.fingerPresetId, { fromEmblem: true });
+            }
+          }
+          persistPrefs();
         });
         emoGrid.appendChild(b);
       }
@@ -1274,6 +1320,8 @@
         tierHint.textContent = tierLabel(intensity);
         temporal.intensity = intensity;
       });
+      intensityEl.addEventListener('change', () => persistPrefs());
+      intensityEl.value = String(intensity);
       intensityEl.dispatchEvent(new Event('input'));
 
       function syncLookSliders() {
@@ -1445,7 +1493,14 @@
         } else {
           setEggsLocked(false);
         }
+        persistPrefs();
       });
+      {
+        const ps = document.getElementById('personaSel');
+        if (ps && savedPrefs.personaId) {
+          ps.value = savedPrefs.personaId;
+        }
+      }
       document.getElementById('arousalSeg').addEventListener('click', (ev) => {
         const btn = ev.target.closest('button[data-arousal]');
         if (!btn) return;
@@ -1642,9 +1697,10 @@
           const opt = document.createElement('option');
           opt.value = p.id;
           opt.textContent = `${p.label}${p.gateway ? ' · GW' : p.type === 'http' ? ' · HTTP' : ''}`;
-          if (p.id === DEFAULT_TTS_PRESET) opt.selected = true;
+          if (p.id === (savedPrefs.ttsPresetId || DEFAULT_TTS_PRESET)) opt.selected = true;
           ttsPresetSel.appendChild(opt);
         }
+        if (ttsAudioSync) ttsAudioSync.checked = savedPrefs.audioSync !== false;
         ttsPresetSel.addEventListener('change', () => {
           const applied = applyTtsPreset(ttsPresetSel.value, { persistBrowser: true });
           const el = document.getElementById('ttsEndpoint');
@@ -1654,6 +1710,7 @@
               `preset · ${applied.label} · set AMOJI_TTS_GATEWAY (or paste endpoint)`,
               'bad',
             );
+            persistPrefs({ ttsPresetId: ttsPresetSel.value, ttsEndpoint: '' });
             return;
           }
           if (el && applied.config?.endpoint) el.value = applied.config.endpoint;
@@ -1664,13 +1721,16 @@
               : `preset · ${applied.label} · ${applied.config?.type || 'mock'}`,
             applied.error ? 'bad' : '',
           );
+          persistPrefs();
         });
         const hint = resolveTtsConfig();
-        if (hint.readyForHttp) {
-          const el = document.getElementById('ttsEndpoint');
-          if (el && hint.endpoint) el.value = hint.endpoint;
-          setTtsStatus(`TTS config · http ready (${hint.provider})`);
+        const el = document.getElementById('ttsEndpoint');
+        if (savedPrefs.ttsEndpoint && el) el.value = savedPrefs.ttsEndpoint;
+        else if (hint.readyForHttp && el && hint.endpoint) el.value = hint.endpoint;
+        if (hint.readyForHttp || savedPrefs.ttsEndpoint) {
+          setTtsStatus(`TTS config · ${hint.readyForHttp ? 'http ready' : 'saved endpoint'}`);
         }
+        ttsAudioSync?.addEventListener('change', () => persistPrefs());
       }
       document.getElementById('ttsAudioFile').addEventListener('change', async (ev) => {
         const file = ev.target.files?.[0];

@@ -173,6 +173,9 @@ Amoji engine (ND “systemic emotion”)
 50. ~~**Face Live Live Link remap picker** (publish remapped blendShapes)~~ ✓
 51. ~~**Emblem ↔ finger sync** (wave/ok/thumbs/point/stopPalm)~~ ✓
 52. ~~**Gateway TTS presets** (`${AMOJI_TTS_GATEWAY}` Step/Index/Kokoro/root)~~ ✓
+53. ~~**Face Live prefs persistence** (localStorage session restore)~~ ✓
+54. ~~**Affect/adaptor → finger maps** (+ chin-rest / self-hug / fists presets)~~ ✓
+55. ~~**Production gateway smoke docs** (TTS_WIRING pass criteria)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -204,4 +207,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (session persistence for Face Live prefs, more emblem finger maps, production gateway smoke docs).
+Next code increment: further polish (prefs export/import JSON, more affect staging, live gateway health chip in Face Live).

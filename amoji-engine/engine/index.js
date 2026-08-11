@@ -409,10 +409,16 @@ export {
   EMBLEM_FINGER_SYNC,
   EMBLEM_TO_FINGER,
   FINGER_TO_EMBLEM,
+  AFFECT_TO_FINGER,
+  ADAPTOR_TO_FINGER,
   fingerPresetForEmblem,
   emblemForFingerPreset,
+  fingerPresetForAffect,
+  fingerPresetForAdaptor,
   syncEmblemToFinger,
   syncFingerToEmblem,
+  syncAffectToFinger,
+  syncAdaptorToFinger,
 } from './export/emblemFingerSync.js';
 export {
   TTS_CONFIG_KEYS,
@@ -435,3 +441,12 @@ export {
   startAuthEchoServer,
   runAuthenticatedTtsSmoke,
 } from './tts/ttsSmoke.js';
+export {
+  FACE_LIVE_PREFS_KEY,
+  FACE_LIVE_PREFS_VERSION,
+  defaultFaceLivePrefs,
+  normalizeFaceLivePrefs,
+  loadFaceLivePrefs,
+  saveFaceLivePrefs,
+  clearFaceLivePrefs,
+} from './ui/faceLivePrefs.js';

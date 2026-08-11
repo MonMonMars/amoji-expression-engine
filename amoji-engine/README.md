@@ -37,7 +37,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 24 | More remaps · finger articulation · TTS auth smoke | Done |
 | Phase 25 | UE consumer remap · finger presets UI · TTS presets | Done |
 | Phase 26 | Face Live LL remap · emblem↔finger · gateway TTS | Done |
-| Phase 27+ | Further production polish… | Specced |
+| Phase 27 | Face Live prefs · affect/adaptor finger maps · gateway smoke docs | Done |
+| Phase 28+ | Further production polish… | Specced |
 
 ## Quick start
 

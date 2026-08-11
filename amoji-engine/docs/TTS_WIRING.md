@@ -85,4 +85,26 @@ AMOJI_TTS_ENDPOINT=https://… AMOJI_TTS_TOKEN=… npm run tts:smoke
 npm run tts:smoke -- --local
 ```
 
-Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js` + `ttsSmoke.js`.
+### Production gateway smoke
+
+Point the smoke harness at your real gateway (same JSON contract: phonemes/alignment + `audioUrl`):
+
+```bash
+export AMOJI_TTS_GATEWAY=https://tts.yourco.com
+export AMOJI_TTS_TOKEN=ghp_or_service_token
+
+# Option A — full synthesize URL
+AMOJI_TTS_ENDPOINT="$AMOJI_TTS_GATEWAY/v1/tts/step" npm run tts:smoke
+
+# Option B — Face Live Gateway · Step preset expands:
+#   ${AMOJI_TTS_GATEWAY}/v1/tts/step
+# then click HTTP synthesize
+
+# Option C — generic /synthesize root
+AMOJI_TTS_ENDPOINT="$AMOJI_TTS_GATEWAY/synthesize" npm run tts:smoke
+```
+
+Pass criteria: `ok: true`, `hasToken: true` when token set, `phonemeCount > 0`, `audioUrl` present.  
+401/403 → check Bearer header (`Authorization: Bearer …`). Empty gateway + Gateway preset → Face Live shows “set AMOJI_TTS_GATEWAY”.
+
+Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js` + `ttsSmoke.js` + `ttsPresets.js`.

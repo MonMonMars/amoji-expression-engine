@@ -57,7 +57,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
-- **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up (emblem sync)
+- **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up · chin-rest · self-hug · fists (emblem / affect / adaptor sync)
+- **Prefs**: Face Live restores emotion / chassis / remap / TTS preset from `localStorage`
 - **TTS speak**: Mock / HTTP / provider presets / gateway presets / Step fixture WAV / attach audio → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew

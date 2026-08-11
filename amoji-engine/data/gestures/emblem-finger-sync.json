@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "note": "Bidirectional hints between Layer G emblems and finger pose presets (catalog emblems only).",
+  "version": 2,
+  "note": "Bidirectional hints: emblems, affect displays, and adaptors → finger pose presets.",
   "emblemToFinger": {
     "wave": "wave",
     "ok": "ok",
@@ -14,5 +14,27 @@
     "thumbs-up": "thumbsUp",
     "open-palm": "stopPalm",
     "point": "point"
+  },
+  "affectToFinger": {
+    "happy": "open-palm",
+    "smile_open": "open-palm",
+    "sad": "self-hug",
+    "angry": "fists",
+    "fear": "self-hug",
+    "disgust": "open-palm",
+    "surprised": "open-palm",
+    "thinking": "chin-rest",
+    "neutral": "rest"
+  },
+  "adaptorToFinger": {
+    "fistClench": "fists",
+    "fingerTap": "pinch",
+    "fingerFlex": "pinch",
+    "chinTouch": "chin-rest",
+    "chinRest": "chin-rest",
+    "armsSelfHug": "self-hug",
+    "armsCrossChest": "self-hug",
+    "fidgetFingers": "pinch",
+    "napeTouch": "rest"
   }
 }

@@ -78,6 +78,41 @@
         "armR": { "thumb": 0.05, "index": 0.85, "middle": 0.9, "ring": 0.9, "pinky": 0.9, "fist": 0.75 },
         "armL": { "fist": 0.2, "handOpen": 0.4 }
       }
+    },
+    "chin-rest": {
+      "id": "chin-rest",
+      "label": "Chin rest",
+      "description": "Thinking chin-rest staging (soft fist, low open)",
+      "gesture": {
+        "fist": 0.35,
+        "handOpen": 0.2,
+        "spread": 0.15,
+        "armR": { "thumb": 0.4, "index": 0.45, "middle": 0.5, "ring": 0.5, "pinky": 0.45 }
+      }
+    },
+    "self-hug": {
+      "id": "self-hug",
+      "label": "Self hug",
+      "description": "Protective closed hands / soft fists",
+      "gesture": {
+        "fist": 0.55,
+        "handOpen": 0.1,
+        "spread": 0.05,
+        "armL": { "fist": 0.6, "handOpen": 0.08 },
+        "armR": { "fist": 0.6, "handOpen": 0.08 }
+      }
+    },
+    "fists": {
+      "id": "fists",
+      "label": "Fists",
+      "description": "Tight bilateral fists (anger / effort)",
+      "gesture": {
+        "fist": 0.95,
+        "handOpen": 0.02,
+        "spread": 0.02,
+        "armL": { "fist": 0.95 },
+        "armR": { "fist": 0.95 }
+      }
     }
   }
 }
