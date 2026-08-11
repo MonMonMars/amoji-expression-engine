@@ -536,6 +536,15 @@
       #disneyExtremeCapacity:hover {
         opacity: 1;
       }
+      #disneyExtremeRoots {
+        margin-top: 2px;
+        opacity: 0.85;
+        font-size: 0.85em;
+        cursor: pointer;
+      }
+      #disneyExtremeRoots:hover {
+        opacity: 1;
+      }
       #disneyExtremeHistory {
         margin-top: 6px;
         flex-wrap: wrap;
@@ -895,6 +904,9 @@
           <button type="button" id="btnDisneyExtremeCopyStacksCapacity">Copy capacity <kbd>⇧`</kbd></button>
           <button type="button" id="btnDisneyExtremeRoots">Roots readout <kbd>\</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyRoots">Copy roots <kbd>⇧\</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistRoot">Jump hist root <kbd>/</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoRoot">Jump redo root <kbd>Alt+/</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavRoot">Jump fav root <kbd>⇧Alt+/</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -982,7 +994,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · 0/8</span>
         </div>
@@ -1006,6 +1018,13 @@
           title="Stacks capacity · ` flash · ⇧` copy · click flash · dbl-click copy"
         >
           stacks · hist 0/8 · redo 0/8 · fav 0/8
+        </div>
+        <div
+          class="status"
+          id="disneyExtremeRoots"
+          title="Root hist/redo/fav · \\ flash · ⇧\\ copy · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · click flash · dbl-click copy"
+        >
+          roots · hist · empty · redo · empty · fav · empty
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -2068,6 +2087,17 @@
           redo: extremeBaselineRedo,
           favorites: extremeBaselineFavorites,
         });
+        syncDisneyExtremeRootsUi();
+      }
+
+      function syncDisneyExtremeRootsUi() {
+        const el = document.getElementById('disneyExtremeRoots');
+        if (!el) return;
+        el.textContent = formatDisneyExtremeBaselineRootsLabel({
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
       }
 
       function flashDisneyExtremeBaselineHistoryList() {
@@ -2145,6 +2175,30 @@
           return false;
         }
         return jumpDisneyExtremeBaselineHistory(n - 1);
+      }
+
+      function jumpDisneyExtremeBaselineHistoryRoot() {
+        if (!extremeBaselineHistory.length) {
+          flashDisneyExtremeStatus('hist · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineHistory(0);
+      }
+
+      function jumpDisneyExtremeBaselineRedoRoot() {
+        if (!extremeBaselineRedo.length) {
+          flashDisneyExtremeStatus('redo · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineRedo(0);
+      }
+
+      function jumpDisneyExtremeBaselineFavoriteRoot() {
+        if (!extremeBaselineFavorites.length) {
+          flashDisneyExtremeStatus('fav · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineFavorite(0);
       }
 
       function jumpDisneyExtremeBaselineRedoTip() {
@@ -3967,6 +4021,18 @@
         copyDisneyExtremeBaselineRoots();
       });
 
+      document.getElementById('btnDisneyExtremeJumpHistRoot')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineHistoryRoot();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpRedoRoot')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineRedoRoot();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpFavRoot')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineFavoriteRoot();
+      });
+
       document.getElementById('disneyExtremeTips')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineTips();
       });
@@ -3981,6 +4047,14 @@
 
       document.getElementById('disneyExtremeCapacity')?.addEventListener('dblclick', () => {
         copyDisneyExtremeBaselineStacksCapacity();
+      });
+
+      document.getElementById('disneyExtremeRoots')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineRoots();
+      });
+
+      document.getElementById('disneyExtremeRoots')?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBaselineRoots();
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -5885,6 +5959,21 @@
         if (resolved.action === 'copyBaselineRoots') {
           ev.preventDefault();
           copyDisneyExtremeBaselineRoots();
+          return;
+        }
+        if (resolved.action === 'jumpBaselineHistoryRoot') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineHistoryRoot();
+          return;
+        }
+        if (resolved.action === 'jumpBaselineRedoRoot') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineRedoRoot();
+          return;
+        }
+        if (resolved.action === 'jumpBaselineFavoriteRoot') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineFavoriteRoot();
           return;
         }
         if (resolved.action === 'copySummary') {

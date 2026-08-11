@@ -710,6 +710,14 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showBaselineTips', help: 'Alt+0 tips readout', kind: 'note' },
   { id: 'copyBaselineTips', help: '⇧Alt+0 copy tips', kind: 'note' },
   {
+    id: 'jumpBaselineHistoryRoot',
+    keys: ['/'],
+    help: '/ jump hist root',
+    kind: 'action',
+  },
+  { id: 'jumpBaselineRedoRoot', help: 'Alt+/ jump redo root', kind: 'note' },
+  { id: 'jumpBaselineFavoriteRoot', help: '⇧Alt+/ jump fav root', kind: 'note' },
+  {
     id: 'showBaselineRoots',
     keys: ['\\', '|'],
     help: '\\ roots readout',
@@ -719,6 +727,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'tipsStrip', help: 'tips strip · live', kind: 'note' },
   { id: 'capacityBadges', help: 'chip rows · capacity', kind: 'note' },
   { id: 'capacityStrip', help: 'capacity strip · live', kind: 'note' },
+  { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },

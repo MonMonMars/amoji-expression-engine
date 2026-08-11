@@ -356,7 +356,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 343 | Extreme Shift+\\ copy roots | Done |
 | Phase 344 | Extreme capacity strip HUD | Done |
 | Phase 345 | Extreme capacity strip clicks | Done |
-| Phase 346+ | Further production polish… | Specced |
+| Phase 346 | Extreme / jump hist root | Done |
+| Phase 347 | Extreme Alt+/ jump redo root | Done |
+| Phase 348 | Extreme ⇧Alt+/ jump fav root | Done |
+| Phase 349 | Extreme roots strip HUD | Done |
+| Phase 350+ | Further production polish… | Specced |
 
 ## Quick start
 
