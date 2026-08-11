@@ -64,6 +64,34 @@ export function formatShareAuditLog(entries, opts = {}) {
 }
 
 /**
+ * Export audit log as pretty JSON (download-friendly).
+ * @param {object[]} entries
+ * @param {{ now?: number }} [opts]
+ */
+export function exportShareAuditJson(entries, opts = {}) {
+  const list = (Array.isArray(entries) ? entries : []).map((e) =>
+    normalizeShareAuditEntry(e),
+  );
+  const payload = {
+    kind: 'amoji.faceLive.prefsShareAudit',
+    version: 1,
+    exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
+    count: list.length,
+    entries: list,
+  };
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_export',
+      ok: true,
+      json: JSON.stringify(payload, null, 2),
+      count: list.length,
+      payload,
+    },
+    {},
+  );
+}
+
+/**
  * Create an in-memory (optional localStorage) share audit log.
  * @param {{
  *   max?: number,
@@ -161,6 +189,9 @@ export function createPrefsShareAudit(opts = {}) {
     },
     format(fmtOpts = {}) {
       return formatShareAuditLog(entries, fmtOpts);
+    },
+    exportJson(exportOpts = {}) {
+      return exportShareAuditJson(entries, exportOpts);
     },
   };
 }

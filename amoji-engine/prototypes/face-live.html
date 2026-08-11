@@ -165,8 +165,14 @@
         margin-top: 6px;
         min-height: 28px;
         opacity: 0.95;
+        cursor: pointer;
       }
-      .sla-spark svg { display: block; width: 100%; max-width: 160px; height: 28px; }
+      .sla-spark:focus-visible {
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      .sla-spark svg { display: block; width: 100%; max-width: 160px; height: 28px; pointer-events: none; }
       #surfaceOverlay {
         position: absolute;
         inset: 0;
@@ -555,7 +561,8 @@
         </label>
         <div class="status" id="ttsStatus">tts idle</div>
         <div class="status" id="ttsHealthChip">gateway · idle</div>
-        <div id="ttsSlaSpark" class="sla-spark" title="gateway SLA sparkline" aria-hidden="true"></div>
+        <div id="ttsSlaSpark" class="sla-spark" title="Click sparkline for probe detail" role="button" tabindex="0"></div>
+        <pre id="ttsProbeDetail" style="max-height:72px;margin-top:6px;">probe · click sparkline</pre>
       </div>
 
       <div class="group">
@@ -601,6 +608,9 @@
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
         <div class="status" id="prefsAuditStatus">share audit · empty</div>
+        <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditExport">Export audit</button>
+        </div>
         <pre id="prefsAuditLog" style="max-height:88px;">—</pre>
         <div id="prefsQrWrap" style="display:none;margin-top:8px;">
           <img id="prefsQrImg" alt="prefs share QR" width="160" height="160" style="border-radius:8px;background:#fff;display:block;" />
@@ -872,8 +882,8 @@
         const cancelled = cancelCompoundEmblemLifecycle(compoundCrossfade, {
           reason,
         });
-        // Manual emblem pick keeps the new emblem; only drop compound lifecycle state.
-        if (cancelled.clearEmblem && reason !== 'emblem_pick') {
+        // Manual emblem/finger pick keeps the new pose; only drop compound lifecycle.
+        if (cancelled.clearEmblem && reason !== 'emblem_pick' && reason !== 'finger_pick') {
           gestures.setEmblem(null);
           if (emblemSel) emblemSel.value = '';
         }
@@ -882,7 +892,7 @@
           if (compoundSel) compoundSel.value = '';
         }
         compoundCrossfade = null;
-        if (reason !== 'emblem_pick') {
+        if (reason !== 'emblem_pick' && reason !== 'finger_pick') {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         }
         return cancelled;
@@ -1125,6 +1135,9 @@
           .join(' · ');
       }
       function applyFingerPreset(id, { fromEmblem = false } = {}) {
+        if (!fromEmblem) {
+          cancelActiveCompoundLifecycle('finger_pick');
+        }
         fingerPresetId = id || DEFAULT_FINGER_PRESET;
         const resolved = resolveFingerPreset(fingerPresetId);
         fingerGesture = resolved.gesture || { fist: 0.05, handOpen: 0.4 };
@@ -1899,15 +1912,42 @@
 
         const ttsHealthChip = document.getElementById('ttsHealthChip');
         const ttsSlaSpark = document.getElementById('ttsSlaSpark');
+        const ttsProbeDetail = document.getElementById('ttsProbeDetail');
         function renderSlaSpark() {
           if (!ttsSlaSpark) return;
           if (!gatewayHealthHistory.size) {
             ttsSlaSpark.innerHTML = '';
+            if (ttsProbeDetail) ttsProbeDetail.textContent = 'probe · click sparkline';
             return;
           }
           const spark = gatewayHealthHistory.sparkline({ width: 140, height: 28 });
           ttsSlaSpark.innerHTML = spark.svg || '';
         }
+        function showProbeDetailFromEvent(ev) {
+          if (!gatewayHealthHistory.size || !ttsSlaSpark) return;
+          const rect = ttsSlaSpark.getBoundingClientRect();
+          const xRatio =
+            rect.width > 0 ? (ev.clientX - rect.left) / rect.width : 1;
+          const detail = gatewayHealthHistory.probeDetail(xRatio);
+          if (ttsProbeDetail) {
+            ttsProbeDetail.textContent = detail.ok
+              ? detail.lines.join('\n')
+              : 'probe · none';
+          }
+        }
+        ttsSlaSpark?.addEventListener('click', (ev) => {
+          showProbeDetailFromEvent(ev);
+        });
+        ttsSlaSpark?.addEventListener('keydown', (ev) => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          ev.preventDefault();
+          const detail = gatewayHealthHistory.probeDetail(1);
+          if (ttsProbeDetail) {
+            ttsProbeDetail.textContent = detail.ok
+              ? detail.lines.join('\n')
+              : 'probe · none';
+          }
+        });
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
             gatewayHealthHistory.clear();
@@ -2105,6 +2145,20 @@
           prefsStatus.className = revoke.canRevoke ? 'status ok' : 'status';
           prefsStatus.textContent = revoke.message;
           document.getElementById('prefsLandingToast')?.classList.remove('show');
+        });
+        document.getElementById('btnPrefsAuditExport')?.addEventListener('click', () => {
+          const exported = prefsShareAudit.exportJson();
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `amoji-prefs-share-audit.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsShareAudit.record('export', { summary: `audit · ${exported.count} entries` });
+          refreshPrefsAuditUi();
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · audit exported · ${exported.count}`;
         });
         refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {

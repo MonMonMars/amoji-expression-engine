@@ -241,6 +241,106 @@ export function buildHealthSparklineSvg(samples, opts = {}) {
 }
 
 /**
+ * Resolve which probe sample was clicked on a sparkline (x ratio 0..1).
+ * @param {object[]} samples
+ * @param {number} xRatio
+ * @param {{ maxPoints?: number }} [opts]
+ */
+export function resolveSparklineProbeAt(samples, xRatio, opts = {}) {
+  const series = buildHealthSparklineSeries(samples, opts);
+  if (!series.points.length) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_pick',
+        ok: false,
+        error: 'empty',
+        index: -1,
+        sample: null,
+      },
+      {},
+    );
+  }
+  const x = Math.max(0, Math.min(1, Number(xRatio) || 0));
+  let best = 0;
+  let bestDist = Infinity;
+  for (let i = 0; i < series.points.length; i++) {
+    const d = Math.abs(series.points[i].x - x);
+    if (d < bestDist) {
+      bestDist = d;
+      best = i;
+    }
+  }
+  const list = (Array.isArray(samples) ? samples : [])
+    .map((s) => normalizeHealthSample(s))
+    .filter((s) => s.status !== 'no_endpoint' && s.status !== 'empty')
+    .slice(-(opts.maxPoints ?? 24));
+  const sample = list[best] || null;
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_pick',
+      ok: !!sample,
+      index: best,
+      xRatio: x,
+      sample,
+      point: series.points[best] || null,
+    },
+    {},
+  );
+}
+
+/**
+ * Human-readable probe detail lines for Face Live HUD.
+ * @param {object|null|undefined} sample
+ * @param {{ sla?: object, index?: number, total?: number }} [opts]
+ */
+export function formatHealthProbeDetail(sample, opts = {}) {
+  if (!sample || sample.status === 'no_endpoint' || sample.status === 'empty') {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_detail',
+        ok: false,
+        text: 'probe · none',
+        lines: [],
+      },
+      {},
+    );
+  }
+  const when =
+    typeof sample.at === 'number'
+      ? new Date(sample.at).toISOString().slice(11, 19)
+      : '—';
+  const lines = [
+    `probe ${typeof opts.index === 'number' ? `#${opts.index + 1}` : ''}`.trim() +
+      (opts.total ? `/${opts.total}` : ''),
+    `${sample.ok ? 'up' : 'down'} · ${sample.status || '—'} · ${sample.tone || ''}`,
+    typeof sample.latencyMs === 'number'
+      ? `latency ${Math.round(sample.latencyMs)}ms`
+      : 'latency —',
+    sample.httpStatus != null ? `http ${sample.httpStatus}` : null,
+    `at ${when}`,
+    sample.message || null,
+  ].filter(Boolean);
+  if (opts.sla && typeof opts.sla.uptimePct === 'number') {
+    lines.push(
+      `sla ${opts.sla.uptimePct}%` +
+        (opts.sla.latencyP50Ms != null
+          ? ` · p50 ${Math.round(opts.sla.latencyP50Ms)}ms`
+          : ''),
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_detail',
+      ok: true,
+      text: lines[0],
+      lines,
+      sample,
+    },
+    {},
+  );
+}
+
+/**
  * Create a mutable rolling history buffer.
  * @param {{ max?: number }} [opts]
  */
@@ -279,6 +379,22 @@ export function createGatewayHealthHistory(opts = {}) {
     },
     sparkline(sparkOpts = {}) {
       return buildHealthSparklineSvg(samples, sparkOpts);
+    },
+    probeAt(xRatio, pickOpts = {}) {
+      return resolveSparklineProbeAt(samples, xRatio, pickOpts);
+    },
+    probeDetail(xRatio, detailOpts = {}) {
+      const pick = resolveSparklineProbeAt(samples, xRatio, detailOpts);
+      const sla = summarizeHealthHistory(samples);
+      return formatHealthProbeDetail(pick.sample, {
+        sla,
+        index: pick.index,
+        total: pick.ok
+          ? samples.filter(
+              (s) => s.status !== 'no_endpoint' && s.status !== 'empty',
+            ).length
+          : 0,
+      });
     },
   };
 }

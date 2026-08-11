@@ -194,6 +194,9 @@ Amoji engine (ND “systemic emotion”)
 71. ~~**SLA sparkline HUD** (`buildHealthSparklineSvg` · Face Live spark)~~ ✓
 72. ~~**Prefs share audit log** (`createPrefsShareAudit` · share/QR/revoke)~~ ✓
 73. ~~**Cancel compound on emblem pick** (manual emblem / Wave clears lifecycle)~~ ✓
+74. ~~**Sparkline probe detail** (`resolveSparklineProbeAt` · click spark → detail)~~ ✓
+75. ~~**Prefs audit export JSON** (`exportShareAuditJson` · Export audit button)~~ ✓
+76. ~~**Cancel compound on finger preset** (manual finger pick clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -225,4 +228,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (sparkline click → probe detail, audit export JSON, compound cancel on finger preset pick).
+Next code increment: further polish (probe detail copy button, audit clear/filter UI, cancel on chassis/pack change).

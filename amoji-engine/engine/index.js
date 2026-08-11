@@ -472,6 +472,8 @@ export {
   formatHealthSlaChip,
   buildHealthSparklineSeries,
   buildHealthSparklineSvg,
+  resolveSparklineProbeAt,
+  formatHealthProbeDetail,
   createGatewayHealthHistory,
 } from './tts/ttsHealthHistory.js';
 export {
@@ -505,6 +507,7 @@ export {
   PREFS_SHARE_AUDIT_KEY,
   normalizeShareAuditEntry,
   formatShareAuditLog,
+  exportShareAuditJson,
   createPrefsShareAudit,
 } from './ui/prefsShareAudit.js';
 export {

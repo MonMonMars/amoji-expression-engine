@@ -44,7 +44,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 31 | Poll jitter · deep-link landing toast · emblem hold/release | Done |
 | Phase 32 | Gateway SLA history · prefs link expiry/revoke · lifecycle cancel | Done |
 | Phase 33 | SLA sparkline · prefs share audit · cancel on emblem pick | Done |
-| Phase 34+ | Further production polish… | Specced |
+| Phase 34 | Sparkline probe detail · audit export JSON · finger-pick cancel | Done |
+| Phase 35+ | Further production polish… | Specced |
 
 ## Quick start
 
