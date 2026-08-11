@@ -205,6 +205,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Space` → jump oldest redo then flash entry summary
  * - `Alt+Space` → jump oldest favorite then flash entry summary
  * - `Shift+Alt+Space` → flash active hist/redo/fav chip indices
+ * - `Enter` → copy active hist/redo/fav chip indices
+ * - `Shift+Enter` → flash Extreme pin strip readout
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -761,6 +763,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'jumpBaselineHistoryRootSummary' && ev.shiftKey) {
       return { ok: true, action: 'jumpBaselineRedoRootSummary' };
+    }
+    if (entry.id === 'copyBaselineActive' && ev.shiftKey) {
+      return { ok: true, action: 'showBaselinePinStrip' };
     }
     return { ok: true, action: entry.id };
   }

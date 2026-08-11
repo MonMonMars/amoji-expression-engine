@@ -364,7 +364,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 351 | Extreme Shift+Space jump redo root summary | Done |
 | Phase 352 | Extreme Alt+Space jump fav root summary | Done |
 | Phase 353 | Extreme active chips strip | Done |
-| Phase 354+ | Further production polish… | Specced |
+| Phase 354 | Extreme active strip dbl-click copy | Done |
+| Phase 355 | Extreme Enter copy active | Done |
+| Phase 356 | Extreme pin strip HUD | Done |
+| Phase 357 | Extreme pin strip flash + clicks | Done |
+| Phase 358+ | Further production polish… | Specced |
 
 ## Quick start
 

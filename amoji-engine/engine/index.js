@@ -352,6 +352,7 @@ export {
   formatDisneyExtremeBaselineTipsLabel,
   formatDisneyExtremeBaselineRootsLabel,
   formatDisneyExtremeBaselineActiveLabel,
+  formatDisneyExtremeBaselinePinStripLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
   formatDisneyExtremeBaselineChipDiffLabel,
   formatDisneyExtremeBaselineChipCompareLabel,

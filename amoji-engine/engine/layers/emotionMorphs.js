@@ -727,6 +727,13 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineFavoriteRootSummary', help: 'Alt+Space jump fav root summary', kind: 'note' },
   { id: 'showBaselineActive', help: '⇧Alt+Space active chips', kind: 'note' },
   {
+    id: 'copyBaselineActive',
+    keys: ['Enter'],
+    help: 'Enter copy active',
+    kind: 'action',
+  },
+  { id: 'showBaselinePinStrip', help: 'Shift+Enter pin strip', kind: 'note' },
+  {
     id: 'showBaselineRoots',
     keys: ['\\', '|'],
     help: '\\ roots readout',
@@ -737,7 +744,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'capacityBadges', help: 'chip rows · capacity', kind: 'note' },
   { id: 'capacityStrip', help: 'capacity strip · live', kind: 'note' },
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
-  { id: 'activeStrip', help: 'active strip · live', kind: 'note' },
+  { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
+  { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -2152,6 +2160,19 @@ export function formatDisneyExtremeBaselineActiveLabel(opts = {}) {
     return `${kind} · #${n + 1}`;
   };
   return `active · ${bit('hist', opts.historyIndex)} · ${bit('redo', opts.redoIndex)} · ${bit('fav', opts.favoriteIndex)}`;
+}
+
+/**
+ * Live pin strip label for Extreme pinned baseline (compact entry or none).
+ * @param {object|null|undefined} snap
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselinePinStripLabel(snap) {
+  if (!snap) return 'pin · none';
+  return `pin · ${formatDisneyExtremeBaselineHistoryEntry(snap, {
+    index: 1,
+    compact: true,
+  })}`;
 }
 
 /**
