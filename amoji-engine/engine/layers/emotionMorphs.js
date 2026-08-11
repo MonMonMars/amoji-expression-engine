@@ -600,6 +600,10 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
   { id: 'copyBaselineStacksJson', keys: ['z', 'Z'], help: 'Z copy stacks', kind: 'action' },
   { id: 'pasteBaselineStacksJson', help: 'Shift+Z paste stacks', kind: 'note' },
+  { id: 'mergeBaselineStacksJson', help: 'Alt+Z merge stacks', kind: 'note' },
+  { id: 'copyBaselineStacksShareUrl', keys: ['v', 'V'], help: 'V share stacks', kind: 'action' },
+  { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
+  { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1120,6 +1124,7 @@ export const DISNEY_EXTREME_SNAPSHOT_HASH_PARAM = 'dxs';
 export const DISNEY_EXTREME_HISTORY_HASH_PARAM = 'dxh';
 export const DISNEY_EXTREME_REDO_HASH_PARAM = 'dxr';
 export const DISNEY_EXTREME_FAVORITES_HASH_PARAM = 'dxf';
+export const DISNEY_EXTREME_STACKS_HASH_PARAM = 'dxb';
 
 function encodeDisneyExtremeBase64Url(json) {
   if (typeof Buffer !== 'undefined') {
@@ -2651,4 +2656,132 @@ export function formatDisneyExtremeBaselineStacksPreviewLabel(stacks = {}) {
   const favN = Array.isArray(stacks.favorites) ? stacks.favorites.length : 0;
   if (!histN && !redoN && !favN) return 'preview · stacks · empty';
   return `preview · stacks · hist ${histN} · redo ${redoN} · fav ${favN}`;
+}
+
+/**
+ * Encode Extreme baseline stacks → URL hash fragment (`#dxb=...` base64url JSON).
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} [stacks]
+ * @returns {string}
+ */
+export function encodeDisneyExtremeBaselineStacksHash(stacks = {}) {
+  const json = serializeDisneyExtremeBaselineStacks(stacks);
+  return `${DISNEY_EXTREME_STACKS_HASH_PARAM}=${encodeDisneyExtremeBase64Url(json)}`;
+}
+
+/**
+ * Decode `#dxb=...` or raw dxb= payload → Extreme baseline stacks.
+ * @param {string} hashOrQuery
+ * @returns {{ ok: true, history: object[], redo: object[], favorites: object[] }|{ ok: false, error: string }}
+ */
+export function decodeDisneyExtremeBaselineStacksHash(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return { ok: false, error: 'empty' };
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(
+    new RegExp(`(?:^|&)?${DISNEY_EXTREME_STACKS_HASH_PARAM}=([^&]+)`),
+  );
+  if (!m) return { ok: false, error: 'no_dxb' };
+  try {
+    const json = decodeDisneyExtremeBase64Url(m[1]);
+    return parseDisneyExtremeBaselineStacks(json);
+  } catch {
+    return { ok: false, error: 'decode_failed' };
+  }
+}
+
+/**
+ * Read Extreme baseline stacks from location.hash if `dxb=` is present.
+ * @param {{ hash?: string }} [loc]
+ * @returns {{ ok: true, history: object[], redo: object[], favorites: object[] }|{ ok: false, error: string }}
+ */
+export function loadDisneyExtremeBaselineStacksFromHash(loc = {}) {
+  const hash =
+    loc.hash ||
+    (typeof location !== 'undefined' ? location.hash : '') ||
+    '';
+  if (!hash.includes(`${DISNEY_EXTREME_STACKS_HASH_PARAM}=`)) {
+    return { ok: false, error: 'no_dxb' };
+  }
+  return decodeDisneyExtremeBaselineStacksHash(hash);
+}
+
+/**
+ * Build share URL with Extreme baseline stacks in hash (`dxb=`).
+ * Merges with existing hash params by default (replaces prior dxb=).
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} [stacks]
+ * @param {{ baseUrl?: string, hash?: string, mergeHash?: boolean }} [opts]
+ * @returns {{ ok: boolean, url: string, hash: string }}
+ */
+export function buildDisneyExtremeBaselineStacksShareUrl(stacks = {}, opts = {}) {
+  const frag = encodeDisneyExtremeBaselineStacksHash(stacks);
+  let hash = frag;
+  if (opts.mergeHash !== false) {
+    const existing = String(
+      opts.hash ||
+        (typeof location !== 'undefined' ? location.hash : '') ||
+        '',
+    ).replace(/^#/, '');
+    if (existing) {
+      const parts = existing
+        .split('&')
+        .filter(
+          (p) =>
+            p && !p.startsWith(`${DISNEY_EXTREME_STACKS_HASH_PARAM}=`),
+        );
+      parts.push(frag);
+      hash = parts.join('&');
+    }
+  }
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  return {
+    ok: true,
+    url: base ? `${base}#${hash}` : `#${hash}`,
+    hash,
+  };
+}
+
+/**
+ * Next/prev favorites index for Q / Shift+Q cycling.
+ * First next → newest; first prev → oldest; then wrap.
+ * @param {number|null|undefined} currentIndex
+ * @param {number} length
+ * @param {{ prev?: boolean }} [opts]
+ * @returns {number|null}
+ */
+export function cycleDisneyExtremeBaselineFavoriteIndex(
+  currentIndex,
+  length,
+  opts = {},
+) {
+  const len = Math.max(0, Math.floor(Number(length) || 0));
+  if (!len) return null;
+  const dir = opts.prev ? -1 : 1;
+  const cur = Number(currentIndex);
+  if (
+    currentIndex == null ||
+    !Number.isInteger(cur) ||
+    cur < 0 ||
+    cur >= len
+  ) {
+    return dir > 0 ? len - 1 : 0;
+  }
+  return (cur + dir + len) % len;
+}
+
+/**
+ * Status label when one or more Extreme hash payloads load.
+ * @param {string[]} [parts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeMultiHashLoadLabel(parts = []) {
+  const list = Array.isArray(parts)
+    ? parts.filter((p) => typeof p === 'string' && p.trim())
+    : [];
+  if (!list.length) return 'link · empty';
+  return `link · ${list.join(' · ')}`;
 }

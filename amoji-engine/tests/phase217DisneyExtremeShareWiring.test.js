@@ -15,6 +15,6 @@ describe('Phase 217 Extreme Face Live share link wiring', () => {
     expect(src).toContain("resolved.action === 'copySnapshotShareUrl'");
     expect(src).toContain('btnDisneyExtremeShare');
     expect(src).toContain('applyIntensity: true');
-    expect(src).toContain('if (!applyDisneyExtremeSnapshotFromHash())');
+    expect(src).toContain('if (!applyDisneyExtremeSnapshotFromHash(');
   });
 });

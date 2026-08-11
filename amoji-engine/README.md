@@ -272,7 +272,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 259 | Extreme fav depth on X-pill baseline summary | Done |
 | Phase 260 | Extreme Esc clears chip compare memory | Done |
 | Phase 261 | Extreme Z / Shift+Z stacks JSON bundle | Done |
-| Phase 262+ | Further production polish… | Specced |
+| Phase 262 | Extreme Alt+Z merge stacks | Done |
+| Phase 263 | Extreme Q / Shift+Q cycle favorite | Done |
+| Phase 264 | Extreme stacks share URL `#dxb=` / V | Done |
+| Phase 265 | Extreme multi-hash load single toast | Done |
+| Phase 266+ | Further production polish… | Specced |
 
 ## Quick start
 

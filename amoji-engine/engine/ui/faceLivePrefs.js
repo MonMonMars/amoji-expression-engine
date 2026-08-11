@@ -103,6 +103,10 @@ export function disneyExtremeUiDefaults() {
  * - `t` / `T` → copy Extreme baseline favorites share link (`#dxf=`)
  * - `z` / `Z` → copy Extreme baseline stacks JSON (hist + redo + fav)
  * - `Shift+Z` → paste Extreme baseline stacks JSON from clipboard
+ * - `Alt+Z` → merge Extreme baseline stacks JSON into current stacks
+ * - `v` / `V` → copy Extreme baseline stacks share link (`#dxb=`)
+ * - `q` / `Q` → cycle next Extreme favorite
+ * - `Shift+Q` → cycle previous Extreme favorite
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
@@ -117,7 +121,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
@@ -328,10 +332,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O (merge redo), Alt+Y (share redo), Alt+G (merge fav).
+  // except Alt+O (merge redo), Alt+Y (share redo), Alt+G (merge fav), Alt+Z (merge stacks).
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
-    if (lower !== 'o' && lower !== 'y' && lower !== 'g') {
+    if (lower !== 'o' && lower !== 'y' && lower !== 'g' && lower !== 'z') {
       return { ok: false, reason: 'modifier' };
     }
   }
@@ -399,8 +403,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'copyBaselineFavoritesJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteBaselineFavoritesJson' };
     }
+    if (entry.id === 'copyBaselineStacksJson' && ev.altKey) {
+      return { ok: true, action: 'mergeBaselineStacksJson' };
+    }
     if (entry.id === 'copyBaselineStacksJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteBaselineStacksJson' };
+    }
+    if (entry.id === 'cycleBaselineFavoriteNext' && ev.shiftKey) {
+      return { ok: true, action: 'cycleBaselineFavoritePrev' };
     }
     return { ok: true, action: entry.id };
   }
