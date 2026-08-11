@@ -44,10 +44,12 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Compound emotions:** 6 region-locked blends (e.g. 開心的驚訝)
 - **Layer T:** Sim AI latency (gaze → pensive filler → secondary) + Improv noise
 - **Layer W gait HUD:** speed / stride / arm origin / footfall weight
+- **Layer G gesture:** Emblem select / Wave / Speaking (Illustrator) / turn Regulators — Affect from emotion, Adaptor after ~3s gap; drives Sakura arm bones
+- **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
 - Idle sway / turntable / cycle emotions / blink
-- HUD: mesh LOD, tex LOD, triangle count, emotion, FPS
+- HUD: mesh LOD, tex LOD, surface level, gesture layer, triangle count, emotion, FPS
 - Debug: active morphs + **ARKit 52** nonzero export preview
 
 ## Code
@@ -56,6 +58,11 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Mapping: `engine/layers/emotionMorphs.js` + `data/emotions/intensity-sculpt-recipes.json`
 - Temporal: `engine/layers/temporalLayer.js`
 - Idle / personas: `engine/layers/idleMode.js` + `data/personas/catalog.json`
+- Latency: `engine/layers/latencyBridge.js` + `data/fillers/filler-pools.json`
+- Compounds: `engine/layers/compoundEmotion.js` + `data/compounds/region-ownership.json`
+- Gait: `engine/layers/gait.js` + `data/gait/emotion-gait.json`
+- Gesture: `engine/layers/gesture.js` + `data/gestures/catalog.json`
+- Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Eyes: `engine/layers/eyeLook.js`
 - Textures: `engine/layers/textureLod.js`

@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "priority": ["emblem", "illustrator", "regulator", "affect", "adaptor"],
+  "gapSecForAdaptor": 3.0,
+  "emblemEmotionSpeedBias": {
+    "happy": 1.25,
+    "smile_open": 1.3,
+    "angry": 1.35,
+    "sad": 0.7,
+    "fear": 1.1,
+    "disgust": 0.9,
+    "surprised": 1.2,
+    "thinking": 0.85,
+    "neutral": 1.0
+  },
+  "emblems": {
+    "wave": {
+      "label": "Wave hello",
+      "pose": "wave",
+      "hand": "R",
+      "durationSec": 1.4
+    },
+    "ok": {
+      "label": "OK sign",
+      "pose": "ok",
+      "hand": "R",
+      "durationSec": 1.2
+    },
+    "thumbsUp": {
+      "label": "Thumbs up",
+      "pose": "thumbsUp",
+      "hand": "R",
+      "durationSec": 1.2
+    },
+    "stopPalm": {
+      "label": "Stop palm",
+      "pose": "stopPalm",
+      "hand": "R",
+      "durationSec": 1.0
+    },
+    "point": {
+      "label": "Point",
+      "pose": "point",
+      "hand": "R",
+      "durationSec": 1.1
+    }
+  },
+  "illustrators": {
+    "beat": {
+      "label": "Speech beat",
+      "pose": "beat",
+      "hand": "R",
+      "baseAmplitude": 0.45
+    }
+  },
+  "regulators": {
+    "nod": {
+      "label": "Agree nod",
+      "pose": "regulatorNod",
+      "hand": "both"
+    },
+    "hurryCircle": {
+      "label": "Hurry up",
+      "pose": "hurryCircle",
+      "hand": "R"
+    },
+    "pausePalm": {
+      "label": "Pause / hold floor",
+      "pose": "stopPalm",
+      "hand": "L"
+    },
+    "waiting": {
+      "label": "Waiting turn",
+      "pose": "waitingOpen",
+      "hand": "both"
+    }
+  },
+  "affectByEmotion": {
+    "happy": { "pose": "armsOpenRaise", "hand": "both", "amplitude": 0.85 },
+    "smile_open": { "pose": "armsOpenRaise", "hand": "both", "amplitude": 0.95 },
+    "sad": { "pose": "armsSelfHug", "hand": "both", "amplitude": 0.7 },
+    "angry": { "pose": "fistsTight", "hand": "both", "amplitude": 1.0 },
+    "fear": { "pose": "armsCrossChest", "hand": "both", "amplitude": 0.9 },
+    "disgust": { "pose": "pushAway", "hand": "R", "amplitude": 0.75 },
+    "surprised": { "pose": "armsOpenRaise", "hand": "both", "amplitude": 0.55 },
+    "thinking": { "pose": "chinRest", "hand": "R", "amplitude": 0.6 },
+    "neutral": { "pose": "rest", "hand": "both", "amplitude": 0.2 }
+  },
+  "adaptorsByMood": {
+    "anxious": ["napeTouch", "fidgetFingers", "hemPlay"],
+    "embarrassed": ["hairPlay", "napeTouch", "fidgetFingers"],
+    "thinking": ["chinTouch", "fingerTap"],
+    "angry_suppressed": ["fistClench", "fingerFlex"],
+    "fear": ["napeTouch", "armsCrossChest"],
+    "sad": ["armsSelfHug", "chinTouch"],
+    "default": ["fingerTap", "chinTouch"]
+  },
+  "adaptorDefs": {
+    "napeTouch": { "label": "Nape touch", "pose": "napeTouch", "hand": "R", "holdSec": 1.6 },
+    "hairPlay": { "label": "Hair play", "pose": "hairPlay", "hand": "R", "holdSec": 1.8 },
+    "chinTouch": { "label": "Chin touch", "pose": "chinTouch", "hand": "R", "holdSec": 1.5 },
+    "chinRest": { "label": "Chin rest", "pose": "chinRest", "hand": "R", "holdSec": 2.0 },
+    "fingerTap": { "label": "Finger tap", "pose": "fingerTap", "hand": "R", "holdSec": 1.2 },
+    "fidgetFingers": { "label": "Fidget fingers", "pose": "fidgetFingers", "hand": "both", "holdSec": 1.4 },
+    "hemPlay": { "label": "Hem play", "pose": "hemPlay", "hand": "L", "holdSec": 1.5 },
+    "fistClench": { "label": "Fist clench", "pose": "fistClench", "hand": "both", "holdSec": 1.3 },
+    "fingerFlex": { "label": "Finger flex", "pose": "fingerFlex", "hand": "both", "holdSec": 1.2 },
+    "armsSelfHug": { "label": "Self hug", "pose": "armsSelfHug", "hand": "both", "holdSec": 2.0 },
+    "armsCrossChest": { "label": "Arms cross", "pose": "armsCrossChest", "hand": "both", "holdSec": 2.0 },
+    "headTurn": { "label": "Head turn (micro)", "pose": "rest", "hand": "both", "holdSec": 0.8 }
+  },
+  "poses": {
+    "rest": {
+      "upperarm_L": [0.05, 0.12, 0.02],
+      "lowerarm_L": [0.15, 0, 0],
+      "hand_L": [0, 0.05, 0],
+      "upperarm_R": [0.05, -0.12, -0.02],
+      "lowerarm_R": [0.15, 0, 0],
+      "hand_R": [0, -0.05, 0],
+      "fist": 0,
+      "handOpen": 0.35
+    },
+    "wave": {
+      "upperarm_R": [-0.55, -0.85, 0.2],
+      "lowerarm_R": [-1.1, 0.15, 0.35],
+      "hand_R": [0.1, 0.4, 0.2],
+      "wavePhase": true,
+      "fist": 0,
+      "handOpen": 0.85
+    },
+    "ok": {
+      "upperarm_R": [-0.25, -0.55, 0.1],
+      "lowerarm_R": [-0.85, 0.2, 0.1],
+      "hand_R": [0.15, 0.1, 0.05],
+      "fist": 0.15,
+      "handOpen": 0.4
+    },
+    "thumbsUp": {
+      "upperarm_R": [-0.2, -0.45, 0.05],
+      "lowerarm_R": [-0.7, 0.1, 0],
+      "hand_R": [0.35, 0.05, 0],
+      "fist": 0.55,
+      "handOpen": 0.1
+    },
+    "stopPalm": {
+      "upperarm_R": [-0.35, -0.4, 0.15],
+      "lowerarm_R": [-0.95, 0, 0.2],
+      "hand_R": [0.5, 0, 0.1],
+      "fist": 0,
+      "handOpen": 1
+    },
+    "point": {
+      "upperarm_R": [-0.3, -0.5, 0.05],
+      "lowerarm_R": [-0.8, 0.05, 0],
+      "hand_R": [0.2, 0, 0],
+      "fist": 0.35,
+      "handOpen": 0.2
+    },
+    "beat": {
+      "upperarm_R": [-0.15, -0.35, 0.05],
+      "lowerarm_R": [-0.55, 0.1, 0.05],
+      "hand_R": [0.1, 0, 0],
+      "beatPhase": true,
+      "fist": 0.1,
+      "handOpen": 0.45
+    },
+    "hurryCircle": {
+      "upperarm_R": [-0.4, -0.55, 0.2],
+      "lowerarm_R": [-0.9, 0.25, 0.3],
+      "hand_R": [0.2, 0.3, 0.2],
+      "wavePhase": true,
+      "fist": 0,
+      "handOpen": 0.7
+    },
+    "waitingOpen": {
+      "upperarm_L": [0.1, 0.25, 0.05],
+      "lowerarm_L": [0.35, 0, 0],
+      "hand_L": [0.1, 0.1, 0],
+      "upperarm_R": [0.1, -0.25, -0.05],
+      "lowerarm_R": [0.35, 0, 0],
+      "hand_R": [0.1, -0.1, 0],
+      "fist": 0,
+      "handOpen": 0.5
+    },
+    "regulatorNod": {
+      "upperarm_L": [0.08, 0.18, 0.02],
+      "lowerarm_L": [0.25, 0, 0],
+      "upperarm_R": [0.08, -0.18, -0.02],
+      "lowerarm_R": [0.25, 0, 0],
+      "fist": 0,
+      "handOpen": 0.4
+    },
+    "armsOpenRaise": {
+      "upperarm_L": [-0.45, 0.75, -0.15],
+      "lowerarm_L": [-0.35, 0, 0],
+      "hand_L": [0.1, 0.15, 0],
+      "upperarm_R": [-0.45, -0.75, 0.15],
+      "lowerarm_R": [-0.35, 0, 0],
+      "hand_R": [0.1, -0.15, 0],
+      "fist": 0,
+      "handOpen": 0.9
+    },
+    "armsSelfHug": {
+      "upperarm_L": [0.35, 0.55, 0.25],
+      "lowerarm_L": [1.15, 0.2, 0.15],
+      "hand_L": [0.2, 0.1, 0],
+      "upperarm_R": [0.35, -0.55, -0.25],
+      "lowerarm_R": [1.15, -0.2, -0.15],
+      "hand_R": [0.2, -0.1, 0],
+      "fist": 0.05,
+      "handOpen": 0.25
+    },
+    "fistsTight": {
+      "upperarm_L": [0.25, 0.35, 0.1],
+      "lowerarm_L": [0.85, 0.05, 0],
+      "hand_L": [0.15, 0, 0],
+      "upperarm_R": [0.25, -0.35, -0.1],
+      "lowerarm_R": [0.85, -0.05, 0],
+      "hand_R": [0.15, 0, 0],
+      "fist": 1,
+      "handOpen": 0
+    },
+    "armsCrossChest": {
+      "upperarm_L": [0.4, 0.45, 0.35],
+      "lowerarm_L": [1.25, 0.35, 0.2],
+      "hand_L": [0.1, 0.15, 0],
+      "upperarm_R": [0.4, -0.45, -0.35],
+      "lowerarm_R": [1.25, -0.35, -0.2],
+      "hand_R": [0.1, -0.15, 0],
+      "fist": 0.2,
+      "handOpen": 0.2
+    },
+    "pushAway": {
+      "upperarm_R": [-0.5, -0.35, 0.2],
+      "lowerarm_R": [-0.7, 0, 0.15],
+      "hand_R": [0.45, 0, 0.1],
+      "fist": 0,
+      "handOpen": 1
+    },
+    "chinRest": {
+      "upperarm_R": [0.15, -0.35, 0.25],
+      "lowerarm_R": [1.35, 0.15, 0.35],
+      "hand_R": [0.35, 0.1, 0.15],
+      "fist": 0.1,
+      "handOpen": 0.35
+    },
+    "chinTouch": {
+      "upperarm_R": [0.12, -0.3, 0.2],
+      "lowerarm_R": [1.25, 0.1, 0.3],
+      "hand_R": [0.3, 0.05, 0.1],
+      "fist": 0.05,
+      "handOpen": 0.4
+    },
+    "napeTouch": {
+      "upperarm_R": [-0.55, -0.65, 0.55],
+      "lowerarm_R": [1.1, 0.4, 0.45],
+      "hand_R": [0.2, 0.25, 0.2],
+      "fist": 0,
+      "handOpen": 0.5
+    },
+    "hairPlay": {
+      "upperarm_R": [-0.65, -0.7, 0.45],
+      "lowerarm_R": [1.0, 0.35, 0.4],
+      "hand_R": [0.15, 0.35, 0.25],
+      "fist": 0.05,
+      "handOpen": 0.45
+    },
+    "fingerTap": {
+      "upperarm_R": [0.05, -0.2, 0.05],
+      "lowerarm_R": [0.55, 0.05, 0],
+      "hand_R": [0.1, 0, 0],
+      "beatPhase": true,
+      "fist": 0.15,
+      "handOpen": 0.35
+    },
+    "fidgetFingers": {
+      "upperarm_L": [0.1, 0.2, 0.05],
+      "lowerarm_L": [0.6, 0, 0],
+      "hand_L": [0.05, 0.1, 0],
+      "upperarm_R": [0.1, -0.2, -0.05],
+      "lowerarm_R": [0.6, 0, 0],
+      "hand_R": [0.05, -0.1, 0],
+      "beatPhase": true,
+      "fist": 0.1,
+      "handOpen": 0.4
+    },
+    "hemPlay": {
+      "upperarm_L": [0.35, 0.25, 0.1],
+      "lowerarm_L": [0.95, 0.1, 0.05],
+      "hand_L": [0.15, 0.1, 0],
+      "fist": 0.05,
+      "handOpen": 0.3
+    },
+    "fistClench": {
+      "upperarm_L": [0.2, 0.28, 0.08],
+      "lowerarm_L": [0.75, 0, 0],
+      "hand_L": [0.1, 0, 0],
+      "upperarm_R": [0.2, -0.28, -0.08],
+      "lowerarm_R": [0.75, 0, 0],
+      "hand_R": [0.1, 0, 0],
+      "fist": 0.85,
+      "handOpen": 0
+    },
+    "fingerFlex": {
+      "upperarm_L": [0.15, 0.22, 0.05],
+      "lowerarm_L": [0.65, 0, 0],
+      "upperarm_R": [0.15, -0.22, -0.05],
+      "lowerarm_R": [0.65, 0, 0],
+      "beatPhase": true,
+      "fist": 0.45,
+      "handOpen": 0.15
+    }
+  }
+}

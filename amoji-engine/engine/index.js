@@ -74,6 +74,38 @@ export {
   sampleWalkPose,
 } from './layers/gait.js';
 export {
+  GESTURE_PRIORITY,
+  GESTURE_EMBLEMS,
+  GESTURE_ILLUSTRATORS,
+  GESTURE_REGULATORS,
+  GESTURE_AFFECT,
+  GESTURE_ADAPTORS,
+  GESTURE_POSES,
+  GAP_SEC_FOR_ADAPTOR,
+  getPose,
+  scalePose,
+  emblemSpeedBias,
+  adaptorPoolForMood,
+  pickAdaptor,
+  resolveGestureLayer,
+  sampleGesturePose,
+  GestureController,
+  applyGestureBones,
+} from './layers/gesture.js';
+export {
+  SURFACE_LEVELS,
+  SURFACE_LEVEL_IDS,
+  getSurfaceLevel,
+  emotionValence,
+  emotionArousal,
+  glowColorForValence,
+  renderGlow,
+  renderPixelFace,
+  meshTexHintsForLevel,
+  renderSurface,
+  uncannyRiskTone,
+} from './layers/surfaceRenderer.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

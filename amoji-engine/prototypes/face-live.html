@@ -160,13 +160,90 @@
       .status { font-size: 0.8rem; color: var(--muted); }
       .status.ok { color: var(--accent); }
       .status.bad { color: var(--danger); }
+      .status.warn { color: var(--accent2); }
+      #surfaceOverlay {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 2;
+      }
+      #surfaceOverlay.on { display: flex; }
+      #glowOrb {
+        width: min(42vmin, 280px);
+        height: min(42vmin, 280px);
+        border-radius: 50%;
+        background: radial-gradient(circle at 40% 35%, #fff8, transparent 55%),
+          radial-gradient(circle, var(--glow, #5ee0a8) 0%, transparent 70%);
+        filter: blur(2px);
+        opacity: 0.85;
+        transform: scale(1);
+        transition: background 0.35s ease;
+      }
+      #pixelFace {
+        width: min(48vmin, 260px);
+        height: min(48vmin, 260px);
+        display: none;
+        grid-template-rows: 1fr auto 1fr;
+        place-items: center;
+        gap: 8%;
+        background: #0a1016;
+        border: 2px solid var(--line);
+        border-radius: 18px;
+        padding: 12%;
+      }
+      #pixelFace.on { display: grid; }
+      #pixelEyes {
+        display: flex;
+        gap: 18%;
+        width: 100%;
+        justify-content: center;
+        align-items: flex-end;
+      }
+      .pixEye {
+        width: 22%;
+        background: var(--pix, #5ee0a8);
+        border-radius: 4px;
+        transition: height 0.15s ease, transform 0.15s ease;
+      }
+      #pixelMouth {
+        width: 55%;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--pix, #5ee0a8);
+        transform-origin: center;
+      }
+      select.ctl {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        font: inherit;
+      }
     </style>
   </head>
   <body>
     <div id="viewport">
+      <div id="surfaceOverlay">
+        <div id="glowOrb"></div>
+        <div id="pixelFace">
+          <div id="pixelEyes">
+            <div class="pixEye" id="pixEyeL"></div>
+            <div class="pixEye" id="pixEyeR"></div>
+          </div>
+          <div id="pixelMouth"></div>
+          <div></div>
+        </div>
+      </div>
       <div class="hud">
         <div class="pill">LOD <strong id="hudLod">—</strong></div>
         <div class="pill">Tex <strong id="hudTex">—</strong></div>
+        <div class="pill">Surf <strong id="hudSurf">6</strong></div>
+        <div class="pill">G <strong id="hudGesture">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
@@ -200,10 +277,34 @@
 
       <div class="group">
         <div class="label">Compound emotion</div>
-        <select id="compoundSel" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;">
+        <select id="compoundSel" class="ctl">
           <option value="">— none (use single) —</option>
         </select>
         <div class="status" id="gaitStatus">gait —</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Layer G · Gesture</div>
+        <select id="emblemSel" class="ctl">
+          <option value="">— no emblem —</option>
+        </select>
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnSpeak">Speaking</button>
+          <button type="button" id="btnWave" class="primary">Wave</button>
+        </div>
+        <div class="seg" id="turnSeg" style="margin-top:8px;grid-template-columns:1fr 1fr 1fr 1fr;">
+          <button type="button" data-turn="none" class="active">—</button>
+          <button type="button" data-turn="nod">Nod</button>
+          <button type="button" data-turn="waiting">Wait</button>
+          <button type="button" data-turn="pause">Pause</button>
+        </div>
+        <div class="status" id="gestureStatus">gesture —</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Surface Renderer</div>
+        <select id="surfaceSel" class="ctl"></select>
+        <div class="status" id="surfaceStatus">surface —</div>
       </div>
 
       <div class="group">
@@ -336,6 +437,18 @@
         sampleWalkPose,
       } from '/engine/layers/gait.js';
       import {
+        GestureController,
+        GESTURE_EMBLEMS,
+        applyGestureBones,
+      } from '/engine/layers/gesture.js';
+      import {
+        SURFACE_LEVEL_IDS,
+        getSurfaceLevel,
+        renderSurface,
+        meshTexHintsForLevel,
+        uncannyRiskTone,
+      } from '/engine/layers/surfaceRenderer.js';
+      import {
         morphsToLiveLinkFrame,
       } from '/engine/export/liveLinkFace.js';
 
@@ -377,13 +490,27 @@
       temporal.setEmotion(emotion, intensity);
       const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
       const latency = new LatencyBridge({ personaId: 'companion', lang: 'zh' });
+      const gestures = new GestureController({ anxiety: 0.35 });
       let compoundId = '';
       let walkPhase = 0;
+      let surfaceLevel = 6;
+      let applySurfaceHints = true;
+      /** @type {Record<string, THREE.Object3D>} */
+      let boneMap = {};
+      /** @type {Record<string, { x: number, y: number, z: number }>} */
+      let boneRest = {};
       const temporalStatus = document.getElementById('temporalStatus');
       const idleStatus = document.getElementById('idleStatus');
       const latencyStatus = document.getElementById('latencyStatus');
       const gaitStatus = document.getElementById('gaitStatus');
+      const gestureStatus = document.getElementById('gestureStatus');
+      const surfaceStatus = document.getElementById('surfaceStatus');
       const compoundSel = document.getElementById('compoundSel');
+      const emblemSel = document.getElementById('emblemSel');
+      const surfaceSel = document.getElementById('surfaceSel');
+      const surfaceOverlay = document.getElementById('surfaceOverlay');
+      const glowOrb = document.getElementById('glowOrb');
+      const pixelFace = document.getElementById('pixelFace');
       for (const [id, def] of Object.entries(COMPOUNDS)) {
         const opt = document.createElement('option');
         opt.value = id;
@@ -393,6 +520,20 @@
       compoundSel.addEventListener('change', () => {
         compoundId = compoundSel.value;
       });
+      for (const [id, def] of Object.entries(GESTURE_EMBLEMS)) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = def.label;
+        emblemSel.appendChild(opt);
+      }
+      for (const id of SURFACE_LEVEL_IDS) {
+        const def = getSurfaceLevel(id);
+        const opt = document.createElement('option');
+        opt.value = String(id);
+        opt.textContent = `L${id} · ${def.label}`;
+        if (id === surfaceLevel) opt.selected = true;
+        surfaceSel.appendChild(opt);
+      }
 
       function refreshTemporalStatus() {
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
@@ -554,13 +695,36 @@
         model.position.y -= box.min.y;
         root.add(model);
         morphMeshes = collectMorphMeshes(model);
-        mixer = gltf.animations?.length
-          ? new THREE.AnimationMixer(model)
-          : null;
-        if (mixer && gltf.animations[0]) {
-          const action = mixer.clipAction(gltf.animations[0]);
-          action.play();
-        }
+        boneMap = {};
+        boneRest = {};
+        model.traverse((c) => {
+          if (!c.name) return;
+          if (/^(upperarm|lowerarm|hand)_[LR]$/.test(c.name)) {
+            boneMap[c.name] = c;
+            boneRest[c.name] = {
+              x: c.rotation.x,
+              y: c.rotation.y,
+              z: c.rotation.z,
+            };
+          }
+        });
+        // Fallback: skeleton bone list (some exporters skip hierarchy names)
+        model.traverse((c) => {
+          if (!c.isSkinnedMesh || !c.skeleton) return;
+          for (const b of c.skeleton.bones) {
+            if (!b?.name || boneMap[b.name]) continue;
+            if (/^(upperarm|lowerarm|hand)_[LR]$/.test(b.name)) {
+              boneMap[b.name] = b;
+              boneRest[b.name] = {
+                x: b.rotation.x,
+                y: b.rotation.y,
+                z: b.rotation.z,
+              };
+            }
+          }
+        });
+        // IdleSway clip fights Layer G arm drives — Layer I root sway covers ambience.
+        mixer = null;
         controls.target.set(0, Math.min(size.y * 0.72, 1.55), 0);
         camera.position.set(0.25, controls.target.y + 0.1, Math.max(size.y * 1.5, 2.1));
         controls.update();
@@ -761,6 +925,53 @@
         latencyStatus.textContent = `improv: ${r.note} (${r.adaptor})`;
       });
 
+      emblemSel.addEventListener('change', () => {
+        const v = emblemSel.value || null;
+        gestures.setEmblem(v);
+      });
+      document.getElementById('btnWave').addEventListener('click', () => {
+        gestures.playEmblem('wave');
+        emblemSel.value = 'wave';
+      });
+      document.getElementById('btnSpeak').addEventListener('click', (e) => {
+        gestures.setSpeaking(!gestures.speaking, 0.65);
+        e.currentTarget.classList.toggle('primary', gestures.speaking);
+      });
+      document.getElementById('turnSeg').addEventListener('click', (ev) => {
+        const btn = ev.target.closest('button[data-turn]');
+        if (!btn) return;
+        const turn = btn.dataset.turn === 'none' ? null : btn.dataset.turn;
+        gestures.setTurnState(turn);
+        document.querySelectorAll('#turnSeg button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.turn === (turn || 'none'));
+        });
+      });
+
+      async function applySurfaceLevel(level, { applyHints = true } = {}) {
+        surfaceLevel = Number(level) || 6;
+        document.getElementById('hudSurf').textContent = String(surfaceLevel);
+        const def = getSurfaceLevel(surfaceLevel);
+        const tone = uncannyRiskTone(def?.uncannyRisk || '');
+        surfaceStatus.className = `status ${tone === 'bad' ? 'bad' : tone === 'ok' ? 'ok' : tone === 'warn' ? 'warn' : ''}`;
+        surfaceStatus.textContent = def
+          ? `${def.label} · risk ${def.uncannyRisk}${def.warning ? ' · ' + def.warning : ''}`
+          : '—';
+        const hints = meshTexHintsForLevel(surfaceLevel);
+        const abstract = surfaceLevel <= 3;
+        surfaceOverlay.classList.toggle('on', abstract);
+        pixelFace.classList.toggle('on', surfaceLevel === 2 || surfaceLevel === 3);
+        glowOrb.style.display = surfaceLevel === 1 ? 'block' : 'none';
+        if (model) model.visible = !abstract;
+        if (applyHints && applySurfaceHints && hints.meshHint && hints.meshHint !== 'none') {
+          if (hints.meshHint !== lod) await loadLod(hints.meshHint);
+          if (hints.texHint && hints.texHint !== texLod) await applyTexLod(hints.texHint);
+        }
+      }
+      surfaceSel.addEventListener('change', () => {
+        applySurfaceLevel(surfaceSel.value);
+      });
+      applySurfaceLevel(6, { applyHints: false });
+
       function tick() {
         const dt = clock.getDelta();
         frames += 1;
@@ -855,6 +1066,62 @@
         gaitStatus.textContent = `${gaitOut.emotion} · spd ${gaitOut.gait.walkSpeed.toFixed(2)} · stride ${gaitOut.gait.strideLength.toFixed(2)} · arm ${gaitOut.gait.armSwingOrigin} · ${gaitOut.gait.footstepWeight}`;
         if (idleOn && model && !mixer) {
           model.position.y += walk.vertical * 0.5;
+        }
+
+        // Layer G — Emblem > Illustrator/Regulator > Affect > Adaptor
+        const anxiety =
+          idle.arousal === 'tense' ? 0.7 : idle.arousal === 'alert' ? 0.45 : 0.25;
+        const gestureState = gestures.tick(dt, {
+          emotion: displayEmo,
+          intensity: displayInt,
+          mood: temporal.moodEmotion || displayEmo,
+          anxiety,
+          latencyAdaptor:
+            latencyState.phase === 'waiting' ? latencyState.adaptor || null : null,
+        });
+        gestureStatus.textContent = `${gestureState.lock} · ${gestureState.layer} · ${gestureState.label} · gap ${gestureState.gapSec.toFixed(1)}s`;
+        document.getElementById('hudGesture').textContent = gestureState.layer;
+        if (model && Object.keys(boneMap).length) {
+          applyGestureBones(boneMap, boneRest, gestureState, 1);
+        }
+        if (emblemSel.value && !gestures.emblem) {
+          emblemSel.value = '';
+        }
+
+        // Surface Renderer — same Layer 1 → level-specific params
+        const surf = renderSurface(
+          surfaceLevel,
+          {
+            emotion: displayEmo,
+            intensity: displayInt,
+            lookX,
+            lookY,
+            blink: temporalState.blink,
+          },
+          { blink: temporalState.blink },
+        );
+        if (surf.surface?.mode === 'glow') {
+          const g = surf.surface;
+          document.documentElement.style.setProperty('--glow', g.color.css);
+          const pulse = 0.92 + Math.sin(clock.elapsedTime * g.pulseRate * Math.PI * 2) * 0.08;
+          glowOrb.style.opacity = String(Math.min(1, g.brightness));
+          glowOrb.style.transform = `scale(${(0.85 + g.glowSpread * 0.35) * pulse})`;
+        } else if (surf.surface?.mode === 'pixel' || surf.surface?.mode === 'emoji') {
+          const p = surf.surface;
+          document.documentElement.style.setProperty('--pix', p.color);
+          const h = Math.max(8, 28 * p.eyeOpen);
+          const brow = p.browRaise || 0;
+          document.getElementById('pixEyeL').style.height = `${h}px`;
+          document.getElementById('pixEyeR').style.height = `${h}px`;
+          document.getElementById('pixEyeL').style.transform = `translate(${p.lookX * 6}px, ${-p.lookY * 6 - brow * 8}px)`;
+          document.getElementById('pixEyeR').style.transform = `translate(${p.lookX * 6}px, ${-p.lookY * 6 - brow * 8}px)`;
+          const mouth = document.getElementById('pixelMouth');
+          mouth.style.transform = `scaleY(${1 + Math.abs(p.mouthCurve) * 1.2}) rotate(${p.mouthCurve * 18}deg)`;
+          if (surf.surface.mode === 'emoji') {
+            pixelFace.style.borderRadius = '50%';
+          } else {
+            pixelFace.style.borderRadius = '18px';
+          }
         }
 
         // Eye look-at (HI Expression_*). Track camera ≈ head-relative aim.

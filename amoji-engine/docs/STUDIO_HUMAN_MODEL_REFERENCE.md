@@ -134,8 +134,8 @@ Amoji engine (ND “systemic emotion”)
 11. ~~**Layer T latency bridge / improvised reaction**~~ ✓
 12. ~~**Compound emotion engine** (region-locked blends)~~ ✓
 13. ~~**Layer W gait styles**~~ ✓
-14. Full Layer G gesture stack (Emblem → Adaptor)
-15. Surface Renderer level switcher
+14. ~~**Full Layer G gesture stack** (Emblem → Adaptor)~~ ✓
+15. ~~**Surface Renderer level switcher**~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
