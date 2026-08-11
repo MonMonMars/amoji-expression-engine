@@ -283,6 +283,8 @@ export {
   formatDisneyExtremeBaselineEaseStripLabel,
   formatDisneyExtremeBaselineMixStripLabel,
   formatDisneyExtremeBaselineNeckStripLabel,
+  formatDisneyExtremeBaselineCurveStripsLabel,
+  formatDisneyExtremeBaselineCurveStripsBundle,
   formatDisneyExtremeNeckFactorsBundle,
   buildDisneyExtremeFactorBarsSvg,
   DISNEY_EXTREME_FACTOR_BAR_MAX,

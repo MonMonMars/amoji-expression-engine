@@ -350,6 +350,75 @@ export function formatDisneyExtremeBaselineNeckStripLabel(opts = {}) {
 }
 
 /**
+ * One-line Extreme curve strips readout (ease · mix · neck).
+ * @param {{
+ *   enabled?: boolean,
+ *   markerT?: number,
+ *   shapeInt?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineCurveStripsLabel(opts = {}) {
+  const ease = formatDisneyExtremeBaselineEaseStripLabel({
+    enabled: opts.enabled,
+    markerT: opts.markerT ?? opts.shapeInt,
+  }).replace(/^ease · /, '');
+  const mix = formatDisneyExtremeBaselineMixStripLabel({
+    enabled: opts.enabled,
+    bodyOn: opts.bodyOn,
+    markerT: opts.bodyMarkerT ?? opts.bodyInt,
+  }).replace(/^mix · /, '');
+  const neck = formatDisneyExtremeBaselineNeckStripLabel({
+    enabled: opts.enabled,
+    bodyOn: opts.bodyOn,
+    neckBlend: opts.neckBlend,
+    bodyMix: opts.bodyMix,
+    bodyInt: opts.bodyInt,
+  }).replace(/^neck · /, '');
+  return `curves · ${ease} · ${mix} · ${neck}`;
+}
+
+/**
+ * Multiline Extreme curve strips clipboard bundle (ease / mix / neck).
+ * @param {{
+ *   enabled?: boolean,
+ *   markerT?: number,
+ *   shapeInt?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineCurveStripsBundle(opts = {}) {
+  return [
+    formatDisneyExtremeBaselineEaseStripLabel({
+      enabled: opts.enabled,
+      markerT: opts.markerT ?? opts.shapeInt,
+    }),
+    formatDisneyExtremeBaselineMixStripLabel({
+      enabled: opts.enabled,
+      bodyOn: opts.bodyOn,
+      markerT: opts.bodyMarkerT ?? opts.bodyInt,
+    }),
+    formatDisneyExtremeBaselineNeckStripLabel({
+      enabled: opts.enabled,
+      bodyOn: opts.bodyOn,
+      neckBlend: opts.neckBlend,
+      bodyMix: opts.bodyMix,
+      bodyInt: opts.bodyInt,
+    }),
+  ].join('\n');
+}
+
+/**
  * Clipboard bundle: neck label + factors label (multiline).
  * @param {{
  *   enabled?: boolean,
@@ -956,6 +1025,20 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'copyBaselineDirtyStripFKey', help: 'Shift+F11 copy dirty', kind: 'note' },
+  {
+    id: 'showBaselineStripsSummaryFKey',
+    keys: ['F1'],
+    help: 'F1 strips summary',
+    kind: 'action',
+  },
+  { id: 'copyBaselineStripsSummaryFKey', help: 'Shift+F1 copy strips', kind: 'note' },
+  {
+    id: 'showBaselineCurveStrip',
+    help: 'Alt+PageDown curve strips',
+    kind: 'note',
+  },
+  { id: 'copyBaselineCurveStrip', help: '⇧Alt+PageDown copy curves', kind: 'note' },
+  { id: 'curveStrip', help: 'curve strips · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },

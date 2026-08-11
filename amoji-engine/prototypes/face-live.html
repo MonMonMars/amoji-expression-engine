@@ -988,6 +988,10 @@
           <button type="button" id="btnDisneyExtremeCopyPinStrip">Copy pin strip <kbd>⇧F10</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStripFKey">Dirty strip <kbd>F11</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey">Copy dirty <kbd>⇧F11</kbd></button>
+          <button type="button" id="btnDisneyExtremeStripsSummaryFKey">Strips summary <kbd>F1</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyStripsSummaryFKey">Copy strips <kbd>⇧F1</kbd></button>
+          <button type="button" id="btnDisneyExtremeCurveStrip">Curve strips <kbd>Alt+PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyCurveStrip">Copy curves <kbd>⇧Alt+PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -1165,6 +1169,13 @@
             title="Live neck · F5 flash · ⇧F5 copy · click flash · dbl-click copy"
           >
             neck · 0.75 · body mix (off)
+          </div>
+          <div
+            class="status"
+            id="disneyExtremeCurveStrip"
+            title="Live curves (ease/mix/neck) · Alt+PageDown flash · ⇧Alt+PageDown copy · click flash · dbl-click copy"
+          >
+            curves · od ×1.45 (off) · cap 1.50 · neck 0.75 (off) · 0.75 · body mix (off)
           </div>
         </details>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
@@ -1556,6 +1567,8 @@
         formatDisneyExtremeBaselineEaseStripLabel,
         formatDisneyExtremeBaselineMixStripLabel,
         formatDisneyExtremeBaselineNeckStripLabel,
+        formatDisneyExtremeBaselineCurveStripsLabel,
+        formatDisneyExtremeBaselineCurveStripsBundle,
         formatDisneyExtremeNeckFactorsBundle,
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
@@ -2619,6 +2632,55 @@
         }
         flashDisneyExtremeStatus(
           ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      function disneyExtremeCurveStripOpts(extremeSnap) {
+        const snap = extremeSnap || disneyExtremeSnapshot();
+        return {
+          enabled: !!snap.enabled,
+          shapeInt: snap.shapeInt,
+          bodyOn: !!snap.bodyOn,
+          bodyInt: snap.bodyInt,
+          neckBlend: snap.neckBlend,
+          bodyMix: snap.bodyMix,
+        };
+      }
+
+      function syncDisneyExtremeCurveStripUi(extremeSnap) {
+        const el = document.getElementById('disneyExtremeCurveStrip');
+        if (!el) return;
+        el.textContent = formatDisneyExtremeBaselineCurveStripsLabel(
+          disneyExtremeCurveStripOpts(extremeSnap),
+        );
+      }
+
+      function flashDisneyExtremeBaselineCurveStrip(extremeSnap) {
+        const text = formatDisneyExtremeBaselineCurveStripsLabel(
+          disneyExtremeCurveStripOpts(extremeSnap),
+        );
+        openDisneyExtremeStrips();
+        syncDisneyExtremeCurveStripUi(extremeSnap);
+        flashDisneyExtremeStatus(text);
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineCurveStrip(extremeSnap) {
+        const text = formatDisneyExtremeBaselineCurveStripsBundle(
+          disneyExtremeCurveStripOpts(extremeSnap),
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · curves` : `copy failed · curves`,
         );
         return ok;
       }
@@ -4823,6 +4885,22 @@
         copyDisneyExtremeBaselineDirtyStrip();
       });
 
+      document.getElementById('btnDisneyExtremeStripsSummaryFKey')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineStripsSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyStripsSummaryFKey')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineStripsSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeCurveStrip')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineCurveStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyCurveStrip')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineCurveStrip();
+      });
+
       document.getElementById('disneyExtremeStripsSummary')?.addEventListener('dblclick', (ev) => {
         ev.preventDefault();
         copyDisneyExtremeBaselineStripsSummary();
@@ -4906,6 +4984,14 @@
 
       document.getElementById('disneyExtremeNeckStrip')?.addEventListener('dblclick', () => {
         copyDisneyExtremeBaselineNeckStrip();
+      });
+
+      document.getElementById('disneyExtremeCurveStrip')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineCurveStrip();
+      });
+
+      document.getElementById('disneyExtremeCurveStrip')?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBaselineCurveStrip();
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -6952,6 +7038,16 @@
         if (resolved.action === 'copyBaselineNeckStrip') {
           ev.preventDefault();
           copyDisneyExtremeBaselineNeckStrip();
+          return;
+        }
+        if (resolved.action === 'showBaselineCurveStrip') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineCurveStrip();
+          return;
+        }
+        if (resolved.action === 'copyBaselineCurveStrip') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineCurveStrip();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -10404,6 +10500,14 @@
           neckBlend: extremeSnap.neckBlend,
           bodyMix: extremeSnap.bodyMix,
           bodyInt: extremeSnap.bodyInt,
+        });
+        syncDisneyExtremeCurveStripUi({
+          enabled: disneyExtremeOn,
+          shapeInt: disneyExtremeOn ? shapeInt : undefined,
+          bodyOn,
+          bodyInt: disneyExtremeOn && bodyOn ? bodyInt : undefined,
+          neckBlend: extremeSnap.neckBlend,
+          bodyMix: extremeSnap.bodyMix,
         });
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)

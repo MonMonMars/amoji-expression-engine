@@ -404,7 +404,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 391 | Extreme F9 active strip | Done |
 | Phase 392 | Extreme F10 pin strip + copy | Done |
 | Phase 393 | Extreme F11 dirty strip | Done |
-| Phase 394+ | Further production polish… | Specced |
+| Phase 394 | Extreme F1 strips summary | Done |
+| Phase 395 | Extreme curve strips live label | Done |
+| Phase 396 | Extreme Alt+PageDown curve strips | Done |
+| Phase 397 | Extreme ⇧Alt+PageDown copy curves | Done |
+| Phase 398+ | Further production polish… | Specced |
 
 ## Quick start
 
