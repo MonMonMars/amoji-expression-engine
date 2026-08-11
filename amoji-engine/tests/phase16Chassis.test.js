@@ -15,13 +15,14 @@ import {
 } from '../engine/export/robotDriver.js';
 
 describe('chassis catalog', () => {
-  it('lists three chassis bound to packs', () => {
+  it('lists chassis bound to packs including variants', () => {
     const list = listChassis();
-    expect(list.map((c) => c.id)).toEqual([
-      'desktop-buddy',
-      'lobby-companion',
-      'lab-humanoid',
-    ]);
+    const ids = list.map((c) => c.id);
+    expect(ids).toContain('desktop-buddy');
+    expect(ids).toContain('lobby-companion');
+    expect(ids).toContain('lab-humanoid');
+    expect(ids).toContain('desktop-buddy-expressive');
+    expect(ids).toContain('lobby-companion-quiet');
     expect(getChassis('lobby-companion').packId).toBe('upper-body-companion');
     expect(DEFAULT_CHASSIS).toBe('desktop-buddy');
   });

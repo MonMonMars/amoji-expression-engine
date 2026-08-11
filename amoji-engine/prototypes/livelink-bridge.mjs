@@ -24,10 +24,38 @@ const publisher = new LiveLinkPublisher({ subject: 'AmojiSakura', fps: 60 });
 /** @type {Set<import('ws').WebSocket>} */
 const clients = new Set();
 
+const bridgeStats = {
+  startedAt: Date.now(),
+  published: 0,
+  publishErrors: 0,
+  lastPublishAt: 0,
+  latenciesMs: /** @type {number[]} */ ([]),
+  wsFanoutFails: 0,
+};
+
+function recordLatency(ms) {
+  bridgeStats.latenciesMs.push(ms);
+  if (bridgeStats.latenciesMs.length > 600) {
+    bridgeStats.latenciesMs.splice(0, bridgeStats.latenciesMs.length - 600);
+  }
+}
+
+function percentile(arr, p) {
+  if (!arr.length) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
+}
+
 publisher.subscribe((frame) => {
   const line = encodeLiveLinkLine(frame);
   for (const ws of clients) {
-    if (ws.readyState === 1) ws.send(line);
+    if (ws.readyState === 1) {
+      try {
+        ws.send(line);
+      } catch {
+        bridgeStats.wsFanoutFails += 1;
+      }
+    }
   }
 });
 
@@ -72,7 +100,37 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, clients: clients.size, frame: publisher.frameIndex }));
+    res.end(
+      JSON.stringify({
+        ok: true,
+        clients: clients.size,
+        frame: publisher.frameIndex,
+        published: bridgeStats.published,
+      }),
+    );
+    return;
+  }
+
+  if (req.method === 'GET' && req.url === '/stats') {
+    const uptimeSec = (Date.now() - bridgeStats.startedAt) / 1000;
+    const fps =
+      uptimeSec > 0.05 ? bridgeStats.published / uptimeSec : 0;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        ok: true,
+        clients: clients.size,
+        frameIndex: publisher.frameIndex,
+        published: bridgeStats.published,
+        publishErrors: bridgeStats.publishErrors,
+        wsFanoutFails: bridgeStats.wsFanoutFails,
+        uptimeSec: Number(uptimeSec.toFixed(2)),
+        avgFps: Number(fps.toFixed(2)),
+        lastPublishAt: bridgeStats.lastPublishAt || null,
+        p50LatencyMs: Number(percentile(bridgeStats.latenciesMs, 0.5).toFixed(2)),
+        p95LatencyMs: Number(percentile(bridgeStats.latenciesMs, 0.95).toFixed(2)),
+      }),
+    );
     return;
   }
 
@@ -85,15 +143,20 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/publish') {
     const chunks = [];
     for await (const c of req) chunks.push(c);
+    const t0 = Date.now();
     try {
       const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
       const frame = body.blendShapes
         ? buildLiveLinkFrame(body.blendShapes, { subject: body.subject })
         : morphsToLiveLinkFrame(body.weights || body.morphs || {}, { subject: body.subject });
       publisher.publishArkit(frame.blendShapes);
+      bridgeStats.published += 1;
+      bridgeStats.lastPublishAt = Date.now();
+      recordLatency(Date.now() - t0);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, frame: publisher.frameIndex }));
     } catch (err) {
+      bridgeStats.publishErrors += 1;
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: false, error: String(err) }));
     }

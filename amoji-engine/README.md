@@ -31,7 +31,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 18 | YouTube/video capture ingest + face quality gates | Done |
 | Phase 19 | Audio sync + Actor Discretion UX depth | Done |
 | Phase 20 | TTS provider client (mock/HTTP + audioUrl E2E) | Done |
-| Phase 21+ | Production polish… | Specced |
+| Phase 21 | Live Link soak · easter apply · chassis variants | Done |
+| Phase 22+ | Further production polish… | Specced |
 
 ## Quick start
 

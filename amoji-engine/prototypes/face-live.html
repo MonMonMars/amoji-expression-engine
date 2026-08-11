@@ -388,10 +388,22 @@
         <div class="status" id="discStatus">discretion —</div>
         <div class="status" id="discContStatus">continuity —</div>
         <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;margin-top:6px;">
-          <input id="eggNlp" type="checkbox" />
-          <span style="font-size:0.8rem;color:var(--muted)">Easter: NLP gaze myth (non-science)</span>
+          <input id="eggNlp" type="checkbox" data-egg="nlpGazeConvention" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: NLP gaze myth</span>
         </label>
-        <div class="status" id="eggStatus">eggs off</div>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggNose" type="checkbox" data-egg="noseTouchTell" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: nose-touch tell</span>
+        </label>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggAvert" type="checkbox" data-egg="gazeAversionGuilt" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: gaze aversion guilt</span>
+        </label>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggArms" type="checkbox" data-egg="crossedArmsClosed" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: crossed arms closed</span>
+        </label>
+        <div class="status" id="eggStatus">eggs off · non-science</div>
       </div>
 
       <div class="group">
@@ -537,9 +549,8 @@
         DiscretionController,
       } from '/engine/layers/discretion.js';
       import {
-        nlpGazeCue,
         personaAllowsEasterEggs,
-        EASTER_EGG_DISCLAIMER,
+        mergeEasterEggCues,
       } from '/engine/easterEggs/index.js';
       import {
         retargetBody,
@@ -664,7 +675,20 @@
       const moodCtl = new MoodController({ state: 'neutral' });
       const discCtl = new DiscretionController({ personaId: 'companion' });
       let gazeModeUi = 'manual';
-      let eggNlpOn = false;
+      const eggEnabled = {
+        nlpGazeConvention: false,
+        noseTouchTell: false,
+        gazeAversionGuilt: false,
+        crossedArmsClosed: false,
+      };
+      const eggEls = {
+        nlpGazeConvention: document.getElementById('eggNlp'),
+        noseTouchTell: document.getElementById('eggNose'),
+        gazeAversionGuilt: document.getElementById('eggAvert'),
+        crossedArmsClosed: document.getElementById('eggArms'),
+      };
+      let eggAdaptorHint = null;
+      let eggPoseHint = null;
       let compoundId = '';
       let walkPhase = 0;
       let surfaceLevel = 6;
@@ -709,10 +733,72 @@
       const moodSel = document.getElementById('moodSel');
       const gazeModeSel = document.getElementById('gazeModeSel');
       const surfaceSel = document.getElementById('surfaceSel');
-      const eggNlpEl = document.getElementById('eggNlp');
       const surfaceOverlay = document.getElementById('surfaceOverlay');
       const glowOrb = document.getElementById('glowOrb');
       const pixelFace = document.getElementById('pixelFace');
+
+      function refreshEggStatus() {
+        const on = Object.entries(eggEnabled)
+          .filter(([, v]) => v)
+          .map(([k]) => k.replace(/([A-Z])/g, ' $1').trim());
+        eggStatus.textContent = on.length
+          ? `ON · ${on.join(', ')} · non-science`
+          : 'eggs off · non-science';
+      }
+      function setEggsLocked(locked) {
+        for (const el of Object.values(eggEls)) {
+          if (!el) continue;
+          el.disabled = locked;
+          if (locked) {
+            el.checked = false;
+          }
+        }
+        if (locked) {
+          for (const k of Object.keys(eggEnabled)) eggEnabled[k] = false;
+          eggAdaptorHint = null;
+          eggPoseHint = null;
+          eggStatus.textContent = 'eggs locked for persona';
+        } else {
+          refreshEggStatus();
+        }
+      }
+      function syncEggHints() {
+        const selections = [];
+        if (eggEnabled.nlpGazeConvention) {
+          selections.push({
+            eggId: 'nlpGazeConvention',
+            behaviorKey: 'constructing_or_evasive',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.noseTouchTell) {
+          selections.push({
+            eggId: 'noseTouchTell',
+            behaviorKey: 'perform_tell',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.gazeAversionGuilt) {
+          selections.push({
+            eggId: 'gazeAversionGuilt',
+            behaviorKey: 'stage_avert',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.crossedArmsClosed) {
+          selections.push({
+            eggId: 'crossedArmsClosed',
+            behaviorKey: 'stage_cross',
+            enabled: true,
+          });
+        }
+        const merged = mergeEasterEggCues(selections, { personaId: idle.personaId });
+        eggAdaptorHint = merged.adaptor || null;
+        eggPoseHint = merged.pose || null;
+        gestures.latencyAdaptor = eggAdaptorHint;
+        refreshEggStatus();
+        return merged;
+      }
       for (const [id, def] of Object.entries(COMPOUNDS)) {
         const opt = document.createElement('option');
         opt.value = id;
@@ -1170,18 +1256,17 @@
           discCtl.setAutoImprovise(true, discStimulus.value || 'noise');
         }
       });
-      eggNlpEl.addEventListener('change', () => {
-        if (!personaAllowsEasterEggs(idle.personaId)) {
-          eggNlpEl.checked = false;
-          eggNlpOn = false;
-          eggStatus.textContent = 'eggs locked for persona';
-          return;
-        }
-        eggNlpOn = eggNlpEl.checked;
-        eggStatus.textContent = eggNlpOn
-          ? `ON — ${EASTER_EGG_DISCLAIMER.slice(0, 48)}…`
-          : 'eggs off';
-      });
+      for (const [eggId, el] of Object.entries(eggEls)) {
+        if (!el) continue;
+        el.addEventListener('change', () => {
+          if (!personaAllowsEasterEggs(idle.personaId)) {
+            setEggsLocked(true);
+            return;
+          }
+          eggEnabled[eggId] = !!el.checked;
+          syncEggHints();
+        });
+      }
 
       document.getElementById('btnIdle').addEventListener('click', (e) => {
         idleOn = !idleOn;
@@ -1232,13 +1317,9 @@
         smileSel.value = defaultSmileForPersona(e.target.value);
         smileCtl.setSmileType(smileSel.value);
         if (!personaAllowsEasterEggs(e.target.value)) {
-          eggNlpOn = false;
-          eggNlpEl.checked = false;
-          eggNlpEl.disabled = true;
-          eggStatus.textContent = 'eggs locked for persona';
+          setEggsLocked(true);
         } else {
-          eggNlpEl.disabled = false;
-          eggStatus.textContent = eggNlpOn ? 'NLP myth ON — non-science' : 'eggs off';
+          setEggsLocked(false);
         }
       });
       document.getElementById('arousalSeg').addEventListener('click', (ev) => {
@@ -1763,19 +1844,38 @@
             });
             lx = eyes.lookX;
             ly = eyes.lookY;
-            if (eggNlpOn) {
-              const cue = nlpGazeCue(
-                displayEmo === 'thinking' ? 'recalling_memory' : 'constructing_or_evasive',
-                { personaId: idle.personaId, enabled: true },
-              );
-              if (cue.enabled && cue.behavior) {
-                lx = cue.behavior.lookX;
-                ly = cue.behavior.lookY;
+            if (Object.values(eggEnabled).some(Boolean)) {
+              const selections = [];
+              if (eggEnabled.nlpGazeConvention) {
+                selections.push({
+                  eggId: 'nlpGazeConvention',
+                  behaviorKey:
+                    displayEmo === 'thinking' ? 'recalling_memory' : 'constructing_or_evasive',
+                  enabled: true,
+                });
+              }
+              if (eggEnabled.gazeAversionGuilt) {
+                selections.push({
+                  eggId: 'gazeAversionGuilt',
+                  behaviorKey: 'stage_avert',
+                  enabled: true,
+                });
+              }
+              const merged = mergeEasterEggCues(selections, { personaId: idle.personaId });
+              if (merged.lookX != null) lx = merged.lookX;
+              if (merged.lookY != null) ly = merged.lookY;
+              if (merged.gaze === 'avoid') {
+                lx *= 0.35;
+                ly = Math.min(ly, -0.15);
               }
             }
             lookX = lx;
             lookY = ly;
-            eyeStatus.textContent = `${eyes.gazeMode} · ${eyes.gaze} · share ${eyes.headEyeShare} · pupil ${eyes.pupil.toFixed(2)}${eyes.vor ? ' · VOR' : ''}${eggNlpOn ? ' · eggNLP' : ''}`;
+            const eggTag = Object.entries(eggEnabled)
+              .filter(([, v]) => v)
+              .map(([k]) => k.slice(0, 6))
+              .join('+');
+            eyeStatus.textContent = `${eyes.gazeMode} · ${eyes.gaze} · share ${eyes.headEyeShare} · pupil ${eyes.pupil.toFixed(2)}${eyes.vor ? ' · VOR' : ''}${eggTag ? ` · egg:${eggTag}` : ''}${eggPoseHint ? ` · ${eggPoseHint}` : ''}`;
             document.getElementById('hudEyes').textContent = eyes.gaze;
           } else if (trackCamera && model) {
             const head = new THREE.Vector3(0, 1.55, 0);

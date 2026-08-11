@@ -48,10 +48,10 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Layer B neck/shoulder:** emotion-driven head tilt + accessory-muscle breath; Threat freeze / Sigh; head-down×gaze lock → anger vs sad
 - **Layer -1 Mood:** slow-transition background mood (embarrassed/anxious/…) biases intensity + leaks signature morphs; retarget HUD for body points
 - **Layer D Discretion:** emotion continuity across picks; Gap improv (blocked while Script hold); passive mood leak
-- **Easter eggs:** NLP gaze myth toggle — default off, locked for corporate/care/education, disclaimer required
+- **Easter eggs:** multi-toggle (NLP gaze / nose-touch / aversion / crossed arms) — default off, locked for corporate/care/education, non-science
 - **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
-- **Live Link pub** → `npm run livelink` bridge for Unreal
+- **Live Link pub** → `npm run livelink` bridge; soak with `npm run livelink:soak` (+ `/stats`)
 - **Eye look-at / Layer E:** camera track or manual; gaze modes lock/avoid/scan/presentation/camera; Turn-start/end; VOR vs head; pupil scale
 - Idle sway / turntable / cycle emotions / blink
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
@@ -59,7 +59,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
 - **TTS speak**: Mock synthesize / Step fixture WAV / attach audio file → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
-- **Chassis calib**: desktop-buddy / lobby-companion / lab-humanoid — gains, invert, deadzone, slew
+- **Chassis calib**: desktop-buddy (+ expressive) / lobby-companion (+ quiet) / lab-humanoid — gains, invert, deadzone, slew
 
 ## Code
 
@@ -84,9 +84,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
-- ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
+- ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
 - Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
-- Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew)
+- Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew + variants)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
 - YT/video batch: `tools/yt-capture/` + `prototypes/yt-capture-batch.html` — prep clip → quality gate → bake

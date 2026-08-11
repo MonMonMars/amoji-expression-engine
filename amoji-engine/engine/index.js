@@ -215,6 +215,11 @@ export {
   listEasterEggs,
   resolveEasterEgg,
   nlpGazeCue,
+  noseTouchCue,
+  gazeAversionCue,
+  crossedArmsCue,
+  applyEasterEggCue,
+  mergeEasterEggCues,
 } from './easterEggs/index.js';
 export {
   EMOTIONS,
@@ -272,6 +277,13 @@ export {
   encodeLiveLinkLine,
   LiveLinkPublisher,
 } from './export/liveLinkFace.js';
+export {
+  syntheticArkitAt,
+  SoakStats,
+  soakPublisher,
+  soakHttp,
+  assertLiveLinkFrameShape,
+} from './export/liveLinkSoak.js';
 export {
   ROBOT_CATALOG,
   ROBOT_PACKS,

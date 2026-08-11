@@ -76,6 +76,57 @@
         "neck_pitch": { "scale": 0.8, "maxDeltaPerSec": 1.3 },
         "jaw": { "maxDeltaPerSec": 2.8 }
       }
+    },
+    "desktop-buddy-expressive": {
+      "id": "desktop-buddy-expressive",
+      "label": "Desktop buddy · expressive",
+      "packId": "face-servo-12",
+      "productLine": "toy-robot",
+      "variantOf": "desktop-buddy",
+      "description": "Higher expression/mouth gain for demos — still soft eye slew.",
+      "gains": {
+        "expression": 1.15,
+        "mouth": 1.2,
+        "eye": 1.1,
+        "body": 1
+      },
+      "joints": {
+        "brow_L": { "scale": 1.1, "deadzone": 0.02 },
+        "brow_R": { "scale": 1.1, "deadzone": 0.02 },
+        "eye_tilt_L": { "invert": true, "scale": 1.1 },
+        "eye_tilt_R": { "invert": true, "scale": 1.1 },
+        "jaw": { "scale": 1.05, "maxDeltaPerSec": 3.2 },
+        "mouth_corner_L": { "scale": 1.15, "deadzone": 0.02 },
+        "mouth_corner_R": { "scale": 1.15, "deadzone": 0.02 },
+        "lid_L": { "maxDeltaPerSec": 5 },
+        "lid_R": { "maxDeltaPerSec": 5 }
+      }
+    },
+    "lobby-companion-quiet": {
+      "id": "lobby-companion-quiet",
+      "label": "Lobby companion · quiet",
+      "packId": "upper-body-companion",
+      "productLine": "companion-robot",
+      "variantOf": "lobby-companion",
+      "description": "Lobby greeter with damped body/mouth for quieter venues.",
+      "gains": {
+        "expression": 0.85,
+        "mouth": 0.8,
+        "eye": 0.9,
+        "body": 0.55
+      },
+      "joints": {
+        "neck_pitch": { "scale": 0.55, "maxDeltaPerSec": 0.9 },
+        "neck_yaw": { "scale": 0.5, "maxDeltaPerSec": 1.0 },
+        "neck_roll": { "scale": 0.4, "maxDeltaPerSec": 0.7 },
+        "shoulder_L_lift": { "scale": 0.6, "offset": 0.01, "maxDeltaPerSec": 0.55 },
+        "shoulder_R_lift": { "scale": 0.6, "offset": 0.01, "maxDeltaPerSec": 0.55 },
+        "jaw": { "scale": 0.75, "maxDeltaPerSec": 1.6 },
+        "mouth_corner_L": { "scale": 0.85 },
+        "mouth_corner_R": { "scale": 0.85 },
+        "elbow_L": { "scale": 0.65, "maxDeltaPerSec": 1.1 },
+        "elbow_R": { "scale": 0.65, "maxDeltaPerSec": 1.1 }
+      }
     }
   },
   "regionGainMap": {

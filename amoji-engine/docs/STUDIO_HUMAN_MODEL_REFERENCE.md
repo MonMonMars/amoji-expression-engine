@@ -155,6 +155,9 @@ Amoji engine (ND “systemic emotion”)
 32. ~~**YouTube/video capture** (prep + MediaPipe batch + face quality gates)~~ ✓
 33. ~~**Audio sync + Layer D UX** (demo tone clock, auto improv, continuity HUD)~~ ✓
 34. ~~**TTS provider E2E** (Mock/HTTP synthesize → audioUrl → SpeechPlayer)~~ ✓
+35. ~~**Live Link soak** (synthetic publish + `/stats` + memory/HTTP harness)~~ ✓
+36. ~~**Easter egg apply** (multi-egg cues + Face Live panel)~~ ✓
+37. ~~**Chassis pack variants** (expressive desktop · quiet lobby)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -186,4 +189,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: production polish (Live Link soak, more easter eggs, chassis packs).
+Next code increment: further polish (UE Mac consumer soak notes, more easter staging, additional chassis product SKUs).

@@ -28,6 +28,7 @@ export function listChassis() {
     packId: c.packId,
     productLine: c.productLine,
     description: c.description,
+    variantOf: c.variantOf || null,
   }));
 }
 

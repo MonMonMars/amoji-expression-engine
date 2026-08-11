@@ -101,3 +101,112 @@ export function resolveEasterEgg(eggId, behaviorKey, opts = {}) {
 export function nlpGazeCue(kind, opts = {}) {
   return resolveEasterEgg('nlpGazeConvention', kind, opts);
 }
+
+/**
+ * Nose-touch "tell" myth — adaptor cue only.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function noseTouchCue(opts = {}) {
+  return resolveEasterEgg('noseTouchTell', 'perform_tell', opts);
+}
+
+/**
+ * Gaze aversion = guilt myth.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function gazeAversionCue(opts = {}) {
+  return resolveEasterEgg('gazeAversionGuilt', 'stage_avert', opts);
+}
+
+/**
+ * Crossed arms = closed-off myth.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function crossedArmsCue(opts = {}) {
+  return resolveEasterEgg('crossedArmsClosed', 'stage_cross', opts);
+}
+
+/**
+ * Apply enabled egg behavior → runtime cue deltas for Face Live / gesture layers.
+ * Returns null behavior fields when egg is off/locked/ui-only.
+ *
+ * @param {string} eggId
+ * @param {string} behaviorKey
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ * @returns {ReturnType<typeof resolveEasterEgg> & {
+ *   lookX: number|null,
+ *   lookY: number|null,
+ *   gaze: string|null,
+ *   adaptor: string|null,
+ *   pose: string|null,
+ *   applied: boolean,
+ * }}
+ */
+export function applyEasterEggCue(eggId, behaviorKey, opts = {}) {
+  const resolved = resolveEasterEgg(eggId, behaviorKey, opts);
+  const b = resolved.behavior || null;
+  const lookX = typeof b?.lookX === 'number' ? b.lookX : null;
+  const lookY = typeof b?.lookY === 'number' ? b.lookY : null;
+  const gaze = typeof b?.gaze === 'string' ? b.gaze : null;
+  const adaptor = typeof b?.adaptor === 'string' ? b.adaptor : null;
+  const pose = typeof b?.pose === 'string' ? b.pose : null;
+  const applied = !!(
+    resolved.enabled &&
+    b &&
+    (lookX != null || lookY != null || gaze || adaptor || pose)
+  );
+  return applyComplianceGate(
+    {
+      ...resolved,
+      lookX,
+      lookY,
+      gaze,
+      adaptor,
+      pose,
+      applied,
+    },
+    {},
+  );
+}
+
+/**
+ * Merge several enabled egg overrides into one staging cue bag.
+ * Later eggs overwrite earlier look/gaze when both set.
+ *
+ * @param {Array<{ eggId: string, behaviorKey: string, enabled?: boolean }>} selections
+ * @param {{ personaId?: string }} [opts]
+ */
+export function mergeEasterEggCues(selections, opts = {}) {
+  /** @type {{ lookX: number|null, lookY: number|null, gaze: string|null, adaptor: string|null, pose: string|null, active: string[] }} */
+  const out = {
+    lookX: null,
+    lookY: null,
+    gaze: null,
+    adaptor: null,
+    pose: null,
+    active: [],
+  };
+  for (const sel of selections || []) {
+    if (!sel?.eggId || !sel?.behaviorKey) continue;
+    const cue = applyEasterEggCue(sel.eggId, sel.behaviorKey, {
+      personaId: opts.personaId,
+      enabled: sel.enabled,
+    });
+    if (!cue.applied) continue;
+    out.active.push(sel.eggId);
+    if (cue.lookX != null) out.lookX = cue.lookX;
+    if (cue.lookY != null) out.lookY = cue.lookY;
+    if (cue.gaze) out.gaze = cue.gaze;
+    if (cue.adaptor) out.adaptor = cue.adaptor;
+    if (cue.pose) out.pose = cue.pose;
+  }
+  return applyComplianceGate(
+    {
+      kind: 'easter_egg_merge',
+      scientific: false,
+      disclaimer: EASTER_EGG_DISCLAIMER,
+      ...out,
+    },
+    {},
+  );
+}
