@@ -10,6 +10,11 @@ export const BODY_BY_EMOTION = bodyData.byEmotion;
 export const THREAT_FREEZE = bodyData.threatFreeze;
 export const GAZE_COMBO = bodyData.gazeCombo;
 
+/** Extreme-band body posture mix cap (intensity can go to 2). */
+export const DISNEY_EXTREME_BODY_MIX_CAP = 1.5;
+/** How strongly neck follows head/chest Extreme scale. */
+export const DISNEY_EXTREME_NECK_SCALE_BLEND = 0.75;
+
 /**
  * @param {number} a
  * @param {number} b
@@ -17,6 +22,16 @@ export const GAZE_COMBO = bodyData.gazeCombo;
  */
 function lerp(a, b, t) {
   return a + (b - a) * t;
+}
+
+/**
+ * Extreme-aware body mix from intensity (caps above 1 for cartoon posture).
+ * @param {number} intensity
+ * @returns {number}
+ */
+export function disneyExtremeBodyMix(intensity) {
+  const t = Math.max(0, Math.min(2.0, Number(intensity) || 0));
+  return Math.min(DISNEY_EXTREME_BODY_MIX_CAP, t);
 }
 
 /**
@@ -59,7 +74,7 @@ export function evaluateBody(emotion, intensity = 1, opts = {}) {
   const raw = BODY_BY_EMOTION[emotion] || BODY_BY_EMOTION.neutral;
   const t = Math.max(0, Math.min(2.0, intensity));
   // Allow extra-extreme tiers to extrapolate posture beyond the normal band.
-  const mix = Math.min(1.35, t);
+  const mix = disneyExtremeBodyMix(t);
 
   /** @type {Record<string, unknown>} */
   let target = { ...raw };
@@ -224,8 +239,10 @@ export function applyBodyBones(boneMap, restRotations, sample, alpha = 1) {
   }
   const neck = boneMap.neck;
   if (neck?.scale?.setScalar) {
-    // Slightly damp neck scale so silhouettes stay readable.
-    neck.scale.setScalar(1 + (sample.chestScale - 1) * 0.6);
+    // Follow head Extreme swell with a readable neck blend.
+    neck.scale.setScalar(
+      1 + (sample.chestScale - 1) * DISNEY_EXTREME_NECK_SCALE_BLEND,
+    );
   }
 }
 

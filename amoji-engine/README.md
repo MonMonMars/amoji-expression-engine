@@ -131,7 +131,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 118 | Extreme status flash hold (copy/help/reset) | Done |
 | Phase 119 | Escape clears Extreme status flash hold | Done |
 | Phase 120 | Disney Extreme overdrive curve punch | Done |
-| Phase 121+ | Further production polish… | Specced |
+| Phase 121 | Disney Extreme body extrapolation punch | Done |
+| Phase 122+ | Further production polish… | Specced |
 
 ## Quick start
 

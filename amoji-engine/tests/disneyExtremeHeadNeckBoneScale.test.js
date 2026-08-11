@@ -13,8 +13,7 @@ describe('Disney Extreme head/neck bone scaling', () => {
     expect(src).toContain('head.scale.setScalar(sample.chestScale)');
     expect(src).toContain('neck?.scale?.setScalar');
     expect(src).toContain(
-      'neck.scale.setScalar(1 + (sample.chestScale - 1) * 0.6)',
+      '1 + (sample.chestScale - 1) * DISNEY_EXTREME_NECK_SCALE_BLEND',
     );
   });
 });
-
