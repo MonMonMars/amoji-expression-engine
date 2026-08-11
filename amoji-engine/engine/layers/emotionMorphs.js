@@ -30,6 +30,11 @@ export const HI_RECIPES = Object.fromEntries(
 );
 HI_RECIPES.neutral = {};
 
+/** Extreme-band overdrive gains (intensity 1..2). */
+export const DISNEY_EXTREME_EASE_OVERDRIVE_GAIN = 1.45;
+export const DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN = 0.85;
+export const DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP = 0.5;
+
 /**
  * Normalize glTF morph name variants (spaces / dots).
  * @param {string} name
@@ -39,7 +44,7 @@ export function normalizeMorphName(name) {
 }
 
 /**
- * Square Enix-style ease: soft in the low band, stronger near peak.
+ * Square Enix-style ease: soft in the low band, stronger near peak / Extreme.
  * @param {number} t 0..2
  */
 export function easeEmotionIntensity(t) {
@@ -48,8 +53,8 @@ export function easeEmotionIntensity(t) {
     const s = x * x * (3 - 2 * x);
     return s;
   }
-  // Overdrive: stronger lift for extra-extreme tiers.
-  return 1 + (x - 1) * 1.25;
+  // Overdrive: cartoon punch for Disney Extreme tiers (1..2).
+  return 1 + (x - 1) * DISNEY_EXTREME_EASE_OVERDRIVE_GAIN;
 }
 
 /**
@@ -95,8 +100,11 @@ export function recipeForIntensity(emotion, intensity) {
     const u = (t - b) / (c - b);
     return merge(scale(tiers.medium, 1 - u), scale(tiers.peak, u));
   }
-  // overdrive: peak + larger lift (enables "extreme" tiers)
-  return scale(tiers.peak, 1 + (t - 1) * 0.6);
+  // overdrive: peak + larger Extreme lift
+  return scale(
+    tiers.peak,
+    1 + (t - 1) * DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN,
+  );
 }
 
 /**
@@ -141,7 +149,12 @@ export function intensityTierWeights(emotion, intensity, available) {
     weights[peak] = u;
   } else {
     weights[peak] = 1;
-    if (available.has(legacy)) weights[legacy] = Math.min(0.35, t - 1);
+    if (available.has(legacy)) {
+      weights[legacy] = Math.min(
+        DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP,
+        (t - 1) * DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP,
+      );
+    }
   }
 
   if (weights[peak] && !available.has(peak) && available.has(legacy)) {

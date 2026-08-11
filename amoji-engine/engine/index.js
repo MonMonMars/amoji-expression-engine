@@ -262,6 +262,9 @@ export {
   shouldHoldDisneyExtremeStatus,
   computeDisneyExtremeIntensities,
   DISNEY_EXTREME_DEFAULTS,
+  DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
+  DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN,
+  DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';
 export {
