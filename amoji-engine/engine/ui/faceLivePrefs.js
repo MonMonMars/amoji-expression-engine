@@ -86,6 +86,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+U` → redo Extreme baseline from redo stack
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `l` / `L` → flash Extreme baseline history list
+ * - `Shift+L` → copy Extreme baseline history JSON
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -336,6 +337,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'undoBaseline' && ev.shiftKey) {
       return { ok: true, action: 'redoBaseline' };
+    }
+    if (entry.id === 'showBaselineHistory' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineHistoryJson' };
     }
     return { ok: true, action: entry.id };
   }

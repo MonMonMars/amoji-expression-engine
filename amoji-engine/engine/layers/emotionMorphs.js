@@ -568,6 +568,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
+  { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1393,8 +1394,9 @@ export function formatDisneyExtremeBaselineSummary(opts = {}) {
 
 /**
  * One-line label for a baseline history entry (list / chip / tooltip).
+ * Optional `kind: 'redo'` uses R#n prefix instead of #n.
  * @param {object|null|undefined} snap
- * @param {{ index?: number, compact?: boolean }} [opts]
+ * @param {{ index?: number, compact?: boolean, kind?: 'hist'|'redo' }} [opts]
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineHistoryEntry(snap, opts = {}) {
@@ -1402,35 +1404,76 @@ export function formatDisneyExtremeBaselineHistoryEntry(snap, opts = {}) {
   if (!captured) return '—';
   const fp = disneyExtremeSnapshotFingerprintShort(captured);
   const n = Math.max(1, Math.floor(Number(opts.index) || 1));
-  if (opts.compact) return `#${n} ${fp}`;
-  if (!captured.enabled) return `#${n} off · fp ${fp}`;
+  const tag = opts.kind === 'redo' ? `R#${n}` : `#${n}`;
+  if (opts.compact) return `${tag} ${fp}`;
+  if (!captured.enabled) return `${tag} off · fp ${fp}`;
   const body = captured.bodyOn
     ? `body×${Number(captured.bodyFactor).toFixed(2)}`
     : 'body off';
-  return `#${n} fp ${fp} · shape×${Number(captured.shapeFactor).toFixed(2)} · ${body} · eye×${Number(captured.eyeFactor).toFixed(2)} · mouth×${Number(captured.mouthFactor).toFixed(2)}`;
+  return `${tag} fp ${fp} · shape×${Number(captured.shapeFactor).toFixed(2)} · ${body} · eye×${Number(captured.eyeFactor).toFixed(2)} · mouth×${Number(captured.mouthFactor).toFixed(2)}`;
 }
 
 /**
  * Status flash / legend for Extreme baseline history stack.
- * Optional `redoDepth` appends · redo N when > 0.
+ * Optional `redo` lists redo chips; `redoDepth` alone appends · redo N.
  * @param {object[]|null|undefined} history
- * @param {{ redoDepth?: number }} [opts]
+ * @param {{ redoDepth?: number, redo?: object[] }} [opts]
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineHistoryList(history, opts = {}) {
   const list = Array.isArray(history) ? history : [];
-  const redoN = Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
-  const redoBit = redoN > 0 ? ` · redo ${redoN}` : '';
-  if (!list.length) {
-    return `hist · empty${redoBit} · U undo · L list`;
-  }
+  const redoList = Array.isArray(opts.redo) ? opts.redo : [];
+  const redoN = Math.max(
+    redoList.length,
+    Math.max(0, Math.floor(Number(opts.redoDepth) || 0)),
+  );
   const parts = list.map((snap, i) =>
     formatDisneyExtremeBaselineHistoryEntry(snap, {
       index: i + 1,
       compact: true,
     }),
   );
-  return `hist ${list.length}${redoBit} · ${parts.join(' · ')} · U undo · L list`;
+  const redoParts = redoList.map((snap, i) =>
+    formatDisneyExtremeBaselineHistoryEntry(snap, {
+      index: i + 1,
+      compact: true,
+      kind: 'redo',
+    }),
+  );
+  const redoBit = redoParts.length
+    ? ` · ${redoParts.join(' · ')}`
+    : redoN > 0
+      ? ` · redo ${redoN}`
+      : '';
+  const trail = ' · U undo · ⇧U redo · L list · ⇧L copy';
+  if (!list.length) {
+    return `hist · empty${redoBit}${trail}`;
+  }
+  return `hist ${list.length}${redoBit} · ${parts.join(' · ')}${trail}`;
+}
+
+/**
+ * Serialize Extreme baseline history stack to versioned JSON.
+ * @param {object[]|null|undefined} history
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function serializeDisneyExtremeBaselineHistory(history, opts = {}) {
+  const list = Array.isArray(history) ? history : [];
+  const items = [];
+  for (const snap of list) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    items.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  return JSON.stringify(
+    {
+      kind: DISNEY_EXTREME_BASELINE_HISTORY_JSON_KIND,
+      items,
+    },
+    null,
+    opts.pretty ? 2 : 0,
+  );
 }
 
 /**

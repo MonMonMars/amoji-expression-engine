@@ -30,11 +30,13 @@ describe('Phase 218 Extreme baseline history list labels', () => {
     ).toContain(`#1 fp ${fp}`);
     expect(formatDisneyExtremeBaselineHistoryEntry(null)).toBe('—');
     expect(formatDisneyExtremeBaselineHistoryList([])).toBe(
-      'hist · empty · U undo · L list',
+      'hist · empty · U undo · ⇧U redo · L list · ⇧L copy',
     );
     expect(
       formatDisneyExtremeBaselineHistoryList([snap], { redoDepth: 1 }),
-    ).toBe(`hist 1 · redo 1 · #1 ${fp} · U undo · L list`);
+    ).toBe(
+      `hist 1 · redo 1 · #1 ${fp} · U undo · ⇧U redo · L list · ⇧L copy`,
+    );
     expect(typeof engine.formatDisneyExtremeBaselineHistoryList).toBe(
       'function',
     );

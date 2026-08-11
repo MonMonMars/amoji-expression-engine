@@ -232,7 +232,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 219 | Extreme L history list hotkey | Done |
 | Phase 220 | Extreme Face Live history chips UI | Done |
 | Phase 221 | Extreme Face Live history list wiring | Done |
-| Phase 222+ | Further production polish… | Specced |
+| Phase 222 | Extreme redo history chip labels | Done |
+| Phase 223 | Extreme baseline history JSON serialize | Done |
+| Phase 224 | Extreme Shift+L copy hist JSON | Done |
+| Phase 225 | Extreme Face Live redo chips + hist export | Done |
+| Phase 226+ | Further production polish… | Specced |
 
 ## Quick start
 
