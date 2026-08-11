@@ -14,6 +14,9 @@ export const PROBE_TOAST_SOUND_FREQ = {
 /** Base oscillator gain before volume multiplier. */
 export const PROBE_TOAST_SOUND_BASE_GAIN = 0.035;
 
+/** Volume multiplier applied while the toast is pinned (ducked). */
+export const PROBE_TOAST_SOUND_DUCK_FACTOR = 0.35;
+
 /**
  * Clamp toast cue volume to [0, 1].
  * @param {unknown} value
@@ -26,17 +29,39 @@ export function clampProbeToastVolume(value, fallback = 1) {
 }
 
 /**
+ * Effective playback volume after optional pin-duck.
+ * @param {{ volume?: number, ducked?: boolean, duckFactor?: number }} [opts]
+ */
+export function effectiveProbeToastVolume(opts = {}) {
+  const volume = clampProbeToastVolume(opts.volume, 1);
+  if (!opts.ducked) return volume;
+  const factor = clampProbeToastVolume(
+    opts.duckFactor ?? PROBE_TOAST_SOUND_DUCK_FACTOR,
+    PROBE_TOAST_SOUND_DUCK_FACTOR,
+  );
+  return clampProbeToastVolume(volume * factor, 0);
+}
+
+/**
  * Resolve whether / how to play a probe toast sound cue.
  * @param {{
  *   enabled?: boolean,
  *   tone?: string|null,
  *   muted?: boolean,
  *   volume?: number,
+ *   ducked?: boolean,
+ *   duckFactor?: number,
  *   event?: string,
  * }} [opts]
  */
 export function resolveProbeToastSound(opts = {}) {
-  const volume = clampProbeToastVolume(opts.volume, 1);
+  const baseVolume = clampProbeToastVolume(opts.volume, 1);
+  const ducked = !!opts.ducked;
+  const volume = effectiveProbeToastVolume({
+    volume: baseVolume,
+    ducked,
+    duckFactor: opts.duckFactor,
+  });
   if (opts.enabled === false || opts.muted) {
     return applyComplianceGate(
       {
@@ -47,6 +72,8 @@ export function resolveProbeToastSound(opts = {}) {
         frequencyHz: null,
         durationMs: 0,
         volume,
+        baseVolume,
+        ducked,
       },
       {},
     );
@@ -63,6 +90,8 @@ export function resolveProbeToastSound(opts = {}) {
         frequencyHz: null,
         durationMs: 0,
         volume,
+        baseVolume,
+        ducked,
       },
       {},
     );
@@ -77,6 +106,8 @@ export function resolveProbeToastSound(opts = {}) {
         frequencyHz: null,
         durationMs: 0,
         volume: 0,
+        baseVolume,
+        ducked,
       },
       {},
     );
@@ -93,6 +124,14 @@ export function resolveProbeToastSound(opts = {}) {
       frequencyHz,
       durationMs: 90,
       volume,
+      baseVolume,
+      ducked,
+      duckFactor: ducked
+        ? clampProbeToastVolume(
+            opts.duckFactor ?? PROBE_TOAST_SOUND_DUCK_FACTOR,
+            PROBE_TOAST_SOUND_DUCK_FACTOR,
+          )
+        : 1,
       gain: PROBE_TOAST_SOUND_BASE_GAIN * volume,
       event: 'show',
     },
@@ -105,6 +144,7 @@ export function resolveProbeToastSound(opts = {}) {
  * @param {{
  *   enabled?: boolean,
  *   volume?: number,
+ *   duckFactor?: number,
  *   AudioContext?: typeof AudioContext,
  *   now?: () => number,
  * }} [opts]
@@ -113,6 +153,11 @@ export function createProbeToastSound(opts = {}) {
   let enabled = opts.enabled !== false;
   let muted = false;
   let volume = clampProbeToastVolume(opts.volume, 1);
+  let ducked = false;
+  const duckFactor = clampProbeToastVolume(
+    opts.duckFactor ?? PROBE_TOAST_SOUND_DUCK_FACTOR,
+    PROBE_TOAST_SOUND_DUCK_FACTOR,
+  );
   /** @type {AudioContext|null} */
   let ctx = null;
   const AC =
@@ -136,6 +181,12 @@ export function createProbeToastSound(opts = {}) {
     },
     get volume() {
       return volume;
+    },
+    get ducked() {
+      return ducked;
+    },
+    get duckFactor() {
+      return duckFactor;
     },
     setEnabled(on) {
       enabled = !!on;
@@ -189,7 +240,30 @@ export function createProbeToastSound(opts = {}) {
       );
     },
     /**
-     * @param {{ tone?: string, event?: string, volume?: number }} [playOpts]
+     * Duck cue level while toast is pinned.
+     * @param {boolean} on
+     */
+    setDucked(on) {
+      ducked = !!on;
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_sound',
+          action: 'set_ducked',
+          ok: true,
+          ducked,
+          duckFactor,
+        },
+        {},
+      );
+    },
+    duck() {
+      return this.setDucked(true);
+    },
+    unduck() {
+      return this.setDucked(false);
+    },
+    /**
+     * @param {{ tone?: string, event?: string, volume?: number, ducked?: boolean }} [playOpts]
      */
     play(playOpts = {}) {
       const resolved = resolveProbeToastSound({
@@ -199,6 +273,8 @@ export function createProbeToastSound(opts = {}) {
           playOpts.volume != null
             ? clampProbeToastVolume(playOpts.volume, volume)
             : volume,
+        ducked: playOpts.ducked != null ? !!playOpts.ducked : ducked,
+        duckFactor,
         tone: playOpts.tone,
         event: playOpts.event || 'show',
       });

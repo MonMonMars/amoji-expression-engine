@@ -286,17 +286,20 @@ export function groupAuditViewsByFolder(views) {
 /**
  * Export saved views as a portable JSON document.
  * @param {object[]} views
- * @param {{ now?: number }} [opts]
+ * @param {{ now?: number, starredOnly?: boolean }} [opts]
  */
 export function exportAuditSavedViewsJson(views, opts = {}) {
-  const list = (Array.isArray(views) ? views : []).map((v) =>
+  let list = (Array.isArray(views) ? views : []).map((v) =>
     normalizeAuditSavedView(v),
   );
+  const starredOnly = !!opts.starredOnly;
+  if (starredOnly) list = list.filter((v) => v.starred);
   const payload = {
     kind: 'amoji.faceLive.prefsShareAudit.views',
     version: 1,
     exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
     count: list.length,
+    starredOnly,
     views: list,
   };
   return applyComplianceGate(
@@ -305,6 +308,8 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
       ok: true,
       json: JSON.stringify(payload, null, 2),
       count: list.length,
+      starredOnly,
+      total: Array.isArray(views) ? views.length : 0,
       payload,
     },
     {},
@@ -1072,6 +1077,12 @@ export function createAuditSavedViews(opts = {}) {
     },
     exportJson(exportOpts = {}) {
       return exportAuditSavedViewsJson(views, exportOpts);
+    },
+    exportStarred(exportOpts = {}) {
+      return exportAuditSavedViewsJson(views, {
+        ...exportOpts,
+        starredOnly: true,
+      });
     },
     importJson(raw, importOpts = {}) {
       const imported = importAuditSavedViewsJson(raw, {

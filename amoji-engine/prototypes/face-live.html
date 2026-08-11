@@ -764,6 +764,7 @@
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
+          <button type="button" id="btnPrefsAuditExportStarred">Export starred</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
             <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
             <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
@@ -1181,6 +1182,7 @@
         probeToastCompareOn = false;
         probeToastFocusTrap.deactivate();
         probeToastDismiss.cancel();
+        probeToastSound.unduck();
       }
       function showProbeToast(detail, opts = {}) {
         const toast = describeHealthProbeToast(detail);
@@ -1293,7 +1295,8 @@
           reason !== 'livelink_pick' &&
           reason !== 'stepout_pick' &&
           reason !== 'leak_pick' &&
-          reason !== 'improv_pick'
+          reason !== 'improv_pick' &&
+          reason !== 'arousal_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1314,7 +1317,8 @@
           reason === 'livelink_pick' ||
           reason === 'stepout_pick' ||
           reason === 'leak_pick' ||
-          reason === 'improv_pick'
+          reason === 'improv_pick' ||
+          reason === 'arousal_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2120,6 +2124,7 @@
       document.getElementById('arousalSeg').addEventListener('click', (ev) => {
         const btn = ev.target.closest('button[data-arousal]');
         if (!btn) return;
+        cancelActiveCompoundLifecycle('arousal_pick');
         idle.setArousal(btn.dataset.arousal);
         document.querySelectorAll('#arousalSeg button').forEach((b) => {
           b.classList.toggle('active', b.dataset.arousal === idle.arousal);
@@ -2530,7 +2535,8 @@
           }
           if (resolved.pin) {
             probeToastDismiss.pin();
-            setTtsStatus('probe toast pinned', 'ok');
+            probeToastSound.duck();
+            setTtsStatus('probe toast pinned · sound ducked', 'ok');
             const pinBtn = document.querySelector(
               '#probeToastActions button[data-action="pin"]',
             );
@@ -2539,7 +2545,8 @@
           }
           if (resolved.unpin) {
             probeToastDismiss.unpin();
-            setTtsStatus('probe toast unpinned', 'ok');
+            probeToastSound.unduck();
+            setTtsStatus('probe toast unpinned · sound restored', 'ok');
             const pinBtn = document.querySelector(
               '#probeToastActions button[data-action="pin"]',
             );
@@ -3170,6 +3177,20 @@
           URL.revokeObjectURL(url);
           prefsStatus.className = 'status ok';
           prefsStatus.textContent = `prefs · views exported · ${exported.count}`;
+        });
+        document.getElementById('btnPrefsAuditExportStarred')?.addEventListener('click', () => {
+          const exported = auditSavedViews.exportStarred();
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'amoji-prefs-audit-views-starred.json';
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsStatus.className = exported.count ? 'status ok' : 'status warn';
+          prefsStatus.textContent = exported.count
+            ? `prefs · starred exported · ${exported.count}`
+            : 'prefs · no starred views to export';
         });
         document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
           document.getElementById('prefsAuditImportViewsFile')?.click();
