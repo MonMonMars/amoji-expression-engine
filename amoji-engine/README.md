@@ -106,7 +106,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 93 | Prefs dropzone drag/meta wiring consistency test | Done |
 | Phase 94 | Prefs dropzone dragover sets copy dropEffect | Done |
 | Phase 95 | Prefs dropzone dragleave/drop removes dragover class | Done |
-| Phase 96+ | Further production polish… | Specced |
+| Phase 96 | Prefs dropzone inheritExportMeta wiring | Done |
+| Phase 97+ | Further production polish… | Specced |
 
 ## Quick start
 
