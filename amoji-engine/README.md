@@ -99,7 +99,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 86 | TTS dragenter ordering test | Done |
 | Phase 87 | TTS dragenter cancel-before-persist test | Done |
 | Phase 88 | TTS dragend resets active flag test | Done |
-| Phase 89+ | Further production polish… | Specced |
+| Phase 89 | TTS dragenter guard sets active test | Done |
+| Phase 90+ | Further production polish… | Specced |
 
 ## Quick start
 
