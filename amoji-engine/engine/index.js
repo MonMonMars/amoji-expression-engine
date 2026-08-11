@@ -279,6 +279,7 @@ export {
   disneyExtremeRecipeOverdriveScale,
   normalizeDisneyExtremeFactors,
   formatDisneyExtremeFactorBarsLabel,
+  formatDisneyExtremeBaselineFactorsStripLabel,
   formatDisneyExtremeNeckFactorsBundle,
   buildDisneyExtremeFactorBarsSvg,
   DISNEY_EXTREME_FACTOR_BAR_MAX,

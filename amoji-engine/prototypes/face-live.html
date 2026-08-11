@@ -968,6 +968,8 @@
           <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeStripsSummary">Strips summary <kbd>PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyStripsSummary">Copy strips <kbd>⇧PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeFactorsStrip">Factors strip <kbd>F2</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyFactorsStrip">Copy factors strip <kbd>⇧F2</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -1117,6 +1119,13 @@
             title="Pin drift · Home flash · End copy · click flash · dbl-click copy"
           >
             dirty · none
+          </div>
+          <div
+            class="status"
+            id="disneyExtremeFactorsStrip"
+            title="Live factors · F2 flash · ⇧F2 copy · click flash · dbl-click copy"
+          >
+            factors · shape/body/eye/mouth (off)
           </div>
         </details>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
@@ -1504,6 +1513,7 @@
         formatDisneyExtremeEaseCurveBundle,
         buildDisneyExtremeEaseSparkSvg,
         formatDisneyExtremeFactorBarsLabel,
+        formatDisneyExtremeBaselineFactorsStripLabel,
         formatDisneyExtremeNeckFactorsBundle,
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
@@ -2337,6 +2347,67 @@
         const text = formatDisneyExtremeBaselineDirtyStripLabel(
           disneyExtremeDirtyStripOpts(extremeSnap),
         );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      function syncDisneyExtremeFactorsStripUi(extremeSnap) {
+        const el = document.getElementById('disneyExtremeFactorsStrip');
+        if (!el) return;
+        const opts = extremeSnap
+          ? {
+              enabled: !!extremeSnap.enabled,
+              shapeFactor: extremeSnap.shapeFactor,
+              bodyOn: !!extremeSnap.bodyOn,
+              bodyFactor: extremeSnap.bodyFactor,
+              eyeFactor: extremeSnap.eyeFactor,
+              mouthFactor: extremeSnap.mouthFactor,
+            }
+          : disneyExtremeFactorOpts();
+        el.textContent = formatDisneyExtremeBaselineFactorsStripLabel(opts);
+      }
+
+      function flashDisneyExtremeBaselineFactorsStrip(extremeSnap) {
+        const opts = extremeSnap
+          ? {
+              enabled: !!extremeSnap.enabled,
+              shapeFactor: extremeSnap.shapeFactor,
+              bodyOn: !!extremeSnap.bodyOn,
+              bodyFactor: extremeSnap.bodyFactor,
+              eyeFactor: extremeSnap.eyeFactor,
+              mouthFactor: extremeSnap.mouthFactor,
+            }
+          : disneyExtremeFactorOpts();
+        const text = formatDisneyExtremeBaselineFactorsStripLabel(opts);
+        openDisneyExtremeStrips();
+        syncDisneyExtremeFactorsStripUi(extremeSnap);
+        flashDisneyExtremeStatus(text);
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineFactorsStrip(extremeSnap) {
+        const opts = extremeSnap
+          ? {
+              enabled: !!extremeSnap.enabled,
+              shapeFactor: extremeSnap.shapeFactor,
+              bodyOn: !!extremeSnap.bodyOn,
+              bodyFactor: extremeSnap.bodyFactor,
+              eyeFactor: extremeSnap.eyeFactor,
+              mouthFactor: extremeSnap.mouthFactor,
+            }
+          : disneyExtremeFactorOpts();
+        const text = formatDisneyExtremeBaselineFactorsStripLabel(opts);
         let ok = false;
         try {
           if (navigator.clipboard?.writeText) {
@@ -4472,6 +4543,14 @@
         copyDisneyExtremeBaselineStripsSummary();
       });
 
+      document.getElementById('btnDisneyExtremeFactorsStrip')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineFactorsStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyFactorsStrip')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineFactorsStrip();
+      });
+
       document.getElementById('disneyExtremeStripsSummary')?.addEventListener('dblclick', (ev) => {
         ev.preventDefault();
         copyDisneyExtremeBaselineStripsSummary();
@@ -4523,6 +4602,14 @@
 
       document.getElementById('disneyExtremeDirty')?.addEventListener('dblclick', () => {
         copyDisneyExtremeBaselineDirtyStrip();
+      });
+
+      document.getElementById('disneyExtremeFactorsStrip')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineFactorsStrip();
+      });
+
+      document.getElementById('disneyExtremeFactorsStrip')?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBaselineFactorsStrip();
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -6524,6 +6611,16 @@
         if (resolved.action === 'copyBaselineStripsSummary') {
           ev.preventDefault();
           copyDisneyExtremeBaselineStripsSummary();
+          return;
+        }
+        if (resolved.action === 'showBaselineFactorsStrip') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineFactorsStrip();
+          return;
+        }
+        if (resolved.action === 'copyBaselineFactorsStrip') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineFactorsStrip();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -9953,6 +10050,14 @@
               mouthFactor: extremeSnap.mouthFactor,
             });
         }
+        syncDisneyExtremeFactorsStripUi({
+          enabled: disneyExtremeOn,
+          shapeFactor: extremeSnap.shapeFactor,
+          bodyOn,
+          bodyFactor: extremeSnap.bodyFactor,
+          eyeFactor: extremeSnap.eyeFactor,
+          mouthFactor: extremeSnap.mouthFactor,
+        });
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);

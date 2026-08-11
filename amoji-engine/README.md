@@ -392,7 +392,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 379 | Extreme Shift+Insert replace pin | Done |
 | Phase 380 | Extreme Alt+Insert jump pin | Done |
 | Phase 381 | Extreme strips summary dbl-click copy | Done |
-| Phase 382+ | Further production polish… | Specced |
+| Phase 382 | Extreme ⇧Alt+Insert jump pin summary | Done |
+| Phase 383 | Extreme factors strip live label | Done |
+| Phase 384 | Extreme F2 factors strip flash | Done |
+| Phase 385 | Extreme Shift+F2 copy factors strip | Done |
+| Phase 386+ | Further production polish… | Specced |
 
 ## Quick start
 

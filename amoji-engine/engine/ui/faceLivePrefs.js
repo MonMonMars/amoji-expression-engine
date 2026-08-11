@@ -222,7 +222,10 @@ export function disneyExtremeUiDefaults() {
  * - `Insert` → pin current Extreme factors as baseline
  * - `Shift+Insert` → replace Extreme pinned baseline
  * - `Alt+Insert` → jump / restore Extreme pinned baseline
+ * - `Shift+Alt+Insert` → jump Extreme pin then flash pin summary
  * - `Tab` → focus / scroll Extreme panel into view (Shift+Tab left to browser)
+ * - `F2` → flash Extreme factors strip
+ * - `Shift+F2` → copy Extreme factors strip
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -451,7 +454,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except ... / Alt+Enter hud bundle / Alt+Insert jump pin.
+  // except ... / Alt+Enter hud bundle / Alt+Insert jump pin (⇧Alt+Insert summary).
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-8]$/.test(lower);
@@ -829,6 +832,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'clearActiveChipsKey') {
       return { ok: true, action: 'clearStatusHold' };
     }
+    if (entry.id === 'pinBaselineInsert' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'jumpBaselinePinSummary' };
+    }
     if (entry.id === 'pinBaselineInsert' && ev.altKey) {
       return { ok: true, action: 'jumpBaselinePin' };
     }
@@ -842,6 +848,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       // Preserve Shift+Tab browser focus traversal.
       if (ev.shiftKey) return { ok: false, reason: 'modifier' };
       return { ok: true, action: 'focusExtremePanel' };
+    }
+    if (entry.id === 'showBaselineFactorsStrip' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineFactorsStrip' };
     }
     return { ok: true, action: entry.id };
   }

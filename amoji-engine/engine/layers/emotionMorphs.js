@@ -280,6 +280,23 @@ export function formatDisneyExtremeFactorBarsLabel(opts = {}) {
 }
 
 /**
+ * Live factors strip label (always `factors · …` prefixed).
+ * @param {{
+ *   enabled?: boolean,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   bodyOn?: boolean,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineFactorsStripLabel(opts = {}) {
+  const core = formatDisneyExtremeFactorBarsLabel(opts);
+  return core.startsWith('factors ·') ? core : `factors · ${core}`;
+}
+
+/**
  * Clipboard bundle: neck label + factors label (multiline).
  * @param {{
  *   enabled?: boolean,
@@ -804,6 +821,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   },
   { id: 'replaceBaselinePinInsert', help: 'Shift+Insert replace pin', kind: 'note' },
   { id: 'jumpBaselinePinInsert', help: 'Alt+Insert jump pin', kind: 'note' },
+  { id: 'jumpBaselinePinInsertSummary', help: '⇧Alt+Insert jump pin summary', kind: 'note' },
   {
     id: 'focusExtremePanelTab',
     keys: ['Tab'],
@@ -811,6 +829,14 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'stripsSummaryCopy', help: 'strips summary · dbl-click copy', kind: 'note' },
+  {
+    id: 'showBaselineFactorsStrip',
+    keys: ['F2'],
+    help: 'F2 factors strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineFactorsStrip', help: 'Shift+F2 copy factors', kind: 'note' },
+  { id: 'factorsStrip', help: 'factors strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
