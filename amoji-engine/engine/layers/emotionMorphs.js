@@ -564,6 +564,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
+  { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1194,6 +1195,28 @@ export function formatDisneyExtremeBaselineSummary(opts = {}) {
   const fp =
     typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
   return `baseline · ${state}${fp} · D diff · ⇧D restore · K clear`;
+}
+
+/**
+ * One-line dry-run preview for an Extreme snapshot (drop Meta / paste check).
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|object|null|undefined} snapOrOpts
+ * @returns {string}
+ */
+export function formatDisneyExtremeSnapshotPreviewLabel(snapOrOpts = {}) {
+  if (!snapOrOpts || typeof snapOrOpts !== 'object') {
+    return 'preview · invalid';
+  }
+  const snap =
+    typeof snapOrOpts.shapeInt === 'number' &&
+    typeof snapOrOpts.ease === 'number'
+      ? snapOrOpts
+      : buildDisneyExtremeLiveSnapshot(snapOrOpts);
+  const fp = disneyExtremeSnapshotFingerprintShort(snap);
+  if (!snap.enabled) return `preview · off · fp ${fp}`;
+  const body = snap.bodyOn
+    ? `body×${Number(snap.bodyFactor).toFixed(2)}`
+    : 'body off';
+  return `preview · shape×${Number(snap.shapeFactor).toFixed(2)} · ${body} · eye×${Number(snap.eyeFactor).toFixed(2)} · mouth×${Number(snap.mouthFactor).toFixed(2)} · fp ${fp}`;
 }
 
 export const DISNEY_EXTREME_BASELINE_STORAGE_KEY =

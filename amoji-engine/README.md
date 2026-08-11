@@ -200,7 +200,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 187 | Extreme Shift+C copy snapshot diff | Done |
 | Phase 188 | Extreme Face Live copy diff wiring | Done |
 | Phase 189 | Extreme summary includes baseline dirty | Done |
-| Phase 190+ | Further production polish… | Specced |
+| Phase 190 | Extreme snapshot preview label | Done |
+| Phase 191 | Extreme drop JSON catalog note | Done |
+| Phase 192 | Extreme Face Live drop apply wiring | Done |
+| Phase 193 | Extreme Face Live Meta drop preview | Done |
+| Phase 194+ | Further production polish… | Specced |
 
 ## Quick start
 

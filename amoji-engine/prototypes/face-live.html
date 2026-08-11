@@ -503,6 +503,21 @@
         border-color: color-mix(in oklab, var(--accent) 55%, var(--line));
         color: var(--accent);
       }
+      #disneyExtremePanel {
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 2px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      #disneyExtremePanel.dragover {
+        border-color: var(--accent);
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 45%, transparent);
+      }
+      #disneyExtremeDropHint {
+        margin-top: 6px;
+        opacity: 0.7;
+        font-size: 0.85em;
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -683,11 +698,11 @@
         <div class="status" id="tierHint">sculpt: medium band</div>
       </div>
 
-      <div class="group">
+      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot JSON · Meta = preview">
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>⇧C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>⇧J</kbd> <kbd>D</kbd> <kbd>⇧D</kbd> <kbd>K</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -788,6 +803,9 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
+        <div class="status" id="disneyExtremeDropHint">
+          Drop snapshot JSON · Meta preview
+        </div>
       </div>
 
       <div class="group">
@@ -1158,6 +1176,7 @@
         isDisneyExtremeSnapshotDirty,
         formatDisneyExtremeDirtyHudBit,
         formatDisneyExtremeBaselineSummary,
+        formatDisneyExtremeSnapshotPreviewLabel,
         saveDisneyExtremeBaseline,
         loadDisneyExtremeBaseline,
         clearDisneyExtremeBaselineStorage,
@@ -1901,6 +1920,66 @@
         flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
         return true;
       }
+
+      async function readDisneyExtremeDropText(dataTransfer) {
+        if (!dataTransfer) return '';
+        const file = dataTransfer.files?.[0];
+        if (file) {
+          try {
+            return await file.text();
+          } catch {
+            return '';
+          }
+        }
+        return (
+          dataTransfer.getData('text/plain') ||
+          dataTransfer.getData('text') ||
+          ''
+        );
+      }
+
+      async function handleDisneyExtremeSnapshotDrop(ev, opts = {}) {
+        const preview = !!opts.preview || !!ev.metaKey;
+        const text = await readDisneyExtremeDropText(ev.dataTransfer);
+        const parsed = parseDisneyExtremeSnapshot(text);
+        if (!parsed.ok) {
+          flashDisneyExtremeStatus(`drop failed · ${parsed.error}`);
+          return false;
+        }
+        if (preview) {
+          flashDisneyExtremeStatus(
+            formatDisneyExtremeSnapshotPreviewLabel(parsed.snap),
+          );
+          return true;
+        }
+        applyDisneyExtremeSnapshot(parsed.snap);
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
+        syncDisneyExtremePrefsSummary();
+        const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
+        flashDisneyExtremeStatus(`dropped · snapshot JSON · fp ${fp}`);
+        return true;
+      }
+
+      const disneyExtremePanel = document.getElementById('disneyExtremePanel');
+      disneyExtremePanel?.addEventListener('dragenter', (ev) => {
+        ev.preventDefault();
+        disneyExtremePanel.classList.add('dragover');
+      });
+      disneyExtremePanel?.addEventListener('dragover', (ev) => {
+        ev.preventDefault();
+        if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'copy';
+        disneyExtremePanel.classList.add('dragover');
+      });
+      disneyExtremePanel?.addEventListener('dragleave', (ev) => {
+        if (!disneyExtremePanel.contains(ev.relatedTarget)) {
+          disneyExtremePanel.classList.remove('dragover');
+        }
+      });
+      disneyExtremePanel?.addEventListener('drop', async (ev) => {
+        ev.preventDefault();
+        disneyExtremePanel.classList.remove('dragover');
+        await handleDisneyExtremeSnapshotDrop(ev);
+      });
 
       function flashDisneyExtremeSnapshotDiff() {
         const current = disneyExtremeSnapshot();

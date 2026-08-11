@@ -294,6 +294,7 @@ export {
   formatDisneyExtremeDirtyHudBit,
   captureDisneyExtremeBaseline,
   formatDisneyExtremeBaselineSummary,
+  formatDisneyExtremeSnapshotPreviewLabel,
   saveDisneyExtremeBaseline,
   loadDisneyExtremeBaseline,
   clearDisneyExtremeBaselineStorage,
