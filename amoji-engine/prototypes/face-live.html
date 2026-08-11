@@ -689,6 +689,13 @@
           <option value="7d">Last 7 days</option>
         </select>
         <div class="row" style="margin-top:4px;">
+          <input id="prefsAuditViewName" class="ctl" type="text" placeholder="View name" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+          <button type="button" id="btnPrefsAuditSaveView">Save view</button>
+        </div>
+        <select id="prefsAuditSavedViews" class="ctl" style="margin-top:4px;">
+          <option value="">Saved views…</option>
+        </select>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
         </div>
@@ -786,8 +793,10 @@
         buildHealthProbeCopyPayload,
         describeHealthProbeToast,
         resolveProbeToastAction,
+        resolveProbeToastShortcut,
       } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
+      import { createAuditSavedViews } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -956,12 +965,14 @@
       let compoundCrossfadeT0 = 0;
       const gatewayHealthHistory = createGatewayHealthHistory();
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
+      const auditSavedViews = createAuditSavedViews({ memory: false });
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
       let prefsAuditRange = 'all';
       let lastProbeDetail = null;
       let probeToastTimer = null;
+      let probeToastVisible = false;
       function refreshPrefsAuditUi() {
         const fmt = prefsShareAudit.format({
           limit: 6,
@@ -975,9 +986,43 @@
         if (statusEl) statusEl.textContent = fmt.text;
         if (logEl) logEl.textContent = fmt.lines.length ? fmt.lines.join('\n') : '—';
       }
+      function refreshAuditSavedViewsUi(selectedId = '') {
+        const sel = document.getElementById('prefsAuditSavedViews');
+        if (!sel) return;
+        const current = selectedId || sel.value || '';
+        sel.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Saved views…';
+        sel.appendChild(placeholder);
+        for (const v of auditSavedViews.views) {
+          const opt = document.createElement('option');
+          opt.value = v.id;
+          opt.textContent = v.name;
+          if (v.id === current) opt.selected = true;
+          sel.appendChild(opt);
+        }
+      }
+      function applyAuditView(view) {
+        if (!view) return;
+        prefsAuditFilter = view.action || 'all';
+        prefsAuditQuery = view.query || '';
+        prefsAuditRegex = !!view.regex;
+        prefsAuditRange = view.rangePreset || 'all';
+        const filterEl = document.getElementById('prefsAuditFilter');
+        const searchEl = document.getElementById('prefsAuditSearch');
+        const regexEl = document.getElementById('prefsAuditRegex');
+        const rangeEl = document.getElementById('prefsAuditRange');
+        if (filterEl) filterEl.value = prefsAuditFilter;
+        if (searchEl) searchEl.value = prefsAuditQuery;
+        if (regexEl) regexEl.checked = prefsAuditRegex;
+        if (rangeEl) rangeEl.value = prefsAuditRange;
+        refreshPrefsAuditUi();
+      }
       function hideProbeToast() {
         const el = document.getElementById('probeDetailToast');
         el?.classList.remove('show');
+        probeToastVisible = false;
         if (probeToastTimer) {
           clearTimeout(probeToastTimer);
           probeToastTimer = null;
@@ -991,23 +1036,29 @@
         const detailEl = document.getElementById('probeToastDetail');
         const actionsEl = document.getElementById('probeToastActions');
         if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
-        if (detailEl) detailEl.textContent = toast.detail || '';
+        if (detailEl) {
+          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss`;
+        }
         if (actionsEl) {
           actionsEl.innerHTML = '';
           for (const a of toast.actions || []) {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.action = a.id;
-            btn.textContent = a.label;
+            btn.textContent = a.shortcut
+              ? `${a.label} (${a.shortcut === 'Escape' ? 'esc' : a.shortcut})`
+              : a.label;
             actionsEl.appendChild(btn);
           }
         }
         el.classList.remove('ok', 'bad', 'warn');
         if (toast.tone) el.classList.add(toast.tone);
         el.classList.add('show');
+        probeToastVisible = true;
         if (probeToastTimer) clearTimeout(probeToastTimer);
         probeToastTimer = setTimeout(() => {
           el.classList.remove('show');
+          probeToastVisible = false;
         }, toast.dismissMs || 3800);
       }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
@@ -1031,14 +1082,16 @@
           reason !== 'chassis_pick' &&
           reason !== 'pack_pick' &&
           reason !== 'remap_pick' &&
-          reason !== 'surface_pick'
+          reason !== 'surface_pick' &&
+          reason !== 'persona_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
           reason === 'chassis_pick' ||
           reason === 'pack_pick' ||
           reason === 'remap_pick' ||
-          reason === 'surface_pick'
+          reason === 'surface_pick' ||
+          reason === 'persona_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1808,6 +1861,7 @@
       });
 
       document.getElementById('personaSel').addEventListener('change', (e) => {
+        cancelActiveCompoundLifecycle('persona_pick');
         idle.setPersona(e.target.value);
         latency.personaId = e.target.value;
         smileCtl.setPersona(e.target.value);
@@ -2130,13 +2184,11 @@
         document.getElementById('btnProbeCopy')?.addEventListener('click', () => {
           copyProbeDetail();
         });
-        document.getElementById('probeToastActions')?.addEventListener('click', async (ev) => {
-          const btn = ev.target.closest('button[data-action]');
-          if (!btn) return;
-          const resolved = resolveProbeToastAction(btn.dataset.action, {
+        async function runProbeToastAction(actionId) {
+          const resolved = resolveProbeToastAction(actionId, {
             detail: lastProbeDetail,
           });
-          if (!resolved.ok) return;
+          if (!resolved.ok) return resolved;
           if (resolved.action === 'copy' && resolved.copy?.ok) {
             try {
               if (navigator.clipboard?.writeText) {
@@ -2157,9 +2209,27 @@
           if (resolved.reprobe) {
             hideProbeToast();
             refreshGatewayHealth();
-            return;
+            return resolved;
           }
           if (resolved.dismiss) hideProbeToast();
+          return resolved;
+        }
+        document.getElementById('probeToastActions')?.addEventListener('click', (ev) => {
+          const btn = ev.target.closest('button[data-action]');
+          if (!btn) return;
+          runProbeToastAction(btn.dataset.action);
+        });
+        document.addEventListener('keydown', (ev) => {
+          if (!probeToastVisible) return;
+          const tag = (ev.target && ev.target.tagName) || '';
+          const typing =
+            tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || ev.target?.isContentEditable;
+          // Escape still dismisses while typing; c/r stay unbound in fields.
+          if (typing && ev.key !== 'Escape') return;
+          const shortcut = resolveProbeToastShortcut(ev, { visible: true });
+          if (!shortcut.ok) return;
+          ev.preventDefault();
+          runProbeToastAction(shortcut.action);
         });
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
@@ -2395,6 +2465,29 @@
           prefsAuditRange = ev.target.value || 'all';
           refreshPrefsAuditUi();
         });
+        document.getElementById('btnPrefsAuditSaveView')?.addEventListener('click', () => {
+          const nameEl = document.getElementById('prefsAuditViewName');
+          const name = nameEl?.value?.trim() || `View ${auditSavedViews.size + 1}`;
+          const saved = auditSavedViews.save(
+            {
+              action: prefsAuditFilter,
+              query: prefsAuditQuery,
+              regex: prefsAuditRegex,
+              rangePreset: prefsAuditRange,
+            },
+            { name },
+          );
+          refreshAuditSavedViewsUi(saved.view?.id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · saved view “${saved.view?.name}”`;
+        });
+        document.getElementById('prefsAuditSavedViews')?.addEventListener('change', (ev) => {
+          const id = ev.target.value;
+          if (!id) return;
+          const got = auditSavedViews.get(id);
+          if (got.ok && got.view) applyAuditView(got.view);
+        });
+        refreshAuditSavedViewsUi();
         refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];

@@ -395,11 +395,68 @@ export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
 
 /** Default toast action ids for Face Live probe toast. */
 export const PROBE_TOAST_ACTIONS = [
-  { id: 'copy', label: 'Copy' },
-  { id: 'reprobe', label: 'Re-probe' },
-  { id: 'dismiss', label: 'Dismiss' },
+  { id: 'copy', label: 'Copy', shortcut: 'c' },
+  { id: 'reprobe', label: 'Re-probe', shortcut: 'r' },
+  { id: 'dismiss', label: 'Dismiss', shortcut: 'Escape' },
 ];
 
+/**
+ * Map a keyboard event to a probe toast action id.
+ * @param {{ key?: string, code?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean }|string|null} ev
+ * @param {{ visible?: boolean }} [opts]
+ */
+export function resolveProbeToastShortcut(ev, opts = {}) {
+  if (opts.visible === false) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_shortcut',
+        ok: false,
+        reason: 'toast_hidden',
+        action: null,
+      },
+      {},
+    );
+  }
+  const key = typeof ev === 'string' ? ev : ev?.key || '';
+  const code = typeof ev === 'object' && ev ? ev.code || '' : '';
+  if (typeof ev === 'object' && ev && (ev.metaKey || ev.ctrlKey || ev.altKey)) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_shortcut',
+        ok: false,
+        reason: 'modifier',
+        action: null,
+      },
+      {},
+    );
+  }
+  const k = String(key);
+  let action = null;
+  if (k === 'Escape' || code === 'Escape') action = 'dismiss';
+  else if (k === 'c' || k === 'C') action = 'copy';
+  else if (k === 'r' || k === 'R') action = 'reprobe';
+  if (!action) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_shortcut',
+        ok: false,
+        reason: 'unbound',
+        action: null,
+        key: k || null,
+      },
+      {},
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_shortcut',
+      ok: true,
+      action,
+      key: k || null,
+    },
+    {},
+  );
+}
 /**
  * Build a toast payload when a sparkline probe is inspected.
  * @param {{ ok?: boolean, lines?: string[], text?: string, sample?: object }|null} detail
