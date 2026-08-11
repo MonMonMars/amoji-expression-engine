@@ -702,7 +702,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>⇧C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>⇧J</kbd> <kbd>D</kbd> <kbd>⇧D</kbd> <kbd>K</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>⇧C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>⇧J</kbd> <kbd>D</kbd> <kbd>⇧D</kbd> <kbd>K</kbd> <kbd>U</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -777,6 +777,7 @@
           <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
+          <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1177,6 +1178,8 @@
         formatDisneyExtremeDirtyHudBit,
         formatDisneyExtremeBaselineSummary,
         formatDisneyExtremeSnapshotPreviewLabel,
+        pushDisneyExtremeBaselineHistory,
+        popDisneyExtremeBaselineHistory,
         saveDisneyExtremeBaseline,
         loadDisneyExtremeBaseline,
         clearDisneyExtremeBaselineStorage,
@@ -1485,6 +1488,20 @@
       let lastExtremeSparkFp = '';
       let lastExtremeBaselineSnap = loadDisneyExtremeBaseline();
       let lastExtremeDirty = false;
+      let extremeBaselineHistory = [];
+
+      function setDisneyExtremeBaseline(snap) {
+        if (lastExtremeBaselineSnap) {
+          extremeBaselineHistory = pushDisneyExtremeBaselineHistory(
+            extremeBaselineHistory,
+            lastExtremeBaselineSnap,
+          );
+        }
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        return lastExtremeBaselineSnap;
+      }
 
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
@@ -1757,6 +1774,10 @@
         clearDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
+        undoDisneyExtremeBaseline();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1855,9 +1876,7 @@
           ok = false;
         }
         if (ok) {
-          lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
-          lastExtremeDirty = false;
-          syncDisneyExtremePrefsSummary();
+          setDisneyExtremeBaseline(snap);
         }
         flashDisneyExtremeStatus(
           ok
@@ -1916,9 +1935,7 @@
           return false;
         }
         applyDisneyExtremeSnapshot(parsed.snap);
-        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
-        lastExtremeDirty = false;
-        syncDisneyExtremePrefsSummary();
+        setDisneyExtremeBaseline(parsed.snap);
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
         return true;
@@ -1956,9 +1973,7 @@
           return true;
         }
         applyDisneyExtremeSnapshot(parsed.snap);
-        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(parsed.snap).snap;
-        lastExtremeDirty = false;
-        syncDisneyExtremePrefsSummary();
+        setDisneyExtremeBaseline(parsed.snap);
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`dropped · snapshot JSON · fp ${fp}`);
         return true;
@@ -2055,10 +2070,27 @@
           return false;
         }
         lastExtremeBaselineSnap = null;
+        extremeBaselineHistory = [];
         clearDisneyExtremeBaselineStorage();
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus('cleared · baseline');
+        return true;
+      }
+
+      function undoDisneyExtremeBaseline() {
+        const popped = popDisneyExtremeBaselineHistory(extremeBaselineHistory);
+        extremeBaselineHistory = popped.history;
+        if (!popped.snap) {
+          flashDisneyExtremeStatus('undo · no history');
+          return false;
+        }
+        applyDisneyExtremeSnapshot(popped.snap);
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(popped.snap).snap;
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        const fp = disneyExtremeSnapshotFingerprintShort(popped.snap);
+        flashDisneyExtremeStatus(`undone · baseline · fp ${fp}`);
         return true;
       }
 
@@ -2337,6 +2369,11 @@
         if (resolved.action === 'clearBaseline') {
           ev.preventDefault();
           clearDisneyExtremeBaseline();
+          return;
+        }
+        if (resolved.action === 'undoBaseline') {
+          ev.preventDefault();
+          undoDisneyExtremeBaseline();
           return;
         }
         if (resolved.action === 'copySummary') {

@@ -208,7 +208,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 195 | Extreme Face Live dirty×N pill wiring | Done |
 | Phase 196 | Extreme dbl-click drop hint paste | Done |
 | Phase 197 | Extreme dirty edge flash | Done |
-| Phase 198+ | Further production polish… | Specced |
+| Phase 198 | Extreme baseline history helpers | Done |
+| Phase 199 | Extreme U undo baseline | Done |
+| Phase 200 | Extreme Face Live baseline history push | Done |
+| Phase 201 | Extreme Face Live undo baseline wiring | Done |
+| Phase 202+ | Further production polish… | Specced |
 
 ## Quick start
 

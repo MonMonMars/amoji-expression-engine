@@ -60,7 +60,8 @@ describe('Phase 185 Extreme baseline session storage', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('loadDisneyExtremeBaseline()');
     expect(src).toContain('saveDisneyExtremeBaseline(snap)');
-    expect(src).toContain('saveDisneyExtremeBaseline(parsed.snap)');
+    expect(src).toContain('setDisneyExtremeBaseline(snap)');
+    expect(src).toContain('setDisneyExtremeBaseline(parsed.snap)');
     expect(src).toContain('clearDisneyExtremeBaselineStorage()');
   });
 });

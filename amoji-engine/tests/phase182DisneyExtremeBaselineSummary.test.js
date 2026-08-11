@@ -5,7 +5,7 @@ import * as engine from '../engine/index.js';
 describe('Phase 182 Extreme baseline summary', () => {
   it('formats none / clean / dirty tooltips', () => {
     expect(formatDisneyExtremeBaselineSummary({})).toBe(
-      'baseline · none · D diff · ⇧D restore · K clear',
+      'baseline · none · D diff · ⇧D restore · K clear · U undo',
     );
     expect(
       formatDisneyExtremeBaselineSummary({
@@ -13,7 +13,9 @@ describe('Phase 182 Extreme baseline summary', () => {
         dirty: false,
         fp: 'abcd1234',
       }),
-    ).toBe('baseline · clean · fp abcd1234 · D diff · ⇧D restore · K clear');
+    ).toBe(
+      'baseline · clean · fp abcd1234 · D diff · ⇧D restore · K clear · U undo',
+    );
     expect(
       formatDisneyExtremeBaselineSummary({
         hasBaseline: true,

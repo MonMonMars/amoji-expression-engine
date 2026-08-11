@@ -14,7 +14,8 @@ describe('Phase 173 Extreme Face Live diff baseline wiring', () => {
     expect(src).toContain('function flashDisneyExtremeSnapshotDiff()');
     expect(src).toContain("resolved.action === 'showSnapshotDiff'");
     expect(src).toContain('saveDisneyExtremeBaseline(snap)');
-    expect(src).toContain('saveDisneyExtremeBaseline(parsed.snap)');
+    expect(src).toContain('setDisneyExtremeBaseline(parsed.snap)');
+    expect(src).toContain('setDisneyExtremeBaseline(snap)');
     expect(src).toContain('diff · no baseline');
     expect(src).toContain('formatDisneyExtremeSnapshotDiffLabel');
     expect(src).toContain('<kbd>D</kbd>');

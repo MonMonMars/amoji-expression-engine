@@ -564,6 +564,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
+  { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1189,6 +1190,47 @@ export function captureDisneyExtremeBaseline(snapOrOpts) {
   });
 }
 
+export const DISNEY_EXTREME_BASELINE_HISTORY_LIMIT = 8;
+
+/**
+ * Push a captured baseline onto a history stack (skips duplicate of tip).
+ * @param {object[]|null|undefined} history
+ * @param {object|null|undefined} snap
+ * @param {{ limit?: number }} [opts]
+ * @returns {object[]}
+ */
+export function pushDisneyExtremeBaselineHistory(history, snap, opts = {}) {
+  const limit = Math.max(
+    1,
+    Math.floor(Number(opts.limit) || DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+  );
+  const captured = captureDisneyExtremeBaseline(snap);
+  const next = Array.isArray(history) ? history.slice() : [];
+  if (!captured) return next;
+  const tip = next[next.length - 1];
+  if (
+    tip &&
+    disneyExtremeSnapshotFingerprint(tip) ===
+      disneyExtremeSnapshotFingerprint(captured)
+  ) {
+    return next;
+  }
+  next.push(captured);
+  while (next.length > limit) next.shift();
+  return next;
+}
+
+/**
+ * Pop the most recent baseline from history.
+ * @param {object[]|null|undefined} history
+ * @returns {{ history: object[], snap: object|null }}
+ */
+export function popDisneyExtremeBaselineHistory(history) {
+  const next = Array.isArray(history) ? history.slice() : [];
+  const snap = next.length ? next.pop() : null;
+  return { history: next, snap: snap || null };
+}
+
 /**
  * Tooltip / status summary for Extreme baseline dirty tracking.
  * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string }} [opts]
@@ -1196,12 +1238,12 @@ export function captureDisneyExtremeBaseline(snapOrOpts) {
  */
 export function formatDisneyExtremeBaselineSummary(opts = {}) {
   if (!opts.hasBaseline) {
-    return 'baseline · none · D diff · ⇧D restore · K clear';
+    return 'baseline · none · D diff · ⇧D restore · K clear · U undo';
   }
   const state = opts.dirty ? 'dirty' : 'clean';
   const fp =
     typeof opts.fp === 'string' && opts.fp ? ` · fp ${opts.fp}` : '';
-  return `baseline · ${state}${fp} · D diff · ⇧D restore · K clear`;
+  return `baseline · ${state}${fp} · D diff · ⇧D restore · K clear · U undo`;
 }
 
 /**
