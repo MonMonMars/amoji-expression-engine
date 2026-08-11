@@ -89,7 +89,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 76 | Combined pulse HUD engine helper · skip breakdown helper · TTS drag-start cancel | Done |
 | Phase 77 | Pulse bits engine helper · toast hash dry-run skip test · TTS drag-end cancel | Done |
 | Phase 78 | TTS drag-leave cancel | Done |
-| Phase 79+ | Further production polish… | Specced |
+| Phase 79 | TTS drag cancel allowlist coverage test | Done |
+| Phase 80+ | Further production polish… | Specced |
 
 ## Quick start
 
