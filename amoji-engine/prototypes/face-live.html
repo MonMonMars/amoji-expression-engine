@@ -454,10 +454,15 @@
         </div>
         <div class="row">
           <button type="button" id="btnTtsFixture">Load Step fixture</button>
+          <button type="button" id="btnTtsSynth">Mock synthesize</button>
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:8px;">
           <input id="ttsAudioSync" type="checkbox" checked />
-          <span style="font-size:0.8rem;color:var(--muted)">Audio sync (demo tone)</span>
+          <span style="font-size:0.8rem;color:var(--muted)">Audio sync (fixture WAV / demo tone)</span>
+        </label>
+        <label class="file-btn" style="margin-top:8px;display:inline-block;">
+          Attach audio file
+          <input type="file" id="ttsAudioFile" accept="audio/*" style="display:none" />
         </label>
         <div class="status" id="ttsStatus">tts idle</div>
       </div>
@@ -557,6 +562,11 @@
       } from '/engine/export/chassisCalibrate.js';
       import { SpeechPlayer } from '/engine/tts/speechPlayer.js';
       import { mouthChannelsToMorphWeights } from '/engine/tts/mouthMorphs.js';
+      import {
+        MockTtsProvider,
+        playWithProvider,
+      } from '/engine/tts/ttsProvider.js';
+      import { estimatePhonemesFromText } from '/engine/tts/estimatePhonemes.js';
       import {
         texturePackUrls,
         applyTexturePack,
@@ -1319,29 +1329,80 @@
         try {
           const res = await fetch('/data/tts/fixtures/sample-payloads.json');
           const fixtures = await res.json();
+          ttsTextEl.value = fixtures.stepAudioEditX.text;
           speechPlayer.emotion = emotion;
           speechPlayer.intensity = intensity;
-          const loaded = speechPlayer.loadTts(fixtures.stepAudioEditX, {
-            demoTone: !!ttsAudioSync?.checked,
+          const provider = new MockTtsProvider({
+            fixture: 'stepAudioEditX',
+            audioUrl: fixtures.stepAudioEditX.audioUrl || '/data/tts/fixtures/hello-mama.wav',
           });
-          ttsTextEl.value = fixtures.stepAudioEditX.text;
-          if (!loaded.loaded) {
-            setTtsStatus(loaded.error || 'fixture failed', 'bad');
+          const played = await playWithProvider(
+            speechPlayer,
+            provider,
+            { text: fixtures.stepAudioEditX.text, emotion },
+            { demoToneFallback: !!ttsAudioSync?.checked },
+          );
+          if (!played.ok) {
+            setTtsStatus(played.error || played.loaded?.error || 'fixture failed', 'bad');
             return;
           }
-          if (ttsAudioSync?.checked && !speechPlayer.audio) {
-            try {
-              speechPlayer.attachDemoTone();
-            } catch {
-              /* ignore */
-            }
+          gestures.setSpeaking(true, 0.7);
+          setTtsStatus(
+            `Step · ${played.syncMode || speechPlayer.syncMode} · ${Number(played.duration || 0).toFixed(2)}s${
+              played.audioUrl ? ' · wav' : ''
+            }`,
+            'ok',
+          );
+        } catch (err) {
+          setTtsStatus(String(err.message || err), 'bad');
+        }
+      });
+      document.getElementById('btnTtsSynth').addEventListener('click', async () => {
+        try {
+          speechPlayer.emotion = emotion;
+          speechPlayer.intensity = intensity;
+          const provider = new MockTtsProvider({ preferAudioUrl: true });
+          const played = await playWithProvider(
+            speechPlayer,
+            provider,
+            { text: ttsTextEl.value || 'Hello, mama.', emotion },
+            { demoToneFallback: !!ttsAudioSync?.checked },
+          );
+          if (!played.ok) {
+            setTtsStatus(played.error || played.loaded?.error || 'synth failed', 'bad');
+            return;
+          }
+          gestures.setSpeaking(true, 0.7);
+          setTtsStatus(
+            `mock · ${played.provider || 'mock'} · ${played.syncMode} · ${Number(played.duration || 0).toFixed(2)}s`,
+            'ok',
+          );
+        } catch (err) {
+          setTtsStatus(String(err.message || err), 'bad');
+        }
+      });
+      document.getElementById('ttsAudioFile').addEventListener('change', async (ev) => {
+        const file = ev.target.files?.[0];
+        if (!file) return;
+        try {
+          const url = URL.createObjectURL(file);
+          speechPlayer.emotion = emotion;
+          speechPlayer.intensity = intensity;
+          const loaded = speechPlayer.loadTts(
+            {
+              text: ttsTextEl.value || file.name,
+              phonemes: estimatePhonemesFromText(ttsTextEl.value || 'Hello mama'),
+              audioUrl: url,
+            },
+            { demoTone: false },
+          );
+          if (!loaded.loaded) {
+            setTtsStatus(loaded.error || 'file failed', 'bad');
+            return;
           }
           gestures.setSpeaking(true, 0.7);
           speechPlayer.play();
-          setTtsStatus(
-            `Step · ${loaded.syncMode || speechPlayer.syncMode} · ${loaded.duration.toFixed(2)}s`,
-            'ok',
-          );
+          setTtsStatus(`file · ${file.name} · ${loaded.duration.toFixed(2)}s`, 'ok');
         } catch (err) {
           setTtsStatus(String(err.message || err), 'bad');
         }

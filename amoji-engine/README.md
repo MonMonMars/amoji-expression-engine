@@ -30,7 +30,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 17 | Production TTS wiring (adapter + SpeechPlayer) | Done |
 | Phase 18 | YouTube/video capture ingest + face quality gates | Done |
 | Phase 19 | Audio sync + Actor Discretion UX depth | Done |
-| Phase 20+ | Polish, real TTS audio providers… | Specced |
+| Phase 20 | TTS provider client (mock/HTTP + audioUrl E2E) | Done |
+| Phase 21+ | Production polish… | Specced |
 
 ## Quick start
 

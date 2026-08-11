@@ -358,3 +358,11 @@ export {
 export { SpeechPlayer, frameAtTime } from './tts/speechPlayer.js';
 export { synthesizeTimingToneWav, timingToneObjectUrl } from './tts/demoAudio.js';
 export { mouthChannelsToMorphWeights } from './tts/mouthMorphs.js';
+export {
+  resolveAudioUrl,
+  MockTtsProvider,
+  HttpTtsProvider,
+  createTtsProvider,
+  playWithProvider,
+  DEFAULT_TTS_ENDPOINT,
+} from './tts/ttsProvider.js';

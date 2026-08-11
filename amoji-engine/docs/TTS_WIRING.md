@@ -27,7 +27,7 @@ Step Audio EditX / IndexTTS2 / Kokoro / words-only
 
 ```bash
 npm run face-live
-# TTS speak panel: Play TTS · Load Step fixture · Stop
+# TTS speak panel: Play TTS · Load Step fixture · Mock synthesize · Attach audio · Stop
 ```
 
 ## Code
@@ -45,4 +45,20 @@ Prefer real TTS phoneme timestamps. Estimation is a fallback for text-only demos
 ## Audio sync
 
 `SpeechPlayer.attachAudio(url)` or `attachDemoTone()` — mouth clock follows `audio.currentTime`.
-Face Live checkbox **Audio sync (demo tone)** generates a soft WAV matching take duration when no TTS `audioUrl` is present.
+Face Live checkbox **Audio sync** uses fixture WAV (`hello-mama.wav`) when present, else demo tone.
+
+## Provider client (E2E)
+
+```js
+import { MockTtsProvider, HttpTtsProvider, playWithProvider, SpeechPlayer } from './engine/index.js';
+
+const player = new SpeechPlayer({ emotion: 'happy' });
+const mock = new MockTtsProvider(); // phonemes + /data/tts/fixtures/hello-mama.wav
+await playWithProvider(player, mock, { text: 'Hello mama.', emotion: 'happy' });
+
+// Real service:
+const http = new HttpTtsProvider({ endpoint: 'https://your-tts/synthesize' });
+await playWithProvider(player, http, { text: '你好', emotion: 'happy' });
+```
+
+Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js`.

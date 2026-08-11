@@ -4,7 +4,7 @@
   "stepAudioEditX": {
     "provider": "step-audio-editx",
     "text": "Hello mama.",
-    "audioUrl": null,
+    "audioUrl": "/data/tts/fixtures/hello-mama.wav",
     "duration": 1.15,
     "phonemes": [
       { "ipa": "h", "start": 0.05, "end": 0.12 },

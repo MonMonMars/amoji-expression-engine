@@ -154,6 +154,7 @@ Amoji engine (ND “systemic emotion”)
 31. ~~**Production TTS wiring** (Step/Index/Kokoro adapter + SpeechPlayer)~~ ✓
 32. ~~**YouTube/video capture** (prep + MediaPipe batch + face quality gates)~~ ✓
 33. ~~**Audio sync + Layer D UX** (demo tone clock, auto improv, continuity HUD)~~ ✓
+34. ~~**TTS provider E2E** (Mock/HTTP synthesize → audioUrl → SpeechPlayer)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -185,4 +186,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: wire real TTS audioUrl providers end-to-end; production polish.
+Next code increment: production polish (Live Link soak, more easter eggs, chassis packs).
