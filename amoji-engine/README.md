@@ -43,7 +43,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 30 | Poll backoff · prefs QR/short-link · compound→emblem crossfade | Done |
 | Phase 31 | Poll jitter · deep-link landing toast · emblem hold/release | Done |
 | Phase 32 | Gateway SLA history · prefs link expiry/revoke · lifecycle cancel | Done |
-| Phase 33+ | Further production polish… | Specced |
+| Phase 33 | SLA sparkline · prefs share audit · cancel on emblem pick | Done |
+| Phase 34+ | Further production polish… | Specced |
 
 ## Quick start
 

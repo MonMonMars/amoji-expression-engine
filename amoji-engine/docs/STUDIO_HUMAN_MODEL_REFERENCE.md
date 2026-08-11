@@ -191,6 +191,9 @@ Amoji engine (ND “systemic emotion”)
 68. ~~**Gateway SLA chip history** (`createGatewayHealthHistory` · uptime/p50)~~ ✓
 69. ~~**Prefs link expiry / revoke** (`evaluatePrefsLinkExpiry` · Clear deep-link)~~ ✓
 70. ~~**Cancel compound lifecycle on emotion** (`cancelCompoundEmblemLifecycle`)~~ ✓
+71. ~~**SLA sparkline HUD** (`buildHealthSparklineSvg` · Face Live spark)~~ ✓
+72. ~~**Prefs share audit log** (`createPrefsShareAudit` · share/QR/revoke)~~ ✓
+73. ~~**Cancel compound on emblem pick** (manual emblem / Wave clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -222,4 +225,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (SLA sparkline HUD, prefs share audit log, compound cancel on emblem manual pick).
+Next code increment: further polish (sparkline click → probe detail, audit export JSON, compound cancel on finger preset pick).

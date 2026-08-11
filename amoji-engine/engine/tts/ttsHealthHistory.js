@@ -134,6 +134,113 @@ export function formatHealthSlaChip(latest, sla) {
 }
 
 /**
+ * Build sparkline points (0..1 normalized latency; ok flag) from samples.
+ * @param {object[]} samples
+ * @param {{ maxPoints?: number }} [opts]
+ */
+export function buildHealthSparklineSeries(samples, opts = {}) {
+  const maxPoints = Math.max(4, opts.maxPoints ?? 24);
+  const list = (Array.isArray(samples) ? samples : [])
+    .map((s) => normalizeHealthSample(s))
+    .filter((s) => s.status !== 'no_endpoint' && s.status !== 'empty')
+    .slice(-maxPoints);
+  const latencies = list
+    .map((s) => s.latencyMs)
+    .filter((n) => typeof n === 'number');
+  const maxLat = latencies.length ? Math.max(...latencies, 1) : 1;
+  const points = list.map((s, i) => {
+    const x = list.length <= 1 ? 0.5 : i / (list.length - 1);
+    const raw =
+      typeof s.latencyMs === 'number' ? s.latencyMs / maxLat : s.ok ? 0.25 : 0.85;
+    const y = Math.max(0, Math.min(1, raw));
+    return { x, y, ok: !!s.ok, latencyMs: s.latencyMs, at: s.at };
+  });
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_sparkline_series',
+      points,
+      count: points.length,
+      maxLatencyMs: latencies.length ? maxLat : null,
+    },
+    {},
+  );
+}
+
+/**
+ * Render an inline SVG sparkline for SLA HUD.
+ * @param {object[]} samples
+ * @param {{
+ *   width?: number,
+ *   height?: number,
+ *   maxPoints?: number,
+ *   strokeOk?: string,
+ *   strokeBad?: string,
+ *   fill?: string,
+ * }} [opts]
+ */
+export function buildHealthSparklineSvg(samples, opts = {}) {
+  const width = opts.width ?? 120;
+  const height = opts.height ?? 28;
+  const series = buildHealthSparklineSeries(samples, {
+    maxPoints: opts.maxPoints,
+  });
+  const pad = 2;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const strokeOk = opts.strokeOk || '#5ee0a8';
+  const strokeBad = opts.strokeBad || '#ff6b6b';
+  const fill = opts.fill || 'rgba(94,224,168,0.12)';
+
+  if (!series.points.length) {
+    const empty = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="gateway SLA sparkline empty"><rect width="100%" height="100%" fill="transparent"/><text x="${width / 2}" y="${height / 2 + 3}" text-anchor="middle" fill="#8fa3b5" font-size="9" font-family="sans-serif">—</text></svg>`;
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_sparkline',
+        svg: empty,
+        empty: true,
+        count: 0,
+      },
+      {},
+    );
+  }
+
+  const coords = series.points.map((p) => ({
+    x: pad + p.x * w,
+    y: pad + (1 - p.y) * h,
+    ok: p.ok,
+  }));
+  const poly = coords.map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+  const area = `${pad},${pad + h} ${poly} ${pad + w},${pad + h}`;
+  const segments = [];
+  for (let i = 1; i < coords.length; i++) {
+    const a = coords[i - 1];
+    const b = coords[i];
+    const ok = a.ok && b.ok;
+    segments.push(
+      `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${ok ? strokeOk : strokeBad}" stroke-width="1.6" stroke-linecap="round"/>`,
+    );
+  }
+  const dots = coords
+    .map(
+      (c) =>
+        `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="1.6" fill="${c.ok ? strokeOk : strokeBad}"/>`,
+    )
+    .join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="gateway SLA sparkline"><polygon points="${area}" fill="${fill}" stroke="none"/>${segments.join('')}${dots}</svg>`;
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_sparkline',
+      svg,
+      empty: false,
+      count: series.count,
+      maxLatencyMs: series.maxLatencyMs,
+      polyline: poly,
+    },
+    {},
+  );
+}
+
+/**
  * Create a mutable rolling history buffer.
  * @param {{ max?: number }} [opts]
  */
@@ -169,6 +276,9 @@ export function createGatewayHealthHistory(opts = {}) {
     formatChip(latest) {
       const sla = summarizeHealthHistory(samples);
       return formatHealthSlaChip(latest || sla.latest, sla);
+    },
+    sparkline(sparkOpts = {}) {
+      return buildHealthSparklineSvg(samples, sparkOpts);
     },
   };
 }

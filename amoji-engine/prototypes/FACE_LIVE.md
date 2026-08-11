@@ -58,9 +58,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
 - **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up · chin-rest · self-hug · fists (emblem / affect / adaptor sync)
-- **Prefs**: Face Live restores from `localStorage`; **Export prefs** / **Import prefs** JSON; **Copy share link** (`#flp=` short link with TTL stamp); **Show QR**; **Clear deep-link**; landing toast shows expiry / revoke hint
-- **TTS speak**: Mock / HTTP / gateway presets + **Probe gateway** health chip (auto-poll with backoff/jitter + **SLA history** uptime/p50)
-- **Compound emotions**: **crossfade → hold → release**; emotion pick **cancels** in-flight lifecycle
+- **Prefs**: Face Live restores from `localStorage`; **Export prefs** / **Import prefs** JSON; **Copy share link** (`#flp=` short link with TTL stamp); **Show QR**; **Clear deep-link**; landing toast shows expiry / revoke hint; **share audit log** (local)
+- **TTS speak**: Mock / HTTP / gateway presets + **Probe gateway** health chip (auto-poll with backoff/jitter + **SLA history** uptime/p50 + **sparkline**)
+- **Compound emotions**: **crossfade → hold → release**; emotion / **manual emblem** pick **cancels** in-flight lifecycle
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 

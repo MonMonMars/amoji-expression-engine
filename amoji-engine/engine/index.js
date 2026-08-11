@@ -470,6 +470,8 @@ export {
   normalizeHealthSample,
   summarizeHealthHistory,
   formatHealthSlaChip,
+  buildHealthSparklineSeries,
+  buildHealthSparklineSvg,
   createGatewayHealthHistory,
 } from './tts/ttsHealthHistory.js';
 export {
@@ -498,6 +500,13 @@ export {
   evaluatePrefsLinkExpiry,
   describePrefsLinkRevoke,
 } from './ui/prefsLinkExpiry.js';
+export {
+  PREFS_SHARE_AUDIT_MAX,
+  PREFS_SHARE_AUDIT_KEY,
+  normalizeShareAuditEntry,
+  formatShareAuditLog,
+  createPrefsShareAudit,
+} from './ui/prefsShareAudit.js';
 export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,

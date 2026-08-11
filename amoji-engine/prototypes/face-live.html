@@ -161,6 +161,12 @@
       .status.ok { color: var(--accent); }
       .status.bad { color: var(--danger); }
       .status.warn { color: var(--accent2); }
+      .sla-spark {
+        margin-top: 6px;
+        min-height: 28px;
+        opacity: 0.95;
+      }
+      .sla-spark svg { display: block; width: 100%; max-width: 160px; height: 28px; }
       #surfaceOverlay {
         position: absolute;
         inset: 0;
@@ -549,6 +555,7 @@
         </label>
         <div class="status" id="ttsStatus">tts idle</div>
         <div class="status" id="ttsHealthChip">gateway · idle</div>
+        <div id="ttsSlaSpark" class="sla-spark" title="gateway SLA sparkline" aria-hidden="true"></div>
       </div>
 
       <div class="group">
@@ -593,6 +600,8 @@
         </div>
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
+        <div class="status" id="prefsAuditStatus">share audit · empty</div>
+        <pre id="prefsAuditLog" style="max-height:88px;">—</pre>
         <div id="prefsQrWrap" style="display:none;margin-top:8px;">
           <img id="prefsQrImg" alt="prefs share QR" width="160" height="160" style="border-radius:8px;background:#fff;display:block;" />
           <div class="status" id="prefsQrHint">scan · or copy short link</div>
@@ -682,6 +691,7 @@
         stopGatewayHealthPoll,
       } from '/engine/tts/ttsHealth.js';
       import { createGatewayHealthHistory } from '/engine/tts/ttsHealthHistory.js';
+      import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -849,12 +859,21 @@
       let compoundCrossfade = null;
       let compoundCrossfadeT0 = 0;
       const gatewayHealthHistory = createGatewayHealthHistory();
+      const prefsShareAudit = createPrefsShareAudit({ memory: false });
+      function refreshPrefsAuditUi() {
+        const fmt = prefsShareAudit.format({ limit: 6 });
+        const statusEl = document.getElementById('prefsAuditStatus');
+        const logEl = document.getElementById('prefsAuditLog');
+        if (statusEl) statusEl.textContent = fmt.text;
+        if (logEl) logEl.textContent = fmt.lines.length ? fmt.lines.join('\n') : '—';
+      }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
         if (!compoundCrossfade) return null;
         const cancelled = cancelCompoundEmblemLifecycle(compoundCrossfade, {
           reason,
         });
-        if (cancelled.clearEmblem) {
+        // Manual emblem pick keeps the new emblem; only drop compound lifecycle state.
+        if (cancelled.clearEmblem && reason !== 'emblem_pick') {
           gestures.setEmblem(null);
           if (emblemSel) emblemSel.value = '';
         }
@@ -863,7 +882,9 @@
           if (compoundSel) compoundSel.value = '';
         }
         compoundCrossfade = null;
-        fingerStatus.textContent = `fingers · lifecycle cancelled`;
+        if (reason !== 'emblem_pick') {
+          fingerStatus.textContent = `fingers · lifecycle cancelled`;
+        }
         return cancelled;
       }
       let walkPhase = 0;
@@ -1681,6 +1702,7 @@
       });
 
       emblemSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('emblem_pick');
         const v = emblemSel.value || null;
         gestures.setEmblem(v);
         if (fingerEmblemSyncOn && v) {
@@ -1691,6 +1713,7 @@
         }
       });
       document.getElementById('btnWave').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('emblem_pick');
         gestures.playEmblem('wave');
         emblemSel.value = 'wave';
         if (fingerEmblemSyncOn) {
@@ -1875,11 +1898,22 @@
         ttsAudioSync?.addEventListener('change', () => persistPrefs());
 
         const ttsHealthChip = document.getElementById('ttsHealthChip');
+        const ttsSlaSpark = document.getElementById('ttsSlaSpark');
+        function renderSlaSpark() {
+          if (!ttsSlaSpark) return;
+          if (!gatewayHealthHistory.size) {
+            ttsSlaSpark.innerHTML = '';
+            return;
+          }
+          const spark = gatewayHealthHistory.sparkline({ width: 140, height: 28 });
+          ttsSlaSpark.innerHTML = spark.svg || '';
+        }
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
             gatewayHealthHistory.clear();
             ttsHealthChip.className = 'status';
             ttsHealthChip.textContent = 'gateway · idle';
+            renderSlaSpark();
             return;
           }
           const sla = gatewayHealthHistory.push(health);
@@ -1892,6 +1926,7 @@
                   sla.latencyP50Ms != null ? Math.round(sla.latencyP50Ms) : '—'
                 }ms`
               : health.message || '';
+          renderSlaSpark();
         }
         async function refreshGatewayHealth() {
           const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
@@ -1964,6 +1999,14 @@
               document.execCommand('copy');
               ta.remove();
             }
+            prefsShareAudit.record('share', {
+              hash: bundle.hash,
+              shortUrl: bundle.shortUrl,
+              expiryHint: bundle.expiryHint,
+              expired: bundle.expired,
+              prefs: bundle.prefs || loadFaceLivePrefs().prefs,
+            });
+            refreshPrefsAuditUi();
             prefsStatus.className = 'status ok';
             prefsStatus.textContent = bundle.expiryHint
               ? `prefs · short link copied · ${bundle.expiryHint}`
@@ -1992,6 +2035,14 @@
             prefsStatus.textContent = 'prefs · QR hidden';
             return;
           }
+          prefsShareAudit.record('qr', {
+            hash: bundle.hash,
+            shortUrl: bundle.shortUrl,
+            expiryHint: bundle.expiryHint,
+            expired: bundle.expired,
+            prefs: bundle.prefs || loadFaceLivePrefs().prefs,
+          });
+          refreshPrefsAuditUi();
           img.onerror = () => {
             // Offline fallback: fingerprint SVG as data URL
             const svg = bundle.qrFingerprintSvg || '';
@@ -2046,11 +2097,16 @@
             } catch {
               location.hash = '';
             }
+            prefsShareAudit.record('revoke', {
+              summary: 'deep-link cleared',
+            });
+            refreshPrefsAuditUi();
           }
           prefsStatus.className = revoke.canRevoke ? 'status ok' : 'status';
           prefsStatus.textContent = revoke.message;
           document.getElementById('prefsLandingToast')?.classList.remove('show');
         });
+        refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
           if (!file) return;
