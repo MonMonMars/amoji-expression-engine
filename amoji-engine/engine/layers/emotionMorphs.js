@@ -709,8 +709,16 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineFavoriteTipSummary', help: 'Shift+0 jump fav tip summary', kind: 'note' },
   { id: 'showBaselineTips', help: 'Alt+0 tips readout', kind: 'note' },
   { id: 'copyBaselineTips', help: '⇧Alt+0 copy tips', kind: 'note' },
+  {
+    id: 'showBaselineRoots',
+    keys: ['\\', '|'],
+    help: '\\ roots readout',
+    kind: 'action',
+  },
+  { id: 'copyBaselineRoots', help: 'Shift+\\ copy roots', kind: 'note' },
   { id: 'tipsStrip', help: 'tips strip · live', kind: 'note' },
   { id: 'capacityBadges', help: 'chip rows · capacity', kind: 'note' },
+  { id: 'capacityStrip', help: 'capacity strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -2057,6 +2065,55 @@ export function formatDisneyExtremeBaselineTipsLabel(stacks = {}) {
     bits.push('fav · empty');
   }
   return `tips · ${bits.join(' · ')}`;
+}
+
+/**
+ * Readout of root (oldest) hist / redo / fav entries without applying.
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineRootsLabel(stacks = {}) {
+  const hist = Array.isArray(stacks.history) ? stacks.history : [];
+  const redo = Array.isArray(stacks.redo) ? stacks.redo : [];
+  const fav = Array.isArray(stacks.favorites) ? stacks.favorites : [];
+  const bits = [];
+  if (hist.length) {
+    bits.push(
+      `hist · ${formatDisneyExtremeBaselineHistoryEntry(hist[0], {
+        index: 1,
+        compact: true,
+      })}`,
+    );
+  } else {
+    bits.push('hist · empty');
+  }
+  if (redo.length) {
+    bits.push(
+      `redo · ${formatDisneyExtremeBaselineHistoryEntry(redo[0], {
+        index: 1,
+        compact: true,
+        kind: 'redo',
+      })}`,
+    );
+  } else {
+    bits.push('redo · empty');
+  }
+  if (fav.length) {
+    bits.push(
+      `fav · ${formatDisneyExtremeBaselineHistoryEntry(fav[0], {
+        index: 1,
+        compact: true,
+        kind: 'fav',
+      })}`,
+    );
+  } else {
+    bits.push('fav · empty');
+  }
+  return `roots · ${bits.join(' · ')}`;
 }
 
 /**

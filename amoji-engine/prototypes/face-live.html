@@ -527,6 +527,15 @@
       #disneyExtremeTips:hover {
         opacity: 1;
       }
+      #disneyExtremeCapacity {
+        margin-top: 2px;
+        opacity: 0.85;
+        font-size: 0.85em;
+        cursor: pointer;
+      }
+      #disneyExtremeCapacity:hover {
+        opacity: 1;
+      }
       #disneyExtremeHistory {
         margin-top: 6px;
         flex-wrap: wrap;
@@ -884,6 +893,8 @@
           <button type="button" id="btnDisneyExtremeCopyTips">Copy tips <kbd>⇧Alt+0</kbd></button>
           <button type="button" id="btnDisneyExtremeStacksCapacity">Stacks capacity <kbd>`</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyStacksCapacity">Copy capacity <kbd>⇧`</kbd></button>
+          <button type="button" id="btnDisneyExtremeRoots">Roots readout <kbd>\</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyRoots">Copy roots <kbd>⇧\</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -988,6 +999,13 @@
           title="Tip hist/redo/fav · Alt+0 flash · ⇧Alt+0 copy · click flash · dbl-click copy"
         >
           tips · hist · empty · redo · empty · fav · empty
+        </div>
+        <div
+          class="status"
+          id="disneyExtremeCapacity"
+          title="Stacks capacity · ` flash · ⇧` copy · click flash · dbl-click copy"
+        >
+          stacks · hist 0/8 · redo 0/8 · fav 0/8
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1430,6 +1448,7 @@
         formatDisneyExtremeBaselineHistoryList,
         formatDisneyExtremeBaselineRedoList,
         formatDisneyExtremeBaselineTipsLabel,
+        formatDisneyExtremeBaselineRootsLabel,
         formatDisneyExtremeBaselineChipPreviewLabel,
         formatDisneyExtremeBaselineChipDiffLabel,
         formatDisneyExtremeBaselineChipCompareLabel,
@@ -2038,6 +2057,17 @@
           redo: extremeBaselineRedo,
           favorites: extremeBaselineFavorites,
         });
+        syncDisneyExtremeCapacityUi();
+      }
+
+      function syncDisneyExtremeCapacityUi() {
+        const el = document.getElementById('disneyExtremeCapacity');
+        if (!el) return;
+        el.textContent = formatDisneyExtremeBaselineStacksCapacityLabel({
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
       }
 
       function flashDisneyExtremeBaselineHistoryList() {
@@ -2226,6 +2256,38 @@
 
       async function copyDisneyExtremeBaselineStacksCapacity() {
         const text = formatDisneyExtremeBaselineStacksCapacityLabel({
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      function flashDisneyExtremeBaselineRoots() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineRootsLabel({
+            history: extremeBaselineHistory,
+            redo: extremeBaselineRedo,
+            favorites: extremeBaselineFavorites,
+          }),
+        );
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineRoots() {
+        const text = formatDisneyExtremeBaselineRootsLabel({
           history: extremeBaselineHistory,
           redo: extremeBaselineRedo,
           favorites: extremeBaselineFavorites,
@@ -3897,12 +3959,28 @@
         copyDisneyExtremeBaselineStacksCapacity();
       });
 
+      document.getElementById('btnDisneyExtremeRoots')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineRoots();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyRoots')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineRoots();
+      });
+
       document.getElementById('disneyExtremeTips')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineTips();
       });
 
       document.getElementById('disneyExtremeTips')?.addEventListener('dblclick', () => {
         copyDisneyExtremeBaselineTips();
+      });
+
+      document.getElementById('disneyExtremeCapacity')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineStacksCapacity();
+      });
+
+      document.getElementById('disneyExtremeCapacity')?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBaselineStacksCapacity();
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -5797,6 +5875,16 @@
         if (resolved.action === 'copyBaselineStacksCapacity') {
           ev.preventDefault();
           copyDisneyExtremeBaselineStacksCapacity();
+          return;
+        }
+        if (resolved.action === 'showBaselineRoots') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineRoots();
+          return;
+        }
+        if (resolved.action === 'copyBaselineRoots') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineRoots();
           return;
         }
         if (resolved.action === 'copySummary') {

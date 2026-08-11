@@ -26,7 +26,7 @@ describe('Phase 109 Disney Extreme hotkey X', () => {
     expect(resolveDisneyExtremeHotkey({ key: '`' }).action).toBe(
       'showBaselineStacksCapacity',
     );
-    expect(resolveDisneyExtremeHotkey({ key: '\\' }).ok).toBe(false);
+    expect(resolveDisneyExtremeHotkey({ key: '/' }).ok).toBe(false);
     expect(typeof engine.resolveDisneyExtremeHotkey).toBe('function');
   });
 

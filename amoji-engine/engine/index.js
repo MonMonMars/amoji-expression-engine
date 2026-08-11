@@ -350,6 +350,7 @@ export {
   formatDisneyExtremeBaselineHistoryList,
   formatDisneyExtremeBaselineRedoList,
   formatDisneyExtremeBaselineTipsLabel,
+  formatDisneyExtremeBaselineRootsLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
   formatDisneyExtremeBaselineChipDiffLabel,
   formatDisneyExtremeBaselineChipCompareLabel,
