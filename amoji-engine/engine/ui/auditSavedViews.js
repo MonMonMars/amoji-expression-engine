@@ -43,6 +43,90 @@ export function snapshotAuditView(filters = {}, opts = {}) {
 }
 
 /**
+ * Export saved views as a portable JSON document.
+ * @param {object[]} views
+ * @param {{ now?: number }} [opts]
+ */
+export function exportAuditSavedViewsJson(views, opts = {}) {
+  const list = (Array.isArray(views) ? views : []).map((v) =>
+    normalizeAuditSavedView(v),
+  );
+  const payload = {
+    kind: 'amoji.faceLive.prefsShareAudit.views',
+    version: 1,
+    exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
+    count: list.length,
+    views: list,
+  };
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_export',
+      ok: true,
+      json: JSON.stringify(payload, null, 2),
+      count: list.length,
+      payload,
+    },
+    {},
+  );
+}
+
+/**
+ * Import saved views from JSON text or object.
+ * @param {string|object} raw
+ * @param {{ max?: number, now?: number, merge?: boolean }} [opts]
+ */
+export function importAuditSavedViewsJson(raw, opts = {}) {
+  const max = Math.max(2, opts.max ?? AUDIT_SAVED_VIEWS_MAX);
+  let parsed = raw;
+  if (typeof raw === 'string') {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views_import',
+          ok: false,
+          reason: 'invalid_json',
+          views: [],
+          count: 0,
+        },
+        {},
+      );
+    }
+  }
+  const listRaw = Array.isArray(parsed)
+    ? parsed
+    : Array.isArray(parsed?.views)
+      ? parsed.views
+      : null;
+  if (!listRaw) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import',
+        ok: false,
+        reason: 'no_views',
+        views: [],
+        count: 0,
+      },
+      {},
+    );
+  }
+  const views = listRaw
+    .map((v) => normalizeAuditSavedView(v, { now: opts.now }))
+    .slice(-max);
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import',
+      ok: true,
+      views,
+      count: views.length,
+      merge: !!opts.merge,
+    },
+    {},
+  );
+}
+
+/**
  * Create a persisted (or memory) saved-views store.
  * @param {{
  *   max?: number,
@@ -172,6 +256,40 @@ export function createAuditSavedViews(opts = {}) {
           action: 'clear',
           ok: true,
           count: 0,
+        },
+        {},
+      );
+    },
+    exportJson(exportOpts = {}) {
+      return exportAuditSavedViewsJson(views, exportOpts);
+    },
+    importJson(raw, importOpts = {}) {
+      const imported = importAuditSavedViewsJson(raw, {
+        max,
+        now: importOpts.now,
+        merge: importOpts.merge,
+      });
+      if (!imported.ok) return imported;
+      if (importOpts.merge) {
+        for (const v of imported.views) {
+          const idx = views.findIndex(
+            (x) => x.name.toLowerCase() === v.name.toLowerCase(),
+          );
+          if (idx >= 0) views[idx] = { ...v, id: views[idx].id };
+          else views.push(v);
+        }
+        while (views.length > max) views.shift();
+      } else {
+        views = imported.views.slice(-max);
+      }
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views_import',
+          ok: true,
+          views: views.slice(),
+          count: views.length,
+          merge: !!importOpts.merge,
         },
         {},
       );

@@ -49,7 +49,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 36 | Probe toast · audit search · Live Link remap cancel | Done |
 | Phase 37 | Probe toast actions · audit regex/range · surface cancel | Done |
 | Phase 38 | Toast shortcuts · audit saved views · persona cancel | Done |
-| Phase 39+ | Further production polish… | Specced |
+| Phase 39 | Toast focus trap · views export/import · mood cancel | Done |
+| Phase 40+ | Further production polish… | Specced |
 
 ## Quick start
 

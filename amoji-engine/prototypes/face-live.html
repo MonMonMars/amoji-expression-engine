@@ -696,6 +696,13 @@
           <option value="">Saved views…</option>
         </select>
         <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditExportViews">Export views</button>
+          <label class="row" style="flex:1;margin:0;align-items:stretch;">
+            <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
+            <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
+          </label>
+        </div>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
         </div>
@@ -797,6 +804,7 @@
       } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import { createAuditSavedViews } from '/engine/ui/auditSavedViews.js';
+      import { createProbeToastFocusTrap } from '/engine/ui/probeToastFocusTrap.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -966,6 +974,7 @@
       const gatewayHealthHistory = createGatewayHealthHistory();
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
       const auditSavedViews = createAuditSavedViews({ memory: false });
+      const probeToastFocusTrap = createProbeToastFocusTrap();
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
@@ -1023,6 +1032,7 @@
         const el = document.getElementById('probeDetailToast');
         el?.classList.remove('show');
         probeToastVisible = false;
+        probeToastFocusTrap.deactivate();
         if (probeToastTimer) {
           clearTimeout(probeToastTimer);
           probeToastTimer = null;
@@ -1037,7 +1047,7 @@
         const actionsEl = document.getElementById('probeToastActions');
         if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
         if (detailEl) {
-          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss`;
+          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss · tab cycle`;
         }
         if (actionsEl) {
           actionsEl.innerHTML = '';
@@ -1055,10 +1065,12 @@
         if (toast.tone) el.classList.add(toast.tone);
         el.classList.add('show');
         probeToastVisible = true;
+        probeToastFocusTrap.activate(el);
         if (probeToastTimer) clearTimeout(probeToastTimer);
         probeToastTimer = setTimeout(() => {
           el.classList.remove('show');
           probeToastVisible = false;
+          probeToastFocusTrap.deactivate();
         }, toast.dismissMs || 3800);
       }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
@@ -1083,7 +1095,8 @@
           reason !== 'pack_pick' &&
           reason !== 'remap_pick' &&
           reason !== 'surface_pick' &&
-          reason !== 'persona_pick'
+          reason !== 'persona_pick' &&
+          reason !== 'mood_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1091,7 +1104,8 @@
           reason === 'pack_pick' ||
           reason === 'remap_pick' ||
           reason === 'surface_pick' ||
-          reason === 'persona_pick'
+          reason === 'persona_pick' ||
+          reason === 'mood_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1754,6 +1768,7 @@
         gazeModeSel.value = 'lock';
       });
       moodSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('mood_pick');
         moodCtl.setMood(moodSel.value);
       });
       document.getElementById('btnDiscImprov').addEventListener('click', () => {
@@ -2221,6 +2236,10 @@
         });
         document.addEventListener('keydown', (ev) => {
           if (!probeToastVisible) return;
+          if (ev.key === 'Tab') {
+            const trapped = probeToastFocusTrap.handleKeydown(ev);
+            if (trapped.trap) return;
+          }
           const tag = (ev.target && ev.target.tagName) || '';
           const typing =
             tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || ev.target?.isContentEditable;
@@ -2486,6 +2505,41 @@
           if (!id) return;
           const got = auditSavedViews.get(id);
           if (got.ok && got.view) applyAuditView(got.view);
+        });
+        document.getElementById('btnPrefsAuditExportViews')?.addEventListener('click', () => {
+          const exported = auditSavedViews.exportJson();
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'amoji-prefs-audit-views.json';
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · views exported · ${exported.count}`;
+        });
+        document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
+          document.getElementById('prefsAuditImportViewsFile')?.click();
+        });
+        document.getElementById('prefsAuditImportViewsFile')?.addEventListener('change', async (ev) => {
+          const file = ev.target.files?.[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            const imported = auditSavedViews.importJson(text, { merge: true });
+            if (!imported.ok) {
+              prefsStatus.className = 'status bad';
+              prefsStatus.textContent = 'prefs · views import failed';
+              return;
+            }
+            refreshAuditSavedViewsUi();
+            prefsStatus.className = 'status ok';
+            prefsStatus.textContent = `prefs · views imported · ${imported.count}`;
+          } catch (err) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = String(err.message || err);
+          }
+          ev.target.value = '';
         });
         refreshAuditSavedViewsUi();
         refreshPrefsAuditUi();

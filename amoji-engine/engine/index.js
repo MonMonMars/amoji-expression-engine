@@ -524,8 +524,15 @@ export {
   AUDIT_SAVED_VIEWS_MAX,
   normalizeAuditSavedView,
   snapshotAuditView,
+  exportAuditSavedViewsJson,
+  importAuditSavedViewsJson,
   createAuditSavedViews,
 } from './ui/auditSavedViews.js';
+export {
+  cycleProbeToastFocusIndex,
+  resolveProbeToastFocusTrap,
+  createProbeToastFocusTrap,
+} from './ui/probeToastFocusTrap.js';
 export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,
