@@ -109,6 +109,9 @@ export const CONTINUITY_RESIDUAL_PULSE_PEAK = {
   neutral: 1.65,
 };
 
+/** Max residual deliver pulse duration (seconds). */
+export const CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC = 1;
+
 export function continuityResidualDeliverPulseClass(continuity) {
   const pulse = hasContinuityResidual(continuity);
   if (!pulse) {
@@ -121,6 +124,9 @@ export function continuityResidualDeliverPulseClass(continuity) {
         intensity: 0,
         peak: null,
         durationSec: null,
+        rawDurationSec: null,
+        durationCapSec: CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC,
+        durationCapped: false,
       },
       {},
     );
@@ -131,7 +137,10 @@ export function continuityResidualDeliverPulseClass(continuity) {
     CONTINUITY_RESIDUAL_PULSE_PEAK[emotion] ??
     CONTINUITY_RESIDUAL_PULSE_PEAK.neutral;
   const peak = Math.min(2, basePeak + intensity * 0.2);
-  const durationSec = Math.min(1, 0.55 + intensity * 0.3);
+  const durationCapSec = CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC;
+  const rawDurationSec = 0.55 + intensity * 0.5;
+  const durationSec = Math.min(durationCapSec, rawDurationSec);
+  const durationCapped = rawDurationSec >= durationCapSec;
   return applyComplianceGate(
     {
       kind: 'continuity_residual_deliver_pulse',
@@ -141,6 +150,50 @@ export function continuityResidualDeliverPulseClass(continuity) {
       intensity,
       peak,
       durationSec,
+      rawDurationSec,
+      durationCapSec,
+      durationCapped,
+    },
+    {},
+  );
+}
+
+/**
+ * HUD label for residual deliver pulse duration (shows cap when clamped).
+ * @param {{
+ *   ok?: boolean,
+ *   durationSec?: number|null,
+ *   durationCapped?: boolean,
+ *   durationCapSec?: number,
+ * }|null} pulse
+ */
+export function continuityResidualPulseDurationHud(pulse) {
+  if (!pulse?.ok || pulse.durationSec == null) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_pulse_duration_hud',
+        ok: false,
+        label: null,
+        durationCapped: false,
+        durationSec: null,
+        durationCapSec: CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC,
+      },
+      {},
+    );
+  }
+  const durationCapSec =
+    pulse.durationCapSec ?? CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC;
+  const label = pulse.durationCapped
+    ? `pulse cap ${durationCapSec.toFixed(1)}s`
+    : `pulse ${pulse.durationSec.toFixed(2)}s`;
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_pulse_duration_hud',
+      ok: true,
+      label,
+      durationCapped: !!pulse.durationCapped,
+      durationSec: pulse.durationSec,
+      durationCapSec,
     },
     {},
   );

@@ -208,6 +208,8 @@ export {
   applyContinuity,
   hasContinuityResidual,
   continuityResidualDeliverPulseClass,
+  continuityResidualPulseDurationHud,
+  CONTINUITY_RESIDUAL_PULSE_DURATION_CAP_SEC,
   decayContinuityResidual,
   tuneContinuityResidualIntensity,
   continuityResidualDecayProgress,

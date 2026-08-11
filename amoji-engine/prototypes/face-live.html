@@ -895,6 +895,7 @@
         DiscretionController,
         hasContinuityResidual,
         continuityResidualDeliverPulseClass,
+        continuityResidualPulseDurationHud,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
@@ -1445,6 +1446,7 @@
           reason !== 'tts_endpoint_cut_pick' &&
           reason !== 'tts_endpoint_select_all_pick' &&
           reason !== 'tts_endpoint_copy_pick' &&
+          reason !== 'tts_endpoint_duplicate_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2221,11 +2223,14 @@
           cancelActiveCompoundLifecycle('deliver_residue_pick');
           const pulse = continuityResidualDeliverPulseClass(cont);
           if (pulse.pulseClass) pulseDiscResidualBar(pulse);
+          const pulseHud = continuityResidualPulseDurationHud(pulse);
+          discContStatus.textContent = pulseHud.ok
+            ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)} · ${pulseHud.label}`
+            : `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`;
+        } else {
+          discContStatus.textContent = `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
         }
         discResidualPeak = resetContinuityResidualPeak(cont).peak;
-        discContStatus.textContent = cont.residual
-          ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
-          : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
         discStatus.textContent = 'line delivered — gap reset';
         document.getElementById('btnScriptHold').classList.remove('primary');
       });
@@ -2942,6 +2947,8 @@
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
           if ((ev.ctrlKey || ev.metaKey) && (ev.key === 'a' || ev.key === 'A')) {
             cancelActiveCompoundLifecycle('tts_endpoint_select_all_pick');
+          } else if ((ev.ctrlKey || ev.metaKey) && (ev.key === 'd' || ev.key === 'D')) {
+            cancelActiveCompoundLifecycle('tts_endpoint_duplicate_pick');
           } else if (ev.key === 'Enter') {
             cancelActiveCompoundLifecycle('tts_endpoint_enter_pick');
             persistPrefs();
@@ -3842,6 +3849,7 @@
                     shiftMerge:
                       dropAction.shiftKey && dropAction.merge && !dropAction.appendOnly,
                     altReplace: dropAction.altKey && dropAction.replace,
+                    ctrlAppend: dropAction.ctrlKey && dropAction.appendOnly,
                     mergeStarredOnly,
                     mergeStarredOnlyExplicit: mergeStarredOnly,
                     toastInHashOnly: toastHashOnly,

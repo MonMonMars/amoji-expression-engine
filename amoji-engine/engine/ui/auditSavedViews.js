@@ -595,6 +595,7 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
  *   now?: number,
  *   shiftMerge?: boolean,
  *   altReplace?: boolean,
+ *   ctrlAppend?: boolean,
  * }} [opts]
  */
 export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
@@ -701,9 +702,10 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
     replace,
     appendOnly,
     shiftMerge: !!opts.shiftMerge,
+    ctrlAppend: !!opts.ctrlAppend,
   });
   let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}`;
-  if (mergeHint.ok && mergeHint.hint && opts.shiftMerge) {
+  if (mergeHint.ok && mergeHint.hint && (opts.shiftMerge || opts.ctrlAppend)) {
     label = `${label} · ${mergeHint.hint}`;
   }
   return applyComplianceGate(
@@ -720,6 +722,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       label,
       hint: mergeHint.ok ? mergeHint.hint : null,
       shiftMerge: !!opts.shiftMerge,
+      ctrlAppend: !!opts.ctrlAppend,
       mergeStarredOnly,
       toastInHashOnly,
       folder,
@@ -736,6 +739,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
  *   appendOnly?: boolean,
  *   shiftMerge?: boolean,
  *   altReplace?: boolean,
+ *   ctrlAppend?: boolean,
  *   mergeStarredOnly?: boolean,
  *   mergeStarredOnlyExplicit?: boolean,
  *   toastInHashOnly?: boolean,
@@ -765,6 +769,7 @@ export function formatAuditViewsImportDryRunMergeHint(raw, opts = {}) {
       hint,
       shiftMerge: !!opts.shiftMerge,
       altReplace: !!opts.altReplace,
+      ctrlAppend: !!opts.ctrlAppend,
       inherited: inherit.ok ? inherit.inherited : [],
       fromExportMeta: inherit.ok ? inherit.fromExportMeta : false,
     },

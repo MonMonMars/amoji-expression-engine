@@ -306,6 +306,9 @@ Amoji engine (ND “systemic emotion”)
 183. ~~**Meta+Alt dry-run replace hint** (`formatAuditViewsImportDryRunMergeHint` · Meta+Alt+drop)~~ ✓
 184. ~~**Residual pulse intensity by emotion** (`continuityResidualDeliverPulseClass` · `--disc-pulse-peak`)~~ ✓
 185. ~~**Cancel on TTS endpoint copy** (`tts_endpoint_copy_pick`)~~ ✓
+186. ~~**Meta+Ctrl dry-run append hint** (`formatAuditViewsImportDryRunMergeHint` · Meta+Ctrl+drop)~~ ✓
+187. ~~**Residual pulse duration cap HUD** (`continuityResidualPulseDurationHud` · `#discContStatus`)~~ ✓
+188. ~~**Cancel on TTS endpoint duplicate** (`tts_endpoint_duplicate_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -337,4 +340,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (Meta+Ctrl dry-run append hint, residual pulse duration cap HUD, endpoint duplicate cancel).
+Next code increment: further production polish (Meta dry-run filter summary, residual pulse peak cap HUD, endpoint context menu cancel).
