@@ -95,7 +95,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 82 | TTS dragover sets active flag | Done |
 | Phase 83 | TTS dragover side effects test | Done |
 | Phase 84 | TTS drag-leave resets active flag | Done |
-| Phase 85+ | Further production polish… | Specced |
+| Phase 85 | TTS dragenter side effects test | Done |
+| Phase 86+ | Further production polish… | Specced |
 
 ## Quick start
 
