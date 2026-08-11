@@ -315,6 +315,10 @@ Amoji engine (ND “systemic emotion”)
 192. ~~**Dry-run skip breakdown** (`previewAuditViewsImportDryRun` · Meta+drop)~~ ✓
 193. ~~**Residual pulse combined HUD helper** (`resolveContinuityResidualPulseBits` · `discContStatus`)~~ ✓
 194. ~~**Cancel on TTS endpoint drag/drop** (`tts_endpoint_drag_pick`)~~ ✓
+195. ~~**Dry-run skip breakdown name-clash test** (`phase75DryRunSkipBreakdownNameClash`)~~ ✓
+196. ~~**Combined pulse HUD engine helper** (`continuityResidualPulseCombinedHud`)~~ ✓
+197. ~~**Dry-run skip breakdown helper** (`formatAuditViewsImportDryRunSkipBreakdown`)~~ ✓
+198. ~~**Cancel on TTS endpoint drag-start** (`tts_endpoint_drag_start_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -346,4 +350,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (Phase 75 TBD).
+Next code increment: further production polish (Phase 77 TBD).

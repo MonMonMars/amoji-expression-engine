@@ -626,6 +626,43 @@ export function formatAuditViewsImportDryRunFilterSummary(raw, opts = {}) {
 }
 
 /**
+ * Parenthetical skip breakdown for Meta dry-run labels.
+ * @param {{
+ *   skippedByStarredOnly?: number,
+ *   skippedByToastInHashOnly?: number,
+ *   skippedByFolderFilter?: number,
+ *   skippedByAppendOnlyClash?: number,
+ * }} [counts]
+ */
+export function formatAuditViewsImportDryRunSkipBreakdown(counts = {}) {
+  /** @type {string[]} */
+  const parts = [];
+  if ((counts.skippedByStarredOnly ?? 0) > 0) {
+    parts.push(`starred ${counts.skippedByStarredOnly}`);
+  }
+  if ((counts.skippedByToastInHashOnly ?? 0) > 0) {
+    parts.push(`toast hash ${counts.skippedByToastInHashOnly}`);
+  }
+  if ((counts.skippedByFolderFilter ?? 0) > 0) {
+    parts.push(`folder ${counts.skippedByFolderFilter}`);
+  }
+  if ((counts.skippedByAppendOnlyClash ?? 0) > 0) {
+    parts.push(`name clashes ${counts.skippedByAppendOnlyClash}`);
+  }
+  const suffix = parts.length ? ` (${parts.join(' · ')})` : '';
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_dry_run_skip_breakdown',
+      ok: true,
+      parts,
+      suffix,
+      label: parts.length ? parts.join(' · ') : null,
+    },
+    {},
+  );
+}
+
+/**
  * Simulate import merge/replace/append stats without mutating stored views.
  * @param {object[]} existing
  * @param {object|string} raw
@@ -722,12 +759,12 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       replace: true,
       altReplace: !!opts.altReplace,
     });
-    const breakdownParts = [];
-    if (skippedByStarredOnly > 0) breakdownParts.push(`starred ${skippedByStarredOnly}`);
-    if (skippedByToastInHashOnly > 0) breakdownParts.push(`toast hash ${skippedByToastInHashOnly}`);
-    if (skippedByFolderFilter > 0) breakdownParts.push(`folder ${skippedByFolderFilter}`);
-    const breakdown = breakdownParts.length ? ` (${breakdownParts.join(' · ')})` : '';
-    let label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}${breakdown}`;
+    const skipBreakdown = formatAuditViewsImportDryRunSkipBreakdown({
+      skippedByStarredOnly,
+      skippedByToastInHashOnly,
+      skippedByFolderFilter,
+    });
+    let label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}${skipBreakdown.suffix}`;
     if (replaceHint.ok && replaceHint.hint && opts.altReplace) {
       label = `${label} · ${replaceHint.hint}`;
     }
@@ -773,13 +810,8 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
     shiftMerge: !!opts.shiftMerge,
     ctrlAppend: !!opts.ctrlAppend,
   });
-  const breakdownParts = [];
-  if (merged.skippedByStarredOnly > 0) breakdownParts.push(`starred ${merged.skippedByStarredOnly}`);
-  if (merged.skippedByToastInHashOnly > 0) breakdownParts.push(`toast hash ${merged.skippedByToastInHashOnly}`);
-  if (merged.skippedByFolderFilter > 0) breakdownParts.push(`folder ${merged.skippedByFolderFilter}`);
-  if (merged.skippedByAppendOnlyClash > 0) breakdownParts.push(`name clashes ${merged.skippedByAppendOnlyClash}`);
-  const breakdown = breakdownParts.length ? ` (${breakdownParts.join(' · ')})` : '';
-  let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}${breakdown}`;
+  const skipBreakdown = formatAuditViewsImportDryRunSkipBreakdown(merged);
+  let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}${skipBreakdown.suffix}`;
   if (mergeHint.ok && mergeHint.hint && (opts.shiftMerge || opts.ctrlAppend)) {
     label = `${label} · ${mergeHint.hint}`;
   }

@@ -897,6 +897,7 @@
         continuityResidualDeliverPulseClass,
         continuityResidualPulseDurationHud,
         continuityResidualPulsePeakHud,
+        continuityResidualPulseCombinedHud,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
@@ -1450,6 +1451,7 @@
           reason !== 'tts_endpoint_duplicate_pick' &&
           reason !== 'tts_endpoint_context_menu_pick' &&
           reason !== 'tts_endpoint_drag_pick' &&
+          reason !== 'tts_endpoint_drag_start_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2214,15 +2216,8 @@
         );
       }
       function resolveContinuityResidualPulseBits(pulse) {
-        const pulseHud = continuityResidualPulseDurationHud(pulse);
-        const peakHud = continuityResidualPulsePeakHud(pulse);
-        const bits = [
-          pulseHud.ok ? pulseHud.label : null,
-          peakHud.ok ? peakHud.label : null,
-        ]
-          .filter(Boolean)
-          .join(' · ');
-        return bits || null;
+        const combined = continuityResidualPulseCombinedHud(pulse);
+        return combined.ok ? combined.label : null;
       }
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('deliver_pick');
@@ -2963,6 +2958,9 @@
         });
         ttsEndpointEl?.addEventListener('dragover', (ev) => {
           ev.preventDefault();
+        });
+        ttsEndpointEl?.addEventListener('dragstart', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_start_pick');
         });
         ttsEndpointEl?.addEventListener('dragenter', (ev) => {
           ev.preventDefault();

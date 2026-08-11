@@ -252,6 +252,39 @@ export function continuityResidualPulsePeakHud(pulse) {
 }
 
 /**
+ * Combined duration + peak HUD label for residual deliver pulse.
+ * @param {{
+ *   ok?: boolean,
+ *   durationSec?: number|null,
+ *   durationCapped?: boolean,
+ *   durationCapSec?: number,
+ *   peak?: number|null,
+ *   peakCapped?: boolean,
+ *   peakCap?: number,
+ * }|null} pulse
+ */
+export function continuityResidualPulseCombinedHud(pulse) {
+  const durationHud = continuityResidualPulseDurationHud(pulse);
+  const peakHud = continuityResidualPulsePeakHud(pulse);
+  /** @type {string[]} */
+  const parts = [];
+  if (durationHud.ok && durationHud.label) parts.push(durationHud.label);
+  if (peakHud.ok && peakHud.label) parts.push(peakHud.label);
+  const label = parts.length ? parts.join(' · ') : null;
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_pulse_combined_hud',
+      ok: !!label,
+      label,
+      parts,
+      durationHud: durationHud.ok ? durationHud.label : null,
+      peakHud: peakHud.ok ? peakHud.label : null,
+    },
+    {},
+  );
+}
+
+/**
  * Exponential decay of continuity residual intensity (half-life based).
  * @param {{ residual?: { emotion?: string, intensity?: number } | null, blend?: number } | null} continuity
  * @param {number} dt seconds since last tick
