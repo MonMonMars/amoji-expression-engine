@@ -68,6 +68,7 @@ describe('Phase 29 gateway health poll', () => {
     startGatewayHealthPoll({
       endpoint: 'https://tts.example.com/v1/tts/step',
       intervalMs: 5000,
+      jitterRatio: 0,
       fetchImpl,
       onResult,
     });
@@ -92,6 +93,7 @@ describe('Phase 29 gateway health poll', () => {
     startGatewayHealthPoll({
       getEndpoint: () => '',
       intervalMs: 5000,
+      jitterRatio: 0,
       onResult,
       immediate: true,
     });

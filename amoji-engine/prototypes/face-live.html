@@ -171,6 +171,52 @@
         z-index: 2;
       }
       #surfaceOverlay.on { display: flex; }
+      #prefsLandingToast {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-12px);
+        z-index: 5;
+        max-width: min(420px, calc(100% - 32px));
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in oklab, var(--accent) 40%, var(--line));
+        background: rgba(8, 16, 14, 0.88);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+      #prefsLandingToast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+      }
+      #prefsLandingToast .toast-title {
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 4px;
+      }
+      #prefsLandingToast .toast-detail {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--ink);
+        line-height: 1.35;
+      }
+      #prefsLandingToast button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.75rem;
+        padding: 0;
+        margin-top: 8px;
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -228,6 +274,11 @@
   </head>
   <body>
     <div id="viewport">
+      <div id="prefsLandingToast" role="status" aria-live="polite">
+        <p class="toast-title" id="prefsToastTitle">Prefs from link</p>
+        <p class="toast-detail" id="prefsToastDetail">—</p>
+        <button type="button" id="btnPrefsToastDismiss">Dismiss</button>
+      </div>
       <div id="surfaceOverlay">
         <div id="glowOrb"></div>
         <div id="pixelFace">
@@ -613,7 +664,7 @@
       import {
         stageAffect,
       } from '/engine/export/affectStaging.js';
-      import { crossfadeCompoundToEmblem } from '/engine/export/compoundEmblemCrossfade.js';
+      import { compoundEmblemLifecycle } from '/engine/export/compoundEmblemCrossfade.js';
       import {
         loadFaceLivePrefs,
         saveFaceLivePrefs,
@@ -622,6 +673,7 @@
         loadFaceLivePrefsFromHash,
       } from '/engine/ui/faceLivePrefs.js';
       import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
+      import { describePrefsDeepLink } from '/engine/ui/prefsLandingToast.js';
       import {
         probeTtsGateway,
         startGatewayHealthPoll,
@@ -957,33 +1009,33 @@
       compoundSel.addEventListener('change', () => {
         compoundId = compoundSel.value;
         if (!compoundId || !affectFingerSyncOn) return;
-        const kick = crossfadeCompoundToEmblem(compoundId, intensity, 0);
-        if (!kick.ok) return;
+        const life = compoundEmblemLifecycle(compoundId, intensity, 0);
+        if (!life.ok) return;
         compoundCrossfade = {
           compoundId,
           intensity,
-          durationSec: kick.durationSec || 0.9,
-          emblemId: kick.emblemId,
+          totalSec: life.totalSec,
+          emblemId: life.emblemId,
         };
         compoundCrossfadeT0 = performance.now() / 1000;
-        if (kick.fingerPresetId) {
-          applyFingerPreset(kick.fingerPresetId, { fromEmblem: true });
+        if (life.fingerPresetId) {
+          applyFingerPreset(life.fingerPresetId, { fromEmblem: true });
         }
-        if (kick.gesture) fingerGesture = { ...kick.gesture };
-        fingerStatus.textContent = kick.emblemId
-          ? `fingers · compound→${kick.emblemId}`
-          : `fingers · ${kick.fingerPresetId || '—'} · compound`;
-        if (kick.lookBias) {
-          lookX = kick.lookBias.lookX || lookX;
-          lookY = kick.lookBias.lookY || lookY;
+        if (life.gesture) fingerGesture = { ...life.gesture };
+        fingerStatus.textContent = life.emblemId
+          ? `fingers · compound→${life.emblemId}`
+          : `fingers · ${life.fingerPresetId || '—'} · compound`;
+        if (life.lookBias) {
+          lookX = life.lookBias.lookX || lookX;
+          lookY = life.lookBias.lookY || lookY;
           lookXEl.value = String(lookX);
           lookYEl.value = String(lookY);
           lookXVal.textContent = lookX.toFixed(2);
           lookYVal.textContent = lookY.toFixed(2);
         }
-        if (kick.emblemId) {
-          if (emblemSel) emblemSel.value = kick.emblemId;
-          gestures.setEmblem(kick.emblemId);
+        if (life.emblemId) {
+          if (emblemSel) emblemSel.value = life.emblemId;
+          gestures.setEmblem(life.emblemId);
         }
       });
       for (const [id, def] of Object.entries(GESTURE_EMBLEMS)) {
@@ -1930,7 +1982,23 @@
         });
         if (hashPrefs.ok) {
           prefsStatus.className = 'status ok';
-          prefsStatus.textContent = 'prefs · loaded from URL hash';
+          const landing = describePrefsDeepLink(hashPrefs);
+          prefsStatus.textContent = landing.message || 'prefs · loaded from URL hash';
+          const toast = document.getElementById('prefsLandingToast');
+          const titleEl = document.getElementById('prefsToastTitle');
+          const detailEl = document.getElementById('prefsToastDetail');
+          if (landing.show && toast) {
+            if (titleEl) titleEl.textContent = landing.title || 'Prefs from link';
+            if (detailEl) detailEl.textContent = landing.detail || '';
+            toast.classList.add('show');
+            const hide = () => toast.classList.remove('show');
+            document.getElementById('btnPrefsToastDismiss')?.addEventListener(
+              'click',
+              hide,
+              { once: true },
+            );
+            setTimeout(hide, landing.dismissMs || 4200);
+          }
         }
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
@@ -2107,21 +2175,33 @@
         if (compoundCrossfade) {
           const elapsed =
             performance.now() / 1000 - compoundCrossfadeT0;
-          const dur = Math.max(0.2, compoundCrossfade.durationSec || 0.9);
-          const t = Math.min(1, elapsed / dur);
-          const xf = crossfadeCompoundToEmblem(
+          const life = compoundEmblemLifecycle(
             compoundCrossfade.compoundId,
             compoundCrossfade.intensity,
-            t,
+            elapsed,
           );
-          if (xf.ok && xf.gesture) fingerGesture = { ...xf.gesture };
-          if (xf.ok && t >= 0.5 && xf.fingerPresetId && fingerPresetId !== xf.fingerPresetId) {
-            applyFingerPreset(xf.fingerPresetId, { fromEmblem: true });
+          if (life.ok && life.gesture) fingerGesture = { ...life.gesture };
+          if (
+            life.ok &&
+            life.fingerPresetId &&
+            fingerPresetId !== life.fingerPresetId &&
+            (life.phase === 'crossfade' || life.phase === 'hold' || life.phase === 'release')
+          ) {
+            applyFingerPreset(life.fingerPresetId, { fromEmblem: true });
           }
-          if (t >= 1) {
-            fingerStatus.textContent = xf.emblemId
-              ? `fingers · ${xf.fingerPresetId || '—'} · emblem ${xf.emblemId}`
-              : `fingers · ${xf.fingerPresetId || '—'} · compound done`;
+          if (life.ok && life.phase === 'hold') {
+            fingerStatus.textContent = `fingers · hold ${life.emblemId || life.fingerPresetId || '—'}`;
+          } else if (life.ok && life.phase === 'release') {
+            fingerStatus.textContent = `fingers · release ${life.fingerPresetId || '—'}`;
+          }
+          if (life.ok && life.phase === 'done') {
+            if (life.clearEmblem) {
+              gestures.setEmblem(null);
+              if (emblemSel) emblemSel.value = '';
+            }
+            fingerStatus.textContent = life.emblemId
+              ? `fingers · ${life.fingerPresetId || '—'} · emblem released`
+              : `fingers · ${life.fingerPresetId || '—'} · compound done`;
             compoundCrossfade = null;
           }
         }

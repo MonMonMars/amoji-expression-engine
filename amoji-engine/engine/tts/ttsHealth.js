@@ -149,7 +149,7 @@ let activePollTimer = null;
 let activePollGen = 0;
 
 /**
- * Exponential backoff for gateway health poll intervals.
+ * Exponential backoff for gateway health poll intervals (no jitter).
  * @param {number} consecutiveFailures
  * @param {{ baseMs?: number, maxMs?: number, factor?: number }} [opts]
  */
@@ -160,6 +160,20 @@ export function computeHealthPollInterval(consecutiveFailures = 0, opts = {}) {
   const n = Math.max(0, Math.floor(Number(consecutiveFailures) || 0));
   const ms = Math.min(max, base * factor ** n);
   return Math.round(ms);
+}
+
+/**
+ * Apply symmetric jitter to a poll delay (±ratio, default 15%).
+ * @param {number} ms
+ * @param {{ ratio?: number, minMs?: number, random?: () => number }} [opts]
+ */
+export function applyHealthPollJitter(ms, opts = {}) {
+  const base = Math.max(0, Number(ms) || 0);
+  const ratio = Math.max(0, Math.min(0.5, opts.ratio ?? 0.15));
+  const minMs = opts.minMs ?? 1000;
+  const rand = typeof opts.random === 'function' ? opts.random : Math.random;
+  const j = 1 + (rand() * 2 - 1) * ratio;
+  return Math.max(minMs, Math.round(base * j));
 }
 
 /**
@@ -178,7 +192,7 @@ export function stopGatewayHealthPoll() {
 }
 
 /**
- * Poll TTS gateway health with exponential backoff on consecutive failures.
+ * Poll TTS gateway health with exponential backoff + jitter on consecutive failures.
  * Replaces any previous poll. Empty endpoint → idle callback, no reschedule storm.
  *
  * @param {{
@@ -187,6 +201,8 @@ export function stopGatewayHealthPoll() {
  *   intervalMs?: number,
  *   maxIntervalMs?: number,
  *   backoffFactor?: number,
+ *   jitterRatio?: number,
+ *   random?: () => number,
  *   token?: string,
  *   fetchImpl?: typeof fetch,
  *   timeoutMs?: number,
@@ -199,6 +215,7 @@ export function startGatewayHealthPoll(opts = {}) {
   const baseMs = Math.max(2000, opts.intervalMs ?? 8000);
   const maxMs = opts.maxIntervalMs ?? 60000;
   const factor = opts.backoffFactor ?? 2;
+  const jitterRatio = opts.jitterRatio ?? 0.15;
   const gen = activePollGen;
   let failures = 0;
 
@@ -234,7 +251,12 @@ export function startGatewayHealthPoll(opts = {}) {
         ),
       );
       // Keep a slow poll so endpoint paste can resume without restart
-      schedule(baseMs);
+      schedule(
+        applyHealthPollJitter(baseMs, {
+          ratio: jitterRatio,
+          random: opts.random,
+        }),
+      );
       return;
     }
     const result = await probeTtsGateway({
@@ -251,23 +273,34 @@ export function startGatewayHealthPoll(opts = {}) {
       maxMs,
       factor,
     });
+    const scheduledMs = applyHealthPollJitter(nextMs, {
+      ratio: jitterRatio,
+      random: opts.random,
+    });
     const enriched = {
       ...result,
       consecutiveFailures: failures,
       nextPollMs: nextMs,
+      scheduledPollMs: scheduledMs,
+      jitterRatio,
       message:
         result.ok || failures === 0
           ? result.message
-          : `${result.message} · retry ${Math.round(nextMs / 1000)}s`,
+          : `${result.message} · retry ~${Math.round(scheduledMs / 1000)}s`,
     };
     opts.onResult?.(enriched);
-    schedule(nextMs);
+    schedule(scheduledMs);
   };
 
   if (opts.immediate !== false) {
     void tick();
   } else {
-    schedule(baseMs);
+    schedule(
+      applyHealthPollJitter(baseMs, {
+        ratio: jitterRatio,
+        random: opts.random,
+      }),
+    );
   }
 
   return applyComplianceGate(
@@ -278,6 +311,7 @@ export function startGatewayHealthPoll(opts = {}) {
       intervalMs: baseMs,
       maxIntervalMs: maxMs,
       backoffFactor: factor,
+      jitterRatio,
       stop: stopGatewayHealthPoll,
     },
     {},

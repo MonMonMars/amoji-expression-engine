@@ -461,6 +461,7 @@ export {
   healthUrlForEndpoint,
   probeTtsGateway,
   computeHealthPollInterval,
+  applyHealthPollJitter,
   startGatewayHealthPoll,
   stopGatewayHealthPoll,
 } from './tts/ttsHealth.js';
@@ -480,9 +481,17 @@ export {
   buildPrefsShareBundle,
 } from './ui/prefsShareLink.js';
 export {
+  PREFS_LANDING_DISMISS_MS,
+  formatPrefsLandingSummary,
+  describePrefsDeepLink,
+} from './ui/prefsLandingToast.js';
+export {
   COMPOUND_TO_EMBLEM,
+  COMPOUND_EMBLEM_HOLD_SEC,
+  COMPOUND_EMBLEM_RELEASE_SEC,
   emblemForCompound,
   crossfadeEase,
   lerpGesture,
   crossfadeCompoundToEmblem,
+  compoundEmblemLifecycle,
 } from './export/compoundEmblemCrossfade.js';

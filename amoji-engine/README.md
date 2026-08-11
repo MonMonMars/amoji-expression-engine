@@ -41,7 +41,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 28 | Prefs JSON import/export · affect staging · gateway health chip | Done |
 | Phase 29 | Auto health poll · prefs URL hash · compound affect staging | Done |
 | Phase 30 | Poll backoff · prefs QR/short-link · compound→emblem crossfade | Done |
-| Phase 31+ | Further production polish… | Specced |
+| Phase 31 | Poll jitter · deep-link landing toast · emblem hold/release | Done |
+| Phase 32+ | Further production polish… | Specced |
 
 ## Quick start
 

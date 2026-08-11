@@ -135,3 +135,129 @@ export function crossfadeCompoundToEmblem(
     {},
   );
 }
+
+/** Extra hold after crossfade reaches emblem (seconds). */
+export const COMPOUND_EMBLEM_HOLD_SEC = 0.55;
+/** Release blend back toward compound affect (seconds). */
+export const COMPOUND_EMBLEM_RELEASE_SEC = 0.4;
+
+/**
+ * Full compound→emblem lifecycle: crossfade → hold → release → done.
+ * @param {string} compoundId
+ * @param {number} [intensity]
+ * @param {number} [elapsedSec] time since kickoff
+ * @param {{
+ *   articulate?: boolean,
+ *   emblemId?: string|null,
+ *   crossfadeSec?: number,
+ *   holdSec?: number,
+ *   releaseSec?: number,
+ * }} [opts]
+ */
+export function compoundEmblemLifecycle(
+  compoundId,
+  intensity = 0.7,
+  elapsedSec = 0,
+  opts = {},
+) {
+  const kick = crossfadeCompoundToEmblem(compoundId, intensity, 0, opts);
+  if (!kick.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'compound_emblem_lifecycle',
+        ok: false,
+        error: kick.error || 'unknown_compound',
+        compoundId,
+        phase: 'done',
+        scientific: false,
+      },
+      {},
+    );
+  }
+  const crossfadeSec = Math.max(
+    0.2,
+    opts.crossfadeSec ?? kick.durationSec ?? 0.9,
+  );
+  const holdSec = Math.max(
+    0,
+    opts.holdSec ?? (kick.emblemId ? COMPOUND_EMBLEM_HOLD_SEC : 0),
+  );
+  const releaseSec = Math.max(
+    0.05,
+    opts.releaseSec ?? (kick.emblemId ? COMPOUND_EMBLEM_RELEASE_SEC : 0.25),
+  );
+  const tElapsed = Math.max(0, Number(elapsedSec) || 0);
+  const totalSec = crossfadeSec + holdSec + releaseSec;
+
+  /** @type {'crossfade'|'hold'|'release'|'done'} */
+  let phase = 'crossfade';
+  let gesture = kick.gesture;
+  let fingerPresetId = kick.fingerPresetId;
+  let emblemId = kick.emblemId;
+  let clearEmblem = false;
+  let t = 0;
+  let ease = 0;
+
+  if (tElapsed < crossfadeSec) {
+    phase = 'crossfade';
+    t = crossfadeSec > 0 ? tElapsed / crossfadeSec : 1;
+    const xf = crossfadeCompoundToEmblem(compoundId, intensity, t, opts);
+    gesture = xf.gesture;
+    fingerPresetId = xf.fingerPresetId;
+    emblemId = xf.emblemId;
+    ease = xf.ease;
+  } else if (tElapsed < crossfadeSec + holdSec) {
+    phase = 'hold';
+    t = 1;
+    const held = crossfadeCompoundToEmblem(compoundId, intensity, 1, opts);
+    gesture = held.gesture;
+    fingerPresetId = held.fingerPresetId;
+    emblemId = held.emblemId;
+    ease = 1;
+  } else if (tElapsed < totalSec) {
+    phase = 'release';
+    const u = (tElapsed - crossfadeSec - holdSec) / releaseSec;
+    ease = crossfadeEase(u);
+    const held = crossfadeCompoundToEmblem(compoundId, intensity, 1, opts);
+    const base = stageCompoundAffect(compoundId, intensity, opts);
+    gesture = lerpGesture(held.gesture, base.gesture, ease);
+    fingerPresetId =
+      ease >= 0.5 ? base.fingerPresetId || held.fingerPresetId : held.fingerPresetId;
+    emblemId = held.emblemId;
+    // mid-release: keep emblem id for UI until done
+  } else {
+    phase = 'done';
+    t = 1;
+    const base = stageCompoundAffect(compoundId, intensity, opts);
+    gesture = base.gesture ? { ...base.gesture } : null;
+    fingerPresetId = base.fingerPresetId;
+    emblemId = kick.emblemId;
+    clearEmblem = !!kick.emblemId;
+    ease = 1;
+  }
+
+  return applyComplianceGate(
+    {
+      kind: 'compound_emblem_lifecycle',
+      ok: true,
+      compoundId,
+      label: kick.label,
+      intensity: Number(intensity) || 0,
+      elapsedSec: tElapsed,
+      phase,
+      t,
+      ease,
+      emblemId: emblemId || null,
+      clearEmblem,
+      fingerPresetId: fingerPresetId || null,
+      gesture,
+      lookBias: kick.lookBias,
+      crossfadeSec,
+      holdSec,
+      releaseSec,
+      totalSec,
+      scientific: false,
+    },
+    {},
+  );
+}

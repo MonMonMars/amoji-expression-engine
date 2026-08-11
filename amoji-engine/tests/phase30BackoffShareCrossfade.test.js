@@ -42,6 +42,7 @@ describe('Phase 30 health poll backoff', () => {
       endpoint: 'https://tts.example.com/v1/tts/step',
       intervalMs: 4000,
       maxIntervalMs: 60000,
+      jitterRatio: 0,
       fetchImpl,
       onResult,
     });
