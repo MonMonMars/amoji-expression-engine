@@ -749,6 +749,19 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
   { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
   { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin', kind: 'note' },
+  {
+    id: 'showBaselineDirtyStrip',
+    keys: ['Home'],
+    help: 'Home dirty strip',
+    kind: 'action',
+  },
+  {
+    id: 'copyBaselineDirtyStrip',
+    keys: ['End'],
+    help: 'End copy dirty',
+    kind: 'action',
+  },
+  { id: 'dirtyStrip', help: 'dirty strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -1877,6 +1890,22 @@ export function formatDisneyExtremeDirtyHudBit(opts = {}) {
     changeCount,
     bit: !hasBaseline ? '' : dirty ? `${dirtyWord}${fpBit}` : ` · clean${fpBit}`,
   };
+}
+
+/**
+ * Live dirty/clean strip label for Extreme pin drift HUD.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string, changeCount?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineDirtyStripLabel(opts = {}) {
+  const hud = formatDisneyExtremeDirtyHudBit(opts);
+  if (!hud.hasBaseline) return 'dirty · none';
+  if (!hud.dirty) {
+    return hud.fp ? `dirty · clean · fp ${hud.fp}` : 'dirty · clean';
+  }
+  const drift =
+    hud.changeCount > 0 ? `dirty×${hud.changeCount}` : 'dirty';
+  return hud.fp ? `dirty · ${drift} · fp ${hud.fp}` : `dirty · ${drift}`;
 }
 
 /**

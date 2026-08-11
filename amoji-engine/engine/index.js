@@ -355,6 +355,7 @@ export {
   formatDisneyExtremeBaselinePinStripLabel,
   formatDisneyExtremeBaselineHudBundleSummary,
   formatDisneyExtremeBaselineHudBundleLabel,
+  formatDisneyExtremeBaselineDirtyStripLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
   formatDisneyExtremeBaselineChipDiffLabel,
   formatDisneyExtremeBaselineChipCompareLabel,

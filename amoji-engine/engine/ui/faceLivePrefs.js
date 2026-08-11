@@ -209,6 +209,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Enter` → flash Extreme pin strip readout
  * - `Alt+Enter` → flash Extreme HUD bundle summary
  * - `Shift+Alt+Enter` → copy Extreme HUD bundle (tips/roots/capacity/active/pin)
+ * - `Home` → flash Extreme dirty/clean pin-drift strip
+ * - `End` → copy Extreme dirty/clean pin-drift strip
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline

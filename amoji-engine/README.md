@@ -372,7 +372,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 359 | Extreme Alt+Enter hud bundle | Done |
 | Phase 360 | Extreme ⇧Alt+Enter copy hud | Done |
 | Phase 361 | Extreme HUD bundle catalog | Done |
-| Phase 362+ | Further production polish… | Specced |
+| Phase 362 | Extreme dirty strip formatter | Done |
+| Phase 363 | Extreme dirty strip HUD | Done |
+| Phase 364 | Extreme Home dirty strip | Done |
+| Phase 365 | Extreme End copy dirty | Done |
+| Phase 366+ | Further production polish… | Specced |
 
 ## Quick start
 
