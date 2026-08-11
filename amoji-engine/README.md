@@ -388,7 +388,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 375 | Extreme HUD bundle includes dirty | Done |
 | Phase 376 | Extreme Delete clear active | Done |
 | Phase 377 | Extreme Insert pin base | Done |
-| Phase 378+ | Further production polish… | Specced |
+| Phase 378 | Extreme Tab focus panel | Done |
+| Phase 379 | Extreme Shift+Insert replace pin | Done |
+| Phase 380 | Extreme Alt+Insert jump pin | Done |
+| Phase 381 | Extreme strips summary dbl-click copy | Done |
+| Phase 382+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -26,7 +26,12 @@ describe('Phase 109 Disney Extreme hotkey X', () => {
     expect(resolveDisneyExtremeHotkey({ key: '`' }).action).toBe(
       'showBaselineStacksCapacity',
     );
-    expect(resolveDisneyExtremeHotkey({ key: 'Tab' }).ok).toBe(false);
+    expect(resolveDisneyExtremeHotkey({ key: 'Tab' }).action).toBe(
+      'focusExtremePanel',
+    );
+    expect(
+      resolveDisneyExtremeHotkey({ key: 'Tab', shiftKey: true }).ok,
+    ).toBe(false);
     expect(typeof engine.resolveDisneyExtremeHotkey).toBe('function');
   });
 

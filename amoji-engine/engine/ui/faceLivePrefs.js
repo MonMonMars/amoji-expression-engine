@@ -220,6 +220,9 @@ export function disneyExtremeUiDefaults() {
  * - `ArrowRight` / `ArrowLeft` → cycle Extreme favorite next / previous
  * - `Delete` / `Backspace` → clear Extreme active chips / status hold
  * - `Insert` → pin current Extreme factors as baseline
+ * - `Shift+Insert` → replace Extreme pinned baseline
+ * - `Alt+Insert` → jump / restore Extreme pinned baseline
+ * - `Tab` → focus / scroll Extreme panel into view (Shift+Tab left to browser)
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -448,7 +451,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except ... / Alt+/ root jumps / Alt+Space root summary / Alt+Enter hud bundle.
+  // except ... / Alt+Enter hud bundle / Alt+Insert jump pin.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-8]$/.test(lower);
@@ -456,6 +459,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     const rootSlash = lower === '/';
     const rootSpace = key === ' ';
     const enterKey = key === 'Enter';
+    const insertKey = key === 'Insert';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -487,7 +491,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !tipDigit &&
       !rootSlash &&
       !rootSpace &&
-      !enterKey
+      !enterKey &&
+      !insertKey
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -824,8 +829,19 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'clearActiveChipsKey') {
       return { ok: true, action: 'clearStatusHold' };
     }
+    if (entry.id === 'pinBaselineInsert' && ev.altKey) {
+      return { ok: true, action: 'jumpBaselinePin' };
+    }
+    if (entry.id === 'pinBaselineInsert' && ev.shiftKey) {
+      return { ok: true, action: 'replaceBaselinePin' };
+    }
     if (entry.id === 'pinBaselineInsert') {
       return { ok: true, action: 'pinBaseline' };
+    }
+    if (entry.id === 'focusExtremePanelTab') {
+      // Preserve Shift+Tab browser focus traversal.
+      if (ev.shiftKey) return { ok: false, reason: 'modifier' };
+      return { ok: true, action: 'focusExtremePanel' };
     }
     return { ok: true, action: entry.id };
   }
