@@ -568,6 +568,34 @@
             />
           </div>
         </div>
+        <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
+          <label class="row" style="margin:0;gap:8px;align-items:center;">
+            <span>Eyes ×</span>
+            <input
+              id="disneyExtremeEyeFactor"
+              type="range"
+              min="1"
+              max="2.2"
+              step="0.05"
+              value="1.4"
+              disabled
+            />
+          </label>
+        </div>
+        <div class="row" style="gap:12px;align-items:center;margin-top:2px;">
+          <label class="row" style="margin:0;gap:8px;align-items:center;">
+            <span>Mouth ×</span>
+            <input
+              id="disneyExtremeMouthFactor"
+              type="range"
+              min="1"
+              max="2.2"
+              step="0.05"
+              value="1.5"
+              disabled
+            />
+          </label>
+        </div>
       </div>
 
       <div class="group">
@@ -1120,6 +1148,8 @@
       const disneyExtremeFactorEl = document.getElementById('disneyExtremeFactor');
       const disneyExtremeBodyEl = document.getElementById('disneyExtremeBody');
       const disneyExtremeBodyFactorEl = document.getElementById('disneyExtremeBodyFactor');
+      const disneyExtremeEyeFactorEl = document.getElementById('disneyExtremeEyeFactor');
+      const disneyExtremeMouthFactorEl = document.getElementById('disneyExtremeMouthFactor');
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
@@ -1142,6 +1172,18 @@
         disneyExtremeBodyEl.addEventListener('change', syncBodyUi);
         disneyExtremeEl?.addEventListener('change', syncBodyUi);
       }
+
+      const syncEyeMouthUi = () => {
+        const masterOn = !!disneyExtremeEl?.checked;
+        if (disneyExtremeEyeFactorEl) {
+          disneyExtremeEyeFactorEl.disabled = !masterOn;
+        }
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.disabled = !masterOn;
+        }
+      };
+      syncEyeMouthUi();
+      disneyExtremeEl?.addEventListener('change', syncEyeMouthUi);
 
       let lod = 'hi';
       let texLod = 'mid';
@@ -4305,6 +4347,21 @@
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);
+
+        // Disney Extreme: separate multipliers for eye vs mouth morphs.
+        const disneyEyeFactor = disneyExtremeEyeFactorEl
+          ? Number(disneyExtremeEyeFactorEl.value || 1.4)
+          : 1.4;
+        const disneyMouthFactor = disneyExtremeMouthFactorEl
+          ? Number(disneyExtremeMouthFactorEl.value || 1.5)
+          : 1.5;
+        if (disneyExtremeOn) {
+          for (const [k, v] of Object.entries(targets || {})) {
+            // Recipes use Expressions_* names; apply coarse categories.
+            if (k.includes('eye') || k.includes('iris')) targets[k] = v * disneyEyeFactor;
+            if (k.includes('mouth')) targets[k] = v * disneyMouthFactor;
+          }
+        }
         if (moodState.morphs && Object.keys(moodState.morphs).length) {
           mergeMorphOverlays(targets, moodState.morphs);
         }
