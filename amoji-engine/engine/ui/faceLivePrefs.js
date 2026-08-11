@@ -85,6 +85,8 @@ export function disneyExtremeUiDefaults() {
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `Shift+K` → clear Extreme baseline history + redo stacks (keep baseline)
  * - `p` / `P` → pin current Extreme factors as baseline
+ * - `o` / `O` → copy Extreme baseline redo JSON
+ * - `Shift+O` → paste Extreme baseline redo JSON from clipboard
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
@@ -353,6 +355,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'clearBaseline' && ev.shiftKey) {
       return { ok: true, action: 'clearBaselineHistory' };
+    }
+    if (entry.id === 'copyBaselineRedoJson' && ev.shiftKey) {
+      return { ok: true, action: 'pasteBaselineRedoJson' };
     }
     return { ok: true, action: entry.id };
   }

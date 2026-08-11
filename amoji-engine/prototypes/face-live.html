@@ -808,6 +808,8 @@
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
           <button type="button" id="btnDisneyExtremePinBase">Pin baseline <kbd>P</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
+          <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
@@ -819,7 +821,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · P pin · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · P pin · O/⇧O redo JSON · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1228,8 +1230,11 @@
         formatDisneyExtremeBaselineHistoryEntry,
         formatDisneyExtremeBaselineHistoryList,
         formatDisneyExtremeBaselineChipPreviewLabel,
+        formatDisneyExtremeBaselineChipDiffLabel,
         serializeDisneyExtremeBaselineHistory,
         parseDisneyExtremeBaselineHistory,
+        serializeDisneyExtremeBaselineRedo,
+        parseDisneyExtremeBaselineRedo,
         formatDisneyExtremeBaselineHistoryPreviewLabel,
         hasDisneyExtremeBaselineHistory,
         formatDisneyExtremeSnapshotPreviewLabel,
@@ -1603,6 +1608,16 @@
                 );
                 return;
               }
+              if (ev.altKey) {
+                flashDisneyExtremeStatus(
+                  formatDisneyExtremeBaselineChipDiffLabel(
+                    disneyExtremeSnapshot(),
+                    snap,
+                    { index: i + 1 },
+                  ),
+                );
+                return;
+              }
               jumpDisneyExtremeBaselineHistory(i);
             });
             el.appendChild(btn);
@@ -1634,6 +1649,16 @@
                     index: i + 1,
                     kind: 'redo',
                   }),
+                );
+                return;
+              }
+              if (ev.altKey) {
+                flashDisneyExtremeStatus(
+                  formatDisneyExtremeBaselineChipDiffLabel(
+                    disneyExtremeSnapshot(),
+                    snap,
+                    { index: i + 1, kind: 'redo' },
+                  ),
                 );
                 return;
               }
@@ -1685,6 +1710,62 @@
         const fp = disneyExtremeSnapshotFingerprintShort(snap);
         flashDisneyExtremeStatus(`pinned · baseline · fp ${fp}`);
         return true;
+      }
+
+      function applyDisneyExtremeBaselineRedo(redo, opts = {}) {
+        const list = Array.isArray(redo) ? redo : [];
+        extremeBaselineRedo = list.slice();
+        persistDisneyExtremeBaselineRedo();
+        syncDisneyExtremeHistoryUi();
+        const count = extremeBaselineRedo.length;
+        if (!opts.silent) {
+          flashDisneyExtremeStatus(
+            count > 0
+              ? `imported · redo ${count}`
+              : 'imported · redo · empty',
+          );
+        }
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineRedoJson() {
+        const json = serializeDisneyExtremeBaselineRedo(extremeBaselineRedo, {
+          pretty: true,
+        });
+        const count = extremeBaselineRedo.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(json);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · redo JSON · ${count}`
+            : `copy failed · redo JSON · ${count}`,
+        );
+        return ok;
+      }
+
+      async function pasteDisneyExtremeBaselineRedoJson() {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · redo clipboard');
+          return false;
+        }
+        const parsed = parseDisneyExtremeBaselineRedo(text);
+        if (!parsed.ok) {
+          flashDisneyExtremeStatus(`paste failed · redo · ${parsed.error}`);
+          return false;
+        }
+        return applyDisneyExtremeBaselineRedo(parsed.redo);
       }
 
       async function copyDisneyExtremeBaselineHistoryJson() {
@@ -2069,6 +2150,14 @@
         pinDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeCopyRedo')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineRedoJson();
+      });
+
+      document.getElementById('btnDisneyExtremePasteRedo')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineRedoJson();
+      });
+
       document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
         undoDisneyExtremeBaseline();
       });
@@ -2344,13 +2433,21 @@
             merge: !!ev.shiftKey,
           });
         }
+        const redoParsed = parseDisneyExtremeBaselineRedo(text);
+        if (redoParsed.ok) {
+          if (preview) {
+            flashDisneyExtremeStatus(
+              redoParsed.redo.length
+                ? `preview · redo ${redoParsed.redo.length}`
+                : 'preview · redo · empty',
+            );
+            return true;
+          }
+          return applyDisneyExtremeBaselineRedo(redoParsed.redo);
+        }
         const parsed = parseDisneyExtremeSnapshot(text);
         if (!parsed.ok) {
-          flashDisneyExtremeStatus(
-            histParsed.error === 'kind'
-              ? `drop failed · ${parsed.error}`
-              : `drop failed · ${parsed.error}`,
-          );
+          flashDisneyExtremeStatus(`drop failed · ${parsed.error}`);
           return false;
         }
         if (preview) {
@@ -2822,6 +2919,16 @@
         if (resolved.action === 'pinBaseline') {
           ev.preventDefault();
           pinDisneyExtremeBaseline();
+          return;
+        }
+        if (resolved.action === 'copyBaselineRedoJson') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineRedoJson();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineRedoJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineRedoJson();
           return;
         }
         if (resolved.action === 'undoBaseline') {

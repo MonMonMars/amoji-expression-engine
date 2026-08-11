@@ -566,6 +566,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
   { id: 'pinBaseline', keys: ['p', 'P'], help: 'P pin base', kind: 'action' },
+  { id: 'copyBaselineRedoJson', keys: ['o', 'O'], help: 'O copy redo JSON', kind: 'action' },
+  { id: 'pasteBaselineRedoJson', help: 'Shift+O paste redo', kind: 'note' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
@@ -581,6 +583,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   },
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
+  { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1512,6 +1515,31 @@ export function formatDisneyExtremeBaselineChipPreviewLabel(snap, opts = {}) {
 }
 
 /**
+ * Diff live Extreme snapshot vs a hist/redo chip (Alt+click).
+ * @param {object|null|undefined} current
+ * @param {object|null|undefined} chipSnap
+ * @param {{ index?: number, kind?: 'hist'|'redo' }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineChipDiffLabel(
+  current,
+  chipSnap,
+  opts = {},
+) {
+  const kind = opts.kind === 'redo' ? 'redo' : 'hist';
+  const entry = formatDisneyExtremeBaselineHistoryEntry(chipSnap, {
+    index: opts.index,
+    compact: true,
+    kind: opts.kind === 'redo' ? 'redo' : undefined,
+  });
+  if (entry === '—') return `chip · ${kind} · invalid`;
+  if (!chipSnap) return `chip · ${kind} · invalid`;
+  const diff = diffDisneyExtremeSnapshots(current, chipSnap);
+  const bit = formatDisneyExtremeSnapshotDiffLabel(diff);
+  return `chip · ${entry} · ${bit}`;
+}
+
+/**
  * Serialize Extreme baseline history stack to versioned JSON.
  * @param {object[]|null|undefined} history
  * @param {{ pretty?: boolean }} [opts]
@@ -1568,6 +1596,66 @@ export function parseDisneyExtremeBaselineHistory(input) {
   return {
     ok: true,
     history: history.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+  };
+}
+
+/**
+ * Serialize Extreme baseline redo stack to versioned JSON.
+ * @param {object[]|null|undefined} redo
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function serializeDisneyExtremeBaselineRedo(redo, opts = {}) {
+  const list = Array.isArray(redo) ? redo : [];
+  const items = [];
+  for (const snap of list) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    items.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  return JSON.stringify(
+    {
+      kind: DISNEY_EXTREME_BASELINE_REDO_JSON_KIND,
+      items,
+    },
+    null,
+    opts.pretty ? 2 : 0,
+  );
+}
+
+/**
+ * Parse clipboard / export JSON into an Extreme baseline redo stack.
+ * @param {string|object|null|undefined} input
+ * @returns {{ ok: true, redo: object[] }|{ ok: false, error: string }}
+ */
+export function parseDisneyExtremeBaselineRedo(input) {
+  let obj = input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return { ok: false, error: 'empty' };
+    try {
+      obj = JSON.parse(trimmed);
+    } catch {
+      return { ok: false, error: 'invalid_json' };
+    }
+  }
+  if (!obj || typeof obj !== 'object') {
+    return { ok: false, error: 'invalid_payload' };
+  }
+  if (obj.kind !== DISNEY_EXTREME_BASELINE_REDO_JSON_KIND) {
+    return { ok: false, error: 'kind' };
+  }
+  if (!Array.isArray(obj.items)) {
+    return { ok: false, error: 'items' };
+  }
+  const redo = [];
+  for (const item of obj.items) {
+    const snap = parseDisneyExtremeSnapshot(item);
+    if (snap.ok) redo.push(snap.snap);
+  }
+  return {
+    ok: true,
+    redo: redo.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
   };
 }
 
