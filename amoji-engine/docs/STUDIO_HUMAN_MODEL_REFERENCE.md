@@ -221,6 +221,9 @@ Amoji engine (ND “systemic emotion”)
 98. ~~**Probe toast history stack** (`createProbeToastHistory` · Prev/Next · `[` / `]`)~~ ✓
 99. ~~**Audit views duplicate** (`duplicate` · Duplicate view)~~ ✓
 100. ~~**Cancel compound on look-at track** (Track camera / Center clears lifecycle)~~ ✓
+101. ~~**Probe toast compare mode** (`compareProbeToastDetails` · `=` toggle vs previous)~~ ✓
+102. ~~**Audit views share snapshot** (`#flv=` · Share view link)~~ ✓
+103. ~~**Cancel compound on idle toggle** (Idle sway clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -252,4 +255,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast compare mode, views share snapshot, cancel on idle toggle).
+Next code increment: further polish (toast SLA badge, views folders, cancel on spin/cycle).

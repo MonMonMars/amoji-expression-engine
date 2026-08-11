@@ -44,6 +44,12 @@ export function createProbeToastHistory(opts = {}) {
     get current() {
       return index >= 0 ? entries[index] : null;
     },
+    get previous() {
+      return index > 0 ? entries[index - 1] : null;
+    },
+    get canCompare() {
+      return index > 0;
+    },
     list() {
       return applyComplianceGate(
         {

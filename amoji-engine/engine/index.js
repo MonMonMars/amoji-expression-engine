@@ -528,6 +528,11 @@ export {
   importAuditSavedViewsJson,
   renameAuditSavedView,
   nextDuplicateViewName,
+  compactAuditViewForShare,
+  expandAuditViewFromShare,
+  encodeAuditViewHash,
+  decodeAuditViewHash,
+  buildAuditViewShareSnapshot,
   createAuditSavedViews,
 } from './ui/auditSavedViews.js';
 export {
@@ -545,6 +550,7 @@ export {
   normalizeProbeToastHistoryEntry,
   createProbeToastHistory,
 } from './ui/probeToastHistory.js';
+export { compareProbeToastDetails } from './ui/probeToastCompare.js';
 export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,

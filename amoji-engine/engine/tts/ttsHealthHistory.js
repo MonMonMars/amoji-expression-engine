@@ -397,6 +397,7 @@ export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
 export const PROBE_TOAST_ACTIONS = [
   { id: 'prev', label: 'Prev', shortcut: '[' },
   { id: 'next', label: 'Next', shortcut: ']' },
+  { id: 'compare', label: 'Compare', shortcut: '=' },
   { id: 'copy', label: 'Copy', shortcut: 'c' },
   { id: 'reprobe', label: 'Re-probe', shortcut: 'r' },
   { id: 'pin', label: 'Pin', shortcut: 'p' },
@@ -441,6 +442,7 @@ export function resolveProbeToastShortcut(ev, opts = {}) {
   else if (k === 'p' || k === 'P') action = 'pin';
   else if (k === '[') action = 'prev';
   else if (k === ']') action = 'next';
+  else if (k === '=' || k === '+') action = 'compare';
   if (!action) {
     return applyComplianceGate(
       {
@@ -536,7 +538,29 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         pin: false,
         unpin: false,
         history: id,
+        compare: false,
         reason: can ? null : id === 'prev' ? 'at_start' : 'at_end',
+      },
+      {},
+    );
+  }
+  if (id === 'compare') {
+    const can = !!ctx.canCompare;
+    const on = !!ctx.compareOn;
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: can || on,
+        action: 'compare',
+        copy: null,
+        dismiss: false,
+        reprobe: false,
+        pin: false,
+        unpin: false,
+        history: null,
+        compare: true,
+        compareOn: !on,
+        reason: can || on ? null : 'need_previous',
       },
       {},
     );
@@ -553,6 +577,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         pin: false,
         unpin: false,
         history: null,
+        compare: false,
       },
       {},
     );
@@ -569,6 +594,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         pin: false,
         unpin: false,
         history: null,
+        compare: false,
       },
       {},
     );
@@ -587,6 +613,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         unpin: pinned,
         sticky: !pinned,
         history: null,
+        compare: false,
       },
       {},
     );
@@ -603,6 +630,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         pin: false,
         unpin: false,
         history: null,
+        compare: false,
       },
       {},
     );
@@ -618,6 +646,7 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
       pin: false,
       unpin: false,
       history: null,
+      compare: false,
     },
     {},
   );

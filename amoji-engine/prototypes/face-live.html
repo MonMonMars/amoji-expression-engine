@@ -708,6 +708,7 @@
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDuplicateView">Duplicate view</button>
+          <button type="button" id="btnPrefsAuditShareView">Share view</button>
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
@@ -810,10 +811,15 @@
         resolveProbeToastShortcut,
       } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
-      import { createAuditSavedViews } from '/engine/ui/auditSavedViews.js';
       import { createProbeToastFocusTrap } from '/engine/ui/probeToastFocusTrap.js';
       import { createProbeToastDismissTimer } from '/engine/ui/probeToastDismiss.js';
       import { createProbeToastHistory } from '/engine/ui/probeToastHistory.js';
+      import { compareProbeToastDetails } from '/engine/ui/probeToastCompare.js';
+      import {
+        createAuditSavedViews,
+        buildAuditViewShareSnapshot,
+        decodeAuditViewHash,
+      } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -999,6 +1005,7 @@
       let prefsAuditRange = 'all';
       let lastProbeDetail = null;
       let probeToastVisible = false;
+      let probeToastCompareOn = false;
       function refreshPrefsAuditUi() {
         const fmt = prefsShareAudit.format({
           limit: 6,
@@ -1049,6 +1056,7 @@
         const el = document.getElementById('probeDetailToast');
         el?.classList.remove('show');
         probeToastVisible = false;
+        probeToastCompareOn = false;
         probeToastFocusTrap.deactivate();
         probeToastDismiss.cancel();
       }
@@ -1058,6 +1066,7 @@
         if (!el || !toast.show) return;
         if (!opts.fromHistory) {
           probeToastHistory.push(detail);
+          probeToastCompareOn = false;
         }
         lastProbeDetail = detail;
         const titleEl = document.getElementById('probeToastTitle');
@@ -1067,23 +1076,39 @@
           probeToastHistory.size > 1
             ? ` · ${probeToastHistory.index + 1}/${probeToastHistory.size}`
             : '';
-        if (titleEl) titleEl.textContent = `${toast.title || 'Probe detail'}${histLabel}`;
-        if (detailEl) {
-          detailEl.textContent = `${toast.detail || ''} · [ ] history · c copy · r re-probe · p pin · esc`;
+        let title = `${toast.title || 'Probe detail'}${histLabel}`;
+        let detailText = `${toast.detail || ''} · [ ] history · = compare · c r p esc`;
+        if (probeToastCompareOn && probeToastHistory.previous) {
+          const cmp = compareProbeToastDetails(
+            detail,
+            probeToastHistory.previous.detail,
+          );
+          if (cmp.ok) {
+            title = `${cmp.title}${histLabel}`;
+            detailText = cmp.lines?.join(' · ') || cmp.detail;
+          }
         }
+        if (titleEl) titleEl.textContent = title;
+        if (detailEl) detailEl.textContent = detailText;
         if (actionsEl) {
           actionsEl.innerHTML = '';
           for (const a of toast.actions || []) {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.action = a.id;
-            const label =
-              a.id === 'pin' && probeToastDismiss.pinned ? 'Unpin' : a.label;
+            let label = a.label;
+            if (a.id === 'pin' && probeToastDismiss.pinned) label = 'Unpin';
+            if (a.id === 'compare' && probeToastCompareOn) label = 'Compare on';
             btn.textContent = a.shortcut
               ? `${label} (${a.shortcut === 'Escape' ? 'esc' : a.shortcut})`
               : label;
             if (a.id === 'prev') btn.disabled = !probeToastHistory.canBack;
             if (a.id === 'next') btn.disabled = !probeToastHistory.canForward;
+            if (a.id === 'compare') {
+              btn.disabled =
+                !probeToastHistory.canCompare && !probeToastCompareOn;
+              if (probeToastCompareOn) btn.classList.add('primary');
+            }
             actionsEl.appendChild(btn);
           }
         }
@@ -1123,7 +1148,8 @@
           reason !== 'smile_pick' &&
           reason !== 'laugh_pick' &&
           reason !== 'gaze_pick' &&
-          reason !== 'look_pick'
+          reason !== 'look_pick' &&
+          reason !== 'idle_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1136,7 +1162,8 @@
           reason === 'smile_pick' ||
           reason === 'laugh_pick' ||
           reason === 'gaze_pick' ||
-          reason === 'look_pick'
+          reason === 'look_pick' ||
+          reason === 'idle_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1869,6 +1896,7 @@
       }
 
       document.getElementById('btnIdle').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('idle_pick');
         idleOn = !idleOn;
         e.currentTarget.classList.toggle('primary', idleOn);
       });
@@ -2239,8 +2267,21 @@
             pinned: probeToastDismiss.pinned,
             canBack: probeToastHistory.canBack,
             canForward: probeToastHistory.canForward,
+            canCompare: probeToastHistory.canCompare,
+            compareOn: probeToastCompareOn,
           });
           if (!resolved.ok) return resolved;
+          if (resolved.compare) {
+            probeToastCompareOn = !!resolved.compareOn;
+            if (lastProbeDetail) {
+              showProbeToast(lastProbeDetail, { fromHistory: true });
+            }
+            setTtsStatus(
+              probeToastCompareOn ? 'probe compare on' : 'probe compare off',
+              'ok',
+            );
+            return resolved;
+          }
           if (resolved.history === 'prev') {
             const stepped = probeToastHistory.back();
             if (stepped.ok && stepped.detail) {
@@ -2517,6 +2558,24 @@
             setTimeout(hide, landing.dismissMs || 4200);
           }
         }
+        const viewHash = decodeAuditViewHash(
+          typeof location !== 'undefined' ? location.hash || '' : '',
+        );
+        if (viewHash.ok && viewHash.view) {
+          const imported = auditSavedViews.save(
+            {
+              action: viewHash.view.action,
+              query: viewHash.view.query,
+              regex: viewHash.view.regex,
+              rangePreset: viewHash.view.rangePreset,
+            },
+            { name: viewHash.view.name },
+          );
+          applyAuditView(viewHash.view);
+          refreshAuditSavedViewsUi(imported.view?.id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · view from link · ${viewHash.view.name}`;
+        }
         document.getElementById('btnPrefsRevoke')?.addEventListener('click', () => {
           const revoke = describePrefsLinkRevoke();
           if (revoke.canRevoke) {
@@ -2654,6 +2713,47 @@
           refreshAuditSavedViewsUi(duped.view?.id);
           prefsStatus.className = 'status ok';
           prefsStatus.textContent = `prefs · duplicated “${duped.view?.name}”`;
+        });
+        document.getElementById('btnPrefsAuditShareView')?.addEventListener('click', async () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a saved view to share';
+            return;
+          }
+          const got = auditSavedViews.get(id);
+          if (!got.ok || !got.view) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · share view failed';
+            return;
+          }
+          const snap = buildAuditViewShareSnapshot(got.view, {
+            origin: location.origin,
+            path: location.pathname || '/prototypes/face-live.html',
+          });
+          try {
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(snap.copyText);
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = snap.copyText;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              ta.remove();
+            }
+            prefsShareAudit.record('share_view', {
+              summary: snap.summary,
+              shortUrl: snap.shortUrl,
+            });
+            refreshPrefsAuditUi();
+            prefsStatus.className = 'status ok';
+            prefsStatus.textContent = `prefs · view link copied · ${got.view.name}`;
+          } catch (err) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = String(err.message || err);
+          }
         });
         document.getElementById('btnPrefsAuditExportViews')?.addEventListener('click', () => {
           const exported = auditSavedViews.exportJson();

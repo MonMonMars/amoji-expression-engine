@@ -188,6 +188,157 @@ export function nextDuplicateViewName(baseName, existingNames = []) {
 }
 
 /**
+ * Compact a saved view for URL hash sharing.
+ * @param {object} view
+ */
+export function compactAuditViewForShare(view) {
+  const v = normalizeAuditSavedView(view || {});
+  /** @type {Record<string, unknown>} */
+  const out = {};
+  if (v.name && v.name !== 'Untitled') out.n = v.name;
+  if (v.action && v.action !== 'all') out.a = v.action;
+  if (v.query) out.q = v.query;
+  if (v.regex) out.r = 1;
+  if (v.rangePreset && v.rangePreset !== 'all') out.p = v.rangePreset;
+  return out;
+}
+
+/**
+ * Expand a compact share payload back into a saved view shape.
+ * @param {object} compact
+ * @param {{ now?: number }} [opts]
+ */
+export function expandAuditViewFromShare(compact, opts = {}) {
+  return normalizeAuditSavedView(
+    {
+      name: compact?.n || compact?.name,
+      action: compact?.a || compact?.action,
+      query: compact?.q ?? compact?.query,
+      regex: compact?.r ?? compact?.regex,
+      rangePreset: compact?.p || compact?.rangePreset,
+    },
+    { now: opts.now },
+  );
+}
+
+/**
+ * Encode saved view → `#flv=…` base64url JSON.
+ * @param {object} view
+ */
+export function encodeAuditViewHash(view) {
+  const compact = compactAuditViewForShare(view);
+  const json = JSON.stringify(compact);
+  const b64 =
+    typeof Buffer !== 'undefined'
+      ? Buffer.from(json, 'utf8').toString('base64url')
+      : btoa(unescape(encodeURIComponent(json)))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/g, '');
+  return `flv=${b64}`;
+}
+
+/**
+ * Decode `#flv=…` payload → saved view.
+ * @param {string} hashOrQuery
+ * @param {{ now?: number }} [opts]
+ */
+export function decodeAuditViewHash(hashOrQuery, opts = {}) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_view_hash',
+        ok: false,
+        reason: 'empty',
+        view: null,
+      },
+      {},
+    );
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(/(?:^|&)?flv=([^&]+)/);
+  if (!m) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_view_hash',
+        ok: false,
+        reason: 'no_flv',
+        view: null,
+      },
+      {},
+    );
+  }
+  raw = m[1];
+  try {
+    const pad = raw.length % 4 === 0 ? '' : '='.repeat(4 - (raw.length % 4));
+    const b64 = raw.replace(/-/g, '+').replace(/_/g, '/') + pad;
+    const json =
+      typeof Buffer !== 'undefined'
+        ? Buffer.from(b64, 'base64').toString('utf8')
+        : decodeURIComponent(escape(atob(b64)));
+    const obj = JSON.parse(json);
+    const view = expandAuditViewFromShare(obj, { now: opts.now });
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_view_hash',
+        ok: true,
+        view,
+        hash: `flv=${m[1]}`,
+      },
+      {},
+    );
+  } catch {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_view_hash',
+        ok: false,
+        reason: 'invalid',
+        view: null,
+      },
+      {},
+    );
+  }
+}
+
+/**
+ * Build a shareable Face Live URL for one audit saved view.
+ * @param {object} view
+ * @param {{
+ *   origin?: string,
+ *   path?: string,
+ *   baseUrl?: string,
+ *   now?: number,
+ * }} [opts]
+ */
+export function buildAuditViewShareSnapshot(view, opts = {}) {
+  const normalized = normalizeAuditSavedView(view || {}, { now: opts.now });
+  const hash = encodeAuditViewHash(normalized);
+  const path = opts.path || '/prototypes/face-live.html';
+  const origin =
+    opts.origin ||
+    (typeof location !== 'undefined' ? location.origin : '') ||
+    '';
+  const shortUrl = origin ? `${origin}${path}#${hash}` : `${path}#${hash}`;
+  const base =
+    opts.baseUrl ||
+    (origin ? `${origin}${path}` : path) ||
+    path;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_view_share',
+      ok: true,
+      view: normalized,
+      hash,
+      shortUrl,
+      url: `${String(base).split('#')[0]}#${hash}`,
+      copyText: shortUrl,
+      summary: `${normalized.name} · ${normalized.action}${normalized.query ? ` · ${normalized.query}` : ''}`,
+    },
+    {},
+  );
+}
+
+/**
  * Create a persisted (or memory) saved-views store.
  * @param {{
  *   max?: number,

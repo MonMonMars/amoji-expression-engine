@@ -53,7 +53,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 40 | Toast pause-on-hover · views delete · smile/laugh cancel | Done |
 | Phase 41 | Toast sticky pin · views rename · gaze cancel | Done |
 | Phase 42 | Toast history stack · views duplicate · look cancel | Done |
-| Phase 43+ | Further production polish… | Specced |
+| Phase 43 | Toast compare · views share snapshot · idle cancel | Done |
+| Phase 44+ | Further production polish… | Specced |
 
 ## Quick start
 
