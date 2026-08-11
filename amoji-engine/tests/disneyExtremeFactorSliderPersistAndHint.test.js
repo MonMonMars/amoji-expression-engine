@@ -21,17 +21,18 @@ describe('Disney Extreme factor slider persist + hint', () => {
     expect(src).toContain(
       "disneyExtremeFactorEl.addEventListener('input', () => {\n          syncDisneyExtremeFactorLabels();\n          updateTierHintForDisneyExtreme();\n        });",
     );
+    expect(src).toContain('syncDisneyExtremePrefsSummary()');
     expect(src).toContain(
-      "disneyExtremeFactorEl.addEventListener('change', () => persistPrefs());",
+      "disneyExtremeFactorEl.addEventListener('change', () => {\n          syncDisneyExtremePrefsSummary();\n          persistPrefs();\n        });",
     );
     expect(src).toContain(
-      "disneyExtremeBodyFactorEl.addEventListener('change', () => persistPrefs());",
+      "disneyExtremeBodyFactorEl.addEventListener('change', () => {\n          syncDisneyExtremePrefsSummary();\n          persistPrefs();\n        });",
     );
     expect(src).toContain(
-      "disneyExtremeEyeFactorEl?.addEventListener('change', () => persistPrefs());",
+      "disneyExtremeEyeFactorEl?.addEventListener('change', () => {\n        syncDisneyExtremePrefsSummary();\n        persistPrefs();\n      });",
     );
     expect(src).toContain(
-      "disneyExtremeMouthFactorEl?.addEventListener('change', () => persistPrefs());",
+      "disneyExtremeMouthFactorEl?.addEventListener('change', () => {\n        syncDisneyExtremePrefsSummary();\n        persistPrefs();\n      });",
     );
   });
 });

@@ -2,7 +2,10 @@
  * Prefs deep-link landing toast — summarize #flp= hash restore for Face Live.
  */
 import { applyComplianceGate } from '../compliance/complianceGate.js';
-import { normalizeFaceLivePrefs } from './faceLivePrefs.js';
+import {
+  normalizeFaceLivePrefs,
+  summarizeDisneyExtremePrefs,
+} from './faceLivePrefs.js';
 import { evaluatePrefsLinkExpiry } from './prefsLinkExpiry.js';
 import { formatProbeToastFeedbackSummary } from './probeToastFeedback.js';
 
@@ -14,9 +17,11 @@ export const PREFS_LANDING_DISMISS_MS = 4200;
  */
 export function formatPrefsLandingSummary(prefs) {
   const p = normalizeFaceLivePrefs(prefs);
+  const extreme = summarizeDisneyExtremePrefs(p);
   const bits = [
     p.emotion,
     typeof p.intensity === 'number' ? `i${p.intensity.toFixed(2)}` : null,
+    extreme !== 'X off' ? extreme : null,
     p.fingerPresetId ? `✋${p.fingerPresetId}` : null,
     p.chassisId ? p.chassisId : null,
     p.ttsPresetId && p.ttsPresetId !== 'mock' ? `tts:${p.ttsPresetId}` : null,

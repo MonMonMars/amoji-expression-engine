@@ -79,6 +79,26 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
 }
 
 /**
+ * One-line summary of Disney Extreme prefs (for landing toast / title tooltips).
+ * @param {object} [prefs]
+ * @returns {string}
+ */
+export function summarizeDisneyExtremePrefs(prefs) {
+  const p = normalizeFaceLivePrefs(prefs);
+  if (!p.disneyExtreme) return 'X off';
+  const body = p.disneyExtremeBody
+    ? `body×${Number(p.disneyExtremeBodyFactor).toFixed(2)}`
+    : 'body off';
+  return [
+    'X on',
+    `shape×${Number(p.disneyExtremeFactor).toFixed(2)}`,
+    body,
+    `eye×${Number(p.disneyExtremeEyeFactor).toFixed(2)}`,
+    `mouth×${Number(p.disneyExtremeMouthFactor).toFixed(2)}`,
+  ].join(' · ');
+}
+
+/**
  * @param {any} raw
  */
 export function normalizeFaceLivePrefs(raw) {

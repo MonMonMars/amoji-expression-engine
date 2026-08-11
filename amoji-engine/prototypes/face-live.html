@@ -1018,6 +1018,7 @@
         loadFaceLivePrefsFromHash,
         disneyExtremeUiDefaults,
         resolveDisneyExtremeHotkey,
+        summarizeDisneyExtremePrefs,
       } from '/engine/ui/faceLivePrefs.js';
       import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
       import { describePrefsDeepLink } from '/engine/ui/prefsLandingToast.js';
@@ -1216,6 +1217,26 @@
         }
       }
 
+      function syncDisneyExtremePrefsSummary(prefsLike) {
+        if (!disneyExtremeStatus) return;
+        disneyExtremeStatus.title = summarizeDisneyExtremePrefs(
+          prefsLike || {
+            disneyExtreme: !!disneyExtremeEl?.checked,
+            disneyExtremeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+            disneyExtremeBody: !!disneyExtremeBodyEl?.checked,
+            disneyExtremeBodyFactor: Number(
+              disneyExtremeBodyFactorEl?.value || 1.6,
+            ),
+            disneyExtremeEyeFactor: Number(
+              disneyExtremeEyeFactorEl?.value || 1.4,
+            ),
+            disneyExtremeMouthFactor: Number(
+              disneyExtremeMouthFactorEl?.value || 1.5,
+            ),
+          },
+        );
+      }
+
       function updateTierHintForDisneyExtreme() {
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
         const { shapeInt } = computeDisneyExtremeIntensities(intensity, {
@@ -1258,19 +1279,24 @@
         );
       }
       syncDisneyExtremeFactorLabels();
+      syncDisneyExtremePrefsSummary(savedPrefs);
 
       if (disneyExtremeEl && disneyExtremeFactorEl) {
         disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
         disneyExtremeEl.addEventListener('change', () => {
           disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
           updateTierHintForDisneyExtreme();
+          syncDisneyExtremePrefsSummary();
           persistPrefs();
         });
         disneyExtremeFactorEl.addEventListener('input', () => {
           syncDisneyExtremeFactorLabels();
           updateTierHintForDisneyExtreme();
         });
-        disneyExtremeFactorEl.addEventListener('change', () => persistPrefs());
+        disneyExtremeFactorEl.addEventListener('change', () => {
+          syncDisneyExtremePrefsSummary();
+          persistPrefs();
+        });
       }
 
       if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
@@ -1283,6 +1309,7 @@
         syncBodyUi();
         disneyExtremeBodyEl.addEventListener('change', () => {
           syncBodyUi();
+          syncDisneyExtremePrefsSummary();
           persistPrefs();
         });
         disneyExtremeEl?.addEventListener('change', () => {
@@ -1292,7 +1319,10 @@
         disneyExtremeBodyFactorEl.addEventListener('input', () => {
           syncDisneyExtremeFactorLabels();
         });
-        disneyExtremeBodyFactorEl.addEventListener('change', () => persistPrefs());
+        disneyExtremeBodyFactorEl.addEventListener('change', () => {
+          syncDisneyExtremePrefsSummary();
+          persistPrefs();
+        });
       }
 
       const syncEyeMouthUi = () => {
@@ -1315,8 +1345,14 @@
       disneyExtremeMouthFactorEl?.addEventListener('input', () => {
         syncDisneyExtremeFactorLabels();
       });
-      disneyExtremeEyeFactorEl?.addEventListener('change', () => persistPrefs());
-      disneyExtremeMouthFactorEl?.addEventListener('change', () => persistPrefs());
+      disneyExtremeEyeFactorEl?.addEventListener('change', () => {
+        syncDisneyExtremePrefsSummary();
+        persistPrefs();
+      });
+      disneyExtremeMouthFactorEl?.addEventListener('change', () => {
+        syncDisneyExtremePrefsSummary();
+        persistPrefs();
+      });
 
       document.getElementById('btnDisneyExtremeReset')?.addEventListener('click', () => {
         const d = disneyExtremeUiDefaults();
@@ -1344,6 +1380,7 @@
           disneyExtremeMouthFactorEl.disabled = !masterOn;
         }
         syncDisneyExtremeFactorLabels();
+        syncDisneyExtremePrefsSummary();
         updateTierHintForDisneyExtreme();
         persistPrefs();
       });
@@ -4508,7 +4545,6 @@
         }
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
         const {
-          shapeFactor,
           shapeInt,
           bodyOn,
           bodyInt,
@@ -4544,7 +4580,13 @@
         // Continuity residual morph overlay: gently carry prior emotion morphs.
         const residualTune = tuneContinuityResidualIntensity(discState.continuity);
         if (residualTune.ok && residualTune.emotion) {
-          const residualShapeInt = Math.min(2.0, residualTune.intensity * shapeFactor);
+          const residualShapeInt = computeDisneyExtremeIntensities(
+            residualTune.intensity,
+            {
+              enabled: disneyExtremeOn,
+              shapeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+            },
+          ).shapeInt;
           const residualMorphs = emotionToMorphWeights(
             lod,
             residualTune.emotion,

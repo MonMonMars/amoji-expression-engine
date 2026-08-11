@@ -470,6 +470,7 @@ export {
   defaultFaceLivePrefs,
   disneyExtremeUiDefaults,
   resolveDisneyExtremeHotkey,
+  summarizeDisneyExtremePrefs,
   normalizeFaceLivePrefs,
   loadFaceLivePrefs,
   saveFaceLivePrefs,
