@@ -147,7 +147,7 @@
         background: linear-gradient(90deg, var(--accent), var(--accent2));
       }
       #discResidualBar {
-        background: linear-gradient(90deg, #c9a227, #e0c060);
+        background: linear-gradient(90deg, #8a9098, #a8aeb6);
       }
       pre {
         margin: 0;
@@ -804,9 +804,9 @@
           id="prefsAuditImportViewsDropZone"
           class="status"
           style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
-          title="Drop JSON · Alt+drop replace · Shift+drop merge · double-click import"
+          title="Drop JSON · Alt+drop replace · Shift+drop merge · Ctrl+drop append · double-click import"
         >
-          Drag & drop JSON · Alt+drop replace · Shift+drop merge · double-click import
+          Drag & drop JSON · Alt replace · Shift merge · Ctrl append · dbl-click import
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
@@ -880,6 +880,7 @@
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
+        continuityResidualBarStyle,
       } from '/engine/layers/discretion.js';
       import {
         personaAllowsEasterEggs,
@@ -1421,6 +1422,7 @@
           reason !== 'tts_endpoint_enter_pick' &&
           reason !== 'tts_endpoint_escape_pick' &&
           reason !== 'tts_endpoint_tab_blur_pick' &&
+          reason !== 'tts_endpoint_focus_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2847,6 +2849,9 @@
         });
         const ttsEndpointEl = document.getElementById('ttsEndpoint');
         let ttsEndpointTabbing = false;
+        ttsEndpointEl?.addEventListener('focus', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_focus_pick');
+        });
         ttsEndpointEl?.addEventListener('change', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_pick');
           persistPrefs();
@@ -3571,7 +3576,7 @@
           if (!prefsAuditImportPreviewText) {
             dropZone.classList.remove('has-preview');
             dropZone.textContent =
-              'Drag & drop JSON · Alt+drop replace · Shift+drop merge · double-click import';
+              'Drag & drop JSON · Alt replace · Shift merge · Ctrl append · dbl-click import';
             return;
           }
           dropZone.classList.add('has-preview');
@@ -3636,8 +3641,10 @@
             return { ok: false };
           }
           const replace = !!importOpts.replace;
+          const appendOnly = !!importOpts.appendOnly;
           const imported = auditSavedViews.importJson(text, {
             merge: !replace,
+            appendOnly,
             mergeStarredOnly,
             mergeStarredOnlyExplicit: mergeStarredOnly,
             toastInHashOnly: toastHashOnly,
@@ -3660,6 +3667,8 @@
           if (imported.fromExportMeta && bits.length) bits.push('from export');
           if (replace) {
             prefsStatus.textContent = `prefs · replaced · ${imported.count} views`;
+          } else if (appendOnly) {
+            prefsStatus.textContent = `prefs · append · +${imported.added || 0} · skip ${imported.skipped || 0}`;
           } else if (bits.length) {
             prefsStatus.textContent = `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`;
           } else {
@@ -3737,9 +3746,13 @@
               const dropAction = shouldAutoImportAuditViewsOnDrop({
                 shiftKey: ev.shiftKey,
                 altKey: ev.altKey,
+                ctrlKey: ev.ctrlKey,
               });
               if (dropAction.autoImport) {
-                await importAuditViewsText(text, { replace: dropAction.replace });
+                await importAuditViewsText(text, {
+                  replace: dropAction.replace,
+                  appendOnly: dropAction.appendOnly,
+                });
                 return;
               }
               prefsStatus.className = 'status ok';
@@ -4016,6 +4029,10 @@
             100,
             (residualProgress.progress || 0) * 100,
           )}%`;
+          const barStyle = continuityResidualBarStyle(discState.continuity);
+          if (barStyle.background) {
+            discResidualBar.style.background = barStyle.background;
+          }
         }
         if (discState.autoReaction && !discState.autoReaction.blocked) {
           cancelActiveCompoundLifecycle('auto_improv_pick');

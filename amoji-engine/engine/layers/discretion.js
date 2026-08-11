@@ -271,6 +271,41 @@ export function resetContinuityResidualPeak(continuity) {
   );
 }
 
+/** Residual decay bar gradient stops keyed by residual emotion. */
+export const CONTINUITY_RESIDUAL_BAR_COLORS = {
+  happy: ['#c9a227', '#e0c060'],
+  sad: ['#4a7ab8', '#6a9fd4'],
+  angry: ['#c94444', '#e06666'],
+  surprised: ['#9b6bd4', '#b88ae8'],
+  fear: ['#6b7a94', '#8a9bb8'],
+  disgust: ['#6a9a55', '#8bc070'],
+  thinking: ['#7a8a9a', '#9aacbc'],
+  smile_open: ['#d4a832', '#f0c850'],
+  neutral: ['#8a9098', '#a8aeb6'],
+};
+
+/**
+ * CSS gradient for continuity residual decay bar.
+ * @param {{ residual?: { emotion?: string } | null } | null} continuity
+ */
+export function continuityResidualBarStyle(continuity) {
+  const emotion = continuity?.residual?.emotion || null;
+  const colors =
+    (emotion && CONTINUITY_RESIDUAL_BAR_COLORS[emotion]) ||
+    CONTINUITY_RESIDUAL_BAR_COLORS.neutral;
+  const background = `linear-gradient(90deg, ${colors[0]}, ${colors[1]})`;
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_bar_style',
+      ok: !!emotion,
+      emotion,
+      background,
+      colors,
+    },
+    {},
+  );
+}
+
 /**
  * Passive leakage: mood signature continuously under dialogue emotion.
  * @param {string} moodId

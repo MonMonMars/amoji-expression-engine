@@ -578,12 +578,13 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
 }
 
 /**
- * Whether a drag-drop should auto-import (Shift+drop merge, Alt+drop replace).
- * @param {{ shiftKey?: boolean, altKey?: boolean }} [opts]
+ * Whether a drag-drop should auto-import (Shift+drop merge, Alt+drop replace, Ctrl+drop append).
+ * @param {{ shiftKey?: boolean, altKey?: boolean, ctrlKey?: boolean }} [opts]
  */
 export function shouldAutoImportAuditViewsOnDrop(opts = {}) {
   const replace = !!opts.altKey;
-  const merge = !replace && !!opts.shiftKey;
+  const appendOnly = !!opts.ctrlKey && !replace;
+  const merge = !replace && (!!opts.shiftKey || appendOnly);
   const autoImport = replace || merge;
   return applyComplianceGate(
     {
@@ -592,8 +593,10 @@ export function shouldAutoImportAuditViewsOnDrop(opts = {}) {
       autoImport,
       replace,
       merge,
+      appendOnly,
       shiftKey: !!opts.shiftKey,
       altKey: !!opts.altKey,
+      ctrlKey: !!opts.ctrlKey,
     },
     {},
   );
@@ -609,6 +612,7 @@ export function shouldAutoImportAuditViewsOnDrop(opts = {}) {
  *   folder?: string|null,
  *   max?: number,
  *   now?: number,
+ *   appendOnly?: boolean,
  * }} [opts]
  */
 export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
@@ -618,6 +622,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
   );
   const mergeStarredOnly = !!opts.mergeStarredOnly;
   const toastInHashOnly = !!opts.toastInHashOnly;
+  const appendOnly = !!opts.appendOnly;
   const folderFilter =
     opts.folder != null && String(opts.folder).trim() !== ''
       ? String(opts.folder).trim()
@@ -645,6 +650,10 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
       (x) => x.name.toLowerCase() === v.name.toLowerCase(),
     );
     if (idx >= 0) {
+      if (appendOnly) {
+        skipped += 1;
+        continue;
+      }
       list[idx] = { ...v, id: list[idx].id };
       updated += 1;
     } else {
@@ -665,6 +674,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
       skipped,
       mergeStarredOnly,
       toastInHashOnly,
+      appendOnly,
       folder: folderFilter,
       count: views.length,
     },
@@ -1552,6 +1562,7 @@ export function createAuditSavedViews(opts = {}) {
           folder,
           max,
           now: importOpts.now,
+          appendOnly: !!importOpts.appendOnly,
         });
         views = merged.views;
         save();
@@ -1564,6 +1575,7 @@ export function createAuditSavedViews(opts = {}) {
             merge: true,
             mergeStarredOnly,
             toastInHashOnly,
+            appendOnly: !!importOpts.appendOnly,
             folder,
             fromExportMeta: filters.fromExportMeta,
             added: merged.added,

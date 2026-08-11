@@ -211,6 +211,7 @@ export {
   tuneContinuityResidualIntensity,
   continuityResidualDecayProgress,
   resetContinuityResidualPeak,
+  continuityResidualBarStyle,
   passiveMoodLeak,
   canImprovise,
   discretionaryImprovise,
