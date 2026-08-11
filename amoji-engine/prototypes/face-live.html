@@ -4389,21 +4389,6 @@
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);
-
-        // Disney Extreme: separate multipliers for eye vs mouth morphs.
-        const disneyEyeFactor = disneyExtremeEyeFactorEl
-          ? Number(disneyExtremeEyeFactorEl.value || 1.4)
-          : 1.4;
-        const disneyMouthFactor = disneyExtremeMouthFactorEl
-          ? Number(disneyExtremeMouthFactorEl.value || 1.5)
-          : 1.5;
-        if (disneyExtremeOn) {
-          for (const [k, v] of Object.entries(targets || {})) {
-            // Recipes use Expressions_* names; apply coarse categories.
-            if (k.includes('eye') || k.includes('iris')) targets[k] = v * disneyEyeFactor;
-            if (k.includes('mouth')) targets[k] = v * disneyMouthFactor;
-          }
-        }
         if (moodState.morphs && Object.keys(moodState.morphs).length) {
           mergeMorphOverlays(targets, moodState.morphs);
         }
@@ -4708,6 +4693,21 @@
             if (morphs.includes(name)) {
               targets[name] = Math.max(targets[name] || 0, w);
             }
+          }
+        }
+
+        // Disney Extreme: separate multipliers for final eye vs mouth morphs.
+        // Apply late so gaze-blended eye weights and speech mouth overrides are amplified too.
+        if (disneyExtremeOn) {
+          const disneyEyeFactor = disneyExtremeEyeFactorEl
+            ? Number(disneyExtremeEyeFactorEl.value || 1.4)
+            : 1.4;
+          const disneyMouthFactor = disneyExtremeMouthFactorEl
+            ? Number(disneyExtremeMouthFactorEl.value || 1.5)
+            : 1.5;
+          for (const [k, v] of Object.entries(targets || {})) {
+            if (k.includes('eye') || k.includes('iris')) targets[k] = v * disneyEyeFactor;
+            if (k.includes('mouth')) targets[k] = v * disneyMouthFactor;
           }
         }
 
