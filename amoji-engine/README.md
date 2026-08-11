@@ -248,7 +248,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 235 | Extreme Shift+K clear hist + Shift+digit redo jump | Done |
 | Phase 236 | Extreme Face Live clear hist helper | Done |
 | Phase 237 | Extreme Face Live clear hist + redo jump wiring | Done |
-| Phase 238+ | Further production polish… | Specced |
+| Phase 238 | Extreme baseline chip preview label | Done |
+| Phase 239 | Extreme P pin baseline hotkey | Done |
+| Phase 240 | Extreme Face Live Meta chip preview | Done |
+| Phase 241 | Extreme Face Live pin baseline wiring | Done |
+| Phase 242+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -12,7 +12,7 @@ describe('Phase 204 Extreme baseline summary history depth', () => {
         historyDepth: 1,
       }),
     ).toBe(
-      'baseline · clean · fp abcd1234 · hist 1 · D diff · ⇧D restore · K clear · U undo · ⇧U redo',
+      'baseline · clean · fp abcd1234 · hist 1 · D diff · ⇧D restore · K clear · P pin · U undo · ⇧U redo',
     );
     expect(formatDisneyExtremeBaselineSummary({ historyDepth: 0 })).not.toContain(
       'hist',

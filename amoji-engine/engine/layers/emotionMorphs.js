@@ -565,6 +565,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
+  { id: 'pinBaseline', keys: ['p', 'P'], help: 'P pin base', kind: 'action' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
@@ -579,6 +580,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'jump',
   },
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
+  { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1423,7 +1425,7 @@ export function formatDisneyExtremeBaselineSummary(opts = {}) {
   const histBit = histN > 0 ? ` · hist ${histN}` : '';
   const redoBit = redoN > 0 ? ` · redo ${redoN}` : '';
   const trail =
-    ' · D diff · ⇧D restore · K clear · U undo · ⇧U redo';
+    ' · D diff · ⇧D restore · K clear · P pin · U undo · ⇧U redo';
   if (!opts.hasBaseline) {
     return `baseline · none${histBit}${redoBit}${trail}`;
   }
@@ -1491,6 +1493,22 @@ export function formatDisneyExtremeBaselineHistoryList(history, opts = {}) {
     return `hist · empty${redoBit}${trail}`;
   }
   return `hist ${list.length}${redoBit} · ${parts.join(' · ')}${trail}`;
+}
+
+/**
+ * Dry-run preview for a hist/redo chip (Meta+click without applying).
+ * @param {object|null|undefined} snap
+ * @param {{ index?: number, kind?: 'hist'|'redo' }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineChipPreviewLabel(snap, opts = {}) {
+  const kind = opts.kind === 'redo' ? 'redo' : 'hist';
+  const entry = formatDisneyExtremeBaselineHistoryEntry(snap, {
+    index: opts.index,
+    kind: opts.kind === 'redo' ? 'redo' : undefined,
+  });
+  if (entry === '—') return `preview · ${kind} · invalid`;
+  return `preview · ${kind} · ${entry}`;
 }
 
 /**

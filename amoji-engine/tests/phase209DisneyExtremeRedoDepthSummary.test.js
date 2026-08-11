@@ -18,7 +18,7 @@ describe('Phase 209 Extreme baseline redo depth + tooltip', () => {
         redoDepth: 2,
       }),
     ).toBe(
-      'baseline · clean · fp abcd1234 · hist 1 · redo 2 · D diff · ⇧D restore · K clear · U undo · ⇧U redo',
+      'baseline · clean · fp abcd1234 · hist 1 · redo 2 · D diff · ⇧D restore · K clear · P pin · U undo · ⇧U redo',
     );
     expect(formatDisneyExtremeBaselineSummary({ redoDepth: 0 })).not.toMatch(
       / · redo \d+/,

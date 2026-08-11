@@ -807,6 +807,7 @@
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
+          <button type="button" id="btnDisneyExtremePinBase">Pin baseline <kbd>P</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
@@ -818,7 +819,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click a chip to jump · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · P pin · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1226,6 +1227,7 @@
         formatDisneyExtremeBaselineSummary,
         formatDisneyExtremeBaselineHistoryEntry,
         formatDisneyExtremeBaselineHistoryList,
+        formatDisneyExtremeBaselineChipPreviewLabel,
         serializeDisneyExtremeBaselineHistory,
         parseDisneyExtremeBaselineHistory,
         formatDisneyExtremeBaselineHistoryPreviewLabel,
@@ -1592,7 +1594,15 @@
             btn.title = formatDisneyExtremeBaselineHistoryEntry(snap, {
               index: i + 1,
             });
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (ev) => {
+              if (ev.metaKey) {
+                flashDisneyExtremeStatus(
+                  formatDisneyExtremeBaselineChipPreviewLabel(snap, {
+                    index: i + 1,
+                  }),
+                );
+                return;
+              }
               jumpDisneyExtremeBaselineHistory(i);
             });
             el.appendChild(btn);
@@ -1617,7 +1627,16 @@
               index: i + 1,
               kind: 'redo',
             });
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (ev) => {
+              if (ev.metaKey) {
+                flashDisneyExtremeStatus(
+                  formatDisneyExtremeBaselineChipPreviewLabel(snap, {
+                    index: i + 1,
+                    kind: 'redo',
+                  }),
+                );
+                return;
+              }
               jumpDisneyExtremeBaselineRedo(i);
             });
             el.appendChild(btn);
@@ -1657,6 +1676,14 @@
         setDisneyExtremeBaseline(snap);
         const fp = disneyExtremeSnapshotFingerprintShort(snap);
         flashDisneyExtremeStatus(`redo · jump R#${index + 1} · fp ${fp}`);
+        return true;
+      }
+
+      function pinDisneyExtremeBaseline() {
+        const snap = disneyExtremeSnapshot();
+        setDisneyExtremeBaseline(snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(`pinned · baseline · fp ${fp}`);
         return true;
       }
 
@@ -2036,6 +2063,10 @@
 
       document.getElementById('btnDisneyExtremeClearHist')?.addEventListener('click', () => {
         clearDisneyExtremeBaselineHistoryOnly();
+      });
+
+      document.getElementById('btnDisneyExtremePinBase')?.addEventListener('click', () => {
+        pinDisneyExtremeBaseline();
       });
 
       document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
@@ -2786,6 +2817,11 @@
         if (resolved.action === 'clearBaselineHistory') {
           ev.preventDefault();
           clearDisneyExtremeBaselineHistoryOnly();
+          return;
+        }
+        if (resolved.action === 'pinBaseline') {
+          ev.preventDefault();
+          pinDisneyExtremeBaseline();
           return;
         }
         if (resolved.action === 'undoBaseline') {

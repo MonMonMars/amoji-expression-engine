@@ -84,6 +84,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+D` → restore Extreme factors from last copy/paste baseline
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `Shift+K` → clear Extreme baseline history + redo stacks (keep baseline)
+ * - `p` / `P` → pin current Extreme factors as baseline
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
