@@ -16,7 +16,7 @@ describe('Phase 247 Extreme Alt+O merge redo', () => {
       resolveDisneyExtremeHotkey({ key: 'o', shiftKey: true }).action,
     ).toBe('pasteBaselineRedoJson');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt+O merge redo');
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Shift merge hist/redo');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Shift merge');
     expect(formatDisneyExtremeBaselineRedoPreviewLabel([])).toBe(
       'preview · redo · empty',
     );

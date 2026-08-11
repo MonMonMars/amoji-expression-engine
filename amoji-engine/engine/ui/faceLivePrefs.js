@@ -85,6 +85,7 @@ export function disneyExtremeUiDefaults() {
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `Shift+K` → clear Extreme baseline history + redo stacks (keep baseline)
  * - `w` / `W` → wipe Extreme baseline redo stack only (keep hist + baseline)
+ * - `Shift+W` → wipe Extreme baseline favorites only
  * - `p` / `P` → pin current Extreme factors as baseline
  * - `o` / `O` → copy Extreme baseline redo JSON
  * - `Shift+O` → paste Extreme baseline redo JSON from clipboard
@@ -96,6 +97,10 @@ export function disneyExtremeUiDefaults() {
  * - `Alt+Y` → copy Extreme baseline redo share link (`#dxr=`)
  * - `s` / `S` → star current Extreme factors into favorites
  * - `Shift+S` → flash Extreme favorites list
+ * - `g` / `G` → copy Extreme baseline favorites JSON
+ * - `Shift+G` → paste Extreme baseline favorites JSON from clipboard
+ * - `Alt+G` → merge Extreme baseline favorites JSON into current favorites
+ * - `t` / `T` → copy Extreme baseline favorites share link (`#dxf=`)
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
@@ -110,7 +115,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
@@ -319,10 +324,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O (merge redo JSON) and Alt+Y (share redo).
+  // except Alt+O (merge redo), Alt+Y (share redo), Alt+G (merge fav).
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
-    if (lower !== 'o' && lower !== 'y') {
+    if (lower !== 'o' && lower !== 'y' && lower !== 'g') {
       return { ok: false, reason: 'modifier' };
     }
   }
@@ -366,6 +371,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'clearBaseline' && ev.shiftKey) {
       return { ok: true, action: 'clearBaselineHistory' };
     }
+    if (entry.id === 'clearBaselineRedo' && ev.shiftKey) {
+      return { ok: true, action: 'clearBaselineFavorites' };
+    }
     if (entry.id === 'copyBaselineRedoJson' && ev.altKey) {
       return { ok: true, action: 'mergeBaselineRedoJson' };
     }
@@ -380,6 +388,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'starBaselineFavorite' && ev.shiftKey) {
       return { ok: true, action: 'showBaselineFavorites' };
+    }
+    if (entry.id === 'copyBaselineFavoritesJson' && ev.altKey) {
+      return { ok: true, action: 'mergeBaselineFavoritesJson' };
+    }
+    if (entry.id === 'copyBaselineFavoritesJson' && ev.shiftKey) {
+      return { ok: true, action: 'pasteBaselineFavoritesJson' };
     }
     return { ok: true, action: entry.id };
   }

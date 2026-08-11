@@ -770,7 +770,7 @@
         <div class="status" id="tierHint">sculpt: medium band</div>
       </div>
 
-      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo JSON · Meta = preview · Shift = merge hist/redo">
+      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav JSON · Meta = preview · Shift = merge">
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
@@ -866,23 +866,28 @@
             <button type="button" id="btnDisneyExtremeMergeRedo">Merge redo JSON <kbd>Alt+O</kbd></button>
             <button type="button" id="btnDisneyExtremeShareHist">Copy hist share <kbd>⇧Y</kbd></button>
             <button type="button" id="btnDisneyExtremeShareRedo">Copy redo share <kbd>Alt+Y</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareFav">Copy fav share <kbd>T</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
             <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
             <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFav">Copy fav JSON <kbd>G</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteFav">Paste fav JSON <kbd>⇧G</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeFav">Merge fav JSON <kbd>Alt+G</kbd></button>
+            <button type="button" id="btnDisneyExtremeWipeFav">Wipe favorites <kbd>⇧W</kbd></button>
           </div>
         </details>
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · dbl-click pin · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · W wipe redo · P pin · S star · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · dbl-click pin · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · W wipe redo · ⇧W wipe favs · P pin · S star · G/⇧G/Alt+G fav JSON · T fav share · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
         <div
           class="row"
           id="disneyExtremeFavorites"
-          title="Starred favorites · click jump · S star · ⇧S list"
+          title="Starred favorites · click jump · S star · ⇧S list · G/⇧G/Alt+G JSON · T share · ⇧W wipe"
         >
           <span class="extreme-hist-empty">fav · empty</span>
         </div>
@@ -911,8 +916,8 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo JSON · Meta preview · Shift merge hist/redo · double-click paste snapshot · I paste hist · ⇧I merge" style="cursor:pointer;">
-          Drop snapshot / hist / redo JSON · Meta preview · Shift merge · dbl-click paste · I hist
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo / fav JSON · Meta preview · Shift merge · double-click paste snapshot · I paste hist · ⇧I merge · G fav JSON" style="cursor:pointer;">
+          Drop snapshot / hist / redo / fav JSON · Meta preview · Shift merge · dbl-click paste
         </div>
       </div>
 
@@ -1288,6 +1293,9 @@
         encodeDisneyExtremeBaselineRedoHash,
         loadDisneyExtremeBaselineRedoFromHash,
         buildDisneyExtremeBaselineRedoShareUrl,
+        encodeDisneyExtremeBaselineFavoritesHash,
+        loadDisneyExtremeBaselineFavoritesFromHash,
+        buildDisneyExtremeBaselineFavoritesShareUrl,
         diffDisneyExtremeSnapshots,
         formatDisneyExtremeSnapshotDiffLabel,
         formatDisneyExtremeSnapshotDiffCopyText,
@@ -1307,11 +1315,16 @@
         formatDisneyExtremeBaselineRedoPreviewLabel,
         hasDisneyExtremeBaselineHistory,
         hasDisneyExtremeBaselineRedo,
+        hasDisneyExtremeBaselineFavorites,
         formatDisneyExtremeSnapshotPreviewLabel,
         pushDisneyExtremeBaselineFavorite,
         formatDisneyExtremeBaselineFavoritesList,
+        formatDisneyExtremeBaselineFavoritesPreviewLabel,
+        serializeDisneyExtremeBaselineFavorites,
+        parseDisneyExtremeBaselineFavorites,
         saveDisneyExtremeBaselineFavorites,
         loadDisneyExtremeBaselineFavorites,
+        clearDisneyExtremeBaselineFavoritesStorage,
         pushDisneyExtremeBaselineHistory,
         popDisneyExtremeBaselineHistory,
         saveDisneyExtremeBaseline,
@@ -1912,6 +1925,112 @@
         );
       }
 
+      function applyDisneyExtremeBaselineFavorites(favorites, opts = {}) {
+        const list = Array.isArray(favorites) ? favorites : [];
+        if (opts.merge) {
+          let next = extremeBaselineFavorites.slice();
+          for (const snap of list) {
+            next = pushDisneyExtremeBaselineFavorite(next, snap);
+          }
+          extremeBaselineFavorites = next;
+        } else {
+          extremeBaselineFavorites = list.slice();
+        }
+        persistDisneyExtremeBaselineFavorites();
+        syncDisneyExtremeFavoritesUi();
+        const count = extremeBaselineFavorites.length;
+        if (!opts.silent) {
+          const verb = opts.merge ? 'merged' : 'imported';
+          flashDisneyExtremeStatus(
+            count > 0
+              ? `${verb} · fav ${count}`
+              : `${verb} · fav · empty`,
+          );
+        }
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineFavoritesJson() {
+        const json = serializeDisneyExtremeBaselineFavorites(
+          extremeBaselineFavorites,
+          { pretty: true },
+        );
+        const count = extremeBaselineFavorites.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(json);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · fav JSON · ${count}`
+            : `copy failed · fav JSON · ${count}`,
+        );
+        return ok;
+      }
+
+      async function pasteDisneyExtremeBaselineFavoritesJson(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · fav clipboard');
+          return false;
+        }
+        const parsed = parseDisneyExtremeBaselineFavorites(text);
+        if (!parsed.ok) {
+          flashDisneyExtremeStatus(`paste failed · fav · ${parsed.error}`);
+          return false;
+        }
+        return applyDisneyExtremeBaselineFavorites(parsed.favorites, {
+          merge: !!opts.merge,
+        });
+      }
+
+      async function copyDisneyExtremeBaselineFavoritesShareUrl() {
+        const share = buildDisneyExtremeBaselineFavoritesShareUrl(
+          extremeBaselineFavorites,
+        );
+        const count = extremeBaselineFavorites.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(share.url);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · fav share · ${count}`
+            : `copy failed · fav share · ${share.hash}`,
+        );
+        return ok;
+      }
+
+      function clearDisneyExtremeBaselineFavoritesOnly() {
+        if (
+          !hasDisneyExtremeBaselineFavorites({
+            favorites: extremeBaselineFavorites,
+          })
+        ) {
+          flashDisneyExtremeStatus('wipe fav · empty');
+          return false;
+        }
+        extremeBaselineFavorites = [];
+        clearDisneyExtremeBaselineFavoritesStorage();
+        syncDisneyExtremeFavoritesUi();
+        flashDisneyExtremeStatus('wiped · fav');
+        return true;
+      }
+
       function pinDisneyExtremeBaseline() {
         const snap = disneyExtremeSnapshot();
         setDisneyExtremeBaseline(snap);
@@ -2422,12 +2541,32 @@
         copyDisneyExtremeBaselineRedoShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeShareFav')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineFavoritesShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeHistList')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineHistoryList();
       });
 
       document.getElementById('btnDisneyExtremeFavList')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineFavoritesList();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyFav')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineFavoritesJson();
+      });
+
+      document.getElementById('btnDisneyExtremePasteFav')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineFavoritesJson();
+      });
+
+      document.getElementById('btnDisneyExtremeMergeFav')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineFavoritesJson({ merge: true });
+      });
+
+      document.getElementById('btnDisneyExtremeWipeFav')?.addEventListener('click', () => {
+        clearDisneyExtremeBaselineFavoritesOnly();
       });
 
       document.getElementById('btnDisneyExtremeCopyHist')?.addEventListener('click', () => {
@@ -2466,6 +2605,7 @@
       }
       applyDisneyExtremeBaselineHistoryFromHash();
       applyDisneyExtremeBaselineRedoFromHash();
+      applyDisneyExtremeBaselineFavoritesFromHash();
       syncDisneyExtremeHistoryUi();
       syncDisneyExtremeFavoritesUi();
 
@@ -2694,6 +2834,14 @@
         return applyDisneyExtremeBaselineRedo(loaded.redo, { merge: false });
       }
 
+      function applyDisneyExtremeBaselineFavoritesFromHash() {
+        const loaded = loadDisneyExtremeBaselineFavoritesFromHash();
+        if (!loaded.ok) return false;
+        return applyDisneyExtremeBaselineFavorites(loaded.favorites, {
+          merge: false,
+        });
+      }
+
       async function pasteDisneyExtremeSnapshotJson() {
         let text = '';
         try {
@@ -2759,6 +2907,20 @@
             return true;
           }
           return applyDisneyExtremeBaselineRedo(redoParsed.redo, {
+            merge: !!ev.shiftKey,
+          });
+        }
+        const favParsed = parseDisneyExtremeBaselineFavorites(text);
+        if (favParsed.ok) {
+          if (preview) {
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineFavoritesPreviewLabel(
+                favParsed.favorites,
+              ),
+            );
+            return true;
+          }
+          return applyDisneyExtremeBaselineFavorites(favParsed.favorites, {
             merge: !!ev.shiftKey,
           });
         }
@@ -3253,6 +3415,11 @@
           clearDisneyExtremeBaselineRedoOnly();
           return;
         }
+        if (resolved.action === 'clearBaselineFavorites') {
+          ev.preventDefault();
+          clearDisneyExtremeBaselineFavoritesOnly();
+          return;
+        }
         if (resolved.action === 'pinBaseline') {
           ev.preventDefault();
           pinDisneyExtremeBaseline();
@@ -3266,6 +3433,26 @@
         if (resolved.action === 'showBaselineFavorites') {
           ev.preventDefault();
           flashDisneyExtremeBaselineFavoritesList();
+          return;
+        }
+        if (resolved.action === 'copyBaselineFavoritesJson') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineFavoritesJson();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineFavoritesJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineFavoritesJson();
+          return;
+        }
+        if (resolved.action === 'mergeBaselineFavoritesJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineFavoritesJson({ merge: true });
+          return;
+        }
+        if (resolved.action === 'copyBaselineFavoritesShareUrl') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineFavoritesShareUrl();
           return;
         }
         if (resolved.action === 'copyBaselineRedoJson') {

@@ -264,7 +264,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 251 | Extreme chip↔chip compare (Shift+Alt+click) | Done |
 | Phase 252 | Extreme favorites S / Shift+S | Done |
 | Phase 253 | Extreme More IO overflow declutter | Done |
-| Phase 254+ | Further production polish… | Specced |
+| Phase 254 | Extreme G / Shift+G / Alt+G favorites JSON | Done |
+| Phase 255 | Extreme favorites drop + preview label | Done |
+| Phase 256 | Extreme Shift+W wipe favorites | Done |
+| Phase 257 | Extreme fav share URL `#dxf=` / T | Done |
+| Phase 258+ | Further production polish… | Specced |
 
 ## Quick start
 
