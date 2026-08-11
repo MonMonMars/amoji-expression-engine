@@ -696,7 +696,11 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineFavoriteSummary', help: '⇧Alt+1–4 fav jump summary', kind: 'note' },
   { id: 'jumpBaselineHistoryTip', keys: ['9'], help: '9 jump hist tip', kind: 'action' },
   { id: 'jumpBaselineRedoTip', help: 'Shift+9 jump redo tip', kind: 'note' },
+  { id: 'jumpBaselineHistoryTipSummary', help: 'Alt+9 jump hist tip summary', kind: 'note' },
+  { id: 'jumpBaselineRedoTipSummary', help: '⇧Alt+9 jump redo tip summary', kind: 'note' },
   { id: 'jumpBaselineFavoriteTip', keys: ['0'], help: '0 jump fav tip', kind: 'action' },
+  { id: 'jumpBaselineFavoriteTipSummary', help: 'Shift+0 jump fav tip summary', kind: 'note' },
+  { id: 'showBaselineTips', help: 'Alt+0 tips readout', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -1994,6 +1998,55 @@ export function formatDisneyExtremeBaselineRedoList(redo) {
     }),
   );
   return `redo ${list.length} · ${parts.join(' · ')}${trail}`;
+}
+
+/**
+ * Readout of tip (latest) hist / redo / fav entries without applying.
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineTipsLabel(stacks = {}) {
+  const hist = Array.isArray(stacks.history) ? stacks.history : [];
+  const redo = Array.isArray(stacks.redo) ? stacks.redo : [];
+  const fav = Array.isArray(stacks.favorites) ? stacks.favorites : [];
+  const bits = [];
+  if (hist.length) {
+    bits.push(
+      formatDisneyExtremeBaselineHistoryEntry(hist[hist.length - 1], {
+        index: hist.length,
+        compact: true,
+      }),
+    );
+  } else {
+    bits.push('hist · empty');
+  }
+  if (redo.length) {
+    bits.push(
+      formatDisneyExtremeBaselineHistoryEntry(redo[redo.length - 1], {
+        index: redo.length,
+        compact: true,
+        kind: 'redo',
+      }),
+    );
+  } else {
+    bits.push('redo · empty');
+  }
+  if (fav.length) {
+    bits.push(
+      formatDisneyExtremeBaselineHistoryEntry(fav[fav.length - 1], {
+        index: fav.length,
+        compact: true,
+        kind: 'fav',
+      }),
+    );
+  } else {
+    bits.push('fav · empty');
+  }
+  return `tips · ${bits.join(' · ')}`;
 }
 
 /**

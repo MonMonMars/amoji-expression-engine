@@ -19,8 +19,8 @@ describe('Phase 329 Extreme 0 jump fav tip', () => {
       'jumpBaselineFavoriteTip',
     );
     expect(
-      resolveDisneyExtremeHotkey({ key: '0', shiftKey: true }).ok,
-    ).toBe(false);
+      resolveDisneyExtremeHotkey({ key: '0', shiftKey: true }).action,
+    ).toBe('jumpBaselineFavoriteTipSummary');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('0 jump fav tip');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('btnDisneyExtremeJumpFavTip');
