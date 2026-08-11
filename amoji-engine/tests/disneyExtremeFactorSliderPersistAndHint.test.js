@@ -19,7 +19,7 @@ describe('Disney Extreme factor slider persist + hint', () => {
     expect(restoreIdx).toBeGreaterThan(savedPrefsIdx);
 
     expect(src).toContain(
-      "disneyExtremeFactorEl.addEventListener('input', () => {\n          updateTierHintForDisneyExtreme();\n        });",
+      "disneyExtremeFactorEl.addEventListener('input', () => {\n          syncDisneyExtremeFactorLabels();\n          updateTierHintForDisneyExtreme();\n        });",
     );
     expect(src).toContain(
       "disneyExtremeFactorEl.addEventListener('change', () => persistPrefs());",

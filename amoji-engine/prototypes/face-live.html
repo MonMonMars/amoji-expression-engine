@@ -538,7 +538,7 @@
             <span>Disney Extreme (big deform)</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
-            <span style="opacity:0.9;">×</span>
+            <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
             <input
               id="disneyExtremeFactor"
               type="range"
@@ -556,7 +556,7 @@
             <span>Apply to body/head</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
-            <span style="opacity:0.9;">×</span>
+            <span style="opacity:0.9;">× <span id="disneyExtremeBodyFactorVal">1.60</span></span>
             <input
               id="disneyExtremeBodyFactor"
               type="range"
@@ -570,7 +570,7 @@
         </div>
         <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <span>Eyes ×</span>
+            <span>Eyes × <span id="disneyExtremeEyeFactorVal">1.40</span></span>
             <input
               id="disneyExtremeEyeFactor"
               type="range"
@@ -584,7 +584,7 @@
         </div>
         <div class="row" style="gap:12px;align-items:center;margin-top:2px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <span>Mouth ×</span>
+            <span>Mouth × <span id="disneyExtremeMouthFactorVal">1.50</span></span>
             <input
               id="disneyExtremeMouthFactor"
               type="range"
@@ -1151,6 +1151,16 @@
       const disneyExtremeBodyFactorEl = document.getElementById('disneyExtremeBodyFactor');
       const disneyExtremeEyeFactorEl = document.getElementById('disneyExtremeEyeFactor');
       const disneyExtremeMouthFactorEl = document.getElementById('disneyExtremeMouthFactor');
+      const disneyExtremeFactorVal = document.getElementById('disneyExtremeFactorVal');
+      const disneyExtremeBodyFactorVal = document.getElementById(
+        'disneyExtremeBodyFactorVal',
+      );
+      const disneyExtremeEyeFactorVal = document.getElementById(
+        'disneyExtremeEyeFactorVal',
+      );
+      const disneyExtremeMouthFactorVal = document.getElementById(
+        'disneyExtremeMouthFactorVal',
+      );
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
@@ -1171,6 +1181,29 @@
       let emotion = savedPrefs.emotion || 'happy';
       let intensity =
         typeof savedPrefs.intensity === 'number' ? savedPrefs.intensity : 0.7;
+
+      function syncDisneyExtremeFactorLabels() {
+        if (disneyExtremeFactorVal && disneyExtremeFactorEl) {
+          disneyExtremeFactorVal.textContent = Number(
+            disneyExtremeFactorEl.value || 1.6,
+          ).toFixed(2);
+        }
+        if (disneyExtremeBodyFactorVal && disneyExtremeBodyFactorEl) {
+          disneyExtremeBodyFactorVal.textContent = Number(
+            disneyExtremeBodyFactorEl.value || 1.6,
+          ).toFixed(2);
+        }
+        if (disneyExtremeEyeFactorVal && disneyExtremeEyeFactorEl) {
+          disneyExtremeEyeFactorVal.textContent = Number(
+            disneyExtremeEyeFactorEl.value || 1.4,
+          ).toFixed(2);
+        }
+        if (disneyExtremeMouthFactorVal && disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorVal.textContent = Number(
+            disneyExtremeMouthFactorEl.value || 1.5,
+          ).toFixed(2);
+        }
+      }
 
       function updateTierHintForDisneyExtreme() {
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
@@ -1212,6 +1245,7 @@
             1.5,
         );
       }
+      syncDisneyExtremeFactorLabels();
 
       if (disneyExtremeEl && disneyExtremeFactorEl) {
         disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
@@ -1221,6 +1255,7 @@
           persistPrefs();
         });
         disneyExtremeFactorEl.addEventListener('input', () => {
+          syncDisneyExtremeFactorLabels();
           updateTierHintForDisneyExtreme();
         });
         disneyExtremeFactorEl.addEventListener('change', () => persistPrefs());
@@ -1242,6 +1277,9 @@
           syncBodyUi();
           updateTierHintForDisneyExtreme();
         });
+        disneyExtremeBodyFactorEl.addEventListener('input', () => {
+          syncDisneyExtremeFactorLabels();
+        });
         disneyExtremeBodyFactorEl.addEventListener('change', () => persistPrefs());
       }
 
@@ -1258,6 +1296,12 @@
       disneyExtremeEl?.addEventListener('change', () => {
         syncEyeMouthUi();
         updateTierHintForDisneyExtreme();
+      });
+      disneyExtremeEyeFactorEl?.addEventListener('input', () => {
+        syncDisneyExtremeFactorLabels();
+      });
+      disneyExtremeMouthFactorEl?.addEventListener('input', () => {
+        syncDisneyExtremeFactorLabels();
       });
       disneyExtremeEyeFactorEl?.addEventListener('change', () => persistPrefs());
       disneyExtremeMouthFactorEl?.addEventListener('change', () => persistPrefs());
@@ -4557,8 +4601,10 @@
           }
         }
         const b = bodyState.body;
-        bodyStatus.textContent = `${bodyState.emotion} · ama ${b.accessoryMuscleActivation.toFixed(2)} · ${b.breathingMode} · ${bodyState.gazeCombo}${bodyState.threatFreezeT > 0 ? ' · FREEZE' : ''}${bodyState.sighT > 0 ? ' · sigh' : ''}`;
-        document.getElementById('hudBody').textContent = b.breathingMode;
+        bodyStatus.textContent = `${bodyState.emotion} · ama ${b.accessoryMuscleActivation.toFixed(2)} · ${b.breathingMode} · ${bodyState.gazeCombo}${bodyState.threatFreezeT > 0 ? ' · FREEZE' : ''}${bodyState.sighT > 0 ? ' · sigh' : ''}${disneyExtremeOn ? ` · bodyInt ${bodyInt.toFixed(2)}` : ''}`;
+        document.getElementById('hudBody').textContent = disneyExtremeOn
+          ? `${b.breathingMode} · ${bodyInt.toFixed(2)}`
+          : b.breathingMode;
 
         const retarget = retargetBody({
           body: b,
