@@ -123,7 +123,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 110 | Extreme prefs summary + residual intensities | Done |
 | Phase 111 | Disney Extreme shape × nudge hotkeys [ ] | Done |
 | Phase 112 | Disney Extreme eye/mouth × nudge hotkeys | Done |
-| Phase 113+ | Further production polish… | Specced |
+| Phase 113 | Disney Extreme body × nudge hotkeys -/= | Done |
+| Phase 114+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -59,6 +59,7 @@ export function disneyExtremeUiDefaults() {
  * Resolve Face Live Disney Extreme hotkey.
  * - `x` / `X` → toggle master
  * - `[` / `]` → nudge shape × (when Extreme is on)
+ * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed)
  * - `,` / `.` → nudge eyes × (when Extreme is on)
  * - `;` / `'` → nudge mouth × (when Extreme is on)
  * Ignores when typing in form fields or with modifier keys.
@@ -70,6 +71,8 @@ export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
 export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = DISNEY_EXTREME_FACTOR_STEP;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
+export const DISNEY_EXTREME_BODY_FACTOR_MIN = 1;
+export const DISNEY_EXTREME_BODY_FACTOR_MAX = 1.8;
 export const DISNEY_EXTREME_EYE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_EYE_FACTOR_MAX = 2.2;
 export const DISNEY_EXTREME_MOUTH_FACTOR_MIN = 1;
@@ -110,6 +113,19 @@ export function nudgeDisneyExtremeShapeFactor(current, delta = DISNEY_EXTREME_FA
     min: DISNEY_EXTREME_SHAPE_FACTOR_MIN,
     max: DISNEY_EXTREME_SHAPE_FACTOR_MAX,
     fallback: defaultFaceLivePrefs().disneyExtremeFactor,
+  });
+}
+
+/**
+ * Nudge / clamp Disney Extreme body factor (1..1.8).
+ * @param {number} current
+ * @param {number} [delta]
+ */
+export function nudgeDisneyExtremeBodyFactor(current, delta = DISNEY_EXTREME_FACTOR_STEP) {
+  return nudgeDisneyExtremeFactor(current, delta, {
+    min: DISNEY_EXTREME_BODY_FACTOR_MIN,
+    max: DISNEY_EXTREME_BODY_FACTOR_MAX,
+    fallback: defaultFaceLivePrefs().disneyExtremeBodyFactor,
   });
 }
 
@@ -163,6 +179,20 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     return {
       ok: true,
       action: 'nudgeShapeUp',
+      delta: DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === '-' || key === '_') {
+    return {
+      ok: true,
+      action: 'nudgeBodyDown',
+      delta: -DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === '=' || key === '+') {
+    return {
+      ok: true,
+      action: 'nudgeBodyUp',
       delta: DISNEY_EXTREME_FACTOR_STEP,
     };
   }

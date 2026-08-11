@@ -302,7 +302,7 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
  */
 export function formatDisneyExtremeLiveHud(opts = {}) {
   if (!opts.enabled) {
-    return { pill: 'off', status: 'extreme off · X · [ ] shape · , . eye · ; \' mouth' };
+    return { pill: 'off', status: 'extreme off · X · [ ] shape · - = body · , . eye · ; \' mouth' };
   }
   const shapeInt = Number(opts.shapeInt);
   const bodyInt = Number(opts.bodyInt);

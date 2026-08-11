@@ -536,7 +536,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd></span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -600,7 +600,7 @@
         <div class="row" style="margin-top:6px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults</button>
         </div>
-        <div class="status" id="disneyExtremeStatus">extreme off · X · [ ] shape · , . eye · ; ' mouth</div>
+        <div class="status" id="disneyExtremeStatus">extreme off · X · [ ] shape · - = body · , . eye · ; ' mouth</div>
       </div>
 
       <div class="group">
@@ -1019,6 +1019,7 @@
         disneyExtremeUiDefaults,
         resolveDisneyExtremeHotkey,
         nudgeDisneyExtremeShapeFactor,
+        nudgeDisneyExtremeBodyFactor,
         nudgeDisneyExtremeEyeFactor,
         nudgeDisneyExtremeMouthFactor,
         summarizeDisneyExtremePrefs,
@@ -1411,6 +1412,25 @@
         ) {
           if (
             applyFactorNudge(disneyExtremeFactorEl, nudgeDisneyExtremeShapeFactor)
+          ) {
+            ev.preventDefault();
+          }
+          return;
+        }
+        if (
+          resolved.action === 'nudgeBodyDown' ||
+          resolved.action === 'nudgeBodyUp'
+        ) {
+          // Body nudge is only meaningful with Apply to body/head — enable if needed.
+          if (disneyExtremeBodyEl && !disneyExtremeBodyEl.checked) {
+            disneyExtremeBodyEl.checked = true;
+            disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+          }
+          if (
+            applyFactorNudge(
+              disneyExtremeBodyFactorEl,
+              nudgeDisneyExtremeBodyFactor,
+            )
           ) {
             ev.preventDefault();
           }
