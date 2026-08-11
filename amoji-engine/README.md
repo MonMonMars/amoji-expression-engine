@@ -80,7 +80,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 67 | Ctrl-drop append import · residual bar color by emotion · TTS focus cancel | Done |
 | Phase 68 | Meta-drop dry-run import · residual bar pulse on deliver · TTS cut cancel | Done |
 | Phase 69 | Meta+Shift dry-run merge hint · residual pulse on residue deliver · TTS select-all cancel | Done |
-| Phase 70+ | Further production polish… | Specced |
+| Phase 70 | Meta+Alt dry-run replace hint · residual pulse intensity by emotion · TTS copy cancel | Done |
+| Phase 71+ | Further production polish… | Specced |
 
 ## Quick start
 

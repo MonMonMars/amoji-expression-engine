@@ -154,7 +154,7 @@
         animation: discResidualPulse 0.55s ease-out;
       }
       #discResidualBar.pulse-residue {
-        animation: discResidualPulseResidue 0.7s ease-out;
+        animation: discResidualPulseResidue var(--disc-pulse-duration, 0.7s) ease-out;
       }
       @keyframes discResidualPulse {
         0% { opacity: 1; filter: brightness(1); }
@@ -163,7 +163,7 @@
       }
       @keyframes discResidualPulseResidue {
         0% { opacity: 1; filter: brightness(1) saturate(1); }
-        40% { opacity: 1; filter: brightness(1.65) saturate(1.35); }
+        40% { opacity: 1; filter: brightness(var(--disc-pulse-peak, 1.65)) saturate(1.35); }
         100% { opacity: 1; filter: brightness(1) saturate(1); }
       }
       pre {
@@ -1444,6 +1444,7 @@
           reason !== 'tts_endpoint_focus_pick' &&
           reason !== 'tts_endpoint_cut_pick' &&
           reason !== 'tts_endpoint_select_all_pick' &&
+          reason !== 'tts_endpoint_copy_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2180,15 +2181,29 @@
         e.currentTarget.classList.toggle('primary', next);
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
       });
-      function pulseDiscResidualBar(pulseClass = 'pulse') {
+      function pulseDiscResidualBar(pulseStyle) {
         if (!discResidualBar) return;
+        const pulseClass =
+          typeof pulseStyle === 'string' ? pulseStyle : pulseStyle?.pulseClass;
+        if (!pulseClass) return;
         discResidualBar.classList.remove('pulse', 'pulse-residue');
+        if (pulseStyle?.peak != null) {
+          discResidualBar.style.setProperty('--disc-pulse-peak', String(pulseStyle.peak));
+        }
+        if (pulseStyle?.durationSec != null) {
+          discResidualBar.style.setProperty(
+            '--disc-pulse-duration',
+            `${pulseStyle.durationSec}s`,
+          );
+        }
         void discResidualBar.offsetWidth;
         discResidualBar.classList.add(pulseClass);
         discResidualBar.addEventListener(
           'animationend',
           () => {
             discResidualBar.classList.remove('pulse', 'pulse-residue');
+            discResidualBar.style.removeProperty('--disc-pulse-peak');
+            discResidualBar.style.removeProperty('--disc-pulse-duration');
           },
           { once: true },
         );
@@ -2205,7 +2220,7 @@
         if (cont.residual) {
           cancelActiveCompoundLifecycle('deliver_residue_pick');
           const pulse = continuityResidualDeliverPulseClass(cont);
-          if (pulse.pulseClass) pulseDiscResidualBar(pulse.pulseClass);
+          if (pulse.pulseClass) pulseDiscResidualBar(pulse);
         }
         discResidualPeak = resetContinuityResidualPeak(cont).peak;
         discContStatus.textContent = cont.residual
@@ -2915,6 +2930,11 @@
         });
         ttsEndpointEl?.addEventListener('cut', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_cut_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
+        ttsEndpointEl?.addEventListener('copy', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_copy_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
@@ -3821,6 +3841,7 @@
                     appendOnly: dropAction.appendOnly,
                     shiftMerge:
                       dropAction.shiftKey && dropAction.merge && !dropAction.appendOnly,
+                    altReplace: dropAction.altKey && dropAction.replace,
                     mergeStarredOnly,
                     mergeStarredOnlyExplicit: mergeStarredOnly,
                     toastInHashOnly: toastHashOnly,

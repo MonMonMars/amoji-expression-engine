@@ -213,6 +213,7 @@ export {
   continuityResidualDecayProgress,
   resetContinuityResidualPeak,
   continuityResidualBarStyle,
+  CONTINUITY_RESIDUAL_PULSE_PEAK,
   passiveMoodLeak,
   canImprovise,
   discretionaryImprovise,

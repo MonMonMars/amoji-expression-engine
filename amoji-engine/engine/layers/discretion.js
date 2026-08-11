@@ -94,16 +94,53 @@ export function hasContinuityResidual(continuity, minIntensity = 0.02) {
 
 /**
  * Pulse class for residual bar when deliver leaves continuity residue.
+ * Peak brightness and duration scale by residual emotion + intensity.
  * @param {{ residual?: { emotion?: string, intensity?: number } | null } | null} continuity
  */
+export const CONTINUITY_RESIDUAL_PULSE_PEAK = {
+  happy: 1.55,
+  sad: 1.48,
+  angry: 1.78,
+  surprised: 1.72,
+  fear: 1.52,
+  disgust: 1.58,
+  thinking: 1.5,
+  smile_open: 1.6,
+  neutral: 1.65,
+};
+
 export function continuityResidualDeliverPulseClass(continuity) {
   const pulse = hasContinuityResidual(continuity);
+  if (!pulse) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_deliver_pulse',
+        ok: false,
+        pulseClass: null,
+        emotion: continuity?.residual?.emotion ?? null,
+        intensity: 0,
+        peak: null,
+        durationSec: null,
+      },
+      {},
+    );
+  }
+  const emotion = continuity?.residual?.emotion ?? 'neutral';
+  const intensity = continuity?.residual?.intensity ?? 0;
+  const basePeak =
+    CONTINUITY_RESIDUAL_PULSE_PEAK[emotion] ??
+    CONTINUITY_RESIDUAL_PULSE_PEAK.neutral;
+  const peak = Math.min(2, basePeak + intensity * 0.2);
+  const durationSec = Math.min(1, 0.55 + intensity * 0.3);
   return applyComplianceGate(
     {
       kind: 'continuity_residual_deliver_pulse',
-      ok: pulse,
-      pulseClass: pulse ? 'pulse-residue' : null,
-      emotion: continuity?.residual?.emotion ?? null,
+      ok: true,
+      pulseClass: 'pulse-residue',
+      emotion,
+      intensity,
+      peak,
+      durationSec,
     },
     {},
   );

@@ -594,6 +594,7 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
  *   max?: number,
  *   now?: number,
  *   shiftMerge?: boolean,
+ *   altReplace?: boolean,
  * }} [opts]
  */
 export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
@@ -656,7 +657,15 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       }
       kept += 1;
     }
-    const label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}`;
+    const replaceHint = formatAuditViewsImportDryRunMergeHint(raw, {
+      ...opts,
+      replace: true,
+      altReplace: !!opts.altReplace,
+    });
+    let label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}`;
+    if (replaceHint.ok && replaceHint.hint && opts.altReplace) {
+      label = `${label} · ${replaceHint.hint}`;
+    }
     return applyComplianceGate(
       {
         kind: 'prefs_share_audit_views_import_dry_run',
@@ -669,6 +678,8 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
         skipped,
         count: kept,
         label,
+        hint: replaceHint.ok ? replaceHint.hint : null,
+        altReplace: !!opts.altReplace,
         mergeStarredOnly,
         toastInHashOnly,
         folder,
@@ -724,6 +735,7 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
  *   replace?: boolean,
  *   appendOnly?: boolean,
  *   shiftMerge?: boolean,
+ *   altReplace?: boolean,
  *   mergeStarredOnly?: boolean,
  *   mergeStarredOnlyExplicit?: boolean,
  *   toastInHashOnly?: boolean,
@@ -752,6 +764,7 @@ export function formatAuditViewsImportDryRunMergeHint(raw, opts = {}) {
       ok: inherit.ok,
       hint,
       shiftMerge: !!opts.shiftMerge,
+      altReplace: !!opts.altReplace,
       inherited: inherit.ok ? inherit.inherited : [],
       fromExportMeta: inherit.ok ? inherit.fromExportMeta : false,
     },
