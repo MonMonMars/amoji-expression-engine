@@ -2957,6 +2957,12 @@
         });
         ttsEndpointEl?.addEventListener('dragover', (ev) => {
           ev.preventDefault();
+          // Some browsers may skip dragenter; treat first dragover as drag_pick.
+          if (ttsEndpointDragActive) return;
+          ttsEndpointDragActive = true;
+          cancelActiveCompoundLifecycle('tts_endpoint_drag_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
         });
         ttsEndpointEl?.addEventListener('dragstart', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_drag_start_pick');
