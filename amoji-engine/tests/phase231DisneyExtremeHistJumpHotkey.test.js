@@ -16,9 +16,11 @@ describe('Phase 231 Extreme 1–8 hist jump hotkey', () => {
       action: 'jumpBaselineHistory',
       index: 0,
     });
-    expect(resolveDisneyExtremeHotkey({ key: '2', shiftKey: true }).ok).toBe(
-      false,
-    );
+    expect(resolveDisneyExtremeHotkey({ key: '2', shiftKey: true })).toEqual({
+      ok: true,
+      action: 'jumpBaselineRedo',
+      index: 1,
+    });
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('1–8 hist jump');
     expect(typeof engine.resolveDisneyExtremeHotkey).toBe('function');
   });

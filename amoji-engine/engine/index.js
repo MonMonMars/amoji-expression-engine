@@ -267,6 +267,7 @@ export {
   formatDisneyExtremeHotkeyCatalog,
   matchDisneyExtremeHotkey,
   disneyExtremeHistoryJumpIndex,
+  hasDisneyExtremeBaselineHistory,
   isDisneyExtremeNudgeHotkeyKey,
   sampleDisneyExtremeEaseCurve,
   formatDisneyExtremeEaseCurveLabel,

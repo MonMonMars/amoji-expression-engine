@@ -244,7 +244,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 231 | Extreme 1–8 hist jump hotkey | Done |
 | Phase 232 | Extreme Shift+I merge hist hotkey | Done |
 | Phase 233 | Extreme Face Live digit jump + merge wiring | Done |
-| Phase 234+ | Further production polish… | Specced |
+| Phase 234 | Extreme has baseline history helper | Done |
+| Phase 235 | Extreme Shift+K clear hist + Shift+digit redo jump | Done |
+| Phase 236 | Extreme Face Live clear hist helper | Done |
+| Phase 237 | Extreme Face Live clear hist + redo jump wiring | Done |
+| Phase 238+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -564,6 +564,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
+  { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
@@ -577,12 +578,28 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     help: '1–8 hist jump',
     kind: 'jump',
   },
+  { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
   { id: 'altCoarser', help: 'Alt coarser', kind: 'note' },
 ];
+
+/**
+ * Whether Extreme hist/redo stacks have anything to clear.
+ * @param {{ historyDepth?: number, redoDepth?: number, history?: object[], redo?: object[] }} [opts]
+ * @returns {boolean}
+ */
+export function hasDisneyExtremeBaselineHistory(opts = {}) {
+  const histLen = Array.isArray(opts.history)
+    ? opts.history.length
+    : Math.max(0, Math.floor(Number(opts.historyDepth) || 0));
+  const redoLen = Array.isArray(opts.redo)
+    ? opts.redo.length
+    : Math.max(0, Math.floor(Number(opts.redoDepth) || 0));
+  return histLen + redoLen > 0;
+}
 
 /**
  * Join catalog help bits into the shared Extreme hotkey legend.

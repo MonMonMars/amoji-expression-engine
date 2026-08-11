@@ -806,6 +806,7 @@
           <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
@@ -817,7 +818,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click a chip to jump · L list · ⇧L copy · U undo · ⇧U redo"
+          title="Baseline history / redo · click a chip to jump · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1228,6 +1229,7 @@
         serializeDisneyExtremeBaselineHistory,
         parseDisneyExtremeBaselineHistory,
         formatDisneyExtremeBaselineHistoryPreviewLabel,
+        hasDisneyExtremeBaselineHistory,
         formatDisneyExtremeSnapshotPreviewLabel,
         pushDisneyExtremeBaselineHistory,
         popDisneyExtremeBaselineHistory,
@@ -2032,6 +2034,10 @@
         clearDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeClearHist')?.addEventListener('click', () => {
+        clearDisneyExtremeBaselineHistoryOnly();
+      });
+
       document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
         undoDisneyExtremeBaseline();
       });
@@ -2431,6 +2437,25 @@
         return true;
       }
 
+      function clearDisneyExtremeBaselineHistoryOnly() {
+        if (
+          !hasDisneyExtremeBaselineHistory({
+            history: extremeBaselineHistory,
+            redo: extremeBaselineRedo,
+          })
+        ) {
+          flashDisneyExtremeStatus('clear hist · empty');
+          return false;
+        }
+        extremeBaselineHistory = [];
+        clearDisneyExtremeBaselineHistoryStorage();
+        clearDisneyExtremeBaselineRedoStack();
+        syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
+        flashDisneyExtremeStatus('cleared · hist');
+        return true;
+      }
+
       function undoDisneyExtremeBaseline() {
         const popped = popDisneyExtremeBaselineHistory(extremeBaselineHistory);
         extremeBaselineHistory = popped.history;
@@ -2758,6 +2783,11 @@
           clearDisneyExtremeBaseline();
           return;
         }
+        if (resolved.action === 'clearBaselineHistory') {
+          ev.preventDefault();
+          clearDisneyExtremeBaselineHistoryOnly();
+          return;
+        }
         if (resolved.action === 'undoBaseline') {
           ev.preventDefault();
           undoDisneyExtremeBaseline();
@@ -2796,6 +2826,11 @@
         if (resolved.action === 'jumpBaselineHistory') {
           ev.preventDefault();
           jumpDisneyExtremeBaselineHistory(resolved.index);
+          return;
+        }
+        if (resolved.action === 'jumpBaselineRedo') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineRedo(resolved.index);
           return;
         }
         if (resolved.action === 'copySummary') {

@@ -83,6 +83,7 @@ export function disneyExtremeUiDefaults() {
  * - `d` / `D` → flash Extreme snapshot diff vs last copy/paste baseline
  * - `Shift+D` → restore Extreme factors from last copy/paste baseline
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
+ * - `Shift+K` → clear Extreme baseline history + redo stacks (keep baseline)
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
@@ -91,6 +92,7 @@ export function disneyExtremeUiDefaults() {
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Shift+I` → merge Extreme baseline history JSON into current stack
  * - `1`–`8` → jump to Extreme baseline history entry by index
+ * - `Shift+1`–`8` → jump to Extreme baseline redo entry by index
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -348,12 +350,18 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'pasteBaselineHistoryJson' && ev.shiftKey) {
       return { ok: true, action: 'mergeBaselineHistoryJson' };
     }
+    if (entry.id === 'clearBaseline' && ev.shiftKey) {
+      return { ok: true, action: 'clearBaselineHistory' };
+    }
     return { ok: true, action: entry.id };
   }
   if (entry.kind === 'jump') {
-    if (ev.shiftKey || ev.altKey) return { ok: false, reason: 'modifier' };
+    if (ev.altKey) return { ok: false, reason: 'modifier' };
     const index = disneyExtremeHistoryJumpIndex(key);
     if (index == null) return { ok: false, reason: 'key' };
+    if (ev.shiftKey) {
+      return { ok: true, action: 'jumpBaselineRedo', index };
+    }
     return { ok: true, action: 'jumpBaselineHistory', index };
   }
   if (entry.kind === 'nudge') {
