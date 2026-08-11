@@ -249,7 +249,7 @@ export const DISNEY_EXTREME_DEFAULTS = {
 
 /** Shared Face Live Extreme hotkey legend (status / docs). */
 export const DISNEY_EXTREME_HOTKEY_HELP =
-  "X · B body · [ ] shape · - = body× · , . eye · ; ' mouth · C copy · R reset · H help · Esc clear · hold nudges";
+  "X · B body · [ ] shape · - = body× · , . eye · ; ' mouth · C copy · R reset · H help · Esc clear · hold nudges · Shift coarse";
 
 /**
  * Status prefix + hotkey legend for Extreme off/on idle copy.

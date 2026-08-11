@@ -63,16 +63,17 @@ export function disneyExtremeUiDefaults() {
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
- * - `[` / `]` → nudge shape × (when Extreme is on)
- * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed)
- * - `,` / `.` → nudge eyes × (when Extreme is on)
- * - `;` / `'` → nudge mouth × (when Extreme is on)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding).
- * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
+ * - `[` / `]` → nudge shape × (when Extreme is on; Shift = coarse 0.10)
+ * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift = coarse)
+ * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse)
+ * - `;` / `'` → nudge mouth × (when Extreme is on; Shift = coarse)
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift allowed for coarse nudges).
+ * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
  */
 export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
+export const DISNEY_EXTREME_FACTOR_COARSE_MULT = 2;
 export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = DISNEY_EXTREME_FACTOR_STEP;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
@@ -86,6 +87,15 @@ export const DISNEY_EXTREME_MOUTH_FACTOR_MAX = 2.2;
 export const DISNEY_EXTREME_NUDGE_REPEAT_INITIAL_MS = 320;
 /** Interval between held nudge repeats. */
 export const DISNEY_EXTREME_NUDGE_REPEAT_INTERVAL_MS = 55;
+
+/**
+ * Nudge step size — Shift doubles for coarse tuning.
+ * @param {boolean} [shiftKey]
+ * @returns {number}
+ */
+export function disneyExtremeNudgeStep(shiftKey = false) {
+  return DISNEY_EXTREME_FACTOR_STEP * (shiftKey ? DISNEY_EXTREME_FACTOR_COARSE_MULT : 1);
+}
 
 /**
  * @param {string|undefined} action
@@ -225,60 +235,61 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   }
   if (key === 'c' || key === 'C') return { ok: true, action: 'copySummary' };
   if (key === 'r' || key === 'R') return { ok: true, action: 'resetDefaults' };
+  const step = disneyExtremeNudgeStep(!!ev.shiftKey);
   if (key === '[' || key === '{') {
     return {
       ok: true,
       action: 'nudgeShapeDown',
-      delta: -DISNEY_EXTREME_FACTOR_STEP,
+      delta: -step,
     };
   }
   if (key === ']' || key === '}') {
     return {
       ok: true,
       action: 'nudgeShapeUp',
-      delta: DISNEY_EXTREME_FACTOR_STEP,
+      delta: step,
     };
   }
   if (key === '-' || key === '_') {
     return {
       ok: true,
       action: 'nudgeBodyDown',
-      delta: -DISNEY_EXTREME_FACTOR_STEP,
+      delta: -step,
     };
   }
   if (key === '=' || key === '+') {
     return {
       ok: true,
       action: 'nudgeBodyUp',
-      delta: DISNEY_EXTREME_FACTOR_STEP,
+      delta: step,
     };
   }
-  if (key === ',') {
+  if (key === ',' || key === '<') {
     return {
       ok: true,
       action: 'nudgeEyeDown',
-      delta: -DISNEY_EXTREME_FACTOR_STEP,
+      delta: -step,
     };
   }
-  if (key === '.') {
+  if (key === '.' || key === '>') {
     return {
       ok: true,
       action: 'nudgeEyeUp',
-      delta: DISNEY_EXTREME_FACTOR_STEP,
+      delta: step,
     };
   }
   if (key === ';' || key === ':') {
     return {
       ok: true,
       action: 'nudgeMouthDown',
-      delta: -DISNEY_EXTREME_FACTOR_STEP,
+      delta: -step,
     };
   }
   if (key === "'" || key === '"') {
     return {
       ok: true,
       action: 'nudgeMouthUp',
-      delta: DISNEY_EXTREME_FACTOR_STEP,
+      delta: step,
     };
   }
   return { ok: false, reason: 'key' };
