@@ -260,7 +260,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 247 | Extreme Alt+O merge redo + Shift-drop redo | Done |
 | Phase 248 | Extreme dbl-click chip pin baseline | Done |
 | Phase 249 | Extreme hist share URL `#dxh=` / Shift+Y | Done |
-| Phase 250+ | Further production polish… | Specced |
+| Phase 250 | Extreme redo share URL `#dxr=` / Alt+Y | Done |
+| Phase 251 | Extreme chip↔chip compare (Shift+Alt+click) | Done |
+| Phase 252 | Extreme favorites S / Shift+S | Done |
+| Phase 253 | Extreme More IO overflow declutter | Done |
+| Phase 254+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -574,6 +574,9 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'copyBaselineHistoryShareUrl', help: 'Shift+Y share hist', kind: 'note' },
+  { id: 'copyBaselineRedoShareUrl', help: 'Alt+Y share redo', kind: 'note' },
+  { id: 'starBaselineFavorite', keys: ['s', 'S'], help: 'S star fav', kind: 'action' },
+  { id: 'showBaselineFavorites', help: 'Shift+S fav list', kind: 'note' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
@@ -587,6 +590,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
+  { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
   { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist/redo · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
@@ -1106,6 +1110,7 @@ export function parseDisneyExtremeSnapshot(input) {
 
 export const DISNEY_EXTREME_SNAPSHOT_HASH_PARAM = 'dxs';
 export const DISNEY_EXTREME_HISTORY_HASH_PARAM = 'dxh';
+export const DISNEY_EXTREME_REDO_HASH_PARAM = 'dxr';
 
 function encodeDisneyExtremeBase64Url(json) {
   if (typeof Buffer !== 'undefined') {
@@ -1311,6 +1316,101 @@ export function buildDisneyExtremeBaselineHistoryShareUrl(
 }
 
 /**
+ * Encode Extreme baseline redo → URL hash fragment (`#dxr=...` base64url JSON).
+ * @param {object[]|{ redo?: object[] }|null|undefined} [redoOrOpts]
+ * @returns {string}
+ */
+export function encodeDisneyExtremeBaselineRedoHash(redoOrOpts = {}) {
+  const redo = Array.isArray(redoOrOpts)
+    ? redoOrOpts
+    : Array.isArray(redoOrOpts?.redo)
+      ? redoOrOpts.redo
+      : [];
+  const json = serializeDisneyExtremeBaselineRedo(redo);
+  return `${DISNEY_EXTREME_REDO_HASH_PARAM}=${encodeDisneyExtremeBase64Url(json)}`;
+}
+
+/**
+ * Decode `#dxr=...` or raw dxr= payload → Extreme baseline redo stack.
+ * @param {string} hashOrQuery
+ * @returns {{ ok: true, redo: object[] }|{ ok: false, error: string }}
+ */
+export function decodeDisneyExtremeBaselineRedoHash(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return { ok: false, error: 'empty' };
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(
+    new RegExp(`(?:^|&)?${DISNEY_EXTREME_REDO_HASH_PARAM}=([^&]+)`),
+  );
+  if (!m) return { ok: false, error: 'no_dxr' };
+  try {
+    const json = decodeDisneyExtremeBase64Url(m[1]);
+    return parseDisneyExtremeBaselineRedo(json);
+  } catch {
+    return { ok: false, error: 'decode_failed' };
+  }
+}
+
+/**
+ * Read Extreme baseline redo from location.hash if `dxr=` is present.
+ * @param {{ hash?: string }} [loc]
+ * @returns {{ ok: true, redo: object[] }|{ ok: false, error: string }}
+ */
+export function loadDisneyExtremeBaselineRedoFromHash(loc = {}) {
+  const hash =
+    loc.hash ||
+    (typeof location !== 'undefined' ? location.hash : '') ||
+    '';
+  if (!hash.includes(`${DISNEY_EXTREME_REDO_HASH_PARAM}=`)) {
+    return { ok: false, error: 'no_dxr' };
+  }
+  return decodeDisneyExtremeBaselineRedoHash(hash);
+}
+
+/**
+ * Build share URL with Extreme baseline redo in hash (`dxr=`).
+ * Merges with existing hash params by default (replaces prior dxr=).
+ * @param {object[]|{ redo?: object[] }|null|undefined} [redoOrOpts]
+ * @param {{ baseUrl?: string, hash?: string, mergeHash?: boolean }} [opts]
+ * @returns {{ ok: boolean, url: string, hash: string }}
+ */
+export function buildDisneyExtremeBaselineRedoShareUrl(
+  redoOrOpts = {},
+  opts = {},
+) {
+  const frag = encodeDisneyExtremeBaselineRedoHash(redoOrOpts);
+  let hash = frag;
+  if (opts.mergeHash !== false) {
+    const existing = String(
+      opts.hash ||
+        (typeof location !== 'undefined' ? location.hash : '') ||
+        '',
+    ).replace(/^#/, '');
+    if (existing) {
+      const parts = existing
+        .split('&')
+        .filter(
+          (p) =>
+            p && !p.startsWith(`${DISNEY_EXTREME_REDO_HASH_PARAM}=`),
+        );
+      parts.push(frag);
+      hash = parts.join('&');
+    }
+  }
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  return {
+    ok: true,
+    url: base ? `${base}#${hash}` : `#${hash}`,
+    hash,
+  };
+}
+
+/**
  * Compact fingerprint token for status flashes (stable for equal snaps).
  * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null|undefined} snap
  * @param {{ length?: number }} [opts]
@@ -1477,6 +1577,7 @@ export function captureDisneyExtremeBaseline(snapOrOpts) {
 }
 
 export const DISNEY_EXTREME_BASELINE_HISTORY_LIMIT = 8;
+export const DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT = 4;
 
 /**
  * Push a captured baseline onto a history stack (skips duplicate of tip).
@@ -1541,9 +1642,9 @@ export function formatDisneyExtremeBaselineSummary(opts = {}) {
 
 /**
  * One-line label for a baseline history entry (list / chip / tooltip).
- * Optional `kind: 'redo'` uses R#n prefix instead of #n.
+ * Optional `kind: 'redo'` uses R#n prefix; `kind: 'fav'` uses F#n.
  * @param {object|null|undefined} snap
- * @param {{ index?: number, compact?: boolean, kind?: 'hist'|'redo' }} [opts]
+ * @param {{ index?: number, compact?: boolean, kind?: 'hist'|'redo'|'fav' }} [opts]
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineHistoryEntry(snap, opts = {}) {
@@ -1551,7 +1652,8 @@ export function formatDisneyExtremeBaselineHistoryEntry(snap, opts = {}) {
   if (!captured) return '—';
   const fp = disneyExtremeSnapshotFingerprintShort(captured);
   const n = Math.max(1, Math.floor(Number(opts.index) || 1));
-  const tag = opts.kind === 'redo' ? `R#${n}` : `#${n}`;
+  const tag =
+    opts.kind === 'redo' ? `R#${n}` : opts.kind === 'fav' ? `F#${n}` : `#${n}`;
   if (opts.compact) return `${tag} ${fp}`;
   if (!captured.enabled) return `${tag} off · fp ${fp}`;
   const body = captured.bodyOn
@@ -1606,10 +1708,12 @@ export function formatDisneyExtremeBaselineHistoryList(history, opts = {}) {
  * @returns {string}
  */
 export function formatDisneyExtremeBaselineChipPreviewLabel(snap, opts = {}) {
-  const kind = opts.kind === 'redo' ? 'redo' : 'hist';
+  const kind =
+    opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : 'hist';
   const entry = formatDisneyExtremeBaselineHistoryEntry(snap, {
     index: opts.index,
-    kind: opts.kind === 'redo' ? 'redo' : undefined,
+    kind:
+      opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : undefined,
   });
   if (entry === '—') return `preview · ${kind} · invalid`;
   return `preview · ${kind} · ${entry}`;
@@ -1638,6 +1742,40 @@ export function formatDisneyExtremeBaselineChipDiffLabel(
   const diff = diffDisneyExtremeSnapshots(current, chipSnap);
   const bit = formatDisneyExtremeSnapshotDiffLabel(diff);
   return `chip · ${entry} · ${bit}`;
+}
+
+/**
+ * Diff two Extreme hist/redo chips (Shift+Alt+click vs remembered chip).
+ * @param {object|null|undefined} aSnap
+ * @param {object|null|undefined} bSnap
+ * @param {{ aIndex?: number, bIndex?: number, aKind?: 'hist'|'redo', bKind?: 'hist'|'redo' }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineChipCompareLabel(
+  aSnap,
+  bSnap,
+  opts = {},
+) {
+  const aKind = opts.aKind === 'redo' ? 'redo' : 'hist';
+  const bKind = opts.bKind === 'redo' ? 'redo' : 'hist';
+  if (!aSnap) return `compare · no A · pick chip first`;
+  if (!bSnap) return `compare · ${aKind} · invalid B`;
+  const aEntry = formatDisneyExtremeBaselineHistoryEntry(aSnap, {
+    index: opts.aIndex,
+    compact: true,
+    kind: opts.aKind === 'redo' ? 'redo' : undefined,
+  });
+  const bEntry = formatDisneyExtremeBaselineHistoryEntry(bSnap, {
+    index: opts.bIndex,
+    compact: true,
+    kind: opts.bKind === 'redo' ? 'redo' : undefined,
+  });
+  if (aEntry === '—' || bEntry === '—') {
+    return `compare · ${aKind}/${bKind} · invalid`;
+  }
+  const diff = diffDisneyExtremeSnapshots(aSnap, bSnap);
+  const bit = formatDisneyExtremeSnapshotDiffLabel(diff);
+  return `compare · ${aEntry} ↔ ${bEntry} · ${bit}`;
 }
 
 /**
@@ -2081,6 +2219,190 @@ export function clearDisneyExtremeBaselineRedoStorage(opts = {}) {
   if (storage) {
     try {
       storage.removeItem(DISNEY_EXTREME_BASELINE_REDO_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  return { ok: true };
+}
+
+export const DISNEY_EXTREME_BASELINE_FAVORITES_STORAGE_KEY =
+  'amoji.disneyExtreme.baselineFavorites.v1';
+
+export const DISNEY_EXTREME_BASELINE_FAVORITES_JSON_KIND =
+  'amoji.disneyExtreme.baselineFavorites.v1';
+
+/**
+ * Push a captured baseline onto the favorites stack (skips duplicate of tip).
+ * @param {object[]|null|undefined} favorites
+ * @param {object|null|undefined} snap
+ * @param {{ limit?: number }} [opts]
+ * @returns {object[]}
+ */
+export function pushDisneyExtremeBaselineFavorite(favorites, snap, opts = {}) {
+  return pushDisneyExtremeBaselineHistory(favorites, snap, {
+    limit:
+      Math.max(
+        1,
+        Math.floor(
+          Number(opts.limit) || DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT,
+        ),
+      ),
+  });
+}
+
+/**
+ * Format Extreme favorites list for status flash.
+ * @param {object[]|null|undefined} favorites
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineFavoritesList(favorites) {
+  const list = Array.isArray(favorites) ? favorites : [];
+  if (!list.length) return 'fav · empty';
+  const bits = list.map((snap, i) =>
+    formatDisneyExtremeBaselineHistoryEntry(snap, {
+      index: i + 1,
+      compact: true,
+      kind: 'fav',
+    }),
+  );
+  return `fav ${list.length} · ${bits.join(' · ')}`;
+}
+
+/**
+ * Serialize Extreme baseline favorites to versioned JSON.
+ * @param {object[]|null|undefined} favorites
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function serializeDisneyExtremeBaselineFavorites(favorites, opts = {}) {
+  const list = Array.isArray(favorites) ? favorites : [];
+  const items = [];
+  for (const snap of list) {
+    const captured = captureDisneyExtremeBaseline(snap);
+    if (!captured) continue;
+    items.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+  }
+  return JSON.stringify(
+    {
+      kind: DISNEY_EXTREME_BASELINE_FAVORITES_JSON_KIND,
+      items,
+    },
+    null,
+    opts.pretty ? 2 : 0,
+  );
+}
+
+/**
+ * Parse clipboard / export JSON into Extreme baseline favorites.
+ * @param {string|object|null|undefined} input
+ * @returns {{ ok: true, favorites: object[] }|{ ok: false, error: string }}
+ */
+export function parseDisneyExtremeBaselineFavorites(input) {
+  let obj = input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return { ok: false, error: 'empty' };
+    try {
+      obj = JSON.parse(trimmed);
+    } catch {
+      return { ok: false, error: 'invalid_json' };
+    }
+  }
+  if (!obj || typeof obj !== 'object') {
+    return { ok: false, error: 'invalid_payload' };
+  }
+  if (obj.kind !== DISNEY_EXTREME_BASELINE_FAVORITES_JSON_KIND) {
+    return { ok: false, error: 'kind' };
+  }
+  if (!Array.isArray(obj.items)) {
+    return { ok: false, error: 'items' };
+  }
+  const favorites = [];
+  for (const item of obj.items) {
+    const snap = parseDisneyExtremeSnapshot(item);
+    if (snap.ok) favorites.push(snap.snap);
+  }
+  return {
+    ok: true,
+    favorites: favorites.slice(-DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT),
+  };
+}
+
+/**
+ * Persist Extreme baseline favorites (sessionStorage by default).
+ * @param {object[]|null|undefined} favorites
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, count: number }}
+ */
+export function saveDisneyExtremeBaselineFavorites(favorites, opts = {}) {
+  const list = Array.isArray(favorites) ? favorites : [];
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return { ok: true, count: list.length };
+  try {
+    if (!list.length) {
+      storage.removeItem(DISNEY_EXTREME_BASELINE_FAVORITES_STORAGE_KEY);
+      return { ok: true, count: 0 };
+    }
+    const items = [];
+    for (const snap of list) {
+      const captured = captureDisneyExtremeBaseline(snap);
+      if (!captured) continue;
+      items.push(JSON.parse(serializeDisneyExtremeSnapshot(captured)));
+    }
+    storage.setItem(
+      DISNEY_EXTREME_BASELINE_FAVORITES_STORAGE_KEY,
+      JSON.stringify({
+        kind: DISNEY_EXTREME_BASELINE_FAVORITES_JSON_KIND,
+        items,
+      }),
+    );
+    return { ok: true, count: items.length };
+  } catch {
+    return { ok: false, count: list.length };
+  }
+}
+
+/**
+ * Load Extreme baseline favorites from sessionStorage (or injected storage).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {object[]}
+ */
+export function loadDisneyExtremeBaselineFavorites(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return [];
+  try {
+    const raw = storage.getItem(DISNEY_EXTREME_BASELINE_FAVORITES_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      parsed.kind !== DISNEY_EXTREME_BASELINE_FAVORITES_JSON_KIND ||
+      !Array.isArray(parsed.items)
+    ) {
+      return [];
+    }
+    const out = [];
+    for (const item of parsed.items) {
+      const snap = parseDisneyExtremeSnapshot(item);
+      if (snap.ok) out.push(snap.snap);
+    }
+    return out.slice(-DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Clear persisted Extreme baseline favorites.
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean }}
+ */
+export function clearDisneyExtremeBaselineFavoritesStorage(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (storage) {
+    try {
+      storage.removeItem(DISNEY_EXTREME_BASELINE_FAVORITES_STORAGE_KEY);
     } catch {
       /* ignore */
     }

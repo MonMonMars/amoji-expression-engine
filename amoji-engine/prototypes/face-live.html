@@ -547,6 +547,49 @@
         border-style: dashed;
         opacity: 0.9;
       }
+      #disneyExtremeFavorites {
+        margin-top: 4px;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        min-height: 1.4em;
+      }
+      #disneyExtremeFavorites button.extreme-fav-chip {
+        font: inherit;
+        font-size: 0.8em;
+        padding: 2px 8px;
+        border-radius: 6px;
+        border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      #disneyExtremeFavorites button.extreme-fav-chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      #disneyExtremeMore {
+        margin-top: 6px;
+        width: 100%;
+      }
+      #disneyExtremeMore > summary {
+        cursor: pointer;
+        opacity: 0.75;
+        font-size: 0.85em;
+        list-style: none;
+        user-select: none;
+      }
+      #disneyExtremeMore > summary::-webkit-details-marker {
+        display: none;
+      }
+      #disneyExtremeMore[open] > summary {
+        opacity: 1;
+        margin-bottom: 6px;
+      }
+      #disneyExtremeMore .row {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -795,38 +838,53 @@
         <div class="row" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeCopy">Copy summary <kbd>C</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyEase">Copy ease SVG <kbd>⇧E</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyMix">Copy mix SVG <kbd>⇧M</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
           <button type="button" id="btnDisneyExtremeBundle">All readout <kbd>A</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
-          <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
           <button type="button" id="btnDisneyExtremeDiff">Diff baseline <kbd>D</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
           <button type="button" id="btnDisneyExtremeWipeRedo">Wipe redo <kbd>W</kbd></button>
           <button type="button" id="btnDisneyExtremePinBase">Pin baseline <kbd>P</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
-          <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
-          <button type="button" id="btnDisneyExtremeMergeRedo">Merge redo JSON <kbd>Alt+O</kbd></button>
+          <button type="button" id="btnDisneyExtremeStarFav">Star favorite <kbd>S</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
-          <button type="button" id="btnDisneyExtremeShareHist">Copy hist share <kbd>⇧Y</kbd></button>
           <button type="button" id="btnDisneyExtremeHistList">History list <kbd>L</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
-          <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
-          <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
         </div>
+        <details id="disneyExtremeMore">
+          <summary>More Extreme IO · SVG · JSON · share · fav</summary>
+          <div class="row" style="gap:8px;">
+            <button type="button" id="btnDisneyExtremeCopyEase">Copy ease SVG <kbd>⇧E</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyMix">Copy mix SVG <kbd>⇧M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeRedo">Merge redo JSON <kbd>Alt+O</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareHist">Copy hist share <kbd>⇧Y</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareRedo">Copy redo share <kbd>Alt+Y</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
+            <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
+          </div>
+        </details>
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · dbl-click pin · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · W wipe redo · P pin · O/⇧O/Alt+O redo JSON · ⇧Y hist share · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · dbl-click pin · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · W wipe redo · P pin · S star · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
+        </div>
+        <div
+          class="row"
+          id="disneyExtremeFavorites"
+          title="Starred favorites · click jump · S star · ⇧S list"
+        >
+          <span class="extreme-hist-empty">fav · empty</span>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -853,8 +911,8 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot or hist JSON · Meta preview · Shift merge hist · double-click paste snapshot · I paste hist · ⇧I merge" style="cursor:pointer;">
-          Drop snapshot / hist JSON · Meta preview · Shift merge hist · dbl-click paste · I hist
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo JSON · Meta preview · Shift merge hist/redo · double-click paste snapshot · I paste hist · ⇧I merge" style="cursor:pointer;">
+          Drop snapshot / hist / redo JSON · Meta preview · Shift merge · dbl-click paste · I hist
         </div>
       </div>
 
@@ -1227,6 +1285,9 @@
         encodeDisneyExtremeBaselineHistoryHash,
         loadDisneyExtremeBaselineHistoryFromHash,
         buildDisneyExtremeBaselineHistoryShareUrl,
+        encodeDisneyExtremeBaselineRedoHash,
+        loadDisneyExtremeBaselineRedoFromHash,
+        buildDisneyExtremeBaselineRedoShareUrl,
         diffDisneyExtremeSnapshots,
         formatDisneyExtremeSnapshotDiffLabel,
         formatDisneyExtremeSnapshotDiffCopyText,
@@ -1237,6 +1298,7 @@
         formatDisneyExtremeBaselineHistoryList,
         formatDisneyExtremeBaselineChipPreviewLabel,
         formatDisneyExtremeBaselineChipDiffLabel,
+        formatDisneyExtremeBaselineChipCompareLabel,
         serializeDisneyExtremeBaselineHistory,
         parseDisneyExtremeBaselineHistory,
         serializeDisneyExtremeBaselineRedo,
@@ -1246,6 +1308,10 @@
         hasDisneyExtremeBaselineHistory,
         hasDisneyExtremeBaselineRedo,
         formatDisneyExtremeSnapshotPreviewLabel,
+        pushDisneyExtremeBaselineFavorite,
+        formatDisneyExtremeBaselineFavoritesList,
+        saveDisneyExtremeBaselineFavorites,
+        loadDisneyExtremeBaselineFavorites,
         pushDisneyExtremeBaselineHistory,
         popDisneyExtremeBaselineHistory,
         saveDisneyExtremeBaseline,
@@ -1564,6 +1630,9 @@
       let lastExtremeDirty = false;
       let extremeBaselineHistory = loadDisneyExtremeBaselineHistory();
       let extremeBaselineRedo = loadDisneyExtremeBaselineRedo();
+      let extremeBaselineFavorites = loadDisneyExtremeBaselineFavorites();
+      /** @type {{ snap: object, index: number, kind: 'hist'|'redo'|'fav' }|null} */
+      let lastExtremeChipCompare = null;
 
       function persistDisneyExtremeBaselineHistory() {
         saveDisneyExtremeBaselineHistory(extremeBaselineHistory);
@@ -1573,9 +1642,21 @@
         saveDisneyExtremeBaselineRedo(extremeBaselineRedo);
       }
 
+      function persistDisneyExtremeBaselineFavorites() {
+        saveDisneyExtremeBaselineFavorites(extremeBaselineFavorites);
+      }
+
       function clearDisneyExtremeBaselineRedoStack() {
         extremeBaselineRedo = [];
         clearDisneyExtremeBaselineRedoStorage();
+      }
+
+      function rememberDisneyExtremeChipCompare(snap, opts = {}) {
+        lastExtremeChipCompare = {
+          snap,
+          index: Number(opts.index) || 1,
+          kind: opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : 'hist',
+        };
       }
 
       function syncDisneyExtremeHistoryUi() {
@@ -1647,19 +1728,49 @@
       function bindDisneyExtremeBaselineChip(btn, opts = {}) {
         const snap = opts.snap;
         const index = Number(opts.index) || 0;
-        const kind = opts.kind === 'redo' ? 'redo' : 'hist';
+        const kind =
+          opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : 'hist';
         let clickTimer = null;
         btn.addEventListener('click', (ev) => {
           if (ev.metaKey) {
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
             flashDisneyExtremeStatus(
               formatDisneyExtremeBaselineChipPreviewLabel(snap, {
                 index: index + 1,
-                kind: kind === 'redo' ? 'redo' : undefined,
+                kind:
+                  kind === 'redo' ? 'redo' : kind === 'fav' ? 'fav' : undefined,
               }),
             );
             return;
           }
+          if (ev.altKey && ev.shiftKey) {
+            const a = lastExtremeChipCompare;
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineChipCompareLabel(
+                a?.snap,
+                snap,
+                {
+                  aIndex: a?.index,
+                  bIndex: index + 1,
+                  aKind: a?.kind === 'redo' ? 'redo' : 'hist',
+                  bKind: kind === 'redo' ? 'redo' : 'hist',
+                },
+              ),
+            );
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
+            return;
+          }
           if (ev.altKey) {
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
             flashDisneyExtremeStatus(
               formatDisneyExtremeBaselineChipDiffLabel(
                 disneyExtremeSnapshot(),
@@ -1676,6 +1787,7 @@
           clickTimer = setTimeout(() => {
             clickTimer = null;
             if (kind === 'redo') jumpDisneyExtremeBaselineRedo(index);
+            else if (kind === 'fav') jumpDisneyExtremeBaselineFavorite(index);
             else jumpDisneyExtremeBaselineHistory(index);
           }, 280);
         });
@@ -1687,9 +1799,43 @@
           }
           pinDisneyExtremeBaselineFromChip(snap, {
             index: index + 1,
-            kind,
+            kind: kind === 'fav' ? 'hist' : kind,
           });
         });
+      }
+
+      function syncDisneyExtremeFavoritesUi() {
+        const el = document.getElementById('disneyExtremeFavorites');
+        if (!el) return;
+        el.replaceChildren();
+        if (!extremeBaselineFavorites.length) {
+          const empty = document.createElement('span');
+          empty.className = 'extreme-hist-empty';
+          empty.textContent = 'fav · empty';
+          el.appendChild(empty);
+          return;
+        }
+        for (let i = extremeBaselineFavorites.length - 1; i >= 0; i--) {
+          const snap = extremeBaselineFavorites[i];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'extreme-fav-chip';
+          btn.textContent = formatDisneyExtremeBaselineHistoryEntry(snap, {
+            index: i + 1,
+            compact: true,
+            kind: 'fav',
+          });
+          btn.title = formatDisneyExtremeBaselineHistoryEntry(snap, {
+            index: i + 1,
+            kind: 'fav',
+          });
+          bindDisneyExtremeBaselineChip(btn, {
+            snap,
+            index: i,
+            kind: 'fav',
+          });
+          el.appendChild(btn);
+        }
       }
 
       function flashDisneyExtremeBaselineHistoryList() {
@@ -1725,6 +1871,45 @@
         const fp = disneyExtremeSnapshotFingerprintShort(snap);
         flashDisneyExtremeStatus(`redo · jump R#${index + 1} · fp ${fp}`);
         return true;
+      }
+
+      function jumpDisneyExtremeBaselineFavorite(index) {
+        const snap = extremeBaselineFavorites[index];
+        if (!snap) {
+          flashDisneyExtremeStatus('fav · missing');
+          return false;
+        }
+        applyDisneyExtremeSnapshot(snap);
+        setDisneyExtremeBaseline(snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(`fav · jump F#${index + 1} · fp ${fp}`);
+        return true;
+      }
+
+      function starDisneyExtremeBaselineFavorite() {
+        const snap = disneyExtremeSnapshot();
+        const before = extremeBaselineFavorites.length;
+        extremeBaselineFavorites = pushDisneyExtremeBaselineFavorite(
+          extremeBaselineFavorites,
+          snap,
+        );
+        persistDisneyExtremeBaselineFavorites();
+        syncDisneyExtremeFavoritesUi();
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        if (extremeBaselineFavorites.length === before) {
+          flashDisneyExtremeStatus(`starred · already · fp ${fp}`);
+        } else {
+          flashDisneyExtremeStatus(
+            `starred · fav ${extremeBaselineFavorites.length} · fp ${fp}`,
+          );
+        }
+        return true;
+      }
+
+      function flashDisneyExtremeBaselineFavoritesList() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineFavoritesList(extremeBaselineFavorites),
+        );
       }
 
       function pinDisneyExtremeBaseline() {
@@ -2201,6 +2386,10 @@
         pinDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeStarFav')?.addEventListener('click', () => {
+        starDisneyExtremeBaselineFavorite();
+      });
+
       document.getElementById('btnDisneyExtremeCopyRedo')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineRedoJson();
       });
@@ -2229,8 +2418,16 @@
         copyDisneyExtremeBaselineHistoryShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeShareRedo')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineRedoShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeHistList')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineHistoryList();
+      });
+
+      document.getElementById('btnDisneyExtremeFavList')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineFavoritesList();
       });
 
       document.getElementById('btnDisneyExtremeCopyHist')?.addEventListener('click', () => {
@@ -2268,7 +2465,9 @@
         maybeAutoBaselineDisneyExtreme({ silent: true });
       }
       applyDisneyExtremeBaselineHistoryFromHash();
+      applyDisneyExtremeBaselineRedoFromHash();
       syncDisneyExtremeHistoryUi();
+      syncDisneyExtremeFavoritesUi();
 
       function flashDisneyExtremeEaseCurve() {
         const snap = disneyExtremeSnapshot();
@@ -2449,6 +2648,28 @@
         return ok;
       }
 
+      async function copyDisneyExtremeBaselineRedoShareUrl() {
+        const share = buildDisneyExtremeBaselineRedoShareUrl(
+          extremeBaselineRedo,
+        );
+        const count = extremeBaselineRedo.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(share.url);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · redo share · ${count}`
+            : `copy failed · redo share · ${share.hash}`,
+        );
+        return ok;
+      }
+
       function applyDisneyExtremeSnapshotFromHash() {
         const loaded = loadDisneyExtremeSnapshotFromHash();
         if (!loaded.ok) return false;
@@ -2465,6 +2686,12 @@
         return applyDisneyExtremeBaselineHistory(loaded.history, {
           merge: false,
         });
+      }
+
+      function applyDisneyExtremeBaselineRedoFromHash() {
+        const loaded = loadDisneyExtremeBaselineRedoFromHash();
+        if (!loaded.ok) return false;
+        return applyDisneyExtremeBaselineRedo(loaded.redo, { merge: false });
       }
 
       async function pasteDisneyExtremeSnapshotJson() {
@@ -3031,6 +3258,16 @@
           pinDisneyExtremeBaseline();
           return;
         }
+        if (resolved.action === 'starBaselineFavorite') {
+          ev.preventDefault();
+          starDisneyExtremeBaselineFavorite();
+          return;
+        }
+        if (resolved.action === 'showBaselineFavorites') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineFavoritesList();
+          return;
+        }
         if (resolved.action === 'copyBaselineRedoJson') {
           ev.preventDefault();
           copyDisneyExtremeBaselineRedoJson();
@@ -3064,6 +3301,11 @@
         if (resolved.action === 'copyBaselineHistoryShareUrl') {
           ev.preventDefault();
           copyDisneyExtremeBaselineHistoryShareUrl();
+          return;
+        }
+        if (resolved.action === 'copyBaselineRedoShareUrl') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineRedoShareUrl();
           return;
         }
         if (resolved.action === 'showBaselineHistory') {

@@ -93,6 +93,9 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+U` → redo Extreme baseline from redo stack
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `Shift+Y` → copy Extreme baseline history share link (`#dxh=`)
+ * - `Alt+Y` → copy Extreme baseline redo share link (`#dxr=`)
+ * - `s` / `S` → star current Extreme factors into favorites
+ * - `Shift+S` → flash Extreme favorites list
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
@@ -107,7 +110,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps; Alt+O merge redo exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
@@ -316,10 +319,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O (merge redo JSON).
+  // except Alt+O (merge redo JSON) and Alt+Y (share redo).
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
-    if (lower !== 'o') {
+    if (lower !== 'o' && lower !== 'y') {
       return { ok: false, reason: 'modifier' };
     }
   }
@@ -369,8 +372,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'copyBaselineRedoJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteBaselineRedoJson' };
     }
+    if (entry.id === 'copySnapshotShareUrl' && ev.altKey) {
+      return { ok: true, action: 'copyBaselineRedoShareUrl' };
+    }
     if (entry.id === 'copySnapshotShareUrl' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineHistoryShareUrl' };
+    }
+    if (entry.id === 'starBaselineFavorite' && ev.shiftKey) {
+      return { ok: true, action: 'showBaselineFavorites' };
     }
     return { ok: true, action: entry.id };
   }
