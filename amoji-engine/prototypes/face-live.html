@@ -173,7 +173,7 @@
     <aside>
       <div>
         <h1>Amoji Face Live</h1>
-        <p class="sub">Realtime facial expression on Sakura LO / HI meshes. Drag to orbit · scroll to zoom.</p>
+        <p class="sub">Realtime facial expression on Sakura LO / HI — patterned after Naughty Dog systemic emotion, Square Enix FACS blends, Capcom fidelity tiers. Drag to orbit · scroll to zoom.</p>
       </div>
 
       <div class="group">
@@ -194,6 +194,19 @@
         <div class="label">Intensity <span id="intensityVal">0.70</span></div>
         <input id="intensity" type="range" min="0" max="1.25" step="0.01" value="0.70" />
         <div class="meter"><i id="intensityMeter"></i></div>
+        <div class="status" id="tierHint">sculpt: medium band</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Eye look-at</div>
+        <div class="row">
+          <button type="button" id="btnLookCam" class="primary">Track camera</button>
+          <button type="button" id="btnLookCenter">Center</button>
+        </div>
+        <div class="label">Look X <span id="lookXVal">0.00</span></div>
+        <input id="lookX" type="range" min="-1" max="1" step="0.01" value="0" />
+        <div class="label">Look Y <span id="lookYVal">0.00</span></div>
+        <input id="lookY" type="range" min="-1" max="1" step="0.01" value="0" />
       </div>
 
       <div class="group">
@@ -212,6 +225,11 @@
         <div class="label">Active morphs</div>
         <pre id="morphDebug">—</pre>
       </div>
+
+      <div class="group">
+        <div class="label">ARKit 52 export (nonzero)</div>
+        <pre id="arkitDebug">—</pre>
+      </div>
     </aside>
 
     <script type="importmap">
@@ -228,9 +246,19 @@
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       import {
         EMOTIONS,
+        INTENSITY_TIERS,
         emotionToMorphWeights,
         applyMorphWeights,
       } from '/engine/layers/emotionMorphs.js';
+      import {
+        lookToEyeMorphWeights,
+        saccadeOffset,
+        mergeEyeWeights,
+      } from '/engine/layers/eyeLook.js';
+      import {
+        morphWeightsToArkit,
+        arkitNonZero,
+      } from '/engine/export/arkitExporter.js';
 
       const ASSETS = {
         lo: '/assets/characters/jp-female-v0/lod/sakura_lo.glb',
@@ -240,13 +268,22 @@
       const viewport = document.getElementById('viewport');
       const loadStatus = document.getElementById('loadStatus');
       const morphDebug = document.getElementById('morphDebug');
+      const arkitDebug = document.getElementById('arkitDebug');
       const intensityEl = document.getElementById('intensity');
       const intensityVal = document.getElementById('intensityVal');
       const intensityMeter = document.getElementById('intensityMeter');
+      const tierHint = document.getElementById('tierHint');
+      const lookXEl = document.getElementById('lookX');
+      const lookYEl = document.getElementById('lookY');
+      const lookXVal = document.getElementById('lookXVal');
+      const lookYVal = document.getElementById('lookYVal');
 
       let lod = 'hi';
       let emotion = 'happy';
       let intensity = 0.7;
+      let lookX = 0;
+      let lookY = 0;
+      let trackCamera = true;
       let idleOn = true;
       let spinOn = false;
       let cycleOn = false;
@@ -321,6 +358,52 @@
         return Math.round(tris);
       }
 
+      /** Capcom-style eye pass: fix broken cornea/iris export for realtime. */
+      function improveEyeMaterials(obj) {
+        obj.traverse((c) => {
+          if (!c.isMesh || !c.material) return;
+          const mats = Array.isArray(c.material) ? c.material : [c.material];
+          for (const m of mats) {
+            if (!m || !m.name) continue;
+            const n = m.name.toLowerCase();
+            if (n.includes('cornea')) {
+              m.transparent = true;
+              m.opacity = 0.12;
+              m.color?.setRGB(0.85, 0.92, 0.98);
+              m.metalness = 0;
+              m.roughness = 0.05;
+              m.depthWrite = false;
+              m.side = THREE.DoubleSide;
+              if ('transmission' in m) m.transmission = 0;
+              m.needsUpdate = true;
+            } else if (n.includes('iris')) {
+              // Missing iris albedo → warm brown iris instead of glowing white
+              if (!m.map) m.color?.setRGB(0.22, 0.12, 0.07);
+              m.metalness = 0;
+              m.roughness = 0.35;
+              m.needsUpdate = true;
+            } else if (n.includes('pupil')) {
+              m.color?.setRGB(0.02, 0.02, 0.02);
+              m.metalness = 0;
+              m.roughness = 0.55;
+              m.emissive?.setRGB(0, 0, 0);
+              m.needsUpdate = true;
+            } else if (n.includes('human_eyes') || n.includes('sclera')) {
+              m.metalness = 0;
+              m.roughness = Math.max(m.roughness ?? 0.4, 0.35);
+              m.needsUpdate = true;
+            }
+          }
+        });
+      }
+
+      function tierLabel(t) {
+        if (t <= INTENSITY_TIERS.subtle) return 'sculpt: subtle';
+        if (t <= INTENSITY_TIERS.medium) return 'sculpt: subtle→medium';
+        if (t <= INTENSITY_TIERS.peak) return 'sculpt: medium→peak';
+        return 'sculpt: peak + overdrive';
+      }
+
       async function loadLod(next) {
         loadStatus.textContent = `Loading ${next.toUpperCase()}…`;
         loadStatus.className = 'status';
@@ -336,6 +419,7 @@
           });
         }
         model = gltf.scene;
+        improveEyeMaterials(model);
         // Center / ground-ish
         const box = new THREE.Box3().setFromObject(model);
         const size = box.getSize(new THREE.Vector3());
@@ -415,8 +499,39 @@
         intensity = Number(intensityEl.value);
         intensityVal.textContent = intensity.toFixed(2);
         intensityMeter.style.width = `${Math.min(100, (intensity / 1.25) * 100)}%`;
+        tierHint.textContent = tierLabel(intensity);
       });
       intensityEl.dispatchEvent(new Event('input'));
+
+      function syncLookSliders() {
+        lookXEl.value = String(lookX);
+        lookYEl.value = String(lookY);
+        lookXVal.textContent = lookX.toFixed(2);
+        lookYVal.textContent = lookY.toFixed(2);
+      }
+      lookXEl.addEventListener('input', () => {
+        trackCamera = false;
+        document.getElementById('btnLookCam').classList.remove('primary');
+        lookX = Number(lookXEl.value);
+        lookXVal.textContent = lookX.toFixed(2);
+      });
+      lookYEl.addEventListener('input', () => {
+        trackCamera = false;
+        document.getElementById('btnLookCam').classList.remove('primary');
+        lookY = Number(lookYEl.value);
+        lookYVal.textContent = lookY.toFixed(2);
+      });
+      document.getElementById('btnLookCam').addEventListener('click', (e) => {
+        trackCamera = !trackCamera;
+        e.currentTarget.classList.toggle('primary', trackCamera);
+      });
+      document.getElementById('btnLookCenter').addEventListener('click', () => {
+        trackCamera = false;
+        document.getElementById('btnLookCam').classList.remove('primary');
+        lookX = 0;
+        lookY = 0;
+        syncLookSliders();
+      });
 
       document.getElementById('btnIdle').addEventListener('click', (e) => {
         idleOn = !idleOn;
@@ -471,23 +586,31 @@
         const targets = currentTargets();
         const morphs = availableMorphs();
 
-        // ND/Capcom eyes: micro saccades on top of expression (HI only)
-        if (lod === 'hi' && idleOn) {
-          const t = clock.elapsedTime;
-          const sx = (Math.sin(t * 3.1) * 0.5 + Math.sin(t * 5.7) * 0.5) * 0.12;
-          const sy = Math.sin(t * 2.4 + 1.7) * 0.08;
-          if (morphs.includes('Expressions_eyesHoriz_max') && sx > 0) {
-            targets.Expressions_eyesHoriz_max = Math.max(targets.Expressions_eyesHoriz_max || 0, sx);
+        // Eye look-at (HI Expression_*). Track camera ≈ head-relative aim.
+        if (lod === 'hi') {
+          let lx = lookX;
+          let ly = lookY;
+          if (trackCamera && model) {
+            const head = new THREE.Vector3(0, 1.55, 0);
+            model.localToWorld(head);
+            const toCam = camera.position.clone().sub(head).normalize();
+            const q = model.getWorldQuaternion(new THREE.Quaternion()).invert();
+            const local = toCam.clone().applyQuaternion(q);
+            lx = Math.max(-1, Math.min(1, local.x * 1.35));
+            ly = Math.max(-1, Math.min(1, local.y * 1.1));
+            lookX = lx;
+            lookY = ly;
+            lookXVal.textContent = lookX.toFixed(2);
+            lookYVal.textContent = lookY.toFixed(2);
+            lookXEl.value = String(lookX.toFixed(2));
+            lookYEl.value = String(lookY.toFixed(2));
           }
-          if (morphs.includes('Expressions_eyesHoriz_min') && sx < 0) {
-            targets.Expressions_eyesHoriz_min = Math.max(targets.Expressions_eyesHoriz_min || 0, -sx);
+          if (idleOn) {
+            const s = saccadeOffset(clock.elapsedTime, 0.1);
+            lx = Math.max(-1, Math.min(1, lx + s.x));
+            ly = Math.max(-1, Math.min(1, ly + s.y));
           }
-          if (morphs.includes('Expressions_eyesVert_max') && sy > 0) {
-            targets.Expressions_eyesVert_max = Math.max(targets.Expressions_eyesVert_max || 0, sy);
-          }
-          if (morphs.includes('Expressions_eyesVert_min') && sy < 0) {
-            targets.Expressions_eyesVert_min = Math.max(targets.Expressions_eyesVert_min || 0, -sy);
-          }
+          mergeEyeWeights(targets, lookToEyeMorphWeights(lx, ly, morphs));
         }
 
         if (blinkT > 0) {
@@ -512,6 +635,12 @@
           .slice(0, 10)
           .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
         morphDebug.textContent = entries.length ? entries.join('\n') : '(neutral)';
+
+        const arkit = arkitNonZero(morphWeightsToArkit(targets));
+        const arkitLines = Object.entries(arkit)
+          .slice(0, 12)
+          .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
+        arkitDebug.textContent = arkitLines.length ? arkitLines.join('\n') : '(all zero)';
 
         controls.update();
         renderer.render(scene, camera);

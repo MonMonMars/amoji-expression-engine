@@ -1,7 +1,7 @@
 /**
  * Map Amoji emotion ids → morph target weights for Sakura LO/HI GLBs.
  * HI prefers fine Expressions_* keys; falls back to EMO_* combined shapes.
- * LO primarily uses EMO_* keys.
+ * LO uses intensity sculpts (subtle / medium / peak) when present.
  */
 
 export const EMOTIONS = [
@@ -15,6 +15,13 @@ export const EMOTIONS = [
   'smile_open',
   'neutral',
 ];
+
+/** Intensity sculpt tiers (ND-style pose density — baked in export_lod_emotions.py). */
+export const INTENSITY_TIERS = {
+  subtle: 0.33,
+  medium: 0.66,
+  peak: 1.0,
+};
 
 /** Fine-grained recipes for HI mesh (MB-Lab Expression_* names as exported to glTF). */
 export const HI_RECIPES = {
@@ -77,6 +84,76 @@ export function normalizeMorphName(name) {
 }
 
 /**
+ * Square Enix-style ease: soft in the low band, stronger near peak.
+ * @param {number} t 0..1.25
+ */
+export function easeEmotionIntensity(t) {
+  const x = Math.max(0, Math.min(1.25, t));
+  if (x <= 1) {
+    // smoothstep then slight lift toward 1
+    const s = x * x * (3 - 2 * x);
+    return s;
+  }
+  return 1 + (x - 1) * 0.85;
+}
+
+/**
+ * Crossfade weights across subtle / medium / peak sculpt morphs.
+ * @param {string} emotion
+ * @param {number} intensity 0..1.25
+ * @param {Set<string>} available
+ * @returns {Record<string, number> | null} null if no tier morphs present
+ */
+export function intensityTierWeights(emotion, intensity, available) {
+  const subtle = `EMO_${emotion}_subtle`;
+  const medium = `EMO_${emotion}_medium`;
+  const peak = `EMO_${emotion}_peak`;
+  const legacy = `EMO_${emotion}`;
+
+  const hasTiers = available.has(subtle) && available.has(medium) && available.has(peak);
+  if (!hasTiers) {
+    if (available.has(legacy)) {
+      return { [legacy]: Math.max(0, Math.min(1.25, intensity)) };
+    }
+    return null;
+  }
+
+  const t = Math.max(0, Math.min(1.25, intensity));
+  /** @type {Record<string, number>} */
+  const weights = {};
+
+  if (t <= 0.001) return weights;
+
+  const a = INTENSITY_TIERS.subtle;
+  const b = INTENSITY_TIERS.medium;
+  const c = INTENSITY_TIERS.peak;
+
+  if (t <= a) {
+    weights[subtle] = t / a;
+  } else if (t <= b) {
+    const u = (t - a) / (b - a);
+    weights[subtle] = 1 - u;
+    weights[medium] = u;
+  } else if (t <= c) {
+    const u = (t - b) / (c - b);
+    weights[medium] = 1 - u;
+    weights[peak] = u;
+  } else {
+    // overdrive: hold peak + residual on legacy if present
+    weights[peak] = 1;
+    if (available.has(legacy)) weights[legacy] = Math.min(0.35, t - 1);
+  }
+
+  // Prefer peak alias if peak key missing but legacy exists
+  if (weights[peak] && !available.has(peak) && available.has(legacy)) {
+    weights[legacy] = (weights[legacy] || 0) + weights[peak];
+    delete weights[peak];
+  }
+
+  return weights;
+}
+
+/**
  * Build a dictionary of morphName → weight for an emotion + intensity.
  * @param {'hi'|'lo'} lod
  * @param {string} emotion
@@ -95,21 +172,22 @@ export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) 
     return weights;
   }
 
-  const emoKey = `EMO_${emotion}`;
-
-  // LO: combined emotion shapes only
+  // LO: intensity sculpts (subtle/medium/peak) or legacy EMO_
   if (lod === 'lo') {
-    if (has(emoKey)) weights[emoKey] = t;
+    const tier = intensityTierWeights(emotion, t, available);
+    if (tier) return tier;
     return weights;
   }
 
-  // HI: prefer fine Expression_* keys, fallback to EMO_
+  // HI: prefer fine Expression_* keys with non-linear intensity
+  const eased = easeEmotionIntensity(t);
   const recipe = HI_RECIPES[emotion] || {};
   for (const [k, v] of Object.entries(recipe)) {
-    if (has(k)) weights[k] = Math.min(1, v * t);
+    if (has(k)) weights[k] = Math.min(1, v * eased);
   }
-  if (Object.keys(weights).length === 0 && has(emoKey)) {
-    weights[emoKey] = t;
+  if (Object.keys(weights).length === 0) {
+    const tier = intensityTierWeights(emotion, t, available);
+    if (tier) return tier;
   }
   return weights;
 }

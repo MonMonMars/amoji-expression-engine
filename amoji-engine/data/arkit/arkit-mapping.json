@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "standard": "Apple ARKit 52 blendshapes",
+  "channels": [
+    "browDownLeft",
+    "browDownRight",
+    "browInnerUp",
+    "browOuterUpLeft",
+    "browOuterUpRight",
+    "cheekPuff",
+    "cheekSquintLeft",
+    "cheekSquintRight",
+    "eyeBlinkLeft",
+    "eyeBlinkRight",
+    "eyeLookDownLeft",
+    "eyeLookDownRight",
+    "eyeLookInLeft",
+    "eyeLookInRight",
+    "eyeLookOutLeft",
+    "eyeLookOutRight",
+    "eyeLookUpLeft",
+    "eyeLookUpRight",
+    "eyeSquintLeft",
+    "eyeSquintRight",
+    "eyeWideLeft",
+    "eyeWideRight",
+    "jawForward",
+    "jawLeft",
+    "jawRight",
+    "jawOpen",
+    "mouthClose",
+    "mouthDimpleLeft",
+    "mouthDimpleRight",
+    "mouthFrownLeft",
+    "mouthFrownRight",
+    "mouthFunnel",
+    "mouthLeft",
+    "mouthRight",
+    "mouthPucker",
+    "mouthPressLeft",
+    "mouthPressRight",
+    "mouthRollLower",
+    "mouthRollUpper",
+    "mouthShrugLower",
+    "mouthShrugUpper",
+    "mouthSmileLeft",
+    "mouthSmileRight",
+    "mouthStretchLeft",
+    "mouthStretchRight",
+    "mouthUpperUpLeft",
+    "mouthUpperUpRight",
+    "noseSneerLeft",
+    "noseSneerRight",
+    "tongueOut",
+    "mouthLowerDownLeft",
+    "mouthLowerDownRight"
+  ],
+  "expressionToArkit": {
+    "Expressions_browSqueezeL_max": [
+      { "target": "browDownLeft", "weight": 0.9 },
+      { "target": "browInnerUp", "weight": 0.15 }
+    ],
+    "Expressions_browSqueezeR_max": [
+      { "target": "browDownRight", "weight": 0.9 },
+      { "target": "browInnerUp", "weight": 0.15 }
+    ],
+    "Expressions_browsMidVert_max": [
+      { "target": "browInnerUp", "weight": 1.0 }
+    ],
+    "Expressions_browsMidVert_min": [
+      { "target": "browDownLeft", "weight": 0.55 },
+      { "target": "browDownRight", "weight": 0.55 }
+    ],
+    "Expressions_browOutVertL_max": [
+      { "target": "browOuterUpLeft", "weight": 1.0 }
+    ],
+    "Expressions_browOutVertR_max": [
+      { "target": "browOuterUpRight", "weight": 1.0 }
+    ],
+    "Expressions_browOutVertL_min": [
+      { "target": "browDownLeft", "weight": 0.45 }
+    ],
+    "Expressions_browOutVertR_min": [
+      { "target": "browDownRight", "weight": 0.45 }
+    ],
+    "Expressions_eyeClosedL_max": [
+      { "target": "eyeBlinkLeft", "weight": 1.0 }
+    ],
+    "Expressions_eyeClosedR_max": [
+      { "target": "eyeBlinkRight", "weight": 1.0 }
+    ],
+    "Expressions_eyeClosedL_min": [
+      { "target": "eyeWideLeft", "weight": 0.85 }
+    ],
+    "Expressions_eyeClosedR_min": [
+      { "target": "eyeWideRight", "weight": 0.85 }
+    ],
+    "Expressions_eyeClosedPressureL_max": [
+      { "target": "eyeBlinkLeft", "weight": 1.0 },
+      { "target": "eyeSquintLeft", "weight": 0.55 }
+    ],
+    "Expressions_eyeClosedPressureR_max": [
+      { "target": "eyeBlinkRight", "weight": 1.0 },
+      { "target": "eyeSquintRight", "weight": 0.55 }
+    ],
+    "Expressions_eyeSquintL_max": [
+      { "target": "eyeSquintLeft", "weight": 1.0 },
+      { "target": "cheekSquintLeft", "weight": 0.35 }
+    ],
+    "Expressions_eyeSquintR_max": [
+      { "target": "eyeSquintRight", "weight": 1.0 },
+      { "target": "cheekSquintRight", "weight": 0.35 }
+    ],
+    "Expressions_eyesHoriz_max": [
+      { "target": "eyeLookOutLeft", "weight": 1.0 },
+      { "target": "eyeLookInRight", "weight": 1.0 }
+    ],
+    "Expressions_eyesHoriz_min": [
+      { "target": "eyeLookInLeft", "weight": 1.0 },
+      { "target": "eyeLookOutRight", "weight": 1.0 }
+    ],
+    "Expressions_eyesVert_max": [
+      { "target": "eyeLookUpLeft", "weight": 1.0 },
+      { "target": "eyeLookUpRight", "weight": 1.0 }
+    ],
+    "Expressions_eyesVert_min": [
+      { "target": "eyeLookDownLeft", "weight": 1.0 },
+      { "target": "eyeLookDownRight", "weight": 1.0 }
+    ],
+    "Expressions_cheekSneerL_max": [
+      { "target": "noseSneerLeft", "weight": 0.85 },
+      { "target": "cheekSquintLeft", "weight": 0.45 }
+    ],
+    "Expressions_cheekSneerR_max": [
+      { "target": "noseSneerRight", "weight": 0.85 },
+      { "target": "cheekSquintRight", "weight": 0.45 }
+    ],
+    "Expressions_nostrilsExpansion_max": [
+      { "target": "noseSneerLeft", "weight": 0.4 },
+      { "target": "noseSneerRight", "weight": 0.4 }
+    ],
+    "Expressions_mouthSmile_max": [
+      { "target": "mouthSmileLeft", "weight": 1.0 },
+      { "target": "mouthSmileRight", "weight": 1.0 }
+    ],
+    "Expressions_mouthSmile_min": [
+      { "target": "mouthFrownLeft", "weight": 0.85 },
+      { "target": "mouthFrownRight", "weight": 0.85 }
+    ],
+    "Expressions_mouthSmileL_max": [
+      { "target": "mouthSmileLeft", "weight": 1.0 }
+    ],
+    "Expressions_mouthSmileR_max": [
+      { "target": "mouthSmileRight", "weight": 1.0 }
+    ],
+    "Expressions_mouthSmileOpen_max": [
+      { "target": "mouthSmileLeft", "weight": 0.9 },
+      { "target": "mouthSmileRight", "weight": 0.9 },
+      { "target": "jawOpen", "weight": 0.35 }
+    ],
+    "Expressions_mouthSmileOpen2_max": [
+      { "target": "mouthSmileLeft", "weight": 0.95 },
+      { "target": "mouthSmileRight", "weight": 0.95 },
+      { "target": "jawOpen", "weight": 0.5 }
+    ],
+    "Expressions_mouthOpen_max": [
+      { "target": "jawOpen", "weight": 0.75 }
+    ],
+    "Expressions_mouthOpenLarge_max": [
+      { "target": "jawOpen", "weight": 1.0 }
+    ],
+    "Expressions_mouthOpenHalf_max": [
+      { "target": "jawOpen", "weight": 0.4 }
+    ],
+    "Expressions_mouthOpenAggr_max": [
+      { "target": "jawOpen", "weight": 0.55 },
+      { "target": "mouthStretchLeft", "weight": 0.35 },
+      { "target": "mouthStretchRight", "weight": 0.35 }
+    ],
+    "Expressions_mouthOpenO_max": [
+      { "target": "mouthFunnel", "weight": 0.7 },
+      { "target": "mouthPucker", "weight": 0.45 },
+      { "target": "jawOpen", "weight": 0.35 }
+    ],
+    "Expressions_mouthClosed_max": [
+      { "target": "mouthClose", "weight": 0.85 },
+      { "target": "mouthPressLeft", "weight": 0.35 },
+      { "target": "mouthPressRight", "weight": 0.35 }
+    ],
+    "Expressions_mouthBite_max": [
+      { "target": "mouthClose", "weight": 0.5 },
+      { "target": "mouthRollLower", "weight": 0.45 },
+      { "target": "mouthPressLeft", "weight": 0.3 },
+      { "target": "mouthPressRight", "weight": 0.3 }
+    ],
+    "Expressions_mouthInflated_max": [
+      { "target": "cheekPuff", "weight": 1.0 }
+    ],
+    "Expressions_mouthHoriz_max": [
+      { "target": "mouthRight", "weight": 1.0 }
+    ],
+    "Expressions_mouthHoriz_min": [
+      { "target": "mouthLeft", "weight": 1.0 }
+    ],
+    "Expressions_mouthLowerOut_max": [
+      { "target": "mouthLowerDownLeft", "weight": 0.55 },
+      { "target": "mouthLowerDownRight", "weight": 0.55 },
+      { "target": "mouthShrugLower", "weight": 0.35 }
+    ],
+    "Expressions_jawHoriz_max": [
+      { "target": "jawRight", "weight": 1.0 }
+    ],
+    "Expressions_jawHoriz_min": [
+      { "target": "jawLeft", "weight": 1.0 }
+    ],
+    "Expressions_jawOut_max": [
+      { "target": "jawForward", "weight": 1.0 }
+    ],
+    "Expressions_tongueOut_max": [
+      { "target": "tongueOut", "weight": 1.0 }
+    ],
+    "Expressions_tongueOutPressure_max": [
+      { "target": "tongueOut", "weight": 1.0 }
+    ]
+  },
+  "muscleToArkit": {
+    "M1": [
+      { "target": "browInnerUp", "weight": 0.75 },
+      { "target": "browOuterUpLeft", "weight": 0.55 },
+      { "target": "browOuterUpRight", "weight": 0.55 }
+    ],
+    "M2": [
+      { "target": "browDownLeft", "weight": 0.85 },
+      { "target": "browDownRight", "weight": 0.85 },
+      { "target": "browInnerUp", "weight": 0.25 }
+    ],
+    "M3": [
+      { "target": "noseSneerLeft", "weight": 0.35 },
+      { "target": "noseSneerRight", "weight": 0.35 },
+      { "target": "browDownLeft", "weight": 0.25 },
+      { "target": "browDownRight", "weight": 0.25 }
+    ],
+    "M4": [
+      { "target": "eyeBlinkLeft", "weight": 0.9 },
+      { "target": "eyeBlinkRight", "weight": 0.9 }
+    ],
+    "M5": [
+      { "target": "eyeSquintLeft", "weight": 0.9 },
+      { "target": "eyeSquintRight", "weight": 0.9 },
+      { "target": "cheekSquintLeft", "weight": 0.5 },
+      { "target": "cheekSquintRight", "weight": 0.5 }
+    ],
+    "M6": [
+      { "target": "eyeWideLeft", "weight": 0.85 },
+      { "target": "eyeWideRight", "weight": 0.85 }
+    ],
+    "M7": [
+      { "target": "noseSneerLeft", "weight": 0.6 },
+      { "target": "noseSneerRight", "weight": 0.6 }
+    ],
+    "M8": [
+      { "target": "noseSneerLeft", "weight": 0.55 },
+      { "target": "noseSneerRight", "weight": 0.55 },
+      { "target": "mouthUpperUpLeft", "weight": 0.5 },
+      { "target": "mouthUpperUpRight", "weight": 0.5 }
+    ],
+    "M9": [
+      { "target": "mouthUpperUpLeft", "weight": 0.7 },
+      { "target": "mouthUpperUpRight", "weight": 0.7 }
+    ],
+    "M10": [
+      { "target": "mouthSmileLeft", "weight": 1.0 },
+      { "target": "mouthSmileRight", "weight": 1.0 }
+    ],
+    "M11": [
+      { "target": "mouthUpperUpLeft", "weight": 0.45 },
+      { "target": "mouthUpperUpRight", "weight": 0.45 },
+      { "target": "mouthSmileLeft", "weight": 0.25 },
+      { "target": "mouthSmileRight", "weight": 0.25 }
+    ],
+    "M12": [
+      { "target": "mouthStretchLeft", "weight": 0.85 },
+      { "target": "mouthStretchRight", "weight": 0.85 }
+    ],
+    "M13": [
+      { "target": "mouthSmileLeft", "weight": 0.55 },
+      { "target": "mouthSmileRight", "weight": 0.55 },
+      { "target": "mouthDimpleLeft", "weight": 0.35 },
+      { "target": "mouthDimpleRight", "weight": 0.35 }
+    ],
+    "M14": [
+      { "target": "mouthFrownLeft", "weight": 0.9 },
+      { "target": "mouthFrownRight", "weight": 0.9 }
+    ],
+    "M15": [
+      { "target": "mouthLowerDownLeft", "weight": 0.7 },
+      { "target": "mouthLowerDownRight", "weight": 0.7 }
+    ],
+    "M16": [
+      { "target": "mouthPucker", "weight": 0.7 },
+      { "target": "mouthFunnel", "weight": 0.45 }
+    ],
+    "M17": [
+      { "target": "mouthClose", "weight": 0.65 },
+      { "target": "mouthPressLeft", "weight": 0.4 },
+      { "target": "mouthPressRight", "weight": 0.4 }
+    ],
+    "M18": [
+      { "target": "jawOpen", "weight": 1.0 }
+    ],
+    "M19": [
+      { "target": "jawLeft", "weight": 0.7 },
+      { "target": "jawRight", "weight": 0.7 }
+    ],
+    "M20": [
+      { "target": "cheekPuff", "weight": 0.85 }
+    ],
+    "M21": [
+      { "target": "mouthShrugLower", "weight": 0.55 },
+      { "target": "mouthFrownLeft", "weight": 0.35 },
+      { "target": "mouthFrownRight", "weight": 0.35 }
+    ]
+  },
+  "notes": "Approximate semantic map from MB-Lab Expression_* and Amoji M1–M21 → Apple ARKit 52. Not a vertex-accurate retarget; use as interop / Live Link drive layer. Unmapped ARKit channels stay 0."
+}

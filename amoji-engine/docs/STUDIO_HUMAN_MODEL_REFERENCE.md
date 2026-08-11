@@ -90,11 +90,13 @@ This is a **production reference**, not a copy of their IP. Use it to judge our 
 | Emotion library (not one-off keys) | ✓ | ✓ | ✓ | `EMO_*` + Face Live | Raise pose count / intensity variants |
 | LO + HI realtime paths | ✓ | ✓ | ✓ | Face Live LO/HI | Keep |
 | Muscle / FACS language | ✓ | ✓ | ✓ | M1–M21 + Expression_* | Write ARKit export map |
-| Eyes: aim + micro motion | ✓ | ✓ | ✓ (eye tex) | Partial (blink only) | **High** |
-| Non-linear emotion blend | — | ✓ | — | Linear morph lerp | Medium |
-| Idle + emotion overlay | ✓ | — | — | Idle OR emotion | **High** — combine |
+| Eyes: aim + micro motion | ✓ | ✓ | ✓ (eye tex) | Face Live look-at + saccade + eye mat fix | Done v1 |
+| Non-linear emotion blend | — | ✓ | — | `easeEmotionIntensity` + tier crossfade | Done v1 |
+| Idle + emotion overlay | ✓ | — | — | Idle sway *with* emotion morphs | Done v1 |
 | Style not pure photo | ✓* | ✓ | selective | Hyper pass overshot; stylized safer | **High** |
 | Hand-authored taste layer | ✓ | ✓ | ✓ | Amoji engine | Keep as product core |
+| 3 intensity sculpts / emotion | ✓ | — | — | `EMO_*_{subtle,medium,peak}` bake | Done v1 |
+| ARKit 52 export map | — | ✓ | — | `data/arkit/arkit-mapping.json` | Done v1 |
 
 \*ND looks “real” but is heavily art-directed performance, not “scan and pray”.
 
@@ -119,11 +121,13 @@ Amoji engine (ND “systemic emotion”)
 ```
 
 ### Near-term build order (after Face Live v0)
-1. **Eye system** — look target + saccade noise on HI `eyesHoriz/Vert`
-2. **Emotion overlays on idle** — never zero the face when idle sway runs
-3. **3 intensity sculpts per emotion** (subtle / medium / peak) like ND pose density
-4. **ARKit 52 export map** from Expression_* / M1–M21 (SE + industry interop)
+1. ~~**Eye system** — look target + saccade noise on HI `eyesHoriz/Vert`~~ ✓
+2. ~~**Emotion overlays on idle** — never zero the face when idle sway runs~~ ✓
+3. ~~**3 intensity sculpts per emotion** (subtle / medium / peak)~~ ✓
+4. ~~**ARKit 52 export map** from Expression_* / M1–M21~~ ✓
 5. **Texture LOD packs** independent of mesh LOD (Capcom)
+6. Hand-tune intensity sculpts in Blender (replace linear recipe bake)
+7. Unreal Live Link consumer for ARKit vector
 
 ---
 

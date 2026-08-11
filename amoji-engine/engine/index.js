@@ -34,7 +34,24 @@ export { performSpeech } from './layers/performSpeech.js';
 export {
   EMOTIONS,
   HI_RECIPES,
+  INTENSITY_TIERS,
   emotionToMorphWeights,
+  intensityTierWeights,
+  easeEmotionIntensity,
   applyMorphWeights,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';
+export {
+  lookToEyeMorphWeights,
+  saccadeOffset,
+  mergeEyeWeights,
+} from './layers/eyeLook.js';
+export {
+  ARKIT_CHANNELS,
+  ARKIT_MAPPING,
+  emptyArkitWeights,
+  morphWeightsToArkit,
+  muscleActivationsToArkit,
+  mergeArkitWeights,
+  arkitNonZero,
+} from './export/arkitExporter.js';

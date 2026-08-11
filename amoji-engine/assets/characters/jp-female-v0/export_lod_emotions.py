@@ -6,6 +6,7 @@ LO is decimated; 8 combined emotion shapes are transferred via bake→decimate�
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -121,8 +122,16 @@ def set_recipe(obj, recipe, intensity=1.0):
     bpy.context.view_layer.update()
 
 
+# ND-style intensity sculpts: subtle / medium / peak (plus legacy EMO_* = peak)
+INTENSITY_SCULPTS = (
+    ("subtle", 0.33),
+    ("medium", 0.66),
+    ("peak", 1.0),
+)
+
+
 def bake_emotion_shapekeys(obj):
-    """Create EMO_* shapekeys from recipes (combined poses)."""
+    """Create EMO_* shapekeys from recipes (combined poses + intensity tiers)."""
     # Ensure basis exists
     if not obj.data.shape_keys:
         obj.shape_key_add(name="Basis", from_mix=False)
@@ -136,10 +145,17 @@ def bake_emotion_shapekeys(obj):
         obj.shape_key_remove(kb)
 
     for emo, recipe in EMOTION_RECIPES.items():
+        for tier, intensity in INTENSITY_SCULPTS:
+            set_recipe(obj, recipe, intensity)
+            name = f"EMO_{emo}_{tier}"
+            kb = obj.shape_key_add(name=name, from_mix=True)
+            kb.value = 0.0
+            print("baked", kb.name)
+        # Legacy alias = peak (Face Live / older callers)
         set_recipe(obj, recipe, 1.0)
         kb = obj.shape_key_add(name=f"EMO_{emo}", from_mix=True)
         kb.value = 0.0
-        print("baked", kb.name)
+        print("baked", kb.name, "(legacy=peak)")
     reset_keys(obj)
 
 
@@ -153,34 +169,105 @@ def duplicate_object(obj, name):
 
 
 def mesh_from_shapekey(obj, key_name, out_name, decimate_ratio=None):
-    """Duplicate obj, apply only key_name shape (or basis), optional decimate, return object."""
-    dup = duplicate_object(obj, out_name)
+    """Bake one shapekey to a static mesh (armature off so topology stays body-only)."""
+    reset_keys(obj)
+    if obj.data.shape_keys and key_name in obj.data.shape_keys.key_blocks:
+        obj.data.shape_keys.key_blocks[key_name].value = 1.0
+
+    # Disable deform modifiers — evaluated mesh must match body vertex count.
+    mod_restore = []
+    for mod in obj.modifiers:
+        mod_restore.append((mod, mod.show_viewport))
+        mod.show_viewport = False
+
+    bpy.context.view_layer.update()
+    dg = bpy.context.evaluated_depsgraph_get()
+    eval_obj = obj.evaluated_get(dg)
+    mesh = bpy.data.meshes.new_from_object(eval_obj)
+    mesh.name = out_name + "_mesh"
+    dup = bpy.data.objects.new(out_name, mesh)
+    bpy.context.collection.objects.link(dup)
+
+    for mod, prev in mod_restore:
+        mod.show_viewport = prev
+    reset_keys(obj)
+
     bpy.ops.object.select_all(action="DESELECT")
     dup.select_set(True)
     bpy.context.view_layer.objects.active = dup
 
-    if dup.data.shape_keys:
-        for kb in dup.data.shape_keys.key_blocks:
-            kb.value = 1.0 if kb.name == key_name else 0.0
-        bpy.context.view_layer.update()
-        # Remove shapekeys keeping current deformation
-        while dup.data.shape_keys:
-            dup.active_shape_key_index = 0
-            bpy.ops.object.shape_key_remove(all=True)
-            break
-
     if decimate_ratio and decimate_ratio < 0.999:
         mod = dup.modifiers.new("decimate", "DECIMATE")
+        mod.decimate_type = "COLLAPSE"
         mod.ratio = decimate_ratio
         bpy.ops.object.modifier_apply(modifier="decimate")
+    print(f"  {out_name} verts={len(dup.data.vertices)}", flush=True)
     return dup
 
 
+def shrinkwrap_pose(lo_basis, hi_obj, key_name, out_name):
+    """Copy LO topology, pull verts onto HI posed surface — identical vert count."""
+    reset_keys(hi_obj)
+    if hi_obj.data.shape_keys and key_name in hi_obj.data.shape_keys.key_blocks:
+        hi_obj.data.shape_keys.key_blocks[key_name].value = 1.0
+
+    mod_restore = []
+    for mod in hi_obj.modifiers:
+        mod_restore.append((mod, mod.show_viewport))
+        mod.show_viewport = False
+
+    bpy.context.view_layer.update()
+
+    dup = lo_basis.copy()
+    dup.data = lo_basis.data.copy()
+    dup.name = out_name
+    dup.data.name = out_name + "_mesh"
+    bpy.context.collection.objects.link(dup)
+
+    bpy.ops.object.select_all(action="DESELECT")
+    dup.select_set(True)
+    bpy.context.view_layer.objects.active = dup
+    mod = dup.modifiers.new("sw", "SHRINKWRAP")
+    mod.target = hi_obj
+    mod.wrap_method = "NEAREST_SURFACEPOINT"
+    bpy.ops.object.modifier_apply(modifier="sw")
+
+    for m, prev in mod_restore:
+        m.show_viewport = prev
+    reset_keys(hi_obj)
+    print(f"  {out_name} verts={len(dup.data.vertices)}", flush=True)
+    return dup
+
+
+def lo_emotion_key_names():
+    """EMO morph names transferred to LO (tiers + legacy peak alias)."""
+    names = []
+    for emo in EMOTION_RECIPES:
+        for tier, _ in INTENSITY_SCULPTS:
+            names.append(f"EMO_{emo}_{tier}")
+        names.append(f"EMO_{emo}")
+    return names
+
+
+def strip_non_emo_shapekeys(obj):
+    """Keep basis + EMO_* only — shrinks LO evaluate/decimate cost."""
+    if not obj.data.shape_keys:
+        return
+    keep = {"basis"}
+    keep.update(lo_emotion_key_names())
+    # MB-Lab basis may be lowercase
+    for kb in list(obj.data.shape_keys.key_blocks):
+        if kb.name.lower() == "basis":
+            continue
+        if kb.name not in keep:
+            obj.shape_key_remove(kb)
+    print("LO src keys", len(obj.data.shape_keys.key_blocks), flush=True)
+
+
 def build_lo(src, ratio=0.2):
-    """Basis + EMO_* keys baked through identical decimation, then joined as shapes."""
-    # Need EMO keys on source first
-    emo_names = ["Basis"] + [f"EMO_{e}" for e in EMOTION_RECIPES]
-    # Basis key on MB-Lab is often named 'basis'
+    """Decimate basis once, then shrinkwrap each EMO pose onto that LO topology."""
+    strip_non_emo_shapekeys(src)
+
     basis_name = "basis"
     if src.data.shape_keys:
         for kb in src.data.shape_keys.key_blocks:
@@ -188,37 +275,48 @@ def build_lo(src, ratio=0.2):
                 basis_name = kb.name
                 break
 
-    parts = []
-    # Basis
-    parts.append(mesh_from_shapekey(src, basis_name, "LO_basis", ratio))
-    for emo in EMOTION_RECIPES:
-        parts.append(mesh_from_shapekey(src, f"EMO_{emo}", f"LO_{emo}", ratio))
+    print("LO building basis (single decimate)…", flush=True)
+    lo_basis = mesh_from_shapekey(src, basis_name, "LO_basis", ratio)
+    rename = {"LO_basis": "basis"}
+    parts = [lo_basis]
 
-    # Join as shapes: select all, active = basis
+    keys = lo_emotion_key_names()
+    for i, key_name in enumerate(keys):
+        safe = key_name.replace("EMO_", "LO_")
+        print(f"LO shrinkwrap {i+1}/{len(keys)} {key_name}", flush=True)
+        parts.append(shrinkwrap_pose(lo_basis, src, key_name, safe))
+        rename[safe] = key_name
+
+    counts = {p.name: len(p.data.vertices) for p in parts}
+    print("LO vert counts", counts, flush=True)
+    basis_count = len(parts[0].data.vertices)
+    mismatched = [n for n, c in counts.items() if c != basis_count]
+    if mismatched:
+        raise RuntimeError(
+            f"LO join_shapes blocked — vertex mismatch vs basis {basis_count}: {mismatched[:8]}"
+        )
+
     bpy.ops.object.select_all(action="DESELECT")
     for p in parts:
         p.select_set(True)
     bpy.context.view_layer.objects.active = parts[0]
     bpy.ops.object.join_shapes()
 
-    # Rename shapekeys
     lo = parts[0]
     if lo.data.shape_keys:
-        blocks = lo.data.shape_keys.key_blocks
-        # After join_shapes, keys are named after objects
-        rename = {"LO_basis": "basis"}
-        for emo in EMOTION_RECIPES:
-            rename[f"LO_{emo}"] = f"EMO_{emo}"
-        for kb in blocks:
+        for kb in lo.data.shape_keys.key_blocks:
             if kb.name in rename:
                 kb.name = rename[kb.name]
 
-    # Delete helper meshes (the shaped ones — join_shapes keeps geometry from active only)
     for p in parts[1:]:
+        mesh = p.data
         bpy.data.objects.remove(p, do_unlink=True)
+        if mesh and mesh.users == 0:
+            bpy.data.meshes.remove(mesh)
 
     lo.name = "Sakura_LO"
-    print("LO verts", len(lo.data.vertices), "keys", len(lo.data.shape_keys.key_blocks) if lo.data.shape_keys else 0)
+    nkeys = len(lo.data.shape_keys.key_blocks) if lo.data.shape_keys else 0
+    print("LO verts", len(lo.data.vertices), "keys", nkeys, flush=True)
     return lo
 
 
@@ -278,32 +376,34 @@ def add_idle_animation(arm):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    skip_hi = os.environ.get("SKIP_HI", "").strip() in ("1", "true", "yes")
     bpy.ops.wm.open_mainfile(filepath=str(SRC))
     hide_extras()
     src = body()
     arm = next((o for o in bpy.data.objects if o.type == "ARMATURE"), None)
 
     bake_emotion_shapekeys(src)
-    add_idle_animation(arm)
-
-    # HI export — full mesh + all keys + EMO_ + armature
-    hi_path = OUT / "sakura_hi.glb"
-    export_glb(hi_path, [src, arm] if arm else [src])
+    if not skip_hi:
+        add_idle_animation(arm)
+        hi_path = OUT / "sakura_hi.glb"
+        export_glb(hi_path, [src, arm] if arm else [src])
+    else:
+        print("SKIP_HI=1 — keeping existing sakura_hi.glb", flush=True)
 
     # LO build from a duplicate of src (with EMO keys)
     src_dup = duplicate_object(src, "Sakura_HI_src")
     lo = build_lo(src_dup, ratio=0.18)
-    # Parent LO under armature if possible for skinning — LO may lose weights on decimate.
-    # Re-export LO mesh only with morphs (body movement tested via procedural three.js on LO).
     lo_path = OUT / "sakura_lo.glb"
     export_glb(lo_path, [lo])
 
+    hi_morphs = [kb.name for kb in src.data.shape_keys.key_blocks] if src.data.shape_keys else []
     meta = {
         "emotions": list(EMOTION_RECIPES.keys()),
+        "intensitySculpts": {tier: intensity for tier, intensity in INTENSITY_SCULPTS},
         "hi": {
             "file": "lod/sakura_hi.glb",
             "verts": len(src.data.vertices),
-            "morphs": [kb.name for kb in src.data.shape_keys.key_blocks] if src.data.shape_keys else [],
+            "morphs": hi_morphs,
         },
         "lo": {
             "file": "lod/sakura_lo.glb",
@@ -313,16 +413,17 @@ def main():
         "recipes": EMOTION_RECIPES,
     }
     MAP_OUT.write_text(json.dumps(meta, indent=2))
-    print(json.dumps({k: meta[k] for k in ("emotions",)}, indent=2))
-    print("HI verts", meta["hi"]["verts"], "LO verts", meta["lo"]["verts"])
-    print("wrote", MAP_OUT)
+    (OUT / "emotion_morph_map.json").write_text(json.dumps(meta, indent=2))
+    print(json.dumps({k: meta[k] for k in ("emotions", "intensitySculpts")}, indent=2), flush=True)
+    print("HI verts", meta["hi"]["verts"], "LO verts", meta["lo"]["verts"], flush=True)
+    print("wrote", MAP_OUT, flush=True)
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print("FATAL", e)
+        print("FATAL", e, flush=True)
         import traceback
 
         traceback.print_exc()
