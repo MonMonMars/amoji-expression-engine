@@ -812,6 +812,7 @@
           <button type="button" id="btnDisneyExtremeHistList">History list <kbd>L</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
           <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
+          <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
         </div>
         <div
           class="row"
@@ -845,8 +846,8 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot or hist JSON · Meta preview · double-click paste snapshot · I paste hist" style="cursor:pointer;">
-          Drop snapshot / hist JSON · Meta preview · dbl-click paste · I hist
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot or hist JSON · Meta preview · Shift merge hist · double-click paste snapshot · I paste hist · ⇧I merge" style="cursor:pointer;">
+          Drop snapshot / hist JSON · Meta preview · Shift merge hist · dbl-click paste · I hist
         </div>
       </div>
 
@@ -1682,22 +1683,31 @@
 
       function applyDisneyExtremeBaselineHistory(history, opts = {}) {
         const list = Array.isArray(history) ? history : [];
-        extremeBaselineHistory = list.slice();
+        if (opts.merge) {
+          let next = extremeBaselineHistory.slice();
+          for (const snap of list) {
+            next = pushDisneyExtremeBaselineHistory(next, snap);
+          }
+          extremeBaselineHistory = next;
+        } else {
+          extremeBaselineHistory = list.slice();
+        }
         persistDisneyExtremeBaselineHistory();
         clearDisneyExtremeBaselineRedoStack();
         syncDisneyExtremeHistoryUi();
         const count = extremeBaselineHistory.length;
         if (!opts.silent) {
+          const verb = opts.merge ? 'merged' : 'imported';
           flashDisneyExtremeStatus(
             count > 0
-              ? `imported · hist ${count}`
-              : 'imported · hist · empty',
+              ? `${verb} · hist ${count}`
+              : `${verb} · hist · empty`,
           );
         }
         return true;
       }
 
-      async function pasteDisneyExtremeBaselineHistoryJson() {
+      async function pasteDisneyExtremeBaselineHistoryJson(opts = {}) {
         let text = '';
         try {
           if (navigator.clipboard?.readText) {
@@ -1712,7 +1722,9 @@
           flashDisneyExtremeStatus(`paste failed · hist · ${parsed.error}`);
           return false;
         }
-        return applyDisneyExtremeBaselineHistory(parsed.history);
+        return applyDisneyExtremeBaselineHistory(parsed.history, {
+          merge: !!opts.merge,
+        });
       }
 
       function setDisneyExtremeBaseline(snap) {
@@ -2044,6 +2056,10 @@
         pasteDisneyExtremeBaselineHistoryJson();
       });
 
+      document.getElementById('btnDisneyExtremeMergeHist')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineHistoryJson({ merge: true });
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -2287,7 +2303,9 @@
             );
             return true;
           }
-          return applyDisneyExtremeBaselineHistory(histParsed.history);
+          return applyDisneyExtremeBaselineHistory(histParsed.history, {
+            merge: !!ev.shiftKey,
+          });
         }
         const parsed = parseDisneyExtremeSnapshot(text);
         if (!parsed.ok) {
@@ -2768,6 +2786,16 @@
         if (resolved.action === 'pasteBaselineHistoryJson') {
           ev.preventDefault();
           pasteDisneyExtremeBaselineHistoryJson();
+          return;
+        }
+        if (resolved.action === 'mergeBaselineHistoryJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineHistoryJson({ merge: true });
+          return;
+        }
+        if (resolved.action === 'jumpBaselineHistory') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineHistory(resolved.index);
           return;
         }
         if (resolved.action === 'copySummary') {

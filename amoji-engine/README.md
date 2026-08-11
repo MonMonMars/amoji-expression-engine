@@ -240,7 +240,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 227 | Extreme hist preview label | Done |
 | Phase 228 | Extreme I paste hist hotkey | Done |
 | Phase 229 | Extreme Face Live hist import wiring | Done |
-| Phase 230+ | Further production polish… | Specced |
+| Phase 230 | Extreme hist digit jump index | Done |
+| Phase 231 | Extreme 1–8 hist jump hotkey | Done |
+| Phase 232 | Extreme Shift+I merge hist hotkey | Done |
+| Phase 233 | Extreme Face Live digit jump + merge wiring | Done |
+| Phase 234+ | Further production polish… | Specced |
 
 ## Quick start
 

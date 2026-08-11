@@ -14,6 +14,6 @@ describe('Phase 229 Extreme Face Live hist import wiring', () => {
     expect(src).toContain('function pasteDisneyExtremeBaselineHistoryJson');
     expect(src).toContain('btnDisneyExtremePasteHist');
     expect(src).toContain("resolved.action === 'pasteBaselineHistoryJson'");
-    expect(src).toContain('imported · hist');
+    expect(src).toContain("opts.merge ? 'merged' : 'imported'");
   });
 });

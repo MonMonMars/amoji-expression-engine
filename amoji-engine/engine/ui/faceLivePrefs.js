@@ -5,6 +5,7 @@ import { applyComplianceGate } from '../compliance/complianceGate.js';
 import {
   matchDisneyExtremeHotkey,
   isDisneyExtremeNudgeHotkeyKey,
+  disneyExtremeHistoryJumpIndex,
   buildDisneyExtremeLiveSnapshot,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
   isDisneyExtremeSnapshotDirty,
@@ -88,6 +89,8 @@ export function disneyExtremeUiDefaults() {
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
+ * - `Shift+I` → merge Extreme baseline history JSON into current stack
+ * - `1`–`8` → jump to Extreme baseline history entry by index
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -342,7 +345,16 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showBaselineHistory' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineHistoryJson' };
     }
+    if (entry.id === 'pasteBaselineHistoryJson' && ev.shiftKey) {
+      return { ok: true, action: 'mergeBaselineHistoryJson' };
+    }
     return { ok: true, action: entry.id };
+  }
+  if (entry.kind === 'jump') {
+    if (ev.shiftKey || ev.altKey) return { ok: false, reason: 'modifier' };
+    const index = disneyExtremeHistoryJumpIndex(key);
+    if (index == null) return { ok: false, reason: 'key' };
+    return { ok: true, action: 'jumpBaselineHistory', index };
   }
   if (entry.kind === 'nudge') {
     const step = disneyExtremeNudgeStep({

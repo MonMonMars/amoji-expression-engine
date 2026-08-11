@@ -570,7 +570,14 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
-  { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · dbl-click paste', kind: 'note' },
+  { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
+  {
+    id: 'jumpBaselineHistory',
+    keys: ['1', '2', '3', '4', '5', '6', '7', '8'],
+    help: '1–8 hist jump',
+    kind: 'jump',
+  },
+  { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · Shift merge hist · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -610,6 +617,22 @@ export function matchDisneyExtremeHotkey(key) {
     }
   }
   return null;
+}
+
+/**
+ * Map digit key `1`–`8` → 0-based Extreme history index (or null).
+ * @param {string} key
+ * @param {{ limit?: number }} [opts]
+ * @returns {number|null}
+ */
+export function disneyExtremeHistoryJumpIndex(key, opts = {}) {
+  const limit = Math.max(
+    1,
+    Math.floor(Number(opts.limit) || DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+  );
+  const n = Number(String(key || ''));
+  if (!Number.isInteger(n) || n < 1 || n > limit) return null;
+  return n - 1;
 }
 
 /**
