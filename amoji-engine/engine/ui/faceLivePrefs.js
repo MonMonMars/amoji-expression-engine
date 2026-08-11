@@ -5,6 +5,9 @@ import { applyComplianceGate } from '../compliance/complianceGate.js';
 import {
   matchDisneyExtremeHotkey,
   isDisneyExtremeNudgeHotkeyKey,
+  easeEmotionIntensity,
+  computeDisneyExtremeIntensities,
+  DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
 } from '../layers/emotionMorphs.js';
 
 export const FACE_LIVE_PREFS_KEY = 'amoji.faceLive.prefs.v1';
@@ -310,6 +313,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
 
 /**
  * One-line summary of Disney Extreme prefs (for landing toast / title tooltips).
+ * When on, includes overdrive gain + eased shapeInt from prefs intensity.
  * @param {object} [prefs]
  * @returns {string}
  */
@@ -319,12 +323,20 @@ export function summarizeDisneyExtremePrefs(prefs) {
   const body = p.disneyExtremeBody
     ? `body×${Number(p.disneyExtremeBodyFactor).toFixed(2)}`
     : 'body off';
+  const { shapeInt } = computeDisneyExtremeIntensities(p.intensity, {
+    enabled: true,
+    shapeFactor: p.disneyExtremeFactor,
+    bodyOn: p.disneyExtremeBody,
+    bodyFactor: p.disneyExtremeBodyFactor,
+  });
   return [
     'X on',
     `shape×${Number(p.disneyExtremeFactor).toFixed(2)}`,
     body,
     `eye×${Number(p.disneyExtremeEyeFactor).toFixed(2)}`,
     `mouth×${Number(p.disneyExtremeMouthFactor).toFixed(2)}`,
+    `od×${DISNEY_EXTREME_EASE_OVERDRIVE_GAIN.toFixed(2)}`,
+    `ease ${easeEmotionIntensity(shapeInt).toFixed(2)}`,
   ].join(' · ');
 }
 

@@ -24,7 +24,7 @@ describe('Phase 110 summarizeDisneyExtremePrefs + residual helper', () => {
       disneyExtremeMouthFactor: 1.5,
     });
     expect(on).toBe(
-      'X on · shape×1.60 · body×1.60 · eye×1.40 · mouth×1.50',
+      'X on · shape×1.60 · body×1.60 · eye×1.40 · mouth×1.50 · od×1.45 · ease 1.17',
     );
     expect(
       summarizeDisneyExtremePrefs({
