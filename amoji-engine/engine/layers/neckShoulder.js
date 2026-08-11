@@ -57,8 +57,9 @@ export function evaluateBody(emotion, intensity = 1, opts = {}) {
   const base = { ...BODY_NEUTRAL };
   let emoKey = emotion;
   const raw = BODY_BY_EMOTION[emotion] || BODY_BY_EMOTION.neutral;
-  const t = Math.max(0, Math.min(1.25, intensity));
-  const mix = Math.min(1, t);
+  const t = Math.max(0, Math.min(2.0, intensity));
+  // Allow extra-extreme tiers to extrapolate posture beyond the normal band.
+  const mix = Math.min(1.35, t);
 
   /** @type {Record<string, unknown>} */
   let target = { ...raw };

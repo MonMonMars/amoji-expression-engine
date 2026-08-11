@@ -532,6 +532,27 @@
       </div>
 
       <div class="group">
+        <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
+          <label class="row" style="margin:0;gap:8px;align-items:center;">
+            <input id="disneyExtreme" type="checkbox" />
+            <span>Disney Extreme (big deform)</span>
+          </label>
+          <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
+            <span style="opacity:0.9;">×</span>
+            <input
+              id="disneyExtremeFactor"
+              type="range"
+              min="1"
+              max="1.8"
+              step="0.05"
+              value="1.6"
+              disabled
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
         <div class="label">Eye look-at</div>
         <div class="row">
           <button type="button" id="btnLookCam" class="primary">Track camera</button>
@@ -1077,10 +1098,19 @@
       const intensityVal = document.getElementById('intensityVal');
       const intensityMeter = document.getElementById('intensityMeter');
       const tierHint = document.getElementById('tierHint');
+      const disneyExtremeEl = document.getElementById('disneyExtreme');
+      const disneyExtremeFactorEl = document.getElementById('disneyExtremeFactor');
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
       const lookYVal = document.getElementById('lookYVal');
+
+      if (disneyExtremeEl && disneyExtremeFactorEl) {
+        disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+        disneyExtremeEl.addEventListener('change', () => {
+          disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+        });
+      }
 
       let lod = 'hi';
       let texLod = 'mid';
@@ -4232,9 +4262,13 @@
           displayEmo = latencyState.emotionHint;
           displayInt = Math.max(displayInt * 0.35, latencyState.intensityHint || 0.3);
         }
+        const disneyExtremeOn = disneyExtremeEl?.checked || false;
+        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
+        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
+        const shapeInt = Math.min(2.0, displayInt * shapeFactor);
         let targets = compoundId
-          ? compoundToMorphWeights(compoundId, displayInt, morphs)
-          : emotionToMorphWeights(lod, displayEmo, displayInt, morphs);
+          ? compoundToMorphWeights(compoundId, shapeInt, morphs)
+          : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);
         if (moodState.morphs && Object.keys(moodState.morphs).length) {
           mergeMorphOverlays(targets, moodState.morphs);
         }
@@ -4244,10 +4278,11 @@
         // Continuity residual morph overlay: gently carry prior emotion morphs.
         const residualTune = tuneContinuityResidualIntensity(discState.continuity);
         if (residualTune.ok && residualTune.emotion) {
+          const residualShapeInt = Math.min(2.0, residualTune.intensity * shapeFactor);
           const residualMorphs = emotionToMorphWeights(
             lod,
             residualTune.emotion,
-            residualTune.intensity,
+            residualShapeInt,
             morphs,
           );
           mergeMorphOverlays(targets, residualMorphs);
@@ -4256,14 +4291,14 @@
         // Smile typology / laughter (happy family subtypes)
         const smileState = smileCtl.tick(dt, {
           emotion: displayEmo,
-          intensity: displayInt,
+          intensity: shapeInt,
           availableMorphs: morphs,
         });
         if (smileState.active && smileState.morphs) {
           if (smileState.kind === 'laughter' || displayEmo === 'happy' || displayEmo === 'smile_open') {
             targets = mergeHappyFamilyMorphs(targets, smileState.morphs, {
               kind: smileState.kind === 'laughter' ? 'laughter' : 'smile',
-              intensity: displayInt,
+              intensity: shapeInt,
             });
           }
         }
@@ -4356,7 +4391,7 @@
         const gazeLock = 1 - Math.min(1, Math.hypot(lookX, lookY));
         const bodyState = bodyCtl.tick(dt, {
           emotion: displayEmo,
-          intensity: displayInt,
+          intensity: shapeInt,
           lookX,
           lookY,
           gazeLock,

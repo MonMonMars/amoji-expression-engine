@@ -40,27 +40,28 @@ export function normalizeMorphName(name) {
 
 /**
  * Square Enix-style ease: soft in the low band, stronger near peak.
- * @param {number} t 0..1.25
+ * @param {number} t 0..2
  */
 export function easeEmotionIntensity(t) {
-  const x = Math.max(0, Math.min(1.25, t));
+  const x = Math.max(0, Math.min(2.0, t));
   if (x <= 1) {
     const s = x * x * (3 - 2 * x);
     return s;
   }
-  return 1 + (x - 1) * 0.85;
+  // Overdrive: stronger lift for extra-extreme tiers.
+  return 1 + (x - 1) * 1.25;
 }
 
 /**
  * Pick / blend hand-tuned tier recipes for a continuous intensity.
  * @param {string} emotion
- * @param {number} intensity 0..1.25
+ * @param {number} intensity 0..2
  * @returns {Record<string, number>}
  */
 export function recipeForIntensity(emotion, intensity) {
   const tiers = SCULPT_RECIPES[emotion];
   if (!tiers) return {};
-  const t = Math.max(0, Math.min(1.25, intensity));
+  const t = Math.max(0, Math.min(2.0, intensity));
   if (t <= 0.001) return {};
 
   const a = INTENSITY_TIERS.subtle;
@@ -94,14 +95,14 @@ export function recipeForIntensity(emotion, intensity) {
     const u = (t - b) / (c - b);
     return merge(scale(tiers.medium, 1 - u), scale(tiers.peak, u));
   }
-  // overdrive: peak + slight lift
-  return scale(tiers.peak, 1 + (t - 1) * 0.2);
+  // overdrive: peak + larger lift (enables "extreme" tiers)
+  return scale(tiers.peak, 1 + (t - 1) * 0.6);
 }
 
 /**
  * Crossfade weights across subtle / medium / peak sculpt morphs.
  * @param {string} emotion
- * @param {number} intensity 0..1.25
+ * @param {number} intensity 0..2
  * @param {Set<string>} available
  * @returns {Record<string, number> | null}
  */
@@ -114,12 +115,12 @@ export function intensityTierWeights(emotion, intensity, available) {
   const hasTiers = available.has(subtle) && available.has(medium) && available.has(peak);
   if (!hasTiers) {
     if (available.has(legacy)) {
-      return { [legacy]: Math.max(0, Math.min(1.25, intensity)) };
+      return { [legacy]: Math.max(0, Math.min(2.0, intensity)) };
     }
     return null;
   }
 
-  const t = Math.max(0, Math.min(1.25, intensity));
+  const t = Math.max(0, Math.min(2.0, intensity));
   /** @type {Record<string, number>} */
   const weights = {};
   if (t <= 0.001) return weights;
@@ -159,7 +160,7 @@ export function intensityTierWeights(emotion, intensity, available) {
  * @param {string[]} availableMorphs morphTargetDictionary keys
  */
 export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) {
-  const t = Math.max(0, Math.min(1.25, intensity));
+  const t = Math.max(0, Math.min(2.0, intensity));
   /** @type {Record<string, number>} */
   const weights = {};
   const available = new Set(availableMorphs);
@@ -178,7 +179,7 @@ export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) 
   // HI: hand-tuned Expression_* blend across sculpt tiers
   const recipe = recipeForIntensity(emotion, t);
   for (const [k, v] of Object.entries(recipe)) {
-    if (has(k)) weights[k] = Math.min(1, v);
+    if (has(k)) weights[k] = Math.min(1.6, v);
   }
   if (Object.keys(weights).length === 0) {
     const tier = intensityTierWeights(emotion, t, available);
