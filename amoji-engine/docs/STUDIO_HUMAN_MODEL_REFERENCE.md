@@ -200,6 +200,9 @@ Amoji engine (ND “systemic emotion”)
 77. ~~**Probe detail copy** (`buildHealthProbeCopyPayload` · Copy probe button)~~ ✓
 78. ~~**Audit clear / filter UI** (`filterShareAuditEntries` · Clear audit)~~ ✓
 79. ~~**Cancel compound on chassis/pack** (robot pack / chassis change)~~ ✓
+80. ~~**Probe detail toast** (`describeHealthProbeToast` · viewport toast)~~ ✓
+81. ~~**Audit search** (free-text query over share audit log)~~ ✓
+82. ~~**Cancel compound on Live Link remap** (remap picker clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -231,4 +234,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (probe detail toast, audit search, cancel on Live Link remap change).
+Next code increment: further polish (probe toast actions, audit regex/date range, cancel on surface level change).

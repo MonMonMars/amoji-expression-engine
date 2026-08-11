@@ -229,6 +229,43 @@
         padding: 0;
         margin-top: 8px;
       }
+      #probeDetailToast {
+        position: absolute;
+        top: 72px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        z-index: 5;
+        max-width: min(360px, calc(100% - 32px));
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in oklab, var(--accent2) 35%, var(--line));
+        background: rgba(16, 14, 8, 0.9);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      #probeDetailToast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+      }
+      #probeDetailToast .toast-title {
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent2);
+        margin: 0 0 4px;
+      }
+      #probeDetailToast.ok .toast-title { color: var(--accent); }
+      #probeDetailToast.bad .toast-title { color: var(--danger); }
+      #probeDetailToast .toast-detail {
+        margin: 0;
+        font-size: 0.88rem;
+        color: var(--ink);
+        line-height: 1.35;
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -290,6 +327,10 @@
         <p class="toast-title" id="prefsToastTitle">Prefs from link</p>
         <p class="toast-detail" id="prefsToastDetail">—</p>
         <button type="button" id="btnPrefsToastDismiss">Dismiss</button>
+      </div>
+      <div id="probeDetailToast" role="status" aria-live="polite">
+        <p class="toast-title" id="probeToastTitle">Probe detail</p>
+        <p class="toast-detail" id="probeToastDetail">—</p>
       </div>
       <div id="surfaceOverlay">
         <div id="glowOrb"></div>
@@ -618,6 +659,7 @@
           <option value="revoke">revoke</option>
           <option value="export">export</option>
         </select>
+        <input id="prefsAuditSearch" class="ctl" type="search" placeholder="Search audit…" style="margin-top:4px;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
@@ -711,7 +753,7 @@
         startGatewayHealthPoll,
         stopGatewayHealthPoll,
       } from '/engine/tts/ttsHealth.js';
-      import { createGatewayHealthHistory, buildHealthProbeCopyPayload } from '/engine/tts/ttsHealthHistory.js';
+      import { createGatewayHealthHistory, buildHealthProbeCopyPayload, describeHealthProbeToast } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import {
         listRemapProfiles,
@@ -882,16 +924,35 @@
       const gatewayHealthHistory = createGatewayHealthHistory();
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
       let prefsAuditFilter = 'all';
+      let prefsAuditQuery = '';
       let lastProbeDetail = null;
+      let probeToastTimer = null;
       function refreshPrefsAuditUi() {
         const fmt = prefsShareAudit.format({
           limit: 6,
           action: prefsAuditFilter,
+          query: prefsAuditQuery,
         });
         const statusEl = document.getElementById('prefsAuditStatus');
         const logEl = document.getElementById('prefsAuditLog');
         if (statusEl) statusEl.textContent = fmt.text;
         if (logEl) logEl.textContent = fmt.lines.length ? fmt.lines.join('\n') : '—';
+      }
+      function showProbeToast(detail) {
+        const toast = describeHealthProbeToast(detail);
+        const el = document.getElementById('probeDetailToast');
+        if (!el || !toast.show) return;
+        const titleEl = document.getElementById('probeToastTitle');
+        const detailEl = document.getElementById('probeToastDetail');
+        if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
+        if (detailEl) detailEl.textContent = toast.detail || '';
+        el.classList.remove('ok', 'bad', 'warn');
+        if (toast.tone) el.classList.add(toast.tone);
+        el.classList.add('show');
+        if (probeToastTimer) clearTimeout(probeToastTimer);
+        probeToastTimer = setTimeout(() => {
+          el.classList.remove('show');
+        }, toast.dismissMs || 3800);
       }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
         if (!compoundCrossfade) return null;
@@ -912,10 +973,15 @@
           reason !== 'emblem_pick' &&
           reason !== 'finger_pick' &&
           reason !== 'chassis_pick' &&
-          reason !== 'pack_pick'
+          reason !== 'pack_pick' &&
+          reason !== 'remap_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
-        } else if (reason === 'chassis_pick' || reason === 'pack_pick') {
+        } else if (
+          reason === 'chassis_pick' ||
+          reason === 'pack_pick' ||
+          reason === 'remap_pick'
+        ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
         return cancelled;
@@ -1230,6 +1296,7 @@
         liveLinkRemapSel.appendChild(opt);
       }
       liveLinkRemapSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('remap_pick');
         liveLinkRemapId = liveLinkRemapSel.value || 'identity';
         liveLinkRemapStatus.textContent = `livelink remap · ${liveLinkRemapId}${
           liveLinkRemapId === 'identity' ? '' : ' · publish remapped'
@@ -1961,6 +2028,7 @@
               ? detail.lines.join('\n')
               : 'probe · none';
           }
+          if (detail.ok) showProbeToast(detail);
         }
         async function copyProbeDetail() {
           const payload = buildHealthProbeCopyPayload(
@@ -1999,6 +2067,7 @@
               ? detail.lines.join('\n')
               : 'probe · none';
           }
+          if (detail.ok) showProbeToast(detail);
         });
         document.getElementById('btnProbeCopy')?.addEventListener('click', () => {
           copyProbeDetail();
@@ -2223,6 +2292,10 @@
         });
         document.getElementById('prefsAuditFilter')?.addEventListener('change', (ev) => {
           prefsAuditFilter = ev.target.value || 'all';
+          refreshPrefsAuditUi();
+        });
+        document.getElementById('prefsAuditSearch')?.addEventListener('input', (ev) => {
+          prefsAuditQuery = ev.target.value || '';
           refreshPrefsAuditUi();
         });
         refreshPrefsAuditUi();

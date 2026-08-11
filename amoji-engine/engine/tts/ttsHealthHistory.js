@@ -391,6 +391,55 @@ export function buildHealthProbeCopyPayload(detail) {
   );
 }
 
+export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
+
+/**
+ * Build a toast payload when a sparkline probe is inspected.
+ * @param {{ ok?: boolean, lines?: string[], text?: string, sample?: object }|null} detail
+ * @param {{ dismissMs?: number }} [opts]
+ */
+export function describeHealthProbeToast(detail, opts = {}) {
+  const dismissMs = opts.dismissMs ?? PROBE_DETAIL_TOAST_DISMISS_MS;
+  if (!detail || detail.ok === false) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast',
+        show: false,
+        reason: 'no_probe',
+        dismissMs,
+      },
+      {},
+    );
+  }
+  const lines = Array.isArray(detail.lines) ? detail.lines : [];
+  const sample = detail.sample || null;
+  const title = sample?.ok
+    ? 'Probe up'
+    : sample
+      ? 'Probe down'
+      : 'Probe detail';
+  const detailLine =
+    lines.find((l) => /^latency/i.test(l)) ||
+    lines[1] ||
+    lines[0] ||
+    detail.text ||
+    'probe';
+  const tone = sample?.tone || (sample?.ok ? 'ok' : 'bad');
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast',
+      show: true,
+      tone,
+      title,
+      detail: detailLine,
+      message: `${title} · ${detailLine}`,
+      lines,
+      dismissMs,
+    },
+    {},
+  );
+}
+
 /**
  * Create a mutable rolling history buffer.
  * @param {{ max?: number }} [opts]

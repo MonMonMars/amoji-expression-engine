@@ -32,22 +32,29 @@ export function normalizeShareAuditEntry(entry, opts = {}) {
 /**
  * Format audit entries for a compact status / pre dump.
  * @param {object[]} entries
- * @param {{ limit?: number, action?: string|null }} [opts]
+ * @param {{ limit?: number, action?: string|null, query?: string|null }} [opts]
  */
 export function formatShareAuditLog(entries, opts = {}) {
   const limit = opts.limit ?? 8;
-  const filtered = filterShareAuditEntries(entries, { action: opts.action });
+  const filtered = filterShareAuditEntries(entries, {
+    action: opts.action,
+    query: opts.query,
+  });
   const list = filtered.slice(-limit);
+  const q = opts.query && String(opts.query).trim() ? String(opts.query).trim() : null;
   if (!list.length) {
     return applyComplianceGate(
       {
         kind: 'prefs_share_audit_format',
-        text: opts.action
-          ? `share audit · no ${opts.action}`
-          : 'share audit · empty',
+        text: q
+          ? `share audit · no match “${q}”`
+          : opts.action
+            ? `share audit · no ${opts.action}`
+            : 'share audit · empty',
         lines: [],
         count: 0,
         filter: opts.action || null,
+        query: q,
         total: Array.isArray(entries) ? entries.length : 0,
       },
       {},
@@ -57,15 +64,20 @@ export function formatShareAuditLog(entries, opts = {}) {
     const t = new Date(e.at).toISOString().slice(11, 19);
     return `${t} · ${e.action} · ${e.summary}${e.expiryHint ? ` · ${e.expiryHint}` : ''}`;
   });
+  const labelBits = [`share audit · ${list.length}`];
+  if (filtered.length !== list.length || opts.action || q) {
+    labelBits[0] = `share audit · ${list.length}/${filtered.length}`;
+  }
+  if (opts.action && opts.action !== 'all') labelBits.push(String(opts.action));
+  if (q) labelBits.push(`“${q}”`);
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_format',
-      text: opts.action
-        ? `share audit · ${list.length}/${filtered.length} · ${opts.action}`
-        : `share audit · ${list.length}`,
+      text: labelBits.join(' · '),
       lines,
       count: list.length,
       filter: opts.action || null,
+      query: q,
       total: Array.isArray(entries) ? entries.length : list.length,
     },
     {},
@@ -73,17 +85,27 @@ export function formatShareAuditLog(entries, opts = {}) {
 }
 
 /**
- * Filter audit entries by action (`all` / empty = no filter).
+ * Filter audit entries by action and/or free-text query.
  * @param {object[]} entries
- * @param {{ action?: string|null }} [opts]
+ * @param {{ action?: string|null, query?: string|null }} [opts]
  */
 export function filterShareAuditEntries(entries, opts = {}) {
   const list = (Array.isArray(entries) ? entries : []).map((e) =>
     normalizeShareAuditEntry(e),
   );
   const action = opts.action && opts.action !== 'all' ? String(opts.action) : null;
-  if (!action) return list;
-  return list.filter((e) => e.action === action);
+  const q = opts.query && String(opts.query).trim()
+    ? String(opts.query).trim().toLowerCase()
+    : null;
+  return list.filter((e) => {
+    if (action && e.action !== action) return false;
+    if (!q) return true;
+    const hay = [e.action, e.summary, e.emotion, e.hash, e.shortUrl, e.expiryHint]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return hay.includes(q);
+  });
 }
 
 /**
@@ -224,8 +246,14 @@ export function createPrefsShareAudit(opts = {}) {
     format(fmtOpts = {}) {
       return formatShareAuditLog(entries, fmtOpts);
     },
-    filter(action) {
-      return filterShareAuditEntries(entries, { action });
+    filter(actionOrOpts, maybeQuery) {
+      if (actionOrOpts && typeof actionOrOpts === 'object') {
+        return filterShareAuditEntries(entries, actionOrOpts);
+      }
+      return filterShareAuditEntries(entries, {
+        action: actionOrOpts,
+        query: maybeQuery,
+      });
     },
     actions() {
       return listShareAuditActions(entries);

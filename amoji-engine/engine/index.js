@@ -475,6 +475,8 @@ export {
   resolveSparklineProbeAt,
   formatHealthProbeDetail,
   buildHealthProbeCopyPayload,
+  PROBE_DETAIL_TOAST_DISMISS_MS,
+  describeHealthProbeToast,
   createGatewayHealthHistory,
 } from './tts/ttsHealthHistory.js';
 export {
