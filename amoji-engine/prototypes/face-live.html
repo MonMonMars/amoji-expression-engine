@@ -754,6 +754,7 @@
           <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
           <button type="button" id="btnDisneyExtremeDiff">Diff baseline <kbd>D</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1148,6 +1149,7 @@
         formatDisneyExtremeSnapshotDiffLabel,
         isDisneyExtremeSnapshotDirty,
         formatDisneyExtremeDirtyHudBit,
+        captureDisneyExtremeBaseline,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1711,6 +1713,10 @@
         restoreDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeClearBase')?.addEventListener('click', () => {
+        clearDisneyExtremeBaseline();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1808,7 +1814,7 @@
         } catch {
           ok = false;
         }
-        if (ok) lastExtremeBaselineSnap = snap;
+        if (ok) lastExtremeBaselineSnap = captureDisneyExtremeBaseline(snap);
         flashDisneyExtremeStatus(
           ok
             ? `copied · snapshot JSON · fp ${fp}`
@@ -1866,7 +1872,7 @@
           return false;
         }
         applyDisneyExtremeSnapshot(parsed.snap);
-        lastExtremeBaselineSnap = parsed.snap;
+        lastExtremeBaselineSnap = captureDisneyExtremeBaseline(parsed.snap);
         const fp = disneyExtremeSnapshotFingerprintShort(parsed.snap);
         flashDisneyExtremeStatus(`pasted · snapshot JSON · fp ${fp}`);
         return true;
@@ -1900,6 +1906,16 @@
         applyDisneyExtremeSnapshot(lastExtremeBaselineSnap);
         const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
         flashDisneyExtremeStatus(`restored · baseline · fp ${fp}`);
+        return true;
+      }
+
+      function clearDisneyExtremeBaseline() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('clear base · none');
+          return false;
+        }
+        lastExtremeBaselineSnap = null;
+        flashDisneyExtremeStatus('cleared · baseline');
         return true;
       }
 
@@ -2153,6 +2169,11 @@
         if (resolved.action === 'restoreBaseline') {
           ev.preventDefault();
           restoreDisneyExtremeBaseline();
+          return;
+        }
+        if (resolved.action === 'clearBaseline') {
+          ev.preventDefault();
+          clearDisneyExtremeBaseline();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -5427,6 +5448,9 @@
               extremeSnap,
               lastExtremeBaselineSnap,
             ),
+            fp: lastExtremeBaselineSnap
+              ? disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap)
+              : '',
           });
           hudExtreme.textContent = `${extremeHud.pill}${dirtyHud.bit}`;
           pillExtreme?.classList.toggle('is-dirty', dirtyHud.dirty);

@@ -291,6 +291,7 @@ export {
   formatDisneyExtremeSnapshotDiffLabel,
   isDisneyExtremeSnapshotDirty,
   formatDisneyExtremeDirtyHudBit,
+  captureDisneyExtremeBaseline,
   DISNEY_EXTREME_SNAPSHOT_JSON_KIND,
   DISNEY_EXTREME_DEFAULTS,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,

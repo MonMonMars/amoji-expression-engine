@@ -188,7 +188,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 175 | Extreme live dirty pill wiring | Done |
 | Phase 176 | Extreme Shift+D restore baseline | Done |
 | Phase 177 | Extreme Face Live restore baseline wiring | Done |
-| Phase 178+ | Further production polish… | Specced |
+| Phase 178 | Extreme capture baseline | Done |
+| Phase 179 | Extreme dirty HUD bit with fp | Done |
+| Phase 180 | Extreme K clear baseline | Done |
+| Phase 181 | Extreme Face Live clear baseline + fp pill | Done |
+| Phase 182+ | Further production polish… | Specced |
 
 ## Quick start
 

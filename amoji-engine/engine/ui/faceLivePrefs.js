@@ -79,6 +79,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
  * - `d` / `D` → flash Extreme snapshot diff vs last copy/paste baseline
  * - `Shift+D` → restore Extreme factors from last copy/paste baseline
+ * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults

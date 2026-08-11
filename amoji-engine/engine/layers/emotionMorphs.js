@@ -562,6 +562,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pasteSnapshotJson', help: 'Shift+J paste json', kind: 'note' },
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
+  { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1100,15 +1101,45 @@ export function isDisneyExtremeSnapshotDirty(current, baseline) {
 
 /**
  * Compact dirty/clean bit for Extreme HUD pill / status.
- * @param {{ hasBaseline?: boolean, dirty?: boolean }} [opts]
- * @returns {{ bit: string, dirty: boolean, hasBaseline: boolean }}
+ * Optional `fp` appends the short baseline fingerprint.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean, fp?: string }} [opts]
+ * @returns {{ bit: string, dirty: boolean, hasBaseline: boolean, fp: string }}
  */
 export function formatDisneyExtremeDirtyHudBit(opts = {}) {
   const hasBaseline = !!opts.hasBaseline;
   const dirty = hasBaseline && !!opts.dirty;
+  const fp =
+    hasBaseline && typeof opts.fp === 'string' && opts.fp
+      ? String(opts.fp)
+      : '';
+  const fpBit = fp ? ` ${fp}` : '';
   return {
     hasBaseline,
     dirty,
-    bit: !hasBaseline ? '' : dirty ? ' · dirty' : ' · clean',
+    fp,
+    bit: !hasBaseline ? '' : dirty ? ` · dirty${fpBit}` : ` · clean${fpBit}`,
   };
+}
+
+/**
+ * Clone an Extreme snapshot into a stable baseline object.
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|object|null|undefined} snapOrOpts
+ * @returns {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null}
+ */
+export function captureDisneyExtremeBaseline(snapOrOpts) {
+  if (!snapOrOpts || typeof snapOrOpts !== 'object') return null;
+  const snap =
+    typeof snapOrOpts.shapeInt === 'number' &&
+    typeof snapOrOpts.ease === 'number'
+      ? snapOrOpts
+      : buildDisneyExtremeLiveSnapshot(snapOrOpts);
+  return buildDisneyExtremeLiveSnapshot({
+    enabled: !!snap.enabled,
+    intensity: Number(snap.intensity) || 0,
+    shapeFactor: Number(snap.shapeFactor),
+    bodyFactor: Number(snap.bodyFactor),
+    eyeFactor: Number(snap.eyeFactor),
+    mouthFactor: Number(snap.mouthFactor),
+    bodyOn: !!snap.bodyOn,
+  });
 }
