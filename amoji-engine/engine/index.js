@@ -549,6 +549,7 @@ export {
   resolveAuditViewsImportFilters,
   formatAuditViewsImportInheritHint,
   summarizeAuditViewsImportPreview,
+  previewAuditViewsImportDryRun,
   shouldAutoImportAuditViewsOnDrop,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,

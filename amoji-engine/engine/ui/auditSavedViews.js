@@ -578,25 +578,157 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
 }
 
 /**
+ * Simulate import merge/replace/append stats without mutating stored views.
+ * @param {object[]} existing
+ * @param {object|string} raw
+ * @param {{
+ *   replace?: boolean,
+ *   appendOnly?: boolean,
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ *   max?: number,
+ *   now?: number,
+ * }} [opts]
+ */
+export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
+  const filters = resolveAuditViewsImportFilters(raw, opts);
+  if (!filters.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_dry_run',
+        ok: false,
+        reason: filters.reason || 'invalid',
+        dryRun: true,
+        added: 0,
+        updated: 0,
+        skipped: 0,
+        label: null,
+      },
+      {},
+    );
+  }
+  const imported = importAuditSavedViewsJson(raw, { merge: false });
+  if (!imported.ok) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_dry_run',
+        ok: false,
+        reason: imported.reason || 'invalid',
+        dryRun: true,
+        added: 0,
+        updated: 0,
+        skipped: 0,
+        label: null,
+      },
+      {},
+    );
+  }
+  const replace = !!opts.replace;
+  const appendOnly = !!opts.appendOnly;
+  const mergeStarredOnly = filters.mergeStarredOnly;
+  const toastInHashOnly = filters.toastInHashOnly;
+  const folder = filters.folder;
+  const incoming = imported.views || [];
+  if (replace) {
+    let kept = 0;
+    let skipped = 0;
+    for (const v of incoming) {
+      if (mergeStarredOnly && !v.starred) {
+        skipped += 1;
+        continue;
+      }
+      if (toastInHashOnly && !v.toastInHashOnly) {
+        skipped += 1;
+        continue;
+      }
+      if (folder) {
+        const vFolder = String(v.folder || '').trim() || 'Inbox';
+        if (vFolder !== folder) {
+          skipped += 1;
+          continue;
+        }
+      }
+      kept += 1;
+    }
+    const label = `dry-run replace · ${kept} view${kept === 1 ? '' : 's'} · skip ${skipped}`;
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_import_dry_run',
+        ok: true,
+        dryRun: true,
+        replace: true,
+        appendOnly: false,
+        added: kept,
+        updated: 0,
+        skipped,
+        count: kept,
+        label,
+        mergeStarredOnly,
+        toastInHashOnly,
+        folder,
+      },
+      {},
+    );
+  }
+  const merged = mergeAuditSavedViewsImport(existing, incoming, {
+    mergeStarredOnly,
+    toastInHashOnly,
+    folder,
+    max: opts.max,
+    now: opts.now,
+    appendOnly,
+  });
+  const mode = appendOnly ? 'append' : 'merge';
+  const label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}`;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_dry_run',
+      ok: true,
+      dryRun: true,
+      replace: false,
+      appendOnly,
+      added: merged.added,
+      updated: merged.updated,
+      skipped: merged.skipped,
+      count: incoming.length,
+      label,
+      mergeStarredOnly,
+      toastInHashOnly,
+      folder,
+    },
+    {},
+  );
+}
+
+/**
  * Whether a drag-drop should auto-import (Shift+drop merge, Alt+drop replace, Ctrl+drop append).
- * @param {{ shiftKey?: boolean, altKey?: boolean, ctrlKey?: boolean }} [opts]
+ * Meta+drop dry-runs without importing.
+ * @param {{ shiftKey?: boolean, altKey?: boolean, ctrlKey?: boolean, metaKey?: boolean }} [opts]
  */
 export function shouldAutoImportAuditViewsOnDrop(opts = {}) {
   const replace = !!opts.altKey;
   const appendOnly = !!opts.ctrlKey && !replace;
   const merge = !replace && (!!opts.shiftKey || appendOnly);
-  const autoImport = replace || merge;
+  const dryRun = !!opts.metaKey;
+  const autoImport = (replace || merge) && !dryRun;
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_views_import_drop',
       ok: true,
       autoImport,
+      dryRun,
       replace,
       merge,
       appendOnly,
       shiftKey: !!opts.shiftKey,
       altKey: !!opts.altKey,
       ctrlKey: !!opts.ctrlKey,
+      metaKey: !!opts.metaKey,
     },
     {},
   );

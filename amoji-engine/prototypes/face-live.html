@@ -148,6 +148,15 @@
       }
       #discResidualBar {
         background: linear-gradient(90deg, #8a9098, #a8aeb6);
+        transition: opacity 0.2s ease, filter 0.2s ease;
+      }
+      #discResidualBar.pulse {
+        animation: discResidualPulse 0.55s ease-out;
+      }
+      @keyframes discResidualPulse {
+        0% { opacity: 1; filter: brightness(1); }
+        35% { opacity: 1; filter: brightness(1.45); }
+        100% { opacity: 1; filter: brightness(1); }
       }
       pre {
         margin: 0;
@@ -804,9 +813,9 @@
           id="prefsAuditImportViewsDropZone"
           class="status"
           style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
-          title="Drop JSON · Alt+drop replace · Shift+drop merge · Ctrl+drop append · double-click import"
+          title="Drop JSON · Meta dry-run · Alt replace · Shift merge · Ctrl append · double-click import"
         >
-          Drag & drop JSON · Alt replace · Shift merge · Ctrl append · dbl-click import
+          Drag & drop JSON · Meta dry-run · Alt replace · Shift merge · Ctrl append · dbl-click import
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
@@ -955,6 +964,7 @@
         filterAuditSavedViews,
         formatAuditViewsImportInheritHint,
         summarizeAuditViewsImportPreview,
+        previewAuditViewsImportDryRun,
         shouldAutoImportAuditViewsOnDrop,
       } from '/engine/ui/auditSavedViews.js';
       import {
@@ -1423,6 +1433,7 @@
           reason !== 'tts_endpoint_escape_pick' &&
           reason !== 'tts_endpoint_tab_blur_pick' &&
           reason !== 'tts_endpoint_focus_pick' &&
+          reason !== 'tts_endpoint_cut_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2159,6 +2170,19 @@
         e.currentTarget.classList.toggle('primary', next);
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
       });
+      function pulseDiscResidualBar() {
+        if (!discResidualBar) return;
+        discResidualBar.classList.remove('pulse');
+        void discResidualBar.offsetWidth;
+        discResidualBar.classList.add('pulse');
+        discResidualBar.addEventListener(
+          'animationend',
+          () => {
+            discResidualBar.classList.remove('pulse');
+          },
+          { once: true },
+        );
+      }
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('deliver_pick');
         discContinuityResidualCompoundHandled = false;
@@ -2172,6 +2196,7 @@
           cancelActiveCompoundLifecycle('deliver_residue_pick');
         }
         discResidualPeak = resetContinuityResidualPeak(cont).peak;
+        pulseDiscResidualBar();
         discContStatus.textContent = cont.residual
           ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
           : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2877,6 +2902,11 @@
           persistPrefs();
           syncGatewayHealthPoll();
         });
+        ttsEndpointEl?.addEventListener('cut', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_cut_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
           if (ev.key === 'Enter') {
@@ -3576,7 +3606,7 @@
           if (!prefsAuditImportPreviewText) {
             dropZone.classList.remove('has-preview');
             dropZone.textContent =
-              'Drag & drop JSON · Alt replace · Shift merge · Ctrl append · dbl-click import';
+              'Drag & drop JSON · Meta dry-run · Alt replace · Shift merge · Ctrl append · dbl-click import';
             return;
           }
           dropZone.classList.add('has-preview');
@@ -3747,12 +3777,48 @@
                 shiftKey: ev.shiftKey,
                 altKey: ev.altKey,
                 ctrlKey: ev.ctrlKey,
+                metaKey: ev.metaKey,
               });
               if (dropAction.autoImport) {
                 await importAuditViewsText(text, {
                   replace: dropAction.replace,
                   appendOnly: dropAction.appendOnly,
                 });
+                return;
+              }
+              if (dropAction.dryRun) {
+                const mergeStarredOnly = !!document.getElementById(
+                  'prefsAuditImportStarredOnly',
+                )?.checked;
+                const folderOnly = !!document.getElementById(
+                  'prefsAuditImportFolderOnly',
+                )?.checked;
+                const toastHashOnly = !!document.getElementById(
+                  'prefsAuditImportToastHashOnly',
+                )?.checked;
+                const folderEl = document.getElementById('prefsAuditViewFolder');
+                const folder = folderOnly
+                  ? prefsAuditFolderFilter || folderEl?.value?.trim() || ''
+                  : '';
+                const dry = previewAuditViewsImportDryRun(
+                  auditSavedViews.views,
+                  text,
+                  {
+                    replace: dropAction.replace,
+                    appendOnly: dropAction.appendOnly,
+                    mergeStarredOnly,
+                    mergeStarredOnlyExplicit: mergeStarredOnly,
+                    toastInHashOnly: toastHashOnly,
+                    toastInHashOnlyExplicit: toastHashOnly,
+                    folder: folder || null,
+                    folderExplicit: folderOnly,
+                    inheritExportMeta: true,
+                  },
+                );
+                prefsStatus.className = dry.ok ? 'status ok' : 'status bad';
+                prefsStatus.textContent = dry.ok
+                  ? `prefs · ${dry.label}`
+                  : 'prefs · dry-run failed';
                 return;
               }
               prefsStatus.className = 'status ok';

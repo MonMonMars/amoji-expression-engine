@@ -297,6 +297,9 @@ Amoji engine (ND “systemic emotion”)
 174. ~~**Ctrl-drop append import** (`appendOnly` · Ctrl+drop merge skip-update)~~ ✓
 175. ~~**Residual bar color by emotion** (`continuityResidualBarStyle` · `#discResidualBar`)~~ ✓
 176. ~~**Cancel on TTS endpoint focus** (`tts_endpoint_focus_pick`)~~ ✓
+177. ~~**Meta-drop import dry-run preview** (`previewAuditViewsImportDryRun` · Meta+drop)~~ ✓
+178. ~~**Residual bar pulse on deliver** (`#discResidualBar.pulse` · Deliver line)~~ ✓
+179. ~~**Cancel on TTS endpoint cut** (`tts_endpoint_cut_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -328,4 +331,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (Meta-drop import dry-run preview, residual bar pulse on deliver, endpoint cut cancel).
+Next code increment: further production polish (Meta+Shift dry-run merge hint, residual pulse on residue deliver, endpoint select-all cancel).
