@@ -503,6 +503,7 @@ export {
   buildPrefsQrImageUrl,
   buildPrefsQrFingerprintSvg,
   buildPrefsShareBundle,
+  buildShareBundleAuditPayload,
 } from './ui/prefsShareLink.js';
 export {
   PREFS_LANDING_DISMISS_MS,

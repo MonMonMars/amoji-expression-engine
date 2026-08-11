@@ -263,6 +263,9 @@ Amoji engine (ND “systemic emotion”)
 140. ~~**Toast feedback hash restore** (`applyProbeToastFeedbackFromPrefs` · `#flp=` landing)~~ ✓
 141. ~~**Audit views import starred+folder** (`resolveAuditViewsImportFilters` · export meta)~~ ✓
 142. ~~**Cancel on speak/TTS** (`speak_pick` / `tts_pick` · Speaking / Play TTS)~~ ✓
+143. ~~**Share bundle audit toast hash** (`buildShareBundleAuditPayload` · toast in `#flp=`)~~ ✓
+144. ~~**Cancel on TTS stop/fixture** (`tts_stop_pick` / `tts_fixture_pick`)~~ ✓
+145. ~~**Cancel compound on script deliver** (`deliver_pick` · Deliver line)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -294,4 +297,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (share bundle audit for toast hash, cancel on TTS stop/fixture, compound on script deliver).
+Next code increment: further polish (cancel on TTS synth/http, compound on script hold/clear, audit toast hash export filter).

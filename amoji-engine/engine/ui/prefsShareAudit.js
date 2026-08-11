@@ -4,6 +4,7 @@
 import { applyComplianceGate } from '../compliance/complianceGate.js';
 import { normalizeFaceLivePrefs } from './faceLivePrefs.js';
 import { formatPrefsLandingSummary } from './prefsLandingToast.js';
+import { formatProbeToastFeedbackSummary } from './probeToastFeedback.js';
 
 export const PREFS_SHARE_AUDIT_MAX = 20;
 export const PREFS_SHARE_AUDIT_KEY = 'amoji.faceLive.prefsShareAudit.v1';
@@ -16,6 +17,9 @@ export function normalizeShareAuditEntry(entry, opts = {}) {
   const now = opts.now ?? Date.now();
   const action = entry?.action || 'share';
   const prefs = entry?.prefs ? normalizeFaceLivePrefs(entry.prefs) : null;
+  const toastFeedbackSummary =
+    entry?.toastFeedbackSummary ||
+    (prefs ? formatProbeToastFeedbackSummary(prefs) : null);
   return {
     id: entry?.id || `share-${now}-${Math.random().toString(36).slice(2, 7)}`,
     action,
@@ -24,6 +28,8 @@ export function normalizeShareAuditEntry(entry, opts = {}) {
     shortUrl: entry?.shortUrl || null,
     expiryHint: entry?.expiryHint || null,
     expired: !!entry?.expired,
+    toastFeedbackSummary,
+    toastInHash: entry?.toastInHash ?? !!toastFeedbackSummary,
     summary: entry?.summary || (prefs ? formatPrefsLandingSummary(prefs) : '—'),
     emotion: prefs?.emotion || entry?.emotion || null,
   };
@@ -180,7 +186,15 @@ export function filterShareAuditEntries(entries, opts = {}) {
       if (range.toMs != null && e.at > range.toMs) return false;
     }
     if (!qRaw) return true;
-    const hay = [e.action, e.summary, e.emotion, e.hash, e.shortUrl, e.expiryHint]
+    const hay = [
+      e.action,
+      e.summary,
+      e.emotion,
+      e.hash,
+      e.shortUrl,
+      e.expiryHint,
+      e.toastFeedbackSummary,
+    ]
       .filter(Boolean)
       .join(' ');
     if (opts.regex) {

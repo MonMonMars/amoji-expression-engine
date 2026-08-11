@@ -1351,7 +1351,10 @@
           reason !== 'sigh_pick' &&
           reason !== 'turn_pick' &&
           reason !== 'speak_pick' &&
-          reason !== 'tts_pick'
+          reason !== 'tts_pick' &&
+          reason !== 'tts_stop_pick' &&
+          reason !== 'tts_fixture_pick' &&
+          reason !== 'deliver_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2083,6 +2086,7 @@
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
       });
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('deliver_pick');
         const cont = discCtl.ingestLine({
           emotion,
           intensity,
@@ -2289,12 +2293,14 @@
         );
       });
       document.getElementById('btnTtsStop').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('tts_stop_pick');
         speechPlayer.stop();
         speechMouthMorphs = null;
         gestures.setSpeaking(false);
         setTtsStatus('stopped');
       });
       document.getElementById('btnTtsFixture').addEventListener('click', async () => {
+        cancelActiveCompoundLifecycle('tts_fixture_pick');
         try {
           const res = await fetch('/data/tts/fixtures/sample-payloads.json');
           const fixtures = await res.json();
@@ -2803,6 +2809,8 @@
               expiryHint: bundle.expiryHint,
               expired: bundle.expired,
               prefs: bundle.prefs || loadFaceLivePrefs().prefs,
+              toastFeedbackSummary: bundle.toastFeedbackSummary,
+              toastInHash: bundle.toastInHash,
             });
             refreshPrefsAuditUi();
             prefsStatus.className = 'status ok';
@@ -2839,6 +2847,8 @@
             expiryHint: bundle.expiryHint,
             expired: bundle.expired,
             prefs: bundle.prefs || loadFaceLivePrefs().prefs,
+            toastFeedbackSummary: bundle.toastFeedbackSummary,
+            toastInHash: bundle.toastInHash,
           });
           refreshPrefsAuditUi();
           img.onerror = () => {

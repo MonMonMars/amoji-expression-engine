@@ -9,6 +9,7 @@ import {
   normalizeFaceLivePrefs,
 } from './faceLivePrefs.js';
 import { stampPrefsForShare, evaluatePrefsLinkExpiry } from './prefsLinkExpiry.js';
+import { formatProbeToastFeedbackSummary } from './probeToastFeedback.js';
 
 export const PREFS_SHARE_DEFAULT_PATH = '/prototypes/face-live';
 
@@ -155,6 +156,38 @@ export function buildPrefsQrFingerprintSvg(payload, opts = {}) {
 }
 
 /**
+ * Audit payload for share/QR actions — includes toast feedback hash metadata.
+ * @param {ReturnType<typeof buildPrefsShareBundle>} bundle
+ * @param {object} [prefs]
+ */
+export function buildShareBundleAuditPayload(bundle, prefs) {
+  const normalized = normalizeFaceLivePrefs(prefs || bundle?.prefs);
+  const toastFeedbackSummary = formatProbeToastFeedbackSummary(normalized);
+  const compact = compactPrefsForHash(normalized);
+  const toastKeys = [
+    'probeToastSoundMuted',
+    'probeToastHapticMuted',
+    'probeToastLinkMute',
+    'probeToastVolume',
+  ].filter((k) => compact[k] !== undefined);
+  return applyComplianceGate(
+    {
+      kind: 'face_live_prefs_share_bundle_audit',
+      hash: bundle?.hash || null,
+      shortUrl: bundle?.shortUrl || bundle?.url || null,
+      expiryHint: bundle?.expiryHint || null,
+      expired: !!bundle?.expired,
+      prefs: normalized,
+      toastFeedbackSummary,
+      toastInHash: toastKeys.length > 0,
+      toastHashKeys: toastKeys,
+      compactKeyCount: bundle?.compactKeyCount ?? Object.keys(compact).length,
+    },
+    {},
+  );
+}
+
+/**
  * One-shot share bundle: short link + QR image URL + offline fingerprint SVG.
  * @param {object} prefs
  * @param {{
@@ -171,6 +204,18 @@ export function buildPrefsShareBundle(prefs, opts = {}) {
   const fingerprint = buildPrefsQrFingerprintSvg(qrPayload, {
     size: opts.qrSize ?? 180,
   });
+  const audit = buildShareBundleAuditPayload(
+    {
+      hash: short.hash,
+      shortUrl: short.shortUrl,
+      url: short.url,
+      expiryHint: short.expiryHint,
+      expired: short.expired,
+      prefs: short.prefs,
+      compactKeyCount: short.compactKeyCount,
+    },
+    short.prefs,
+  );
   return applyComplianceGate(
     {
       kind: 'face_live_prefs_share_bundle',
@@ -184,6 +229,9 @@ export function buildPrefsShareBundle(prefs, opts = {}) {
       prefs: short.prefs,
       expiryHint: short.expiryHint,
       expired: short.expired,
+      toastFeedbackSummary: audit.toastFeedbackSummary,
+      toastInHash: audit.toastInHash,
+      toastHashKeys: audit.toastHashKeys,
     },
     {},
   );
