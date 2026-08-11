@@ -135,6 +135,26 @@ export function shouldRepeatDisneyExtremeNudge(opts = {}) {
   return now - last >= interval;
 }
 
+/** Short status flash while hold-nudging factors. */
+export const DISNEY_EXTREME_NUDGE_FLASH_MS = 700;
+
+/**
+ * Status copy for a factor nudge flash.
+ * @param {string} action
+ * @param {number|string} value
+ * @returns {string}
+ */
+export function formatDisneyExtremeNudgeFlash(action, value) {
+  const v = typeof value === 'number' ? value : Number(value);
+  const shown = Number.isFinite(v) ? v.toFixed(2) : '—';
+  const a = String(action || '');
+  if (a.includes('Shape')) return `shape × ${shown}`;
+  if (a.includes('Body')) return `body × ${shown}`;
+  if (a.includes('Eye')) return `eye × ${shown}`;
+  if (a.includes('Mouth')) return `mouth × ${shown}`;
+  return `× ${shown}`;
+}
+
 /**
  * Nudge / clamp a Disney Extreme factor slider value.
  * @param {number} current

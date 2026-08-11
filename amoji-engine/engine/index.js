@@ -483,6 +483,8 @@ export {
   isDisneyExtremeNudgeAction,
   shouldRepeatDisneyExtremeNudge,
   disneyExtremeNudgeStep,
+  formatDisneyExtremeNudgeFlash,
+  DISNEY_EXTREME_NUDGE_FLASH_MS,
   nudgeDisneyExtremeFactor,
   nudgeDisneyExtremeShapeFactor,
   nudgeDisneyExtremeBodyFactor,

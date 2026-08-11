@@ -1024,6 +1024,8 @@
         resolveDisneyExtremeHotkey,
         isDisneyExtremeNudgeAction,
         shouldRepeatDisneyExtremeNudge,
+        formatDisneyExtremeNudgeFlash,
+        DISNEY_EXTREME_NUDGE_FLASH_MS,
         nudgeDisneyExtremeShapeFactor,
         nudgeDisneyExtremeBodyFactor,
         nudgeDisneyExtremeEyeFactor,
@@ -1535,18 +1537,19 @@
         }
 
         const applyFactorNudge = (el, nudger) => {
-          if (!el || el.disabled) return false;
-          el.value = String(nudger(Number(el.value), resolved.delta));
+          if (!el || el.disabled) return null;
+          const next = nudger(Number(el.value), resolved.delta);
+          el.value = String(next);
           el.dispatchEvent(new Event('input'));
           el.dispatchEvent(new Event('change'));
-          return true;
+          return next;
         };
-        let applied = false;
+        let nextVal = null;
         if (
           resolved.action === 'nudgeShapeDown' ||
           resolved.action === 'nudgeShapeUp'
         ) {
-          applied = applyFactorNudge(
+          nextVal = applyFactorNudge(
             disneyExtremeFactorEl,
             nudgeDisneyExtremeShapeFactor,
           );
@@ -1559,7 +1562,7 @@
             disneyExtremeBodyEl.checked = true;
             disneyExtremeBodyEl.dispatchEvent(new Event('change'));
           }
-          applied = applyFactorNudge(
+          nextVal = applyFactorNudge(
             disneyExtremeBodyFactorEl,
             nudgeDisneyExtremeBodyFactor,
           );
@@ -1567,7 +1570,7 @@
           resolved.action === 'nudgeEyeDown' ||
           resolved.action === 'nudgeEyeUp'
         ) {
-          applied = applyFactorNudge(
+          nextVal = applyFactorNudge(
             disneyExtremeEyeFactorEl,
             nudgeDisneyExtremeEyeFactor,
           );
@@ -1575,14 +1578,18 @@
           resolved.action === 'nudgeMouthDown' ||
           resolved.action === 'nudgeMouthUp'
         ) {
-          applied = applyFactorNudge(
+          nextVal = applyFactorNudge(
             disneyExtremeMouthFactorEl,
             nudgeDisneyExtremeMouthFactor,
           );
         }
-        if (applied) {
+        if (typeof nextVal === 'number') {
           ev.preventDefault();
           if (disneyExtremeNudgeHold) disneyExtremeNudgeHold.lastFireMs = now;
+          flashDisneyExtremeStatus(
+            formatDisneyExtremeNudgeFlash(resolved.action, nextVal),
+            DISNEY_EXTREME_NUDGE_FLASH_MS,
+          );
         }
       });
       document.addEventListener('keyup', (ev) => {
