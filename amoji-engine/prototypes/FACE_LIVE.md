@@ -49,9 +49,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge for Unreal
-- **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
+- **Eye look-at / Layer E:** camera track or manual; gaze modes lock/avoid/scan/presentation/camera; Turn-start/end; VOR vs head; pupil scale
 - Idle sway / turntable / cycle emotions / blink
-- HUD: mesh LOD, tex LOD, surface level, gesture layer, body mode, triangle count, emotion, FPS
+- HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** nonzero export preview
 
 ## Code
@@ -65,11 +65,12 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Gait: `engine/layers/gait.js` + `data/gait/emotion-gait.json`
 - Gesture: `engine/layers/gesture.js` + `data/gestures/catalog.json`
 - Body: `engine/layers/neckShoulder.js` + `data/body/emotion-neck-shoulder.json`
+- Eyes: `engine/layers/eyeLook.js` + `engine/layers/eyeAnchor.js` + `data/eyes/layer-e.json`
+- Script: `engine/layers/scriptLine.js` + `data/script/line-schema.json` (`performScript`)
 - Smile / laugh: `engine/layers/smileLaugh.js` + `data/emotions/smile-types.json`
 - Phoneme timing: `engine/layers/phonemeTiming.js` + `data/visemes/phoneme-to-viseme.json`
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
-- Eyes: `engine/layers/eyeLook.js`
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
 - Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
