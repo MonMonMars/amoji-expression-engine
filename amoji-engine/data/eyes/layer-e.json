@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "eyeOnlyDeg": 27,
+  "mixedMaxDeg": 60,
+  "degToLook": 0.022,
+  "pupilProfiles": {
+    "robot": {
+      "happy": 0.055,
+      "smile_open": 0.07,
+      "sad": 0.04,
+      "angry": -0.04,
+      "fear": -0.03,
+      "disgust": 0.02,
+      "surprised": 0.06,
+      "thinking": -0.015,
+      "neutral": 0
+    },
+    "human": {
+      "happy": 0.02,
+      "smile_open": 0.025,
+      "sad": 0.04,
+      "angry": -0.02,
+      "fear": 0.015,
+      "disgust": 0.05,
+      "surprised": 0.03,
+      "thinking": -0.01,
+      "neutral": 0
+    }
+  },
+  "microsaccade": {
+    "neutralHz": 1.4,
+    "negativeHzMul": 0.45,
+    "thinkingHzMul": 0.7,
+    "amp": 0.04,
+    "driftAmp": 0.018,
+    "tremorAmp": 0.006
+  },
+  "gazeModes": {
+    "dyadic_speak": {
+      "label": "Dyadic · speaking",
+      "lockRatio": 0.5,
+      "avertBeforeSpeakSec": 0.25
+    },
+    "dyadic_listen": {
+      "label": "Dyadic · listening",
+      "lockRatio": 0.75,
+      "checkGlanceSec": 2.5
+    },
+    "presentation": {
+      "label": "Presentation scan",
+      "anchorDwellSec": 4,
+      "triangle": [
+        [0.55, 0.1],
+        [-0.45, 0.15],
+        [0.1, -0.05]
+      ]
+    },
+    "camera": {
+      "label": "Camera lock",
+      "lockRatio": 1,
+      "look": [0, 0.05]
+    }
+  },
+  "emotionAnchorBias": {
+    "thinking": [0.45, 0.35],
+    "fear": [-0.25, 0.15],
+    "embarrassed": [-0.35, -0.2],
+    "disgust": [0.4, -0.1],
+    "sad": [0, -0.25]
+  }
+}

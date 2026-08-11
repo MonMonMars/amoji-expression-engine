@@ -146,6 +146,31 @@ export {
   SmileLaughController,
 } from './layers/smileLaugh.js';
 export {
+  EYE_ONLY_DEG,
+  MIXED_MAX_DEG,
+  GAZE_MODES,
+  PUPIL_PROFILES,
+  headEyeShare,
+  resolveHeadEye,
+  applyVor,
+  pupilScaleForEmotion,
+  fixationMicro,
+  presentationLook,
+  resolveGazeDirection,
+  evaluateEyes,
+  EyeController,
+} from './layers/eyeAnchor.js';
+export {
+  SCRIPT_GAZE,
+  MOOD_SUPPRESSION,
+  SCRIPT_EXAMPLE,
+  validateScriptLine,
+  normalizeScriptLine,
+  applyMoodBias,
+  matchCompound,
+  performScript,
+} from './layers/scriptLine.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

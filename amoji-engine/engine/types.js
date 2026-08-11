@@ -1,5 +1,5 @@
 /**
- * @typedef {'happy'|'sad'|'angry'|'fear'|'surprised'|'disgust'|'thinking'|'suspicious'|'neutral'|'concerned'|'embarrassed'} EmotionId
+ * @typedef {'happy'|'sad'|'angry'|'fear'|'surprised'|'disgust'|'thinking'|'suspicious'|'neutral'|'concerned'|'embarrassed'|'smile_open'} EmotionId
  */
 
 /**
@@ -10,7 +10,6 @@
 
 /**
  * Abstract facial parameter bag (presentation-agnostic).
- * Point keys use Lilith/Amoji IDs (EB-L1, MO-L, …). Optional abstract axes for Layer CA.
  * @typedef {Record<string, PointDelta|number|undefined> & {
  *   valence?: number,
  *   arousal?: number,
@@ -25,10 +24,25 @@
 /**
  * Layer 0 script line (AEP-compatible host input). No biometric fields allowed.
  * @typedef {{
+ *   line_id?: string,
  *   text?: string,
- *   dialogue_emotion?: EmotionId,
- *   mood?: string,
- *   directions?: string[],
+ *   dialogue_emotion?: EmotionId | {
+ *     primary: EmotionId|string,
+ *     secondary?: EmotionId|string|null,
+ *     intensity?: number,
+ *   },
+ *   mood?: string | { state: string, baseline_intensity?: number },
+ *   directions?: {
+ *     pause_before_ms?: number,
+ *     gaze?: 'lock'|'avoid'|'idle_scan'|'camera'|'presentation',
+ *     step_out_before?: boolean,
+ *     emblem?: string|null,
+ *     smile?: string|null,
+ *   },
+ *   allow_improvisation?: boolean,
+ *   persona?: string,
+ *   phonemes?: Array<object|Array>|null,
+ *   paralinguistics?: Array<object>,
  *   intensity?: number,
  * }} ScriptLine
  */

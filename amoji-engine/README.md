@@ -19,7 +19,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 6 | Layer G gesture stack (Emblem→Adaptor) + Surface Renderer L1–10 | Done |
 | Phase 7 | Layer B neck/shoulder/breath + TTS phoneme timing | Done |
 | Phase 8 | Smile typology (reward/affiliative/dominance) + laugh head→torso PD | Done |
-| Phase 9+ | Full body retarget polish, script schema, eye VOR… | Specced |
+| Phase 9 | Layer E eyes (VOR/pupil/gaze modes) + Layer 0 script pipeline | Done |
+| Phase 10+ | Full body retarget polish, mood engine depth… | Specced |
 
 ## Quick start
 

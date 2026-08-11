@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Layer 0 AI script line — pure semantic input, no biometrics",
+  "required": [],
+  "example": {
+    "line_id": "L042",
+    "text": "我諗都幾好嘅…",
+    "dialogue_emotion": {
+      "primary": "sad",
+      "secondary": "angry",
+      "intensity": 0.5
+    },
+    "mood": {
+      "state": "embarrassed",
+      "baseline_intensity": 0.3
+    },
+    "directions": {
+      "pause_before_ms": 400,
+      "gaze": "avoid",
+      "step_out_before": false,
+      "emblem": null,
+      "smile": "affiliative"
+    },
+    "allow_improvisation": true,
+    "persona": "companion",
+    "phonemes": null,
+    "paralinguistics": []
+  },
+  "gazeDirections": ["lock", "avoid", "idle_scan", "camera", "presentation"],
+  "moodSuppression": {
+    "embarrassed": { "happy": 0.35, "smile_open": 0.4 },
+    "anxious": { "happy": 0.25, "surprised": 0.15 },
+    "suspicious": { "happy": 0.2 },
+    "tired": { "happy": 0.3, "angry": 0.2 }
+  }
+}

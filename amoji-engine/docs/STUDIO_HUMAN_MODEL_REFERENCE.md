@@ -140,6 +140,8 @@ Amoji engine (ND “systemic emotion”)
 17. ~~**TTS phoneme timing** → coarticulated visemes~~ ✓
 18. ~~**Smile typology** (reward / affiliative / dominance)~~ ✓
 19. ~~**Laughter** head-dominant → torso/shoulder PD + contagion freshness~~ ✓
+20. ~~**Layer E** head–eye / VOR / pupil / Dyadic·Presentation gaze~~ ✓
+21. ~~**Layer 0 script** normalize + `performScript` pipeline~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

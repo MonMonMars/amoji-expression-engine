@@ -245,6 +245,7 @@
         <div class="pill">Surf <strong id="hudSurf">6</strong></div>
         <div class="pill">G <strong id="hudGesture">—</strong></div>
         <div class="pill">B <strong id="hudBody">—</strong></div>
+        <div class="pill">E <strong id="hudEyes">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
@@ -344,10 +345,24 @@
           <button type="button" id="btnLookCam" class="primary">Track camera</button>
           <button type="button" id="btnLookCenter">Center</button>
         </div>
+        <div class="label">Gaze mode (Layer E)</div>
+        <select id="gazeModeSel" class="ctl">
+          <option value="manual">Manual / camera track</option>
+          <option value="lock">Dyadic lock</option>
+          <option value="avoid">Avert</option>
+          <option value="idle_scan">Idle scan</option>
+          <option value="presentation">Presentation triangle</option>
+          <option value="camera">Camera lock</option>
+        </select>
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnTurnStart">Turn-start</button>
+          <button type="button" id="btnTurnEnd">Turn-end</button>
+        </div>
         <div class="label">Look X <span id="lookXVal">0.00</span></div>
         <input id="lookX" type="range" min="-1" max="1" step="0.01" value="0" />
         <div class="label">Look Y <span id="lookYVal">0.00</span></div>
         <input id="lookY" type="range" min="-1" max="1" step="0.01" value="0" />
+        <div class="status" id="eyeStatus">eyes —</div>
       </div>
 
       <div class="group">
@@ -433,6 +448,9 @@
         saccadeOffset,
         mergeEyeWeights,
       } from '/engine/layers/eyeLook.js';
+      import {
+        EyeController,
+      } from '/engine/layers/eyeAnchor.js';
       import {
         morphWeightsToArkit,
         arkitNonZero,
@@ -526,6 +544,8 @@
       const gestures = new GestureController({ anxiety: 0.35 });
       const bodyCtl = new BodyController();
       const smileCtl = new SmileLaughController({ personaId: 'companion' });
+      const eyeCtl = new EyeController({ gaze: 'lock', pupilProfile: 'robot' });
+      let gazeModeUi = 'manual';
       let compoundId = '';
       let walkPhase = 0;
       let surfaceLevel = 6;
@@ -542,10 +562,12 @@
       const gestureStatus = document.getElementById('gestureStatus');
       const bodyStatus = document.getElementById('bodyStatus');
       const smileStatus = document.getElementById('smileStatus');
+      const eyeStatus = document.getElementById('eyeStatus');
       const surfaceStatus = document.getElementById('surfaceStatus');
       const compoundSel = document.getElementById('compoundSel');
       const emblemSel = document.getElementById('emblemSel');
       const smileSel = document.getElementById('smileSel');
+      const gazeModeSel = document.getElementById('gazeModeSel');
       const surfaceSel = document.getElementById('surfaceSel');
       const surfaceOverlay = document.getElementById('surfaceOverlay');
       const glowOrb = document.getElementById('glowOrb');
@@ -868,6 +890,27 @@
         lookX = 0;
         lookY = 0;
         syncLookSliders();
+      });
+      gazeModeSel.addEventListener('change', () => {
+        gazeModeUi = gazeModeSel.value;
+        if (gazeModeUi === 'manual') {
+          trackCamera = true;
+          document.getElementById('btnLookCam').classList.add('primary');
+        } else {
+          trackCamera = false;
+          document.getElementById('btnLookCam').classList.remove('primary');
+          eyeCtl.setGaze(gazeModeUi);
+        }
+      });
+      document.getElementById('btnTurnStart').addEventListener('click', () => {
+        eyeCtl.signalTurnStart();
+        gazeModeUi = 'avoid';
+        gazeModeSel.value = 'avoid';
+      });
+      document.getElementById('btnTurnEnd').addEventListener('click', () => {
+        eyeCtl.signalTurnEnd();
+        gazeModeUi = 'lock';
+        gazeModeSel.value = 'lock';
       });
 
       document.getElementById('btnIdle').addEventListener('click', (e) => {
@@ -1217,15 +1260,30 @@
           }
         }
 
-        // Eye look-at (HI Expression_*). Track camera ≈ head-relative aim.
+        // Eye look-at (HI) — Layer E modes or manual/camera track + VOR vs head
         if (lod === 'hi') {
           let lx = lookX;
           let ly = lookY;
+          const headYaw = bodyState.pose?.headRoll ?? 0;
+          const headPitch = bodyState.pose?.headPitch ?? 0;
+
           if (latencyState.phase === 'waiting') {
             lx = latencyState.lookX;
             ly = latencyState.lookY;
-            lookXVal.textContent = lx.toFixed(2);
-            lookYVal.textContent = ly.toFixed(2);
+          } else if (gazeModeUi !== 'manual') {
+            const eyes = eyeCtl.tick(dt, {
+              emotion: displayEmo,
+              intensity: displayInt,
+              headYaw,
+              headPitch,
+              availableMorphs: morphs,
+            });
+            lx = eyes.lookX;
+            ly = eyes.lookY;
+            lookX = lx;
+            lookY = ly;
+            eyeStatus.textContent = `${eyes.gazeMode} · ${eyes.gaze} · share ${eyes.headEyeShare} · pupil ${eyes.pupil.toFixed(2)}${eyes.vor ? ' · VOR' : ''}`;
+            document.getElementById('hudEyes').textContent = eyes.gaze;
           } else if (trackCamera && model) {
             const head = new THREE.Vector3(0, 1.55, 0);
             model.localToWorld(head);
@@ -1236,12 +1294,19 @@
             ly = Math.max(-1, Math.min(1, local.y * 1.1));
             lookX = lx;
             lookY = ly;
-            lookXVal.textContent = lookX.toFixed(2);
-            lookYVal.textContent = lookY.toFixed(2);
-            lookXEl.value = String(lookX.toFixed(2));
-            lookYEl.value = String(lookY.toFixed(2));
+            eyeStatus.textContent = 'manual · camera track';
+            document.getElementById('hudEyes').textContent = 'cam';
+          } else {
+            eyeStatus.textContent = 'manual · sliders';
+            document.getElementById('hudEyes').textContent = 'man';
           }
-          if (idleOn) {
+
+          lookXVal.textContent = lx.toFixed(2);
+          lookYVal.textContent = ly.toFixed(2);
+          lookXEl.value = String(lx.toFixed(2));
+          lookYEl.value = String(ly.toFixed(2));
+
+          if (idleOn && gazeModeUi === 'manual') {
             const s = saccadeOffset(clock.elapsedTime, 0.1);
             lx = Math.max(-1, Math.min(1, lx + s.x));
             ly = Math.max(-1, Math.min(1, ly + s.y));
