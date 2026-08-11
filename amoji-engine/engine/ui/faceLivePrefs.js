@@ -78,11 +78,13 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+M` → copy body mix SVG to clipboard
  * - `f` / `F` → flash factor bars label on status
  * - `Shift+F` → copy factor bars SVG to clipboard
+ * - `Alt+F` → paste Extreme baseline favorites share URL (`#dxf=`)
  * - `n` / `N` → flash neck blend / body mix label on status
  * - `a` / `A` → flash combined Extreme bundle readout
  * - `Shift+A` → copy Extreme bundle text to clipboard
  * - `j` / `J` → copy Extreme snapshot JSON to clipboard
  * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
+ * - `Alt+J` → paste Extreme snapshot share URL (`#dxs=`)
  * - `d` / `D` → flash Extreme snapshot diff vs last copy/paste baseline
  * - `Shift+D` → restore Extreme factors from last copy/paste baseline
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
@@ -118,6 +120,7 @@ export function disneyExtremeUiDefaults() {
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `Shift+Y` → copy Extreme baseline history share link (`#dxh=`)
  * - `Alt+Y` → copy Extreme baseline redo share link (`#dxr=`)
+ * - `Shift+Alt+Y` → paste Extreme baseline redo share URL (`#dxr=`)
  * - `s` / `S` → star current Extreme factors into favorites
  * - `Shift+S` → flash Extreme favorites list
  * - `Alt+S` → unstar matching Extreme favorite
@@ -142,6 +145,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Alt+L` → copy Extreme baseline stacks summary
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Shift+I` → merge Extreme baseline history JSON into current stack
+ * - `Alt+I` → paste Extreme baseline history share URL (`#dxh=`)
  * - `1`–`8` → jump to Extreme baseline history entry by index
  * - `Shift+1`–`8` → jump to Extreme baseline redo entry by index
  * - `Alt+1`–`4` → jump to Extreme favorite by index
@@ -154,7 +158,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / Alt+B paste stacks / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / Alt+1–4 fav jump exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -369,7 +373,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B and Alt+1–4 fav jump.
+  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J and Alt+1–4 fav jump.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-4]$/.test(lower);
@@ -390,6 +394,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       lower !== 'u' &&
       lower !== 'r' &&
       lower !== 'b' &&
+      lower !== 'f' &&
+      lower !== 'i' &&
+      lower !== 'j' &&
       !favJumpDigit
     ) {
       return { ok: false, reason: 'modifier' };
@@ -411,11 +418,17 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showBodyMix' && ev.shiftKey) {
       return { ok: true, action: 'copyBodyMixCurve' };
     }
+    if (entry.id === 'showFactorBars' && ev.altKey) {
+      return { ok: true, action: 'pasteBaselineFavoritesShareUrl' };
+    }
     if (entry.id === 'showFactorBars' && ev.shiftKey) {
       return { ok: true, action: 'copyFactorBars' };
     }
     if (entry.id === 'showBundle' && ev.shiftKey) {
       return { ok: true, action: 'copyBundle' };
+    }
+    if (entry.id === 'copySnapshotJson' && ev.altKey) {
+      return { ok: true, action: 'pasteSnapshotShareUrl' };
     }
     if (entry.id === 'copySnapshotJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteSnapshotJson' };
@@ -450,6 +463,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showBaselineHistory' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineHistoryJson' };
     }
+    if (entry.id === 'pasteBaselineHistoryJson' && ev.altKey) {
+      return { ok: true, action: 'pasteBaselineHistoryShareUrl' };
+    }
     if (entry.id === 'pasteBaselineHistoryJson' && ev.shiftKey) {
       return { ok: true, action: 'mergeBaselineHistoryJson' };
     }
@@ -473,6 +489,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copyBaselineRedoJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteBaselineRedoJson' };
+    }
+    if (entry.id === 'copySnapshotShareUrl' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'pasteBaselineRedoShareUrl' };
     }
     if (entry.id === 'copySnapshotShareUrl' && ev.altKey) {
       return { ok: true, action: 'copyBaselineRedoShareUrl' };

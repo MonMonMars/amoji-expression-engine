@@ -870,16 +870,20 @@
             <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
             <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteSnapShare">Paste snap share <kbd>Alt+J</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
             <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeRedo">Merge redo JSON <kbd>Alt+O</kbd></button>
             <button type="button" id="btnDisneyExtremeShareHist">Copy hist share <kbd>⇧Y</kbd></button>
             <button type="button" id="btnDisneyExtremeShareRedo">Copy redo share <kbd>Alt+Y</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteRedoShare">Paste redo share <kbd>⇧Alt+Y</kbd></button>
             <button type="button" id="btnDisneyExtremeShareFav">Copy fav share <kbd>T</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteFavShare">Paste fav share <kbd>Alt+F</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
             <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteHistShare">Paste hist share <kbd>Alt+I</kbd></button>
             <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFav">Copy fav JSON <kbd>G</kbd></button>
             <button type="button" id="btnDisneyExtremePasteFav">Paste fav JSON <kbd>⇧G</kbd></button>
@@ -912,7 +916,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G fav JSON · T fav share · Alt+T more IO · Alt+H copy help · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V stacks/kit · Alt+B paste stacks · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1342,6 +1346,10 @@
         loadDisneyExtremeMoreIoOpen,
         DISNEY_EXTREME_HOTKEY_HELP,
         decodeDisneyExtremeBaselineStacksHash,
+        decodeDisneyExtremeSnapshotHash,
+        decodeDisneyExtremeBaselineHistoryHash,
+        decodeDisneyExtremeBaselineRedoHash,
+        decodeDisneyExtremeBaselineFavoritesHash,
         removeDisneyExtremeBaselineFavorite,
         formatDisneyExtremeMultiHashLoadLabel,
         diffDisneyExtremeSnapshots,
@@ -2080,6 +2088,94 @@
         return applyDisneyExtremeBaselineStacks(stacks, {
           merge: !!opts.merge,
         });
+      }
+
+      async function pasteDisneyExtremeBaselineFavoritesShareUrl(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · fav share clipboard');
+          return false;
+        }
+        const decoded = decodeDisneyExtremeBaselineFavoritesHash(text);
+        if (!decoded.ok) {
+          flashDisneyExtremeStatus(`paste failed · fav share · ${decoded.error}`);
+          return false;
+        }
+        return applyDisneyExtremeBaselineFavorites(decoded.favorites, {
+          merge: !!opts.merge,
+        });
+      }
+
+      async function pasteDisneyExtremeBaselineHistoryShareUrl(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · hist share clipboard');
+          return false;
+        }
+        const decoded = decodeDisneyExtremeBaselineHistoryHash(text);
+        if (!decoded.ok) {
+          flashDisneyExtremeStatus(
+            `paste failed · hist share · ${decoded.error}`,
+          );
+          return false;
+        }
+        return applyDisneyExtremeBaselineHistory(decoded.history, {
+          merge: !!opts.merge,
+        });
+      }
+
+      async function pasteDisneyExtremeBaselineRedoShareUrl(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · redo share clipboard');
+          return false;
+        }
+        const decoded = decodeDisneyExtremeBaselineRedoHash(text);
+        if (!decoded.ok) {
+          flashDisneyExtremeStatus(
+            `paste failed · redo share · ${decoded.error}`,
+          );
+          return false;
+        }
+        return applyDisneyExtremeBaselineRedo(decoded.redo, {
+          merge: !!opts.merge,
+        });
+      }
+
+      async function pasteDisneyExtremeSnapshotShareUrl() {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · snap share clipboard');
+          return false;
+        }
+        const decoded = decodeDisneyExtremeSnapshotHash(text);
+        if (!decoded.ok) {
+          flashDisneyExtremeStatus(
+            `paste failed · snap share · ${decoded.error}`,
+          );
+          return false;
+        }
+        applyDisneyExtremeSnapshot(decoded.snap, { applyIntensity: true });
+        setDisneyExtremeBaseline(decoded.snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(decoded.snap);
+        flashDisneyExtremeStatus(`pasted · snap share · fp ${fp}`);
+        return true;
       }
 
       function toggleDisneyExtremeMoreIo(opts = {}) {
@@ -3028,6 +3124,10 @@
         pasteDisneyExtremeSnapshotJson();
       });
 
+      document.getElementById('btnDisneyExtremePasteSnapShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeSnapshotShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeDiff')?.addEventListener('click', () => {
         flashDisneyExtremeSnapshotDiff();
       });
@@ -3092,8 +3192,16 @@
         copyDisneyExtremeBaselineRedoShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremePasteRedoShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineRedoShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeShareFav')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineFavoritesShareUrl();
+      });
+
+      document.getElementById('btnDisneyExtremePasteFavShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineFavoritesShareUrl();
       });
 
       document.getElementById('btnDisneyExtremeHistList')?.addEventListener('click', () => {
@@ -3230,6 +3338,10 @@
 
       document.getElementById('btnDisneyExtremeMergeHist')?.addEventListener('click', () => {
         pasteDisneyExtremeBaselineHistoryJson({ merge: true });
+      });
+
+      document.getElementById('btnDisneyExtremePasteHistShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineHistoryShareUrl();
       });
 
       function disneyExtremeFactorOpts() {
@@ -4227,6 +4339,11 @@
           pasteDisneyExtremeSnapshotJson();
           return;
         }
+        if (resolved.action === 'pasteSnapshotShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeSnapshotShareUrl();
+          return;
+        }
         if (resolved.action === 'showSnapshotDiff') {
           ev.preventDefault();
           flashDisneyExtremeSnapshotDiff();
@@ -4427,6 +4544,16 @@
           copyDisneyExtremeBaselineRedoShareUrl();
           return;
         }
+        if (resolved.action === 'pasteBaselineRedoShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineRedoShareUrl();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineFavoritesShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineFavoritesShareUrl();
+          return;
+        }
         if (resolved.action === 'showBaselineHistory') {
           ev.preventDefault();
           flashDisneyExtremeBaselineHistoryList();
@@ -4445,6 +4572,11 @@
         if (resolved.action === 'pasteBaselineHistoryJson') {
           ev.preventDefault();
           pasteDisneyExtremeBaselineHistoryJson();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineHistoryShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineHistoryShareUrl();
           return;
         }
         if (resolved.action === 'mergeBaselineHistoryJson') {

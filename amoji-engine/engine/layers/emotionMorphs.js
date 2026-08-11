@@ -559,11 +559,13 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBodyMixCurve', help: 'Shift+M copy mix', kind: 'note' },
   { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
+  { id: 'pasteBaselineFavoritesShareUrl', help: 'Alt+F paste fav', kind: 'note' },
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
   { id: 'copySnapshotJson', keys: ['j', 'J'], help: 'J json', kind: 'action' },
   { id: 'pasteSnapshotJson', help: 'Shift+J paste json', kind: 'note' },
+  { id: 'pasteSnapshotShareUrl', help: 'Alt+J paste snap', kind: 'note' },
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
@@ -584,6 +586,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'copyBaselineHistoryShareUrl', help: 'Shift+Y share hist', kind: 'note' },
   { id: 'copyBaselineRedoShareUrl', help: 'Alt+Y share redo', kind: 'note' },
+  { id: 'pasteBaselineRedoShareUrl', help: '⇧Alt+Y paste redo', kind: 'note' },
   { id: 'starBaselineFavorite', keys: ['s', 'S'], help: 'S star fav', kind: 'action' },
   { id: 'showBaselineFavorites', help: 'Shift+S fav list', kind: 'note' },
   { id: 'unstarBaselineFavorite', help: 'Alt+S unstar fav', kind: 'note' },
@@ -599,6 +602,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineStacksSummary', help: '⇧Alt+L copy stacks', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
   { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
+  { id: 'pasteBaselineHistoryShareUrl', help: 'Alt+I paste hist share', kind: 'note' },
   {
     id: 'jumpBaselineHistory',
     keys: ['1', '2', '3', '4', '5', '6', '7', '8'],
@@ -1184,6 +1188,20 @@ export const DISNEY_EXTREME_REDO_HASH_PARAM = 'dxr';
 export const DISNEY_EXTREME_FAVORITES_HASH_PARAM = 'dxf';
 export const DISNEY_EXTREME_STACKS_HASH_PARAM = 'dxb';
 
+/**
+ * Normalize share URL / hash input to a raw hash fragment body.
+ * @param {string} hashOrQuery
+ * @returns {string}
+ */
+function stripDisneyExtremeHashInput(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') return '';
+  let raw = hashOrQuery.trim();
+  const hashIdx = raw.indexOf('#');
+  if (hashIdx >= 0) raw = raw.slice(hashIdx + 1);
+  else raw = raw.replace(/^#/, '');
+  return raw;
+}
+
 function encodeDisneyExtremeBase64Url(json) {
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(json, 'utf8').toString('base64url');
@@ -1222,7 +1240,7 @@ export function decodeDisneyExtremeSnapshotHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.replace(/^#/, '');
+  const raw = stripDisneyExtremeHashInput(hashOrQuery);
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=([^&]+)`),
   );
@@ -1315,7 +1333,7 @@ export function decodeDisneyExtremeBaselineHistoryHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.replace(/^#/, '');
+  const raw = stripDisneyExtremeHashInput(hashOrQuery);
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_HISTORY_HASH_PARAM}=([^&]+)`),
   );
@@ -1411,7 +1429,7 @@ export function decodeDisneyExtremeBaselineRedoHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.replace(/^#/, '');
+  const raw = stripDisneyExtremeHashInput(hashOrQuery);
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_REDO_HASH_PARAM}=([^&]+)`),
   );
@@ -1506,7 +1524,7 @@ export function decodeDisneyExtremeBaselineFavoritesHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.replace(/^#/, '');
+  const raw = stripDisneyExtremeHashInput(hashOrQuery);
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_FAVORITES_HASH_PARAM}=([^&]+)`),
   );
@@ -2803,10 +2821,7 @@ export function decodeDisneyExtremeBaselineStacksHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.trim();
-  const hashIdx = raw.indexOf('#');
-  if (hashIdx >= 0) raw = raw.slice(hashIdx + 1);
-  else raw = raw.replace(/^#/, '');
+  const raw = stripDisneyExtremeHashInput(hashOrQuery);
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_STACKS_HASH_PARAM}=([^&]+)`),
   );
