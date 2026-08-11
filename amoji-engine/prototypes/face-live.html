@@ -1961,7 +1961,9 @@
         if (t <= INTENSITY_TIERS.subtle) return 'sculpt: subtle';
         if (t <= INTENSITY_TIERS.medium) return 'sculpt: subtle→medium';
         if (t <= INTENSITY_TIERS.peak) return 'sculpt: medium→peak';
-        return 'sculpt: peak + overdrive';
+        // Old Face Live overdrive band was ~1.25. With Disney Extreme we allow 0..2.
+        if (t <= 1.25) return 'sculpt: peak + overdrive';
+        return 'sculpt: peak + extreme deform';
       }
 
       async function applyTexLod(tier) {
