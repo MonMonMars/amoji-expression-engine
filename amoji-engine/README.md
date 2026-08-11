@@ -93,7 +93,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 80 | TTS dragover cancel reliability | Done |
 | Phase 81 | TTS dragover guard coverage test | Done |
 | Phase 82 | TTS dragover sets active flag | Done |
-| Phase 83+ | Further production polish… | Specced |
+| Phase 83 | TTS dragover side effects test | Done |
+| Phase 84+ | Further production polish… | Specced |
 
 ## Quick start
 
