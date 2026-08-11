@@ -596,6 +596,9 @@
             />
           </label>
         </div>
+        <div class="row" style="margin-top:6px;">
+          <button type="button" id="btnDisneyExtremeReset">Reset × defaults</button>
+        </div>
       </div>
 
       <div class="group">
@@ -1009,6 +1012,7 @@
         exportFaceLivePrefsJson,
         importFaceLivePrefsJson,
         loadFaceLivePrefsFromHash,
+        disneyExtremeUiDefaults,
       } from '/engine/ui/faceLivePrefs.js';
       import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
       import { describePrefsDeepLink } from '/engine/ui/prefsLandingToast.js';
@@ -1305,6 +1309,36 @@
       });
       disneyExtremeEyeFactorEl?.addEventListener('change', () => persistPrefs());
       disneyExtremeMouthFactorEl?.addEventListener('change', () => persistPrefs());
+
+      document.getElementById('btnDisneyExtremeReset')?.addEventListener('click', () => {
+        const d = disneyExtremeUiDefaults();
+        if (disneyExtremeFactorEl) {
+          disneyExtremeFactorEl.value = String(d.disneyExtremeFactor);
+        }
+        if (disneyExtremeBodyEl) disneyExtremeBodyEl.checked = !!d.disneyExtremeBody;
+        if (disneyExtremeBodyFactorEl) {
+          disneyExtremeBodyFactorEl.value = String(d.disneyExtremeBodyFactor);
+        }
+        if (disneyExtremeEyeFactorEl) {
+          disneyExtremeEyeFactorEl.value = String(d.disneyExtremeEyeFactor);
+        }
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.value = String(d.disneyExtremeMouthFactor);
+        }
+        const masterOn = !!disneyExtremeEl?.checked;
+        if (disneyExtremeFactorEl) disneyExtremeFactorEl.disabled = !masterOn;
+        if (disneyExtremeBodyFactorEl) {
+          disneyExtremeBodyFactorEl.disabled =
+            !masterOn || !disneyExtremeBodyEl?.checked;
+        }
+        if (disneyExtremeEyeFactorEl) disneyExtremeEyeFactorEl.disabled = !masterOn;
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.disabled = !masterOn;
+        }
+        syncDisneyExtremeFactorLabels();
+        updateTierHintForDisneyExtreme();
+        persistPrefs();
+      });
       let lookX = 0;
       let lookY = 0;
       let trackCamera = true;

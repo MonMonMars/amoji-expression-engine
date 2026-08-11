@@ -466,6 +466,7 @@ export {
   FACE_LIVE_PREFS_KEY,
   FACE_LIVE_PREFS_VERSION,
   defaultFaceLivePrefs,
+  disneyExtremeUiDefaults,
   normalizeFaceLivePrefs,
   loadFaceLivePrefs,
   saveFaceLivePrefs,

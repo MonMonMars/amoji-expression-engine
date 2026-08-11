@@ -42,6 +42,20 @@ export function defaultFaceLivePrefs() {
 }
 
 /**
+ * Factory defaults for Disney Extreme × factors / body apply (master toggle excluded).
+ */
+export function disneyExtremeUiDefaults() {
+  const d = defaultFaceLivePrefs();
+  return {
+    disneyExtremeFactor: d.disneyExtremeFactor,
+    disneyExtremeBody: d.disneyExtremeBody,
+    disneyExtremeBodyFactor: d.disneyExtremeBodyFactor,
+    disneyExtremeEyeFactor: d.disneyExtremeEyeFactor,
+    disneyExtremeMouthFactor: d.disneyExtremeMouthFactor,
+  };
+}
+
+/**
  * @param {any} raw
  */
 export function normalizeFaceLivePrefs(raw) {
