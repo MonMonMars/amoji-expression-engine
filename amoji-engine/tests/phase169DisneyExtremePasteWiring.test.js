@@ -11,7 +11,7 @@ describe('Phase 169 Extreme Face Live paste JSON wiring', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('id="btnDisneyExtremePasteJson"');
     expect(src).toContain('async function pasteDisneyExtremeSnapshotJson()');
-    expect(src).toContain('function applyDisneyExtremeSnapshot(snap)');
+    expect(src).toContain('function applyDisneyExtremeSnapshot(snap');
     expect(src).toContain("resolved.action === 'pasteSnapshotJson'");
     expect(src).toContain('parseDisneyExtremeSnapshot');
     expect(src).toContain('disneyExtremeSnapshotFingerprintShort');

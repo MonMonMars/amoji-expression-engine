@@ -566,6 +566,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
+  { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -1049,6 +1050,115 @@ export function parseDisneyExtremeSnapshot(input) {
     bodyOn: !!obj.bodyOn,
   });
   return { ok: true, snap };
+}
+
+export const DISNEY_EXTREME_SNAPSHOT_HASH_PARAM = 'dxs';
+
+function encodeDisneyExtremeBase64Url(json) {
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(json, 'utf8').toString('base64url');
+  }
+  return btoa(unescape(encodeURIComponent(json)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '');
+}
+
+function decodeDisneyExtremeBase64Url(raw) {
+  const pad = raw.length % 4 === 0 ? '' : '='.repeat(4 - (raw.length % 4));
+  const b64 = raw.replace(/-/g, '+').replace(/_/g, '/') + pad;
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(b64, 'base64').toString('utf8');
+  }
+  return decodeURIComponent(escape(atob(b64)));
+}
+
+/**
+ * Encode Extreme snapshot → URL hash fragment (`#dxs=...` base64url JSON).
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|object} [snapOrOpts]
+ * @returns {string}
+ */
+export function encodeDisneyExtremeSnapshotHash(snapOrOpts = {}) {
+  const json = serializeDisneyExtremeSnapshot(snapOrOpts);
+  return `${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=${encodeDisneyExtremeBase64Url(json)}`;
+}
+
+/**
+ * Decode `#dxs=...` or raw dxs= payload → Extreme snapshot.
+ * @param {string} hashOrQuery
+ * @returns {{ ok: true, snap: object }|{ ok: false, error: string }}
+ */
+export function decodeDisneyExtremeSnapshotHash(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return { ok: false, error: 'empty' };
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(
+    new RegExp(`(?:^|&)?${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=([^&]+)`),
+  );
+  if (!m) return { ok: false, error: 'no_dxs' };
+  try {
+    const json = decodeDisneyExtremeBase64Url(m[1]);
+    return parseDisneyExtremeSnapshot(json);
+  } catch {
+    return { ok: false, error: 'decode_failed' };
+  }
+}
+
+/**
+ * Read Extreme snapshot from location.hash if `dxs=` is present.
+ * @param {{ hash?: string }} [loc]
+ * @returns {{ ok: true, snap: object }|{ ok: false, error: string }}
+ */
+export function loadDisneyExtremeSnapshotFromHash(loc = {}) {
+  const hash =
+    loc.hash ||
+    (typeof location !== 'undefined' ? location.hash : '') ||
+    '';
+  if (!hash.includes(`${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=`)) {
+    return { ok: false, error: 'no_dxs' };
+  }
+  return decodeDisneyExtremeSnapshotHash(hash);
+}
+
+/**
+ * Build share URL with Extreme snapshot in hash (`dxs=`).
+ * Merges with existing hash params by default (replaces prior dxs=).
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|object} [snapOrOpts]
+ * @param {{ baseUrl?: string, hash?: string, mergeHash?: boolean }} [opts]
+ * @returns {{ ok: boolean, url: string, hash: string }}
+ */
+export function buildDisneyExtremeSnapshotShareUrl(snapOrOpts = {}, opts = {}) {
+  const frag = encodeDisneyExtremeSnapshotHash(snapOrOpts);
+  let hash = frag;
+  if (opts.mergeHash !== false) {
+    const existing = String(
+      opts.hash ||
+        (typeof location !== 'undefined' ? location.hash : '') ||
+        '',
+    ).replace(/^#/, '');
+    if (existing) {
+      const parts = existing
+        .split('&')
+        .filter(
+          (p) =>
+            p &&
+            !p.startsWith(`${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=`),
+        );
+      parts.push(frag);
+      hash = parts.join('&');
+    }
+  }
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  return {
+    ok: true,
+    url: base ? `${base}#${hash}` : `#${hash}`,
+    hash,
+  };
 }
 
 /**

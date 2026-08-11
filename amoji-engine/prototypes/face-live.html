@@ -779,6 +779,7 @@
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
+          <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1173,6 +1174,9 @@
         disneyExtremeSnapshotFingerprintShort,
         serializeDisneyExtremeSnapshot,
         parseDisneyExtremeSnapshot,
+        encodeDisneyExtremeSnapshotHash,
+        loadDisneyExtremeSnapshotFromHash,
+        buildDisneyExtremeSnapshotShareUrl,
         diffDisneyExtremeSnapshots,
         formatDisneyExtremeSnapshotDiffLabel,
         formatDisneyExtremeSnapshotDiffCopyText,
@@ -1824,6 +1828,10 @@
         redoDisneyExtremeBaseline();
       });
 
+      document.getElementById('btnDisneyExtremeShare')?.addEventListener('click', () => {
+        copyDisneyExtremeSnapshotShareUrl();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1843,7 +1851,9 @@
         });
       }
 
-      maybeAutoBaselineDisneyExtreme({ silent: true });
+      if (!applyDisneyExtremeSnapshotFromHash()) {
+        maybeAutoBaselineDisneyExtreme({ silent: true });
+      }
 
       function flashDisneyExtremeEaseCurve() {
         const snap = disneyExtremeSnapshot();
@@ -1938,8 +1948,15 @@
         return ok;
       }
 
-      function applyDisneyExtremeSnapshot(snap) {
+      function applyDisneyExtremeSnapshot(snap, opts = {}) {
         if (!snap) return false;
+        if (opts.applyIntensity && typeof snap.intensity === 'number') {
+          intensity = Number(snap.intensity);
+          if (intensityEl) {
+            intensityEl.value = String(intensity);
+            intensityEl.dispatchEvent(new Event('input'));
+          }
+        }
         if (disneyExtremeEl) disneyExtremeEl.checked = !!snap.enabled;
         if (disneyExtremeFactorEl) {
           disneyExtremeFactorEl.value = String(snap.shapeFactor);
@@ -1968,6 +1985,40 @@
         syncDisneyExtremePrefsSummary();
         updateTierHintForDisneyExtreme();
         persistPrefs();
+        return true;
+      }
+
+      async function copyDisneyExtremeSnapshotShareUrl() {
+        const snap = disneyExtremeSnapshot();
+        const share = buildDisneyExtremeSnapshotShareUrl(snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(share.url);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        if (ok) {
+          setDisneyExtremeBaseline(snap);
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · share link · fp ${fp}`
+            : `copy failed · share · ${share.hash}`,
+        );
+        return ok;
+      }
+
+      function applyDisneyExtremeSnapshotFromHash() {
+        const loaded = loadDisneyExtremeSnapshotFromHash();
+        if (!loaded.ok) return false;
+        applyDisneyExtremeSnapshot(loaded.snap, { applyIntensity: true });
+        setDisneyExtremeBaseline(loaded.snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(loaded.snap);
+        flashDisneyExtremeStatus(`link · snapshot · fp ${fp}`);
         return true;
       }
 
@@ -2465,6 +2516,11 @@
         if (resolved.action === 'redoBaseline') {
           ev.preventDefault();
           redoDisneyExtremeBaseline();
+          return;
+        }
+        if (resolved.action === 'copySnapshotShareUrl') {
+          ev.preventDefault();
+          copyDisneyExtremeSnapshotShareUrl();
           return;
         }
         if (resolved.action === 'copySummary') {

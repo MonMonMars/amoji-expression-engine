@@ -84,6 +84,7 @@ export function disneyExtremeUiDefaults() {
  * - `k` / `K` → clear Extreme snapshot baseline (dirty tracking off)
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
+ * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline

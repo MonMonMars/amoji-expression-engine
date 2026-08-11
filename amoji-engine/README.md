@@ -224,7 +224,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 211 | Extreme Face Live auto-baseline wiring | Done |
 | Phase 212 | Extreme bundle label dirty bit | Done |
 | Phase 213 | Extreme Face Live bundle dirty wiring | Done |
-| Phase 214+ | Further production polish… | Specced |
+| Phase 214 | Extreme snapshot hash encode/decode | Done |
+| Phase 215 | Extreme snapshot share URL + loadFromHash | Done |
+| Phase 216 | Extreme Y share link hotkey | Done |
+| Phase 217 | Extreme Face Live share link wiring | Done |
+| Phase 218+ | Further production polish… | Specced |
 
 ## Quick start
 
