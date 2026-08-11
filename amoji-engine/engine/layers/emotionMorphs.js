@@ -578,6 +578,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineRedoShareUrl', help: 'Alt+Y share redo', kind: 'note' },
   { id: 'starBaselineFavorite', keys: ['s', 'S'], help: 'S star fav', kind: 'action' },
   { id: 'showBaselineFavorites', help: 'Shift+S fav list', kind: 'note' },
+  { id: 'unstarBaselineFavorite', help: 'Alt+S unstar fav', kind: 'note' },
   { id: 'copyBaselineFavoritesJson', keys: ['g', 'G'], help: 'G copy fav JSON', kind: 'action' },
   { id: 'pasteBaselineFavoritesJson', help: 'Shift+G paste fav', kind: 'note' },
   { id: 'mergeBaselineFavoritesJson', help: 'Alt+G merge fav', kind: 'note' },
@@ -593,17 +594,21 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'jump',
   },
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
+  { id: 'jumpBaselineFavorite', help: 'Alt+1–4 fav jump', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
   { id: 'starBaselineChip', help: 'Shift+click chip star', kind: 'note' },
+  { id: 'unstarBaselineChip', help: 'Ctrl+click fav chip unstar', kind: 'note' },
   { id: 'pinBaselineChip', help: 'dbl-click chip pin', kind: 'note' },
   { id: 'copyBaselineStacksJson', keys: ['z', 'Z'], help: 'Z copy stacks', kind: 'action' },
   { id: 'pasteBaselineStacksJson', help: 'Shift+Z paste stacks', kind: 'note' },
   { id: 'mergeBaselineStacksJson', help: 'Alt+Z merge stacks', kind: 'note' },
   { id: 'copyBaselineStacksShareUrl', keys: ['v', 'V'], help: 'V share stacks', kind: 'action' },
+  { id: 'copyBaselineKitShareUrl', help: 'Shift+V share kit', kind: 'note' },
   { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
   { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
+  { id: 'activeFavoriteChip', help: 'fav chip · active', kind: 'note' },
   { id: 'dropSnapshotJson', help: 'drop JSON · hist/redo/fav/stacks/snap · Meta preview · Shift merge · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
@@ -2399,6 +2404,61 @@ export function pushDisneyExtremeBaselineFavorite(favorites, snap, opts = {}) {
 }
 
 /**
+ * Remove a favorite by fingerprint match (or by index when `opts.index` set).
+ * @param {object[]|null|undefined} favorites
+ * @param {object|null|undefined} [snap]
+ * @param {{ index?: number }} [opts]
+ * @returns {{ favorites: object[], removed: boolean, index: number }}
+ */
+export function removeDisneyExtremeBaselineFavorite(
+  favorites,
+  snap = null,
+  opts = {},
+) {
+  const list = Array.isArray(favorites) ? favorites.slice() : [];
+  if (
+    typeof opts.index === 'number' &&
+    Number.isInteger(opts.index) &&
+    opts.index >= 0 &&
+    opts.index < list.length
+  ) {
+    list.splice(opts.index, 1);
+    return { favorites: list, removed: true, index: opts.index };
+  }
+  const captured = captureDisneyExtremeBaseline(snap);
+  if (!captured) {
+    return { favorites: list, removed: false, index: -1 };
+  }
+  const target = disneyExtremeSnapshotFingerprint(captured);
+  const index = list.findIndex(
+    (item) => disneyExtremeSnapshotFingerprint(item) === target,
+  );
+  if (index < 0) {
+    return { favorites: list, removed: false, index: -1 };
+  }
+  list.splice(index, 1);
+  return { favorites: list, removed: true, index };
+}
+
+/**
+ * Map digit key `1`–`4` → 0-based Extreme favorites index (or null).
+ * @param {string} key
+ * @param {{ limit?: number }} [opts]
+ * @returns {number|null}
+ */
+export function disneyExtremeFavoriteJumpIndex(key, opts = {}) {
+  return disneyExtremeHistoryJumpIndex(key, {
+    limit:
+      Math.max(
+        1,
+        Math.floor(
+          Number(opts.limit) || DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT,
+        ),
+      ),
+  });
+}
+
+/**
  * Format Extreme favorites list for status flash.
  * @param {object[]|null|undefined} favorites
  * @returns {string}
@@ -2784,4 +2844,54 @@ export function formatDisneyExtremeMultiHashLoadLabel(parts = []) {
     : [];
   if (!list.length) return 'link · empty';
   return `link · ${list.join(' · ')}`;
+}
+
+/**
+ * Build share URL with live snapshot + stacks (`dxs=` + `dxb=`).
+ * @param {{
+ *   snap?: object,
+ *   history?: object[],
+ *   redo?: object[],
+ *   favorites?: object[],
+ * }|null|undefined} [kit]
+ * @param {{ baseUrl?: string, hash?: string, mergeHash?: boolean }} [opts]
+ * @returns {{ ok: boolean, url: string, hash: string }}
+ */
+export function buildDisneyExtremeBaselineKitShareUrl(kit = {}, opts = {}) {
+  const snapFrag = encodeDisneyExtremeSnapshotHash(kit?.snap || kit);
+  const stacksFrag = encodeDisneyExtremeBaselineStacksHash({
+    history: kit?.history,
+    redo: kit?.redo,
+    favorites: kit?.favorites,
+  });
+  let hash = `${snapFrag}&${stacksFrag}`;
+  if (opts.mergeHash !== false) {
+    const existing = String(
+      opts.hash ||
+        (typeof location !== 'undefined' ? location.hash : '') ||
+        '',
+    ).replace(/^#/, '');
+    if (existing) {
+      const parts = existing
+        .split('&')
+        .filter(
+          (p) =>
+            p &&
+            !p.startsWith(`${DISNEY_EXTREME_SNAPSHOT_HASH_PARAM}=`) &&
+            !p.startsWith(`${DISNEY_EXTREME_STACKS_HASH_PARAM}=`),
+        );
+      parts.push(snapFrag, stacksFrag);
+      hash = parts.join('&');
+    }
+  }
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  return {
+    ok: true,
+    url: base ? `${base}#${hash}` : `#${hash}`,
+    hash,
+  };
 }

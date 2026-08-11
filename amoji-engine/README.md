@@ -276,7 +276,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 263 | Extreme Q / Shift+Q cycle favorite | Done |
 | Phase 264 | Extreme stacks share URL `#dxb=` / V | Done |
 | Phase 265 | Extreme multi-hash load single toast | Done |
-| Phase 266+ | Further production polish… | Specced |
+| Phase 266 | Extreme Alt+S unstar favorite | Done |
+| Phase 267 | Extreme Alt+1–4 favorite jump | Done |
+| Phase 268 | Extreme kit share URL `#dxs=`+`#dxb=` / Shift+V | Done |
+| Phase 269 | Extreme active favorite chip highlight | Done |
+| Phase 270+ | Further production polish… | Specced |
 
 ## Quick start
 

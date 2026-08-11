@@ -568,6 +568,11 @@
         border-color: var(--accent);
         color: var(--accent);
       }
+      #disneyExtremeFavorites button.extreme-fav-chip.is-active {
+        border-color: var(--accent);
+        background: color-mix(in oklab, var(--accent) 18%, transparent);
+        color: var(--accent);
+      }
       #disneyExtremeMore {
         margin-top: 6px;
         width: 100%;
@@ -879,21 +884,23 @@
             <button type="button" id="btnDisneyExtremePasteStacks">Paste stacks JSON <kbd>⇧Z</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacks">Merge stacks JSON <kbd>Alt+Z</kbd></button>
             <button type="button" id="btnDisneyExtremeShareStacks">Copy stacks share <kbd>V</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareKit">Copy kit share <kbd>⇧V</kbd></button>
             <button type="button" id="btnDisneyExtremeNextFav">Next favorite <kbd>Q</kbd></button>
             <button type="button" id="btnDisneyExtremePrevFav">Prev favorite <kbd>⇧Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
           </div>
         </details>
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · dbl-click pin · 1–8 hist · ⇧1–8 redo · L list · ⇧L copy · ⇧K clear hist · W wipe redo · ⇧W wipe favs · P pin · S star · Q/⇧Q cycle fav · G/⇧G/Alt+G fav JSON · T fav share · Z/⇧Z/Alt+Z stacks · V stacks share · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · ⇧L copy · ⇧K clear hist · W wipe redo · ⇧W wipe favs · P pin · S star · Alt+S unstar · Q/⇧Q cycle fav · G/⇧G/Alt+G fav JSON · T fav share · Z/⇧Z/Alt+Z stacks · V/⇧V stacks/kit share · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
         <div
           class="row"
           id="disneyExtremeFavorites"
-          title="Starred favorites · click jump · S star · ⇧S list · Q/⇧Q cycle · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Z/⇧Z/Alt+Z/V stacks"
+          title="Starred favorites · click jump · S star · Alt+S unstar · Ctrl+click unstar · ⇧S list · Q/⇧Q cycle · Alt+1–4 jump · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Z/⇧Z/Alt+Z/V/⇧V stacks"
         >
           <span class="extreme-hist-empty">fav · empty</span>
         </div>
@@ -1305,7 +1312,9 @@
         encodeDisneyExtremeBaselineStacksHash,
         loadDisneyExtremeBaselineStacksFromHash,
         buildDisneyExtremeBaselineStacksShareUrl,
+        buildDisneyExtremeBaselineKitShareUrl,
         cycleDisneyExtremeBaselineFavoriteIndex,
+        removeDisneyExtremeBaselineFavorite,
         formatDisneyExtremeMultiHashLoadLabel,
         diffDisneyExtremeSnapshots,
         formatDisneyExtremeSnapshotDiffLabel,
@@ -1775,6 +1784,10 @@
             );
             return;
           }
+          if (ev.ctrlKey && kind === 'fav') {
+            unstarDisneyExtremeBaselineFavoriteAt(index);
+            return;
+          }
           if (ev.altKey && ev.shiftKey) {
             const a = lastExtremeChipCompare;
             flashDisneyExtremeStatus(
@@ -1856,6 +1869,9 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'extreme-fav-chip';
+          if (extremeFavoriteCycleIndex === i) {
+            btn.classList.add('is-active');
+          }
           btn.textContent = formatDisneyExtremeBaselineHistoryEntry(snap, {
             index: i + 1,
             compact: true,
@@ -1949,10 +1965,74 @@
         if (extremeBaselineFavorites.length === before) {
           flashDisneyExtremeStatus(`starred · already · fp ${fp}`);
         } else {
+          extremeFavoriteCycleIndex = extremeBaselineFavorites.length - 1;
+          syncDisneyExtremeFavoritesUi();
           flashDisneyExtremeStatus(
             `starred · fav ${extremeBaselineFavorites.length} · fp ${fp}`,
           );
         }
+        return true;
+      }
+
+      function unstarDisneyExtremeBaselineFavorite() {
+        const snap = disneyExtremeSnapshot();
+        const result = removeDisneyExtremeBaselineFavorite(
+          extremeBaselineFavorites,
+          snap,
+        );
+        if (!result.removed) {
+          const fp = disneyExtremeSnapshotFingerprintShort(snap);
+          flashDisneyExtremeStatus(`unstar · missing · fp ${fp}`);
+          return false;
+        }
+        extremeBaselineFavorites = result.favorites;
+        if (
+          extremeFavoriteCycleIndex != null &&
+          extremeFavoriteCycleIndex >= extremeBaselineFavorites.length
+        ) {
+          extremeFavoriteCycleIndex =
+            extremeBaselineFavorites.length > 0
+              ? extremeBaselineFavorites.length - 1
+              : null;
+        }
+        persistDisneyExtremeBaselineFavorites();
+        syncDisneyExtremeFavoritesUi();
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(
+          `unstarred · fav ${extremeBaselineFavorites.length} · fp ${fp}`,
+        );
+        return true;
+      }
+
+      function unstarDisneyExtremeBaselineFavoriteAt(index) {
+        const snap = extremeBaselineFavorites[index];
+        const result = removeDisneyExtremeBaselineFavorite(
+          extremeBaselineFavorites,
+          null,
+          { index },
+        );
+        if (!result.removed) {
+          flashDisneyExtremeStatus('unstar · chip · missing');
+          return false;
+        }
+        extremeBaselineFavorites = result.favorites;
+        if (extremeFavoriteCycleIndex === index) {
+          extremeFavoriteCycleIndex =
+            extremeBaselineFavorites.length > 0
+              ? Math.min(index, extremeBaselineFavorites.length - 1)
+              : null;
+        } else if (
+          extremeFavoriteCycleIndex != null &&
+          extremeFavoriteCycleIndex > index
+        ) {
+          extremeFavoriteCycleIndex -= 1;
+        }
+        persistDisneyExtremeBaselineFavorites();
+        syncDisneyExtremeFavoritesUi();
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(
+          `unstarred · chip · F#${index + 1} · fav ${extremeBaselineFavorites.length} · fp ${fp}`,
+        );
         return true;
       }
 
@@ -2205,6 +2285,33 @@
           ok
             ? `copied · stacks share · hist ${histN} · redo ${redoN} · fav ${favN}`
             : `copy failed · stacks share · ${share.hash}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBaselineKitShareUrl() {
+        const share = buildDisneyExtremeBaselineKitShareUrl({
+          snap: disneyExtremeSnapshot(),
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
+        const histN = extremeBaselineHistory.length;
+        const redoN = extremeBaselineRedo.length;
+        const favN = extremeBaselineFavorites.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(share.url);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · kit share · hist ${histN} · redo ${redoN} · fav ${favN}`
+            : `copy failed · kit share · ${share.hash}`,
         );
         return ok;
       }
@@ -2765,12 +2872,20 @@
         copyDisneyExtremeBaselineStacksShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeShareKit')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineKitShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeNextFav')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineFavorite();
       });
 
       document.getElementById('btnDisneyExtremePrevFav')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineFavorite({ prev: true });
+      });
+
+      document.getElementById('btnDisneyExtremeUnstarFav')?.addEventListener('click', () => {
+        unstarDisneyExtremeBaselineFavorite();
       });
 
       document.getElementById('btnDisneyExtremeCopyHist')?.addEventListener('click', () => {
@@ -3722,6 +3837,11 @@
           flashDisneyExtremeBaselineFavoritesList();
           return;
         }
+        if (resolved.action === 'unstarBaselineFavorite') {
+          ev.preventDefault();
+          unstarDisneyExtremeBaselineFavorite();
+          return;
+        }
         if (resolved.action === 'copyBaselineFavoritesJson') {
           ev.preventDefault();
           copyDisneyExtremeBaselineFavoritesJson();
@@ -3760,6 +3880,11 @@
         if (resolved.action === 'copyBaselineStacksShareUrl') {
           ev.preventDefault();
           copyDisneyExtremeBaselineStacksShareUrl();
+          return;
+        }
+        if (resolved.action === 'copyBaselineKitShareUrl') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineKitShareUrl();
           return;
         }
         if (resolved.action === 'cycleBaselineFavoriteNext') {
@@ -3840,6 +3965,11 @@
         if (resolved.action === 'jumpBaselineRedo') {
           ev.preventDefault();
           jumpDisneyExtremeBaselineRedo(resolved.index);
+          return;
+        }
+        if (resolved.action === 'jumpBaselineFavorite') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineFavorite(resolved.index);
           return;
         }
         if (resolved.action === 'copySummary') {
