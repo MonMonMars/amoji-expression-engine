@@ -9,6 +9,7 @@ import {
   computeDisneyExtremeIntensities,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
 } from '../layers/emotionMorphs.js';
+import { disneyExtremeBodyMix } from '../layers/neckShoulder.js';
 
 export const FACE_LIVE_PREFS_KEY = 'amoji.faceLive.prefs.v1';
 export const FACE_LIVE_PREFS_VERSION = 1;
@@ -70,6 +71,7 @@ export function disneyExtremeUiDefaults() {
  * - `e` / `E` → flash ease curve label on status
  * - `Shift+E` → copy ease curve SVG to clipboard
  * - `m` / `M` → flash body mix label on status
+ * - `Shift+M` → copy body mix SVG to clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -299,6 +301,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showEaseCurve' && ev.shiftKey) {
       return { ok: true, action: 'copyEaseCurve' };
     }
+    if (entry.id === 'showBodyMix' && ev.shiftKey) {
+      return { ok: true, action: 'copyBodyMixCurve' };
+    }
     return { ok: true, action: entry.id };
   }
   if (entry.kind === 'nudge') {
@@ -319,7 +324,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
 
 /**
  * One-line summary of Disney Extreme prefs (for landing toast / title tooltips).
- * When on, includes overdrive gain + eased shapeInt from prefs intensity.
+ * When on, includes overdrive gain + eased shapeInt; body-on also appends mix.
  * @param {object} [prefs]
  * @returns {string}
  */
@@ -329,13 +334,17 @@ export function summarizeDisneyExtremePrefs(prefs) {
   const body = p.disneyExtremeBody
     ? `body×${Number(p.disneyExtremeBodyFactor).toFixed(2)}`
     : 'body off';
-  const { shapeInt } = computeDisneyExtremeIntensities(p.intensity, {
-    enabled: true,
-    shapeFactor: p.disneyExtremeFactor,
-    bodyOn: p.disneyExtremeBody,
-    bodyFactor: p.disneyExtremeBodyFactor,
-  });
-  return [
+  const { shapeInt, bodyInt, bodyOn } = computeDisneyExtremeIntensities(
+    p.intensity,
+    {
+      enabled: true,
+      shapeFactor: p.disneyExtremeFactor,
+      bodyOn: p.disneyExtremeBody,
+      bodyFactor: p.disneyExtremeBodyFactor,
+    },
+  );
+  /** @type {string[]} */
+  const parts = [
     'X on',
     `shape×${Number(p.disneyExtremeFactor).toFixed(2)}`,
     body,
@@ -343,7 +352,11 @@ export function summarizeDisneyExtremePrefs(prefs) {
     `mouth×${Number(p.disneyExtremeMouthFactor).toFixed(2)}`,
     `od×${DISNEY_EXTREME_EASE_OVERDRIVE_GAIN.toFixed(2)}`,
     `ease ${easeEmotionIntensity(shapeInt).toFixed(2)}`,
-  ].join(' · ');
+  ];
+  if (bodyOn) {
+    parts.push(`mix ${disneyExtremeBodyMix(bodyInt).toFixed(2)}`);
+  }
+  return parts.join(' · ');
 }
 
 /**

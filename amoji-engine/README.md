@@ -152,7 +152,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 139 | Extreme body mix spark panel | Done |
 | Phase 140 | Extreme M hotkey flash body mix | Done |
 | Phase 141 | Extreme HUD spark click flashes ease | Done |
-| Phase 142+ | Further production polish… | Specced |
+| Phase 142 | Extreme Shift+M copy body mix SVG | Done |
+| Phase 143 | Extreme HUD mini body mix spark | Done |
+| Phase 144 | Extreme summary includes body mix | Done |
+| Phase 145 | Extreme HUD body spark click flashes mix | Done |
+| Phase 146+ | Further production polish… | Specced |
 
 ## Quick start
 

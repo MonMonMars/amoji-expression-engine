@@ -402,6 +402,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
   { id: 'copyEaseCurve', help: 'Shift+E copy ease', kind: 'note' },
   { id: 'showBodyMix', keys: ['m', 'M'], help: 'M mix', kind: 'action' },
+  { id: 'copyBodyMixCurve', help: 'Shift+M copy mix', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
