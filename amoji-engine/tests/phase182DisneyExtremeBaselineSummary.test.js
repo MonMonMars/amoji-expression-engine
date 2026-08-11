@@ -21,6 +21,19 @@ describe('Phase 182 Extreme baseline summary', () => {
         hasBaseline: true,
         dirty: true,
         fp: 'deadbeef',
+        historyDepth: 2,
+      }),
+    ).toContain(' · hist 2 · ');
+    expect(
+      formatDisneyExtremeBaselineSummary({ historyDepth: 3 }),
+    ).toBe(
+      'baseline · none · hist 3 · D diff · ⇧D restore · K clear · U undo',
+    );
+    expect(
+      formatDisneyExtremeBaselineSummary({
+        hasBaseline: true,
+        dirty: true,
+        fp: 'deadbeef',
       }),
     ).toContain('baseline · dirty · fp deadbeef');
     expect(typeof engine.formatDisneyExtremeBaselineSummary).toBe('function');

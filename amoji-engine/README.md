@@ -212,7 +212,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 199 | Extreme U undo baseline | Done |
 | Phase 200 | Extreme Face Live baseline history push | Done |
 | Phase 201 | Extreme Face Live undo baseline wiring | Done |
-| Phase 202+ | Further production polish… | Specced |
+| Phase 202 | Extreme baseline history session storage | Done |
+| Phase 203 | Extreme Face Live history persist wiring | Done |
+| Phase 204 | Extreme baseline summary history depth | Done |
+| Phase 205 | Extreme Face Live hist depth tooltip | Done |
+| Phase 206+ | Further production polish… | Specced |
 
 ## Quick start
 

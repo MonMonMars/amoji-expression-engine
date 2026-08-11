@@ -1183,6 +1183,9 @@
         saveDisneyExtremeBaseline,
         loadDisneyExtremeBaseline,
         clearDisneyExtremeBaselineStorage,
+        saveDisneyExtremeBaselineHistory,
+        loadDisneyExtremeBaselineHistory,
+        clearDisneyExtremeBaselineHistoryStorage,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1488,7 +1491,11 @@
       let lastExtremeSparkFp = '';
       let lastExtremeBaselineSnap = loadDisneyExtremeBaseline();
       let lastExtremeDirty = false;
-      let extremeBaselineHistory = [];
+      let extremeBaselineHistory = loadDisneyExtremeBaselineHistory();
+
+      function persistDisneyExtremeBaselineHistory() {
+        saveDisneyExtremeBaselineHistory(extremeBaselineHistory);
+      }
 
       function setDisneyExtremeBaseline(snap) {
         if (lastExtremeBaselineSnap) {
@@ -1496,6 +1503,7 @@
             extremeBaselineHistory,
             lastExtremeBaselineSnap,
           );
+          persistDisneyExtremeBaselineHistory();
         }
         lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
         lastExtremeDirty = false;
@@ -2072,6 +2080,7 @@
         lastExtremeBaselineSnap = null;
         extremeBaselineHistory = [];
         clearDisneyExtremeBaselineStorage();
+        clearDisneyExtremeBaselineHistoryStorage();
         lastExtremeDirty = false;
         syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus('cleared · baseline');
@@ -2081,6 +2090,7 @@
       function undoDisneyExtremeBaseline() {
         const popped = popDisneyExtremeBaselineHistory(extremeBaselineHistory);
         extremeBaselineHistory = popped.history;
+        persistDisneyExtremeBaselineHistory();
         if (!popped.snap) {
           flashDisneyExtremeStatus('undo · no history');
           return false;
@@ -5666,6 +5676,7 @@
               hasBaseline: dirtyHud.hasBaseline,
               dirty: dirtyHud.dirty,
               fp: dirtyHud.fp,
+              historyDepth: extremeBaselineHistory.length,
             }),
           );
           if (dirtyHud.dirty && !lastExtremeDirty) {
