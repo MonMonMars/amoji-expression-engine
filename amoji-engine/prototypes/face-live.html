@@ -966,6 +966,8 @@
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeCloseStrips">Close strips <kbd>Alt+PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenCurveStrips">Open curves <kbd>⇧Alt+PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeStripsSummary">Strips summary <kbd>PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyStripsSummary">Copy strips <kbd>⇧PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeFactorsStrip">Factors strip <kbd>F2</kbd></button>
@@ -2346,6 +2348,15 @@
         return toggleDisneyExtremeStrips({ open: true });
       }
 
+      function closeDisneyExtremeStrips() {
+        return toggleDisneyExtremeStrips({ open: false });
+      }
+
+      function openDisneyExtremeCurveStrips() {
+        openDisneyExtremeStrips();
+        return flashDisneyExtremeBaselineCurveStrip();
+      }
+
       function flashDisneyExtremeBaselineStripsSummary(extremeSnap) {
         const text = formatDisneyExtremeBaselineStripsSummaryLabel(
           {
@@ -2695,6 +2706,7 @@
 
       function disneyExtremeHudBundleActiveOpts() {
         const dirty = disneyExtremeDirtyStripOpts();
+        const curves = disneyExtremeCurveStripOpts();
         return {
           historyIndex: extremeHistoryJumpIndexActive,
           redoIndex: extremeRedoJumpIndexActive,
@@ -2704,6 +2716,12 @@
           dirty: dirty.dirty,
           fp: dirty.fp,
           changeCount: dirty.changeCount,
+          enabled: curves.enabled,
+          shapeInt: curves.shapeInt,
+          bodyOn: curves.bodyOn,
+          bodyInt: curves.bodyInt,
+          neckBlend: curves.neckBlend,
+          bodyMix: curves.bodyMix,
         };
       }
 
@@ -4795,6 +4813,14 @@
 
       document.getElementById('btnDisneyExtremeOpenStrips')?.addEventListener('click', () => {
         openDisneyExtremeStrips();
+      });
+
+      document.getElementById('btnDisneyExtremeCloseStrips')?.addEventListener('click', () => {
+        closeDisneyExtremeStrips();
+      });
+
+      document.getElementById('btnDisneyExtremeOpenCurveStrips')?.addEventListener('click', () => {
+        openDisneyExtremeCurveStrips();
       });
 
       document.getElementById('btnDisneyExtremeStripsSummary')?.addEventListener('click', () => {
@@ -6988,6 +7014,16 @@
         if (resolved.action === 'openBaselineStrips') {
           ev.preventDefault();
           openDisneyExtremeStrips();
+          return;
+        }
+        if (resolved.action === 'closeBaselineStrips') {
+          ev.preventDefault();
+          closeDisneyExtremeStrips();
+          return;
+        }
+        if (resolved.action === 'openBaselineCurveStrips') {
+          ev.preventDefault();
+          openDisneyExtremeCurveStrips();
           return;
         }
         if (resolved.action === 'showBaselineStripsSummary') {

@@ -213,6 +213,8 @@ export function disneyExtremeUiDefaults() {
  * - `End` → copy Extreme dirty/clean pin-drift strip
  * - `PageUp` → toggle Extreme strips panel
  * - `Shift+PageUp` → open Extreme strips panel
+ * - `Alt+PageUp` → close Extreme strips panel
+ * - `Shift+Alt+PageUp` → open Extreme strips and flash curve strips
  * - `PageDown` → flash Extreme strips summary
  * - `Shift+PageDown` → copy Extreme strips summary
  * - `Alt+PageDown` → flash Extreme curve strips (ease/mix/neck)
@@ -486,6 +488,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     const enterKey = key === 'Enter';
     const insertKey = key === 'Insert';
     const pageDownKey = key === 'PageDown';
+    const pageUpKey = key === 'PageUp';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -519,7 +522,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !rootSpace &&
       !enterKey &&
       !insertKey &&
-      !pageDownKey
+      !pageDownKey &&
+      !pageUpKey
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -819,6 +823,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copyBaselineActive' && ev.shiftKey) {
       return { ok: true, action: 'showBaselinePinStrip' };
+    }
+    if (entry.id === 'toggleBaselineStrips' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'openBaselineCurveStrips' };
+    }
+    if (entry.id === 'toggleBaselineStrips' && ev.altKey) {
+      return { ok: true, action: 'closeBaselineStrips' };
     }
     if (entry.id === 'toggleBaselineStrips' && ev.shiftKey) {
       return { ok: true, action: 'openBaselineStrips' };

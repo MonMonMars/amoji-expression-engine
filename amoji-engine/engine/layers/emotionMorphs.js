@@ -887,7 +887,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
   { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
   { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
-  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin/dirty', kind: 'note' },
+  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin/dirty/curves', kind: 'note' },
   {
     id: 'showBaselineDirtyStrip',
     keys: ['Home'],
@@ -908,6 +908,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'openBaselineStrips', help: 'Shift+PageUp open strips', kind: 'note' },
+  { id: 'closeBaselineStrips', help: 'Alt+PageUp close strips', kind: 'note' },
+  { id: 'openBaselineCurveStrips', help: '⇧Alt+PageUp open curves', kind: 'note' },
   {
     id: 'showBaselineStripsSummary',
     keys: ['PageDown'],
@@ -2521,6 +2523,14 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
  *   dirty?: boolean,
  *   fp?: string,
  *   changeCount?: number,
+ *   enabled?: boolean,
+ *   shapeInt?: number,
+ *   markerT?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2545,11 +2555,21 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
     fp: opts.fp,
     changeCount: opts.changeCount,
   });
-  return `hud · ${capacity} · ${active} · ${pin} · ${dirty}`;
+  const curves = formatDisneyExtremeBaselineCurveStripsLabel({
+    enabled: opts.enabled,
+    markerT: opts.markerT ?? opts.shapeInt,
+    bodyOn: opts.bodyOn,
+    bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+    neckBlend: opts.neckBlend,
+    bodyMix: opts.bodyMix,
+    bodyInt: opts.bodyInt,
+  });
+  return `hud · ${capacity} · ${active} · ${pin} · ${dirty} · ${curves}`;
 }
 
 /**
- * Multiline Extreme HUD bundle for clipboard (tips/roots/capacity/active/pin/dirty).
+ * Multiline Extreme HUD bundle for clipboard
+ * (tips/roots/capacity/active/pin/dirty/curves).
  * @param {{
  *   history?: object[]|null,
  *   redo?: object[]|null,
@@ -2564,6 +2584,14 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
  *   dirty?: boolean,
  *   fp?: string,
  *   changeCount?: number,
+ *   enabled?: boolean,
+ *   shapeInt?: number,
+ *   markerT?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2587,6 +2615,15 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
       dirty: opts.dirty,
       fp: opts.fp,
       changeCount: opts.changeCount,
+    }),
+    formatDisneyExtremeBaselineCurveStripsLabel({
+      enabled: opts.enabled,
+      markerT: opts.markerT ?? opts.shapeInt,
+      bodyOn: opts.bodyOn,
+      bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+      neckBlend: opts.neckBlend,
+      bodyMix: opts.bodyMix,
+      bodyInt: opts.bodyInt,
     }),
   ].join('\n');
 }

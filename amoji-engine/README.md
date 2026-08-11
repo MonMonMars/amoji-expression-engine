@@ -408,7 +408,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 395 | Extreme curve strips live label | Done |
 | Phase 396 | Extreme Alt+PageDown curve strips | Done |
 | Phase 397 | Extreme ⇧Alt+PageDown copy curves | Done |
-| Phase 398+ | Further production polish… | Specced |
+| Phase 398 | Extreme Alt+PageUp close strips | Done |
+| Phase 399 | Extreme HUD bundle summary + curves | Done |
+| Phase 400 | Extreme HUD bundle clipboard + curves | Done |
+| Phase 401 | Extreme ⇧Alt+PageUp open curves | Done |
+| Phase 402+ | Further production polish… | Specced |
 
 ## Quick start
 
