@@ -783,6 +783,13 @@
             <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
           </label>
         </div>
+        <div
+          id="prefsAuditImportViewsDropZone"
+          class="status"
+          style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
+        >
+          Drag & drop JSON to preview
+        </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
           <span style="font-size:0.8rem;color:var(--muted)">Import merge starred only</span>
@@ -1386,6 +1393,7 @@
           reason !== 'tts_endpoint_pick' &&
           reason !== 'tts_endpoint_blur_pick' &&
           reason !== 'tts_endpoint_input_pick' &&
+          reason !== 'tts_endpoint_paste_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2803,18 +2811,25 @@
         document.getElementById('btnTtsHealth').addEventListener('click', () => {
           refreshGatewayHealth();
         });
-        document.getElementById('ttsEndpoint')?.addEventListener('change', () => {
+        const ttsEndpointEl = document.getElementById('ttsEndpoint');
+        ttsEndpointEl?.addEventListener('change', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
-        document.getElementById('ttsEndpoint')?.addEventListener('blur', () => {
+        ttsEndpointEl?.addEventListener('blur', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_blur_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
-        document.getElementById('ttsEndpoint')?.addEventListener('input', () => {
+        ttsEndpointEl?.addEventListener('input', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_input_pick');
+          persistPrefs();
+          syncGatewayHealthPoll();
+        });
+        // Paste is common with endpoints; treat it like an input change.
+        ttsEndpointEl?.addEventListener('paste', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_paste_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
@@ -3490,7 +3505,11 @@
             ? `prefs · exported ${exported.count} toast-hash views`
             : 'prefs · no toast-hash saved views';
         });
-        document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
+        document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', async () => {
+          if (prefsAuditImportPreviewText) {
+            await importAuditViewsText(prefsAuditImportPreviewText);
+            return;
+          }
           document.getElementById('prefsAuditImportViewsFile')?.click();
         });
         let prefsAuditImportPreviewText = '';
@@ -3530,6 +3549,55 @@
           );
           hintEl.textContent = hinted.ok && hinted.hint ? hinted.hint : '—';
         }
+        async function importAuditViewsText(text) {
+          const mergeStarredOnly = !!document.getElementById(
+            'prefsAuditImportStarredOnly',
+          )?.checked;
+          const folderOnly = !!document.getElementById(
+            'prefsAuditImportFolderOnly',
+          )?.checked;
+          const toastHashOnly = !!document.getElementById(
+            'prefsAuditImportToastHashOnly',
+          )?.checked;
+          const folderEl = document.getElementById('prefsAuditViewFolder');
+          const folder = folderOnly
+            ? prefsAuditFolderFilter || folderEl?.value?.trim() || ''
+            : '';
+          if (folderOnly && !folder) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent =
+              'prefs · pick a folder for import folder filter';
+            return { ok: false };
+          }
+          const imported = auditSavedViews.importJson(text, {
+            merge: true,
+            mergeStarredOnly,
+            mergeStarredOnlyExplicit: mergeStarredOnly,
+            toastInHashOnly: toastHashOnly,
+            toastInHashOnlyExplicit: toastHashOnly,
+            folder: folder || null,
+            folderExplicit: folderOnly,
+            inheritExportMeta: true,
+          });
+          if (!imported.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · views import failed';
+            return imported;
+          }
+          refreshAuditSavedViewsUi();
+          prefsStatus.className = 'status ok';
+          const bits = [];
+          if (imported.mergeStarredOnly) bits.push('starred');
+          if (imported.toastInHashOnly) bits.push('toast hash');
+          if (imported.folder) bits.push(`folder ${imported.folder}`);
+          if (imported.fromExportMeta && bits.length) bits.push('from export');
+          prefsStatus.textContent = bits.length
+            ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
+            : `prefs · views imported · ${imported.count}`;
+          prefsAuditImportPreviewText = '';
+          refreshAuditImportInheritHint();
+          return imported;
+        }
         for (const id of [
           'prefsAuditImportStarredOnly',
           'prefsAuditImportFolderOnly',
@@ -3546,60 +3614,49 @@
             const text = await file.text();
             prefsAuditImportPreviewText = text;
             refreshAuditImportInheritHint();
-            const mergeStarredOnly = !!document.getElementById(
-              'prefsAuditImportStarredOnly',
-            )?.checked;
-            const folderOnly = !!document.getElementById(
-              'prefsAuditImportFolderOnly',
-            )?.checked;
-            const toastHashOnly = !!document.getElementById(
-              'prefsAuditImportToastHashOnly',
-            )?.checked;
-            const folderEl = document.getElementById('prefsAuditViewFolder');
-            const folder = folderOnly
-              ? prefsAuditFolderFilter ||
-                folderEl?.value?.trim() ||
-                ''
-              : '';
-            if (folderOnly && !folder) {
-              prefsStatus.className = 'status bad';
-              prefsStatus.textContent =
-                'prefs · pick a folder for import folder filter';
-              return;
-            }
-            const imported = auditSavedViews.importJson(text, {
-              merge: true,
-              mergeStarredOnly,
-              mergeStarredOnlyExplicit: mergeStarredOnly,
-              toastInHashOnly: toastHashOnly,
-              toastInHashOnlyExplicit: toastHashOnly,
-              folder: folder || null,
-              folderExplicit: folderOnly,
-              inheritExportMeta: true,
-            });
-            if (!imported.ok) {
-              prefsStatus.className = 'status bad';
-              prefsStatus.textContent = 'prefs · views import failed';
-              return;
-            }
-            refreshAuditSavedViewsUi();
-            prefsStatus.className = 'status ok';
-            const bits = [];
-            if (imported.mergeStarredOnly) bits.push('starred');
-            if (imported.toastInHashOnly) bits.push('toast hash');
-            if (imported.folder) bits.push(`folder ${imported.folder}`);
-            if (imported.fromExportMeta && bits.length) bits.push('from export');
-            prefsStatus.textContent = bits.length
-              ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
-              : `prefs · views imported · ${imported.count}`;
-            prefsAuditImportPreviewText = '';
-            refreshAuditImportInheritHint();
+            await importAuditViewsText(text);
           } catch (err) {
             prefsStatus.className = 'status bad';
             prefsStatus.textContent = String(err.message || err);
           }
           ev.target.value = '';
         });
+        const prefsAuditImportViewsDropZone = document.getElementById(
+          'prefsAuditImportViewsDropZone',
+        );
+        if (prefsAuditImportViewsDropZone) {
+          prefsAuditImportViewsDropZone.addEventListener('dragover', (ev) => {
+            ev.preventDefault();
+            try {
+              ev.dataTransfer.dropEffect = 'copy';
+            } catch {
+              /* ignore */
+            }
+          });
+          prefsAuditImportViewsDropZone.addEventListener('dragenter', (ev) => {
+            ev.preventDefault();
+            prefsAuditImportViewsDropZone.classList.add('dragover');
+          });
+          prefsAuditImportViewsDropZone.addEventListener('dragleave', () => {
+            prefsAuditImportViewsDropZone.classList.remove('dragover');
+          });
+          prefsAuditImportViewsDropZone.addEventListener('drop', async (ev) => {
+            ev.preventDefault();
+            prefsAuditImportViewsDropZone.classList.remove('dragover');
+            const file = ev.dataTransfer?.files?.[0];
+            if (!file) return;
+            try {
+              const text = await file.text();
+              prefsAuditImportPreviewText = text;
+              refreshAuditImportInheritHint();
+              prefsStatus.className = 'status ok';
+              prefsStatus.textContent = 'prefs · drop preview ready · click import';
+            } catch (err) {
+              prefsStatus.className = 'status bad';
+              prefsStatus.textContent = String(err.message || err);
+            }
+          });
+        }
         refreshAuditSavedViewsUi();
         refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
@@ -3892,6 +3949,19 @@
         }
         if (discState.leakMorphs && Object.keys(discState.leakMorphs).length) {
           mergeMorphOverlays(targets, discState.leakMorphs);
+        }
+        // Continuity residual morph overlay: gently carry prior emotion morphs.
+        if (hasContinuityResidual(discState.continuity)) {
+          const residual = discState.continuity?.residual;
+          if (residual?.emotion && typeof residual.intensity === 'number') {
+            const residualMorphs = emotionToMorphWeights(
+              lod,
+              residual.emotion,
+              residual.intensity,
+              morphs,
+            );
+            mergeMorphOverlays(targets, residualMorphs);
+          }
         }
 
         // Smile typology / laughter (happy family subtypes)
