@@ -188,11 +188,14 @@ export class DiscretionController {
   constructor(opts = {}) {
     this.personaId = opts.personaId || 'companion';
     this.allowImprovisation = opts.allowImprovisation !== false;
+    this.autoImprovise = !!opts.autoImprovise;
+    this.autoStimulus = opts.autoStimulus || 'noise';
     this.previous = null;
     this.scriptPending = false;
     this.gapSec = 0;
-    this.improvCooldown = 0;
+    this.improvCool = 0;
     this.lastImprov = null;
+    this.lastContinuity = null;
   }
 
   /** @param {string} personaId */
@@ -226,9 +229,33 @@ export class DiscretionController {
       emotion: cont.emotion,
       intensity: cont.intensity,
     };
+    this.lastContinuity = cont;
     this.scriptPending = false;
     this.gapSec = 0;
     return cont;
+  }
+
+  /** Clear emotional continuity residue (hard cut). */
+  clearContinuity() {
+    this.previous = null;
+    this.lastContinuity = null;
+  }
+
+  /**
+   * @param {boolean} on
+   * @param {string} [stimulus]
+   */
+  setAutoImprovise(on, stimulus) {
+    this.autoImprovise = !!on;
+    if (stimulus) this.autoStimulus = stimulus;
+  }
+
+  /**
+   * Seconds of gap required before improvisation is allowed.
+   */
+  minGapSec() {
+    const profile = personalityProfile(this.personaId);
+    return 0.35 + (1 - profile.assertiveness) * 0.9;
   }
 
   /**
@@ -244,23 +271,41 @@ export class DiscretionController {
       ? passiveMoodLeak(ctx.mood, ctx.moodBaseline ?? 0.3, ctx.availableMorphs)
       : { morphs: {} };
 
+    const ready = canImprovise({
+      allowImprovisation: this.allowImprovisation,
+      scriptPending: this.scriptPending,
+      gapSec: this.gapSec,
+      personaId: this.personaId,
+    });
+
+    /** @type {object|null} */
+    let autoReaction = null;
+    if (this.autoImprovise && ready && this.improvCool <= 0) {
+      autoReaction = this.tryImprovise(this.autoStimulus, { mood: ctx.mood });
+      if (autoReaction?.blocked) autoReaction = null;
+    }
+
+    const minGap = this.minGapSec();
     return applyComplianceGate(
       {
         kind: 'discretion_state',
         personaId: this.personaId,
         profile: personalityProfile(this.personaId),
         gapSec: this.gapSec,
+        minGapSec: minGap,
+        gapProgress: Math.min(1, this.gapSec / Math.max(1e-3, minGap)),
         scriptPending: this.scriptPending,
-        canImprovise: canImprovise({
-          allowImprovisation: this.allowImprovisation,
-          scriptPending: this.scriptPending,
-          gapSec: this.gapSec,
-          personaId: this.personaId,
-        }),
+        allowImprovisation: this.allowImprovisation,
+        autoImprovise: this.autoImprovise,
+        autoStimulus: this.autoStimulus,
+        canImprovise: ready,
         previous: this.previous,
+        continuity: this.lastContinuity,
         leakMorphs: leak.morphs || {},
+        leakCount: Object.keys(leak.morphs || {}).length,
         lastImprov: this.lastImprov,
         improvCool: this.improvCool,
+        autoReaction,
       },
       {},
     );

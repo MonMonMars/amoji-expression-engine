@@ -29,7 +29,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 16 | Chassis calibration (scale/slew) on robot packs | Done |
 | Phase 17 | Production TTS wiring (adapter + SpeechPlayer) | Done |
 | Phase 18 | YouTube/video capture ingest + face quality gates | Done |
-| Phase 19+ | Actor discretion UX, audio sync polish… | Specced |
+| Phase 19 | Audio sync + Actor Discretion UX depth | Done |
+| Phase 20+ | Polish, real TTS audio providers… | Specced |
 
 ## Quick start
 

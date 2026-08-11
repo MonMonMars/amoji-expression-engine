@@ -41,3 +41,8 @@ npm run face-live
 | `data/tts/fixtures/sample-payloads.json` | Step / Index / Kokoro examples |
 
 Prefer real TTS phoneme timestamps. Estimation is a fallback for text-only demos.
+
+## Audio sync
+
+`SpeechPlayer.attachAudio(url)` or `attachDemoTone()` — mouth clock follows `audio.currentTime`.
+Face Live checkbox **Audio sync (demo tone)** generates a soft WAV matching take duration when no TTS `audioUrl` is present.

@@ -371,7 +371,22 @@
           <button type="button" id="btnDiscImprov">Gap improv</button>
           <button type="button" id="btnScriptHold">Script hold</button>
         </div>
+        <div class="row">
+          <button type="button" id="btnDiscDeliver">Deliver line</button>
+          <button type="button" id="btnDiscClear">Clear residue</button>
+        </div>
+        <select id="discStimulus" class="ctl" style="margin-top:8px;">
+          <option value="noise">Stimulus: noise</option>
+          <option value="interrupt">Stimulus: interrupt</option>
+          <option value="wait">Stimulus: wait</option>
+        </select>
+        <label class="row" style="align-items:center;gap:8px;margin-top:8px;">
+          <input id="discAuto" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Auto improv on gap</span>
+        </label>
+        <div class="meter" title="gap toward improv"><i id="discGapBar"></i></div>
         <div class="status" id="discStatus">discretion —</div>
+        <div class="status" id="discContStatus">continuity —</div>
         <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;margin-top:6px;">
           <input id="eggNlp" type="checkbox" />
           <span style="font-size:0.8rem;color:var(--muted)">Easter: NLP gaze myth (non-science)</span>
@@ -440,6 +455,10 @@
         <div class="row">
           <button type="button" id="btnTtsFixture">Load Step fixture</button>
         </div>
+        <label class="row" style="align-items:center;gap:8px;margin-top:8px;">
+          <input id="ttsAudioSync" type="checkbox" checked />
+          <span style="font-size:0.8rem;color:var(--muted)">Audio sync (demo tone)</span>
+        </label>
         <div class="status" id="ttsStatus">tts idle</div>
       </div>
 
@@ -666,6 +685,11 @@
       const eyeStatus = document.getElementById('eyeStatus');
       const moodStatus = document.getElementById('moodStatus');
       const discStatus = document.getElementById('discStatus');
+      const discContStatus = document.getElementById('discContStatus');
+      const discGapBar = document.getElementById('discGapBar');
+      const discStimulus = document.getElementById('discStimulus');
+      const discAuto = document.getElementById('discAuto');
+      const ttsAudioSync = document.getElementById('ttsAudioSync');
       const eggStatus = document.getElementById('eggStatus');
       const retargetStatus = document.getElementById('retargetStatus');
       const surfaceStatus = document.getElementById('surfaceStatus');
@@ -1086,7 +1110,8 @@
         moodCtl.setMood(moodSel.value);
       });
       document.getElementById('btnDiscImprov').addEventListener('click', () => {
-        const r = discCtl.tryImprovise('noise', { mood: moodCtl.state });
+        const stimulus = discStimulus.value || 'noise';
+        const r = discCtl.tryImprovise(stimulus, { mood: moodCtl.state });
         if (r.blocked) {
           discStatus.textContent = `improv blocked: ${r.reason}`;
           return;
@@ -1100,13 +1125,40 @@
           x.classList.toggle('active', x.dataset.emo === emotion);
         });
         document.getElementById('hudEmo').textContent = emotion;
-        discStatus.textContent = `improv: ${r.note} (${r.adaptor})`;
+        discStatus.textContent = `improv[${stimulus}]: ${r.note}`;
       });
       document.getElementById('btnScriptHold').addEventListener('click', (e) => {
         const next = !discCtl.scriptPending;
         discCtl.markScriptPending(next);
         e.currentTarget.classList.toggle('primary', next);
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
+      });
+      document.getElementById('btnDiscDeliver').addEventListener('click', () => {
+        const cont = discCtl.ingestLine({
+          emotion,
+          intensity,
+          stepOutBefore: stepOutNext,
+        });
+        discContStatus.textContent = cont.residual
+          ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
+          : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
+        discStatus.textContent = 'line delivered — gap reset';
+        document.getElementById('btnScriptHold').classList.remove('primary');
+      });
+      document.getElementById('btnDiscClear').addEventListener('click', () => {
+        discCtl.clearContinuity();
+        discContStatus.textContent = 'continuity cleared';
+      });
+      discAuto.addEventListener('change', () => {
+        discCtl.setAutoImprovise(discAuto.checked, discStimulus.value || 'noise');
+        discStatus.textContent = discAuto.checked
+          ? `auto improv ON (${discStimulus.value})`
+          : 'auto improv off';
+      });
+      discStimulus.addEventListener('change', () => {
+        if (discCtl.autoImprovise) {
+          discCtl.setAutoImprovise(true, discStimulus.value || 'noise');
+        }
       });
       eggNlpEl.addEventListener('change', () => {
         if (!personaAllowsEasterEggs(idle.personaId)) {
@@ -1236,15 +1288,24 @@
         const text = ttsTextEl.value || 'Hello mama';
         speechPlayer.emotion = emotion;
         speechPlayer.intensity = intensity;
-        const loaded = speechPlayer.loadText(text);
+        const loaded = speechPlayer.loadText(text, {
+          demoTone: !!ttsAudioSync?.checked,
+        });
         if (!loaded.loaded) {
           setTtsStatus(loaded.error || 'load failed', 'bad');
           return;
         }
+        if (ttsAudioSync?.checked && !speechPlayer.audio) {
+          try {
+            speechPlayer.attachDemoTone();
+          } catch {
+            /* ignore */
+          }
+        }
         gestures.setSpeaking(true, 0.7);
         speechPlayer.play();
         setTtsStatus(
-          `playing · ${loaded.frames}f · ${loaded.duration.toFixed(2)}s · est=${loaded.estimateSource || 'tts'}`,
+          `playing · ${loaded.syncMode || speechPlayer.syncMode} · ${loaded.frames}f · ${loaded.duration.toFixed(2)}s`,
           'ok',
         );
       });
@@ -1260,16 +1321,25 @@
           const fixtures = await res.json();
           speechPlayer.emotion = emotion;
           speechPlayer.intensity = intensity;
-          const loaded = speechPlayer.loadTts(fixtures.stepAudioEditX);
+          const loaded = speechPlayer.loadTts(fixtures.stepAudioEditX, {
+            demoTone: !!ttsAudioSync?.checked,
+          });
           ttsTextEl.value = fixtures.stepAudioEditX.text;
           if (!loaded.loaded) {
             setTtsStatus(loaded.error || 'fixture failed', 'bad');
             return;
           }
+          if (ttsAudioSync?.checked && !speechPlayer.audio) {
+            try {
+              speechPlayer.attachDemoTone();
+            } catch {
+              /* ignore */
+            }
+          }
           gestures.setSpeaking(true, 0.7);
           speechPlayer.play();
           setTtsStatus(
-            `Step fixture · ${loaded.provider} · ${loaded.duration.toFixed(2)}s`,
+            `Step · ${loaded.syncMode || speechPlayer.syncMode} · ${loaded.duration.toFixed(2)}s`,
             'ok',
           );
         } catch (err) {
@@ -1397,10 +1467,32 @@
           moodBaseline: moodState.baseline,
           availableMorphs: availableMorphs(),
         });
-        if (!discCtl.scriptPending) {
+        if (discGapBar) {
+          discGapBar.style.width = `${Math.min(100, (discState.gapProgress || 0) * 100)}%`;
+        }
+        if (discState.autoReaction && !discState.autoReaction.blocked) {
+          const r = discState.autoReaction;
+          temporal.setEmotion(r.emotion, r.intensity, { stepOutBefore: false });
+          emotion = r.emotion;
+          intensity = r.intensity;
+          intensityEl.value = String(intensity);
+          intensityEl.dispatchEvent(new Event('input'));
+          document.querySelectorAll('#emoGrid button').forEach((x) => {
+            x.classList.toggle('active', x.dataset.emo === emotion);
+          });
+          document.getElementById('hudEmo').textContent = emotion;
+          discStatus.textContent = `auto[${discState.autoStimulus}]: ${r.emotion}`;
+        } else if (!discCtl.scriptPending) {
           discStatus.textContent = discState.canImprovise
-            ? `gap ${discState.gapSec.toFixed(1)}s · improv ready`
-            : `gap ${discState.gapSec.toFixed(1)}s · waiting`;
+            ? `gap ${discState.gapSec.toFixed(1)}s · improv ready · cool ${discState.improvCool?.toFixed?.(1) || 0}s`
+            : `gap ${discState.gapSec.toFixed(1)}/${discState.minGapSec?.toFixed?.(1) || '?'}s · waiting`;
+        }
+        if (discState.continuity?.residual) {
+          discContStatus.textContent = `residue ${discState.continuity.residual.emotion} ${discState.continuity.residual.intensity.toFixed(2)} · blend ${discState.continuity.blend.toFixed(2)} · leak ${discState.leakCount}`;
+        } else if (discState.previous) {
+          discContStatus.textContent = `prev ${discState.previous.emotion} @ ${discState.previous.intensity.toFixed(2)} · leak ${discState.leakCount}`;
+        } else {
+          discContStatus.textContent = `continuity empty · leak ${discState.leakCount || 0}`;
         }
         moodStatus.textContent = moodState.transitioning
           ? `${moodState.state}→${moodState.targetState} · base ${moodState.baseline.toFixed(2)}`

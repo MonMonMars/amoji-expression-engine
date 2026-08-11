@@ -356,4 +356,5 @@ export {
   estimatePhonemesFromText,
 } from './tts/estimatePhonemes.js';
 export { SpeechPlayer, frameAtTime } from './tts/speechPlayer.js';
+export { synthesizeTimingToneWav, timingToneObjectUrl } from './tts/demoAudio.js';
 export { mouthChannelsToMorphWeights } from './tts/mouthMorphs.js';
