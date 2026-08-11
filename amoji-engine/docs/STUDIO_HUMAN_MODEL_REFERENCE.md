@@ -272,6 +272,9 @@ Amoji engine (ND “systemic emotion”)
 149. ~~**Toast hash saved views** (`toastInHashOnly` · `#flv=` + saved views)~~ ✓
 150. ~~**Cancel on TTS preset change** (`tts_preset_pick`)~~ ✓
 151. ~~**Cancel compound on disc auto-improv** (`auto_improv_pick` · toggle + auto reaction)~~ ✓
+152. ~~**Toast hash view export filter** (`exportToastHash` · Export toast hash views)~~ ✓
+153. ~~**Cancel on disc stimulus change** (`stimulus_pick`)~~ ✓
+154. ~~**Cancel on script hold release** (`script_hold_release_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

@@ -166,7 +166,7 @@ export function pruneUnstarredViews(views, opts = {}) {
 /**
  * Filter views by starred-only and/or folder.
  * @param {object[]} views
- * @param {{ starredOnly?: boolean, folder?: string|null }} [opts]
+ * @param {{ starredOnly?: boolean, folder?: string|null, toastInHashOnly?: boolean }} [opts]
  */
 export function filterAuditSavedViews(views, opts = {}) {
   const list = Array.isArray(views) ? views.slice() : [];
@@ -176,6 +176,7 @@ export function filterAuditSavedViews(views, opts = {}) {
       : null;
   const filtered = list.filter((v) => {
     if (opts.starredOnly && !v.starred) return false;
+    if (opts.toastInHashOnly && !v.toastInHashOnly) return false;
     if (folderFilter) {
       const vFolder = String(v.folder || '').trim() || 'Inbox';
       if (vFolder !== folderFilter) return false;
@@ -190,6 +191,7 @@ export function filterAuditSavedViews(views, opts = {}) {
       count: filtered.length,
       total: list.length,
       starredOnly: !!opts.starredOnly,
+      toastInHashOnly: !!opts.toastInHashOnly,
       folder: folderFilter,
     },
     {},
@@ -329,18 +331,20 @@ export function groupAuditViewsByFolder(views) {
 /**
  * Export saved views as a portable JSON document.
  * @param {object[]} views
- * @param {{ now?: number, starredOnly?: boolean, folder?: string|null }} [opts]
+ * @param {{ now?: number, starredOnly?: boolean, folder?: string|null, toastInHashOnly?: boolean }} [opts]
  */
 export function exportAuditSavedViewsJson(views, opts = {}) {
   let list = (Array.isArray(views) ? views : []).map((v) =>
     normalizeAuditSavedView(v),
   );
   const starredOnly = !!opts.starredOnly;
+  const toastInHashOnly = !!opts.toastInHashOnly;
   const folderFilter =
     opts.folder != null && String(opts.folder).trim() !== ''
       ? String(opts.folder).trim()
       : null;
   if (starredOnly) list = list.filter((v) => v.starred);
+  if (toastInHashOnly) list = list.filter((v) => v.toastInHashOnly);
   if (folderFilter) {
     list = list.filter((v) => {
       const vFolder = String(v.folder || '').trim() || 'Inbox';
@@ -353,6 +357,7 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
     exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
     count: list.length,
     starredOnly,
+    toastInHashOnly,
     folder: folderFilter,
     views: list,
   };
@@ -363,6 +368,7 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
       json: JSON.stringify(payload, null, 2),
       count: list.length,
       starredOnly,
+      toastInHashOnly,
       folder: folderFilter,
       total: Array.isArray(views) ? views.length : 0,
       payload,
@@ -1344,6 +1350,12 @@ export function createAuditSavedViews(opts = {}) {
         ...exportOpts,
         starredOnly: true,
         folder,
+      });
+    },
+    exportToastHash(exportOpts = {}) {
+      return exportAuditSavedViewsJson(views, {
+        ...exportOpts,
+        toastInHashOnly: true,
       });
     },
     importJson(raw, importOpts = {}) {

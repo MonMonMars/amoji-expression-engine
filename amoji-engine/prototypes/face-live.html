@@ -777,6 +777,7 @@
           <button type="button" id="btnPrefsAuditExportStarred">Export starred</button>
           <button type="button" id="btnPrefsAuditExportFolder">Export folder</button>
           <button type="button" id="btnPrefsAuditExportStarredFolder">Export starred folder</button>
+          <button type="button" id="btnPrefsAuditExportToastHashViews">Export toast hash views</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
             <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
             <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
@@ -1182,6 +1183,7 @@
           if (filterFolder && f.name !== filterFolder) continue;
           for (const v of f.views) {
             if (prefsAuditStarredOnly && !v.starred) continue;
+            if (prefsAuditToastHashOnly && !v.toastInHashOnly) continue;
             visible.push({ ...v, _folderLabel: f.name });
             const opt = document.createElement('option');
             opt.value = v.id;
@@ -1370,7 +1372,9 @@
           reason !== 'script_hold_pick' &&
           reason !== 'clear_pick' &&
           reason !== 'tts_preset_pick' &&
-          reason !== 'auto_improv_pick'
+          reason !== 'auto_improv_pick' &&
+          reason !== 'stimulus_pick' &&
+          reason !== 'script_hold_release_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2096,8 +2100,8 @@
         discStatus.textContent = `improv[${stimulus}]: ${r.note}`;
       });
       document.getElementById('btnScriptHold').addEventListener('click', (e) => {
-        cancelActiveCompoundLifecycle('script_hold_pick');
         const next = !discCtl.scriptPending;
+        cancelActiveCompoundLifecycle(next ? 'script_hold_pick' : 'script_hold_release_pick');
         discCtl.markScriptPending(next);
         e.currentTarget.classList.toggle('primary', next);
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
@@ -2128,6 +2132,7 @@
           : 'auto improv off';
       });
       discStimulus.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('stimulus_pick');
         if (discCtl.autoImprovise) {
           discCtl.setAutoImprovise(true, discStimulus.value || 'noise');
         }
@@ -3016,6 +3021,7 @@
         document.getElementById('prefsAuditToastHashOnly')?.addEventListener('change', (ev) => {
           prefsAuditToastHashOnly = !!ev.target.checked;
           refreshPrefsAuditUi();
+          refreshAuditSavedViewsUi();
         });
         document.getElementById('prefsAuditRange')?.addEventListener('change', (ev) => {
           prefsAuditRange = ev.target.value || 'all';
@@ -3441,6 +3447,20 @@
           prefsStatus.textContent = exported.count
             ? `prefs · exported ${exported.count} starred in ${folder}`
             : `prefs · no starred views in ${folder}`;
+        });
+        document.getElementById('btnPrefsAuditExportToastHashViews')?.addEventListener('click', () => {
+          const exported = auditSavedViews.exportToastHash();
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `amoji-prefs-audit-views-toast-hash.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsStatus.className = exported.count ? 'status ok' : 'status warn';
+          prefsStatus.textContent = exported.count
+            ? `prefs · exported ${exported.count} toast-hash views`
+            : 'prefs · no toast-hash saved views';
         });
         document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
           document.getElementById('prefsAuditImportViewsFile')?.click();
