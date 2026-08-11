@@ -72,6 +72,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+E` → copy ease curve SVG to clipboard
  * - `m` / `M` → flash body mix label on status
  * - `Shift+M` → copy body mix SVG to clipboard
+ * - `f` / `F` → flash factor bars label on status
+ * - `Shift+F` → copy factor bars SVG to clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -303,6 +305,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBodyMix' && ev.shiftKey) {
       return { ok: true, action: 'copyBodyMixCurve' };
+    }
+    if (entry.id === 'showFactorBars' && ev.shiftKey) {
+      return { ok: true, action: 'copyFactorBars' };
     }
     return { ok: true, action: entry.id };
   }

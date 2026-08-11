@@ -156,7 +156,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 143 | Extreme HUD mini body mix spark | Done |
 | Phase 144 | Extreme summary includes body mix | Done |
 | Phase 145 | Extreme HUD body spark click flashes mix | Done |
-| Phase 146+ | Further production polish… | Specced |
+| Phase 146 | Extreme factor bars helpers | Done |
+| Phase 147 | Extreme factor bars panel | Done |
+| Phase 148 | Extreme F hotkey flash factor bars | Done |
+| Phase 149 | Extreme Shift+F copy factor bars SVG | Done |
+| Phase 150+ | Further production polish… | Specced |
 
 ## Quick start
 

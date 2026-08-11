@@ -174,6 +174,152 @@ export function buildDisneyExtremeEaseSparkSvg(opts = {}) {
   return { svg, empty: false, sample };
 }
 
+/** Per-factor slider ceilings for Extreme factor-bar UI. */
+export const DISNEY_EXTREME_FACTOR_BAR_MAX = {
+  shape: 1.8,
+  body: 1.8,
+  eye: 2.2,
+  mouth: 2.2,
+};
+
+/**
+ * @param {number} n
+ * @param {number} min
+ * @param {number} max
+ */
+function clampDisneyExtremeFactor(n, min, max) {
+  const v = typeof n === 'number' && Number.isFinite(n) ? n : min;
+  return Math.max(min, Math.min(max, v));
+}
+
+/**
+ * Normalize Extreme × factors for bars / labels.
+ * @param {{
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   bodyOn?: boolean,
+ * }} [opts]
+ * @returns {{
+ *   shape: number,
+ *   body: number,
+ *   eye: number,
+ *   mouth: number,
+ *   bodyOn: boolean,
+ * }}
+ */
+export function normalizeDisneyExtremeFactors(opts = {}) {
+  const d = DISNEY_EXTREME_DEFAULTS;
+  const max = DISNEY_EXTREME_FACTOR_BAR_MAX;
+  return {
+    shape: clampDisneyExtremeFactor(
+      opts.shapeFactor ?? d.shapeFactor,
+      1,
+      max.shape,
+    ),
+    body: clampDisneyExtremeFactor(
+      opts.bodyFactor ?? d.bodyFactor,
+      1,
+      max.body,
+    ),
+    eye: clampDisneyExtremeFactor(opts.eyeFactor ?? d.eyeFactor, 1, max.eye),
+    mouth: clampDisneyExtremeFactor(
+      opts.mouthFactor ?? d.mouthFactor,
+      1,
+      max.mouth,
+    ),
+    bodyOn: !!opts.bodyOn,
+  };
+}
+
+/**
+ * Compact label for Extreme shape/body/eye/mouth × factors.
+ * @param {{
+ *   enabled?: boolean,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   bodyOn?: boolean,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeFactorBarsLabel(opts = {}) {
+  if (!opts.enabled) return 'factors · shape/body/eye/mouth (off)';
+  const f = normalizeDisneyExtremeFactors(opts);
+  const bodyBit = f.bodyOn
+    ? `body×${f.body.toFixed(2)}`
+    : 'body off';
+  return `shape×${f.shape.toFixed(2)} · ${bodyBit} · eye×${f.eye.toFixed(2)} · mouth×${f.mouth.toFixed(2)}`;
+}
+
+/**
+ * Horizontal factor bars SVG (shape / body / eye / mouth).
+ * @param {{
+ *   enabled?: boolean,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   bodyOn?: boolean,
+ *   width?: number,
+ *   height?: number,
+ * }} [opts]
+ * @returns {{ svg: string, empty: boolean, factors: ReturnType<typeof normalizeDisneyExtremeFactors> }}
+ */
+export function buildDisneyExtremeFactorBarsSvg(opts = {}) {
+  const width = opts.width ?? 160;
+  const height = opts.height ?? 44;
+  const factors = normalizeDisneyExtremeFactors(opts);
+  const max = DISNEY_EXTREME_FACTOR_BAR_MAX;
+  const padX = 28;
+  const padY = 3;
+  const rowH = (height - padY * 2) / 4;
+  const barMaxW = width - padX - 4;
+  const rows = [
+    {
+      id: 'shape',
+      label: 'S',
+      value: factors.shape,
+      max: max.shape,
+      fill: '#7ec8ff',
+    },
+    {
+      id: 'body',
+      label: 'B',
+      value: opts.enabled && factors.bodyOn ? factors.body : 1,
+      max: max.body,
+      fill: opts.enabled && factors.bodyOn ? '#9ddea6' : 'rgba(157,222,166,0.35)',
+    },
+    {
+      id: 'eye',
+      label: 'E',
+      value: factors.eye,
+      max: max.eye,
+      fill: '#c4a1ff',
+    },
+    {
+      id: 'mouth',
+      label: 'M',
+      value: factors.mouth,
+      max: max.mouth,
+      fill: '#ffb454',
+    },
+  ];
+  const muted = !opts.enabled;
+  const parts = rows.map((row, i) => {
+    const y = padY + i * rowH + rowH * 0.2;
+    const h = rowH * 0.6;
+    const t = Math.max(0, Math.min(1, (row.value - 1) / Math.max(1e-6, row.max - 1)));
+    const w = muted ? barMaxW * 0.08 : barMaxW * t;
+    const fill = muted ? 'rgba(255,255,255,0.18)' : row.fill;
+    return `<text x="2" y="${(y + h * 0.85).toFixed(1)}" fill="rgba(255,255,255,0.55)" font-size="8" font-family="ui-monospace,monospace">${row.label}</text><rect x="${padX}" y="${y.toFixed(1)}" width="${barMaxW.toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="rgba(255,255,255,0.06)"/><rect x="${padX}" y="${y.toFixed(1)}" width="${Math.max(1.5, w).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${fill}"/>`;
+  });
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Disney Extreme factor bars"><rect width="100%" height="100%" fill="transparent"/>${parts.join('')}</svg>`;
+  return { svg, empty: false, factors };
+}
+
 /**
  * Pick / blend hand-tuned tier recipes for a continuous intensity.
  * @param {string} emotion
@@ -403,6 +549,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyEaseCurve', help: 'Shift+E copy ease', kind: 'note' },
   { id: 'showBodyMix', keys: ['m', 'M'], help: 'M mix', kind: 'action' },
   { id: 'copyBodyMixCurve', help: 'Shift+M copy mix', kind: 'note' },
+  { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
+  { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
