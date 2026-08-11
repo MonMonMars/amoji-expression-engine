@@ -34,11 +34,14 @@ export { performSpeech } from './layers/performSpeech.js';
 export {
   EMOTIONS,
   HI_RECIPES,
+  SCULPT_RECIPES,
   INTENSITY_TIERS,
   emotionToMorphWeights,
   intensityTierWeights,
+  recipeForIntensity,
   easeEmotionIntensity,
   applyMorphWeights,
+  mergeMorphOverlays,
   normalizeMorphName,
 } from './layers/emotionMorphs.js';
 export {
@@ -46,6 +49,22 @@ export {
   saccadeOffset,
   mergeEyeWeights,
 } from './layers/eyeLook.js';
+export {
+  TemporalLayer,
+  stepOutCurve,
+  blinkEnvelope,
+  blinkIntervalSec,
+  planMicroLeak,
+  evaluateMicroLeak,
+  BLINK_RATE,
+  STEP_OUT_DURATION,
+} from './layers/temporalLayer.js';
+export {
+  TEX_LODS,
+  texturePackUrls,
+  classifyMaterial,
+  applyTexturePack,
+} from './layers/textureLod.js';
 export {
   ARKIT_CHANNELS,
   ARKIT_MAPPING,
@@ -56,8 +75,9 @@ export {
   arkitNonZero,
 } from './export/arkitExporter.js';
 export {
-  TEX_LODS,
-  texturePackUrls,
-  classifyMaterial,
-  applyTexturePack,
-} from './layers/textureLod.js';
+  LIVELINK_PROTOCOL,
+  buildLiveLinkFrame,
+  morphsToLiveLinkFrame,
+  encodeLiveLinkLine,
+  LiveLinkPublisher,
+} from './export/liveLinkFace.js';

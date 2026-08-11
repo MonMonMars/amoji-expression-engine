@@ -17,72 +17,20 @@ ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "AmojiSakura_realistic_hyper.blend"
 OUT = ROOT / "lod"
 MAP_OUT = ROOT / "emotion_morph_map.json"
+# ROOT = .../jp-female-v0 → parents[2] = amoji-engine
+SCULPT_JSON = ROOT.parents[2] / "data" / "emotions" / "intensity-sculpt-recipes.json"
 
-# Combined emotion recipes → MB-Lab Expression_* weights (0..1)
+# Hand-tuned intensity sculpts (not linear scales of peak)
+with SCULPT_JSON.open() as f:
+    _SCULPT = json.load(f)
+
+EMOTION_TIER_RECIPES = _SCULPT["recipes"]
+INTENSITY_SCULPTS = tuple(
+    (tier, float(val)) for tier, val in _SCULPT["tiers"].items()
+)
+# Peak recipes kept for docs / legacy single-pose references
 EMOTION_RECIPES = {
-    "happy": {
-        "Expressions_mouthSmile_max": 0.85,
-        "Expressions_mouthSmileL_max": 0.55,
-        "Expressions_mouthSmileR_max": 0.55,
-        "Expressions_eyeSquintL_max": 0.35,
-        "Expressions_eyeSquintR_max": 0.35,
-        "Expressions_browsMidVert_min": 0.15,
-    },
-    "sad": {
-        "Expressions_mouthSmile_min": 0.55,
-        "Expressions_browsMidVert_max": 0.7,
-        "Expressions_browOutVertL_max": 0.35,
-        "Expressions_browOutVertR_max": 0.35,
-        "Expressions_eyeClosedL_max": 0.15,
-        "Expressions_eyeClosedR_max": 0.15,
-    },
-    "angry": {
-        "Expressions_browSqueezeL_max": 0.8,
-        "Expressions_browSqueezeR_max": 0.8,
-        "Expressions_browsMidVert_min": 0.55,
-        "Expressions_mouthOpenAggr_max": 0.35,
-        "Expressions_eyeSquintL_max": 0.4,
-        "Expressions_eyeSquintR_max": 0.4,
-        "Expressions_nostrilsExpansion_max": 0.45,
-    },
-    "surprised": {
-        "Expressions_mouthOpenLarge_max": 0.7,
-        "Expressions_browsMidVert_max": 0.85,
-        "Expressions_browOutVertL_max": 0.55,
-        "Expressions_browOutVertR_max": 0.55,
-        "Expressions_eyeClosedL_min": 0.5,
-        "Expressions_eyeClosedR_min": 0.5,
-    },
-    "fear": {
-        "Expressions_mouthOpen_max": 0.45,
-        "Expressions_browsMidVert_max": 0.6,
-        "Expressions_browSqueezeL_max": 0.35,
-        "Expressions_browSqueezeR_max": 0.35,
-        "Expressions_eyeClosedL_min": 0.4,
-        "Expressions_eyeClosedR_min": 0.4,
-        "Expressions_nostrilsExpansion_max": 0.3,
-    },
-    "disgust": {
-        "Expressions_cheekSneerL_max": 0.7,
-        "Expressions_cheekSneerR_max": 0.55,
-        "Expressions_nostrilsExpansion_max": 0.65,
-        "Expressions_mouthBite_max": 0.4,
-        "Expressions_browSqueezeL_max": 0.4,
-        "Expressions_browSqueezeR_max": 0.3,
-    },
-    "thinking": {
-        "Expressions_browOutVertL_max": 0.45,
-        "Expressions_browSqueezeR_max": 0.35,
-        "Expressions_mouthClosed_max": 0.4,
-        "Expressions_eyesHoriz_max": 0.25,
-    },
-    "smile_open": {
-        "Expressions_mouthSmileOpen_max": 0.85,
-        "Expressions_mouthSmileL_max": 0.5,
-        "Expressions_mouthSmileR_max": 0.5,
-        "Expressions_eyeSquintL_max": 0.45,
-        "Expressions_eyeSquintR_max": 0.45,
-    },
+    emo: tiers.get("peak", {}) for emo, tiers in EMOTION_TIER_RECIPES.items()
 }
 
 
@@ -122,40 +70,31 @@ def set_recipe(obj, recipe, intensity=1.0):
     bpy.context.view_layer.update()
 
 
-# ND-style intensity sculpts: subtle / medium / peak (plus legacy EMO_* = peak)
-INTENSITY_SCULPTS = (
-    ("subtle", 0.33),
-    ("medium", 0.66),
-    ("peak", 1.0),
-)
-
-
 def bake_emotion_shapekeys(obj):
-    """Create EMO_* shapekeys from recipes (combined poses + intensity tiers)."""
-    # Ensure basis exists
+    """Create EMO_* shapekeys from hand-tuned tier recipes."""
     if not obj.data.shape_keys:
         obj.shape_key_add(name="Basis", from_mix=False)
     reset_keys(obj)
     bpy.context.view_layer.update()
 
-    # Remove prior EMO_ keys
     sk = obj.data.shape_keys
     to_remove = [kb for kb in sk.key_blocks if kb.name.startswith("EMO_")]
     for kb in to_remove:
         obj.shape_key_remove(kb)
 
-    for emo, recipe in EMOTION_RECIPES.items():
-        for tier, intensity in INTENSITY_SCULPTS:
-            set_recipe(obj, recipe, intensity)
+    for emo, tiers in EMOTION_TIER_RECIPES.items():
+        for tier, _intensity_mark in INTENSITY_SCULPTS:
+            recipe = tiers.get(tier) or tiers.get("peak") or {}
+            set_recipe(obj, recipe, 1.0)  # recipe already encodes intensity pose
             name = f"EMO_{emo}_{tier}"
             kb = obj.shape_key_add(name=name, from_mix=True)
             kb.value = 0.0
-            print("baked", kb.name)
-        # Legacy alias = peak (Face Live / older callers)
-        set_recipe(obj, recipe, 1.0)
+            print("baked", kb.name, flush=True)
+        # Legacy alias = peak
+        set_recipe(obj, tiers.get("peak") or {}, 1.0)
         kb = obj.shape_key_add(name=f"EMO_{emo}", from_mix=True)
         kb.value = 0.0
-        print("baked", kb.name, "(legacy=peak)")
+        print("baked", kb.name, "(legacy=peak)", flush=True)
     reset_keys(obj)
 
 
@@ -411,6 +350,8 @@ def main():
             "morphs": [kb.name for kb in lo.data.shape_keys.key_blocks] if lo.data.shape_keys else [],
         },
         "recipes": EMOTION_RECIPES,
+        "tierRecipes": EMOTION_TIER_RECIPES,
+        "sculptSource": "data/emotions/intensity-sculpt-recipes.json",
     }
     MAP_OUT.write_text(json.dumps(meta, indent=2))
     (OUT / "emotion_morph_map.json").write_text(json.dumps(meta, indent=2))

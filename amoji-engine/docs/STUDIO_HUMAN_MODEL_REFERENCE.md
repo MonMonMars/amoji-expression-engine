@@ -126,9 +126,11 @@ Amoji engine (ND “systemic emotion”)
 3. ~~**3 intensity sculpts per emotion** (subtle / medium / peak)~~ ✓
 4. ~~**ARKit 52 export map** from Expression_* / M1–M21~~ ✓
 5. ~~**Texture LOD packs** independent of mesh LOD (Capcom)~~ ✓
-6. Hand-tune intensity sculpts in Blender (replace linear recipe bake)
-7. Unreal Live Link consumer for ARKit vector
-8. Phase 3 timeline layer (blink / leak / Step-Out as engine rules)
+6. ~~**Hand-tune intensity sculpts** (non-linear per-tier recipes)~~ ✓
+7. ~~**Unreal Live Link consumer** for ARKit vector~~ ✓ (bridge + UE Python stub)
+8. ~~**Phase 3 timeline** (blink / leak / Step-Out)~~ ✓
+9. Cohen–Massaro coarticulation (continuous visemes)
+10. Persona idle variants / Layer I full breath ladder
 ---
 
 ## 7. What *not* to copy blindly

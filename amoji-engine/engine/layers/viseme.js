@@ -1,4 +1,4 @@
-import visemeData from '../../data/visemes/preston-blair-10.json';
+import visemeData from '../../data/visemes/preston-blair-10.json' with { type: 'json' };
 
 const VISEME_TABLE = visemeData.visemes;
 

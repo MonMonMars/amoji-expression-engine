@@ -38,7 +38,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 
 - Toggle **Mesh** Low / High poly
 - Toggle **Texture** 512 / 1K / 2K (does not reload mesh)
-- Emotion buttons + intensity slider (LO crossfades intensity sculpts; HI uses eased Expression recipes)
+- Emotion buttons + intensity slider (hand-tuned subtle/medium/peak sculpts)
+- **Phase 3:** Step-Out next · Force leak · Mood fear · emotion-modulated blink
+- **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
 - Idle sway / turntable / cycle emotions / blink
 - HUD: mesh LOD, tex LOD, triangle count, emotion, FPS
@@ -47,8 +49,10 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 ## Code
 
 - UI: `prototypes/face-live.html`
-- Mapping: `engine/layers/emotionMorphs.js`
+- Mapping: `engine/layers/emotionMorphs.js` + `data/emotions/intensity-sculpt-recipes.json`
+- Temporal: `engine/layers/temporalLayer.js`
 - Eyes: `engine/layers/eyeLook.js`
 - Textures: `engine/layers/textureLod.js`
-- ARKit: `data/arkit/arkit-mapping.json` + `engine/export/arkitExporter.js`
-- Studio method reference (Capcom / Square Enix / Naughty Dog): `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`
+- ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
+- Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
+- Studio method reference: `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`

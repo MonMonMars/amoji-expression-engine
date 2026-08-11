@@ -1,8 +1,9 @@
 /**
  * Map Amoji emotion ids → morph target weights for Sakura LO/HI GLBs.
- * HI prefers fine Expressions_* keys; falls back to EMO_* combined shapes.
- * LO uses intensity sculpts (subtle / medium / peak) when present.
+ * HI uses hand-tuned intensity sculpt recipes (subtle/medium/peak, not linear scales).
+ * LO crossfades baked EMO_*_{subtle,medium,peak} morphs.
  */
+import sculptData from '../../data/emotions/intensity-sculpt-recipes.json' with { type: 'json' };
 
 export const EMOTIONS = [
   'happy',
@@ -17,63 +18,16 @@ export const EMOTIONS = [
 ];
 
 /** Intensity sculpt tiers (ND-style pose density — baked in export_lod_emotions.py). */
-export const INTENSITY_TIERS = {
-  subtle: 0.33,
-  medium: 0.66,
-  peak: 1.0,
-};
+export const INTENSITY_TIERS = sculptData.tiers;
 
-/** Fine-grained recipes for HI mesh (MB-Lab Expression_* names as exported to glTF). */
-export const HI_RECIPES = {
-  happy: {
-    Expressions_mouthSmile_max: 0.85,
-    Expressions_mouthSmileL_max: 0.55,
-    Expressions_mouthSmileR_max: 0.55,
-    Expressions_eyeSquintL_max: 0.35,
-    Expressions_eyeSquintR_max: 0.35,
-  },
-  sad: {
-    Expressions_mouthSmile_min: 0.55,
-    Expressions_browsMidVert_max: 0.7,
-    Expressions_browOutVertL_max: 0.35,
-    Expressions_browOutVertR_max: 0.35,
-  },
-  angry: {
-    Expressions_browSqueezeL_max: 0.8,
-    Expressions_browSqueezeR_max: 0.8,
-    Expressions_mouthOpenAggr_max: 0.35,
-    Expressions_eyeSquintL_max: 0.4,
-    Expressions_eyeSquintR_max: 0.4,
-  },
-  surprised: {
-    Expressions_mouthOpenLarge_max: 0.7,
-    Expressions_browsMidVert_max: 0.85,
-    Expressions_browOutVertL_max: 0.55,
-    Expressions_browOutVertR_max: 0.55,
-  },
-  fear: {
-    Expressions_mouthOpen_max: 0.45,
-    Expressions_browsMidVert_max: 0.6,
-    Expressions_eyeClosedL_min: 0.35,
-    Expressions_eyeClosedR_min: 0.35,
-  },
-  disgust: {
-    Expressions_cheekSneerL_max: 0.7,
-    Expressions_cheekSneerR_max: 0.55,
-    Expressions_nostrilsExpansion_max: 0.65,
-  },
-  thinking: {
-    Expressions_browOutVertL_max: 0.45,
-    Expressions_browSqueezeR_max: 0.35,
-    Expressions_mouthClosed_max: 0.4,
-  },
-  smile_open: {
-    Expressions_mouthSmileOpen_max: 0.85,
-    Expressions_eyeSquintL_max: 0.45,
-    Expressions_eyeSquintR_max: 0.45,
-  },
-  neutral: {},
-};
+/** Hand-tuned per-tier Expression_* recipes */
+export const SCULPT_RECIPES = sculptData.recipes;
+
+/** Peak recipes (compat alias for Face Live / temporal leak). */
+export const HI_RECIPES = Object.fromEntries(
+  Object.entries(SCULPT_RECIPES).map(([emo, tiers]) => [emo, tiers.peak || {}]),
+);
+HI_RECIPES.neutral = {};
 
 /**
  * Normalize glTF morph name variants (spaces / dots).
@@ -90,7 +44,6 @@ export function normalizeMorphName(name) {
 export function easeEmotionIntensity(t) {
   const x = Math.max(0, Math.min(1.25, t));
   if (x <= 1) {
-    // smoothstep then slight lift toward 1
     const s = x * x * (3 - 2 * x);
     return s;
   }
@@ -98,11 +51,58 @@ export function easeEmotionIntensity(t) {
 }
 
 /**
+ * Pick / blend hand-tuned tier recipes for a continuous intensity.
+ * @param {string} emotion
+ * @param {number} intensity 0..1.25
+ * @returns {Record<string, number>}
+ */
+export function recipeForIntensity(emotion, intensity) {
+  const tiers = SCULPT_RECIPES[emotion];
+  if (!tiers) return {};
+  const t = Math.max(0, Math.min(1.25, intensity));
+  if (t <= 0.001) return {};
+
+  const a = INTENSITY_TIERS.subtle;
+  const b = INTENSITY_TIERS.medium;
+  const c = INTENSITY_TIERS.peak;
+
+  /** @param {Record<string, number>} r @param {number} w */
+  const scale = (r, w) => {
+    /** @type {Record<string, number>} */
+    const out = {};
+    for (const [k, v] of Object.entries(r || {})) out[k] = v * w;
+    return out;
+  };
+
+  /** @param {Record<string, number>} A @param {Record<string, number>} B */
+  const merge = (A, B) => {
+    /** @type {Record<string, number>} */
+    const out = { ...A };
+    for (const [k, v] of Object.entries(B)) out[k] = (out[k] || 0) + v;
+    return out;
+  };
+
+  if (t <= a) {
+    return scale(tiers.subtle, t / a);
+  }
+  if (t <= b) {
+    const u = (t - a) / (b - a);
+    return merge(scale(tiers.subtle, 1 - u), scale(tiers.medium, u));
+  }
+  if (t <= c) {
+    const u = (t - b) / (c - b);
+    return merge(scale(tiers.medium, 1 - u), scale(tiers.peak, u));
+  }
+  // overdrive: peak + slight lift
+  return scale(tiers.peak, 1 + (t - 1) * 0.2);
+}
+
+/**
  * Crossfade weights across subtle / medium / peak sculpt morphs.
  * @param {string} emotion
  * @param {number} intensity 0..1.25
  * @param {Set<string>} available
- * @returns {Record<string, number> | null} null if no tier morphs present
+ * @returns {Record<string, number> | null}
  */
 export function intensityTierWeights(emotion, intensity, available) {
   const subtle = `EMO_${emotion}_subtle`;
@@ -121,7 +121,6 @@ export function intensityTierWeights(emotion, intensity, available) {
   const t = Math.max(0, Math.min(1.25, intensity));
   /** @type {Record<string, number>} */
   const weights = {};
-
   if (t <= 0.001) return weights;
 
   const a = INTENSITY_TIERS.subtle;
@@ -139,12 +138,10 @@ export function intensityTierWeights(emotion, intensity, available) {
     weights[medium] = 1 - u;
     weights[peak] = u;
   } else {
-    // overdrive: hold peak + residual on legacy if present
     weights[peak] = 1;
     if (available.has(legacy)) weights[legacy] = Math.min(0.35, t - 1);
   }
 
-  // Prefer peak alias if peak key missing but legacy exists
   if (weights[peak] && !available.has(peak) && available.has(legacy)) {
     weights[legacy] = (weights[legacy] || 0) + weights[peak];
     delete weights[peak];
@@ -165,25 +162,22 @@ export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) 
   /** @type {Record<string, number>} */
   const weights = {};
   const available = new Set(availableMorphs);
-
   const has = (n) => available.has(n);
 
   if (emotion === 'neutral' || t <= 0.001) {
     return weights;
   }
 
-  // LO: intensity sculpts (subtle/medium/peak) or legacy EMO_
   if (lod === 'lo') {
     const tier = intensityTierWeights(emotion, t, available);
     if (tier) return tier;
     return weights;
   }
 
-  // HI: prefer fine Expression_* keys with non-linear intensity
-  const eased = easeEmotionIntensity(t);
-  const recipe = HI_RECIPES[emotion] || {};
+  // HI: hand-tuned Expression_* blend across sculpt tiers
+  const recipe = recipeForIntensity(emotion, t);
   for (const [k, v] of Object.entries(recipe)) {
-    if (has(k)) weights[k] = Math.min(1, v * eased);
+    if (has(k)) weights[k] = Math.min(1, v);
   }
   if (Object.keys(weights).length === 0) {
     const tier = intensityTierWeights(emotion, t, available);
@@ -202,7 +196,6 @@ export function applyMorphWeights(mesh, targetWeights, lerpAlpha = 0.25) {
   if (!mesh.morphTargetDictionary || !mesh.morphTargetInfluences) return;
   const dict = mesh.morphTargetDictionary;
   const infl = mesh.morphTargetInfluences;
-  // decay unused
   for (let i = 0; i < infl.length; i++) {
     infl[i] += (0 - infl[i]) * lerpAlpha;
   }
@@ -211,4 +204,16 @@ export function applyMorphWeights(mesh, targetWeights, lerpAlpha = 0.25) {
     if (idx === undefined) continue;
     infl[idx] += (w - infl[idx]) * lerpAlpha;
   }
+}
+
+/**
+ * Merge residual Step-Out + leak overlays into emotion targets (max).
+ * @param {Record<string, number>} base
+ * @param {Record<string, number>} overlay
+ */
+export function mergeMorphOverlays(base, overlay) {
+  for (const [k, v] of Object.entries(overlay || {})) {
+    base[k] = Math.max(base[k] || 0, v);
+  }
+  return base;
 }

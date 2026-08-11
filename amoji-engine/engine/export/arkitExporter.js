@@ -1,7 +1,7 @@
 /**
  * Map Amoji Expression_* morph weights and/or M1–M21 activations → ARKit 52.
  */
-import mappingData from '../../data/arkit/arkit-mapping.json';
+import mappingData from '../../data/arkit/arkit-mapping.json' with { type: 'json' };
 
 export const ARKIT_CHANNELS = mappingData.channels;
 export const ARKIT_MAPPING = mappingData;

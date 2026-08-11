@@ -88,10 +88,12 @@ On UE 5.8: enable built-in **Unreal MCP** plugin → Project Settings → MCP �
 
 ## Suggested realtime test loop (desktop)
 
-1. Drive Amoji Phase 2 mouth override → export ARKit 52 weights (JSON per frame)  
-2. UE Control Rig / MetaHuman ARKit mapper consumes weights  
+1. `npm run livelink` + Face Live **Live Link pub** (or POST `/publish`)  
+2. UE: run `unreal/AmojiLiveLinkConsumer.py` against actor `AmojiSakura`  
 3. PIE: play “mama papa” + Happy t=1.0 — verify MBP jaw lock visually  
 4. Compare stylized vs realistic side-by-side for uncanny check  
+
+See **`UNREAL_LIVELINK.md`** for the ARKit frame protocol.
 
 ---
 

@@ -218,6 +218,19 @@
       </div>
 
       <div class="group">
+        <div class="label">Phase 3 timeline</div>
+        <div class="row">
+          <button type="button" id="btnStepOut">Step-Out next</button>
+          <button type="button" id="btnLeak">Force leak</button>
+        </div>
+        <div class="row">
+          <button type="button" id="btnMoodFear">Mood: fear</button>
+          <button type="button" id="btnLiveLink">Live Link pub</button>
+        </div>
+        <div class="status" id="temporalStatus">step-out off · livelink off</div>
+      </div>
+
+      <div class="group">
         <div class="label">Motion test</div>
         <div class="row">
           <button type="button" id="btnIdle" class="primary">Idle sway</button>
@@ -255,8 +268,10 @@
       import {
         EMOTIONS,
         INTENSITY_TIERS,
+        HI_RECIPES,
         emotionToMorphWeights,
         applyMorphWeights,
+        mergeMorphOverlays,
       } from '/engine/layers/emotionMorphs.js';
       import {
         lookToEyeMorphWeights,
@@ -271,12 +286,19 @@
         texturePackUrls,
         applyTexturePack,
       } from '/engine/layers/textureLod.js';
+      import {
+        TemporalLayer,
+      } from '/engine/layers/temporalLayer.js';
+      import {
+        morphsToLiveLinkFrame,
+      } from '/engine/export/liveLinkFace.js';
 
       const ASSETS = {
         lo: '/assets/characters/jp-female-v0/lod/sakura_lo.glb',
         hi: '/assets/characters/jp-female-v0/lod/sakura_hi.glb',
       };
       const TEX_BASE = '/assets/characters/jp-female-v0';
+      const LIVELINK_HTTP = 'http://127.0.0.1:7879/publish';
 
       const viewport = document.getElementById('viewport');
       const loadStatus = document.getElementById('loadStatus');
@@ -303,6 +325,16 @@
       let cycleOn = false;
       let blinkT = 0;
       let cycleT = 0;
+      let stepOutNext = false;
+      let liveLinkOn = false;
+      const temporal = new TemporalLayer({ recipes: HI_RECIPES });
+      temporal.setEmotion(emotion, intensity);
+      const temporalStatus = document.getElementById('temporalStatus');
+
+      function refreshTemporalStatus() {
+        temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
+      }
+      refreshTemporalStatus();
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0c1116);
@@ -508,6 +540,10 @@
         if (e === emotion) b.classList.add('active');
         b.addEventListener('click', () => {
           emotion = e;
+          temporal.setEmotion(emotion, intensity, { stepOutBefore: stepOutNext });
+          stepOutNext = false;
+          document.getElementById('btnStepOut').classList.remove('primary');
+          refreshTemporalStatus();
           document.querySelectorAll('#emoGrid button').forEach((x) => {
             x.classList.toggle('active', x.dataset.emo === emotion);
           });
@@ -546,6 +582,7 @@
         intensityVal.textContent = intensity.toFixed(2);
         intensityMeter.style.width = `${Math.min(100, (intensity / 1.25) * 100)}%`;
         tierHint.textContent = tierLabel(intensity);
+        temporal.intensity = intensity;
       });
       intensityEl.dispatchEvent(new Event('input'));
 
@@ -591,7 +628,34 @@
         cycleOn = !cycleOn;
         e.currentTarget.classList.toggle('primary', cycleOn);
       });
-      document.getElementById('btnBlink').addEventListener('click', forceBlink);
+      document.getElementById('btnBlink').addEventListener('click', () => {
+        temporal.forceBlink();
+        forceBlink();
+      });
+
+      document.getElementById('btnStepOut').addEventListener('click', (e) => {
+        stepOutNext = !stepOutNext;
+        e.currentTarget.classList.toggle('primary', stepOutNext);
+        refreshTemporalStatus();
+      });
+      document.getElementById('btnLeak').addEventListener('click', () => {
+        temporal.forceLeak(temporal.moodEmotion || 'fear');
+      });
+      document.getElementById('btnMoodFear').addEventListener('click', (e) => {
+        if (temporal.moodEmotion === 'fear') {
+          temporal.setMood(null, 0);
+          e.currentTarget.classList.remove('primary');
+        } else {
+          temporal.setMood('fear', 0.65);
+          e.currentTarget.classList.add('primary');
+        }
+        refreshTemporalStatus();
+      });
+      document.getElementById('btnLiveLink').addEventListener('click', (e) => {
+        liveLinkOn = !liveLinkOn;
+        e.currentTarget.classList.toggle('primary', liveLinkOn);
+        refreshTemporalStatus();
+      });
 
       function tick() {
         const dt = clock.getDelta();
@@ -610,6 +674,10 @@
             const list = EMOTIONS.filter((e) => e !== 'neutral');
             const idx = list.indexOf(emotion);
             emotion = list[(idx + 1) % list.length];
+            temporal.setEmotion(emotion, intensity, { stepOutBefore: stepOutNext });
+            stepOutNext = false;
+            document.getElementById('btnStepOut').classList.remove('primary');
+            refreshTemporalStatus();
             document.querySelectorAll('#emoGrid button').forEach((x) => {
               x.classList.toggle('active', x.dataset.emo === emotion);
             });
@@ -622,15 +690,30 @@
         if (idleOn && model && !mixer) {
           const t = clock.elapsedTime;
           model.rotation.y = Math.sin(t * 0.7) * 0.15;
+          // light breath proxy (Layer I lite)
           model.position.y = Math.sin(t * 1.4) * 0.01;
+          model.scale.setScalar(1 + Math.sin(t * 0.35) * 0.002);
         }
         if (mixer) mixer.update(dt);
 
-        if (blinkT > 0) blinkT = Math.max(0, blinkT - dt);
-        else if (Math.random() < dt * 0.25) blinkT = 0.14;
-
-        const targets = currentTargets();
+        const temporalState = temporal.tick(dt);
         const morphs = availableMorphs();
+        const targets = emotionToMorphWeights(
+          lod,
+          temporalState.displayEmotion,
+          temporalState.displayIntensity,
+          morphs,
+        );
+        if (temporalState.residualEmotion && temporalState.residualIntensity > 0.02) {
+          const residual = emotionToMorphWeights(
+            lod,
+            temporalState.residualEmotion,
+            temporalState.residualIntensity,
+            morphs,
+          );
+          mergeMorphOverlays(targets, residual);
+        }
+        mergeMorphOverlays(targets, temporalState.leakWeights);
 
         // Eye look-at (HI Expression_*). Track camera ≈ head-relative aim.
         if (lod === 'hi') {
@@ -659,8 +742,12 @@
           mergeEyeWeights(targets, lookToEyeMorphWeights(lx, ly, morphs));
         }
 
-        if (blinkT > 0) {
-          const w = Math.sin((1 - blinkT / 0.18) * Math.PI);
+        if (temporalState.blink > 0.01 || blinkT > 0) {
+          const w =
+            temporalState.blink > 0.01
+              ? temporalState.blink
+              : Math.sin((1 - blinkT / 0.18) * Math.PI);
+          if (blinkT > 0) blinkT = Math.max(0, blinkT - dt);
           for (const name of [
             'Expressions_eyeClosedL_max',
             'Expressions_eyeClosedR_max',
@@ -687,6 +774,15 @@
           .slice(0, 12)
           .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
         arkitDebug.textContent = arkitLines.length ? arkitLines.join('\n') : '(all zero)';
+
+        if (liveLinkOn && frames % 2 === 0) {
+          const frame = morphsToLiveLinkFrame(targets);
+          fetch(LIVELINK_HTTP, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(frame),
+          }).catch(() => {});
+        }
 
         controls.update();
         renderer.render(scene, camera);

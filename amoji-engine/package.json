@@ -7,7 +7,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lab": "npx --yes serve prototypes -p 5173",
-    "face-live": "npx --yes serve . -p 5174"
+    "face-live": "npx --yes serve . -p 5174",
+    "livelink": "node prototypes/livelink-bridge.mjs"
   },
   "keywords": [
     "amoji",
@@ -22,6 +23,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "three": "^0.178.0"
+    "three": "^0.178.0",
+    "ws": "^8.18.3"
   }
 }

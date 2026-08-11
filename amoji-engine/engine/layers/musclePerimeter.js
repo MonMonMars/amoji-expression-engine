@@ -1,4 +1,4 @@
-import perimeterData from '../../data/muscles/emotion-perimeter-table.json';
+import perimeterData from '../../data/muscles/emotion-perimeter-table.json' with { type: 'json' };
 
 const { table: MUSCLE_PERIMETER_TABLE, emotions: PERIMETER_EMOTIONS } = perimeterData;
 

@@ -238,5 +238,200 @@
       "Expressions_eyeSquintL_max": 0.45,
       "Expressions_eyeSquintR_max": 0.45
     }
-  }
+  },
+  "tierRecipes": {
+    "happy": {
+      "subtle": {
+        "Expressions_eyeSquintL_max": 0.28,
+        "Expressions_eyeSquintR_max": 0.22,
+        "Expressions_mouthSmileL_max": 0.18,
+        "Expressions_mouthSmileR_max": 0.12,
+        "Expressions_browsMidVert_min": 0.08
+      },
+      "medium": {
+        "Expressions_mouthSmile_max": 0.55,
+        "Expressions_mouthSmileL_max": 0.4,
+        "Expressions_mouthSmileR_max": 0.35,
+        "Expressions_eyeSquintL_max": 0.32,
+        "Expressions_eyeSquintR_max": 0.3,
+        "Expressions_browsMidVert_min": 0.12
+      },
+      "peak": {
+        "Expressions_mouthSmile_max": 0.85,
+        "Expressions_mouthSmileL_max": 0.55,
+        "Expressions_mouthSmileR_max": 0.55,
+        "Expressions_eyeSquintL_max": 0.35,
+        "Expressions_eyeSquintR_max": 0.35,
+        "Expressions_browsMidVert_min": 0.15
+      }
+    },
+    "sad": {
+      "subtle": {
+        "Expressions_browsMidVert_max": 0.35,
+        "Expressions_browOutVertL_max": 0.2,
+        "Expressions_browOutVertR_max": 0.15,
+        "Expressions_mouthSmile_min": 0.12
+      },
+      "medium": {
+        "Expressions_mouthSmile_min": 0.4,
+        "Expressions_browsMidVert_max": 0.55,
+        "Expressions_browOutVertL_max": 0.3,
+        "Expressions_browOutVertR_max": 0.28,
+        "Expressions_eyeClosedL_max": 0.1,
+        "Expressions_eyeClosedR_max": 0.08
+      },
+      "peak": {
+        "Expressions_mouthSmile_min": 0.55,
+        "Expressions_browsMidVert_max": 0.7,
+        "Expressions_browOutVertL_max": 0.35,
+        "Expressions_browOutVertR_max": 0.35,
+        "Expressions_eyeClosedL_max": 0.15,
+        "Expressions_eyeClosedR_max": 0.15
+      }
+    },
+    "angry": {
+      "subtle": {
+        "Expressions_browSqueezeL_max": 0.4,
+        "Expressions_browSqueezeR_max": 0.35,
+        "Expressions_browsMidVert_min": 0.2,
+        "Expressions_eyeSquintL_max": 0.15
+      },
+      "medium": {
+        "Expressions_browSqueezeL_max": 0.65,
+        "Expressions_browSqueezeR_max": 0.6,
+        "Expressions_browsMidVert_min": 0.4,
+        "Expressions_eyeSquintL_max": 0.3,
+        "Expressions_eyeSquintR_max": 0.28,
+        "Expressions_nostrilsExpansion_max": 0.25,
+        "Expressions_mouthOpenAggr_max": 0.15
+      },
+      "peak": {
+        "Expressions_browSqueezeL_max": 0.8,
+        "Expressions_browSqueezeR_max": 0.8,
+        "Expressions_browsMidVert_min": 0.55,
+        "Expressions_mouthOpenAggr_max": 0.35,
+        "Expressions_eyeSquintL_max": 0.4,
+        "Expressions_eyeSquintR_max": 0.4,
+        "Expressions_nostrilsExpansion_max": 0.45
+      }
+    },
+    "surprised": {
+      "subtle": {
+        "Expressions_browsMidVert_max": 0.45,
+        "Expressions_browOutVertL_max": 0.25,
+        "Expressions_browOutVertR_max": 0.25,
+        "Expressions_eyeClosedL_min": 0.2,
+        "Expressions_eyeClosedR_min": 0.2,
+        "Expressions_mouthOpenHalf_max": 0.25
+      },
+      "medium": {
+        "Expressions_mouthOpenLarge_max": 0.4,
+        "Expressions_browsMidVert_max": 0.7,
+        "Expressions_browOutVertL_max": 0.45,
+        "Expressions_browOutVertR_max": 0.45,
+        "Expressions_eyeClosedL_min": 0.4,
+        "Expressions_eyeClosedR_min": 0.4
+      },
+      "peak": {
+        "Expressions_mouthOpenLarge_max": 0.7,
+        "Expressions_browsMidVert_max": 0.85,
+        "Expressions_browOutVertL_max": 0.55,
+        "Expressions_browOutVertR_max": 0.55,
+        "Expressions_eyeClosedL_min": 0.5,
+        "Expressions_eyeClosedR_min": 0.5
+      }
+    },
+    "fear": {
+      "subtle": {
+        "Expressions_browsMidVert_max": 0.3,
+        "Expressions_browSqueezeL_max": 0.15,
+        "Expressions_eyeClosedL_min": 0.2,
+        "Expressions_eyeClosedR_min": 0.18,
+        "Expressions_nostrilsExpansion_max": 0.12
+      },
+      "medium": {
+        "Expressions_mouthOpen_max": 0.28,
+        "Expressions_browsMidVert_max": 0.5,
+        "Expressions_browSqueezeL_max": 0.28,
+        "Expressions_browSqueezeR_max": 0.25,
+        "Expressions_eyeClosedL_min": 0.32,
+        "Expressions_eyeClosedR_min": 0.3,
+        "Expressions_nostrilsExpansion_max": 0.22
+      },
+      "peak": {
+        "Expressions_mouthOpen_max": 0.45,
+        "Expressions_browsMidVert_max": 0.6,
+        "Expressions_browSqueezeL_max": 0.35,
+        "Expressions_browSqueezeR_max": 0.35,
+        "Expressions_eyeClosedL_min": 0.4,
+        "Expressions_eyeClosedR_min": 0.4,
+        "Expressions_nostrilsExpansion_max": 0.3
+      }
+    },
+    "disgust": {
+      "subtle": {
+        "Expressions_nostrilsExpansion_max": 0.3,
+        "Expressions_cheekSneerL_max": 0.25,
+        "Expressions_browSqueezeL_max": 0.15
+      },
+      "medium": {
+        "Expressions_cheekSneerL_max": 0.5,
+        "Expressions_cheekSneerR_max": 0.35,
+        "Expressions_nostrilsExpansion_max": 0.5,
+        "Expressions_mouthBite_max": 0.22,
+        "Expressions_browSqueezeL_max": 0.3,
+        "Expressions_browSqueezeR_max": 0.2
+      },
+      "peak": {
+        "Expressions_cheekSneerL_max": 0.7,
+        "Expressions_cheekSneerR_max": 0.55,
+        "Expressions_nostrilsExpansion_max": 0.65,
+        "Expressions_mouthBite_max": 0.4,
+        "Expressions_browSqueezeL_max": 0.4,
+        "Expressions_browSqueezeR_max": 0.3
+      }
+    },
+    "thinking": {
+      "subtle": {
+        "Expressions_browOutVertL_max": 0.25,
+        "Expressions_eyesHoriz_max": 0.15,
+        "Expressions_mouthClosed_max": 0.15
+      },
+      "medium": {
+        "Expressions_browOutVertL_max": 0.4,
+        "Expressions_browSqueezeR_max": 0.28,
+        "Expressions_mouthClosed_max": 0.3,
+        "Expressions_eyesHoriz_max": 0.22
+      },
+      "peak": {
+        "Expressions_browOutVertL_max": 0.45,
+        "Expressions_browSqueezeR_max": 0.35,
+        "Expressions_mouthClosed_max": 0.4,
+        "Expressions_eyesHoriz_max": 0.25
+      }
+    },
+    "smile_open": {
+      "subtle": {
+        "Expressions_mouthSmile_max": 0.35,
+        "Expressions_eyeSquintL_max": 0.2,
+        "Expressions_eyeSquintR_max": 0.18,
+        "Expressions_mouthOpenHalf_max": 0.15
+      },
+      "medium": {
+        "Expressions_mouthSmileOpen_max": 0.55,
+        "Expressions_mouthSmileL_max": 0.35,
+        "Expressions_mouthSmileR_max": 0.32,
+        "Expressions_eyeSquintL_max": 0.35,
+        "Expressions_eyeSquintR_max": 0.32
+      },
+      "peak": {
+        "Expressions_mouthSmileOpen_max": 0.85,
+        "Expressions_mouthSmileL_max": 0.5,
+        "Expressions_mouthSmileR_max": 0.5,
+        "Expressions_eyeSquintL_max": 0.45,
+        "Expressions_eyeSquintR_max": 0.45
+      }
+    }
+  },
+  "sculptSource": "data/emotions/intensity-sculpt-recipes.json"
 }

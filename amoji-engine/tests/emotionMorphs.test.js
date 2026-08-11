@@ -3,7 +3,7 @@ import {
   EMOTIONS,
   emotionToMorphWeights,
   intensityTierWeights,
-  easeEmotionIntensity,
+  recipeForIntensity,
   applyMorphWeights,
 } from '../engine/layers/emotionMorphs.js';
 
@@ -27,6 +27,9 @@ describe('emotionMorphs', () => {
   const hiMorphs = [
     ...loLegacy,
     'Expressions_mouthSmile_max',
+    'Expressions_mouthSmileL_max',
+    'Expressions_eyeSquintL_max',
+    'Expressions_eyeSquintR_max',
     'Expressions_browSqueezeL_max',
     'Expressions_browSqueezeR_max',
     'Expressions_mouthOpenLarge_max',
@@ -54,18 +57,15 @@ describe('emotionMorphs', () => {
     expect(peak.EMO_happy_peak).toBeCloseTo(1);
   });
 
-  it('HI prefers fine Expression_ keys with eased intensity', () => {
+  it('HI uses hand-tuned Expression_ recipes', () => {
     const w = emotionToMorphWeights('hi', 'happy', 1, hiMorphs);
     expect(w.Expressions_mouthSmile_max).toBeGreaterThan(0.5);
     expect(w.EMO_happy).toBeUndefined();
-    const soft = emotionToMorphWeights('hi', 'happy', 0.3, hiMorphs);
-    expect(soft.Expressions_mouthSmile_max).toBeLessThan(w.Expressions_mouthSmile_max * 0.55);
-  });
-
-  it('easeEmotionIntensity is smoothstep-like under 1', () => {
-    expect(easeEmotionIntensity(0)).toBe(0);
-    expect(easeEmotionIntensity(1)).toBeCloseTo(1);
-    expect(easeEmotionIntensity(0.5)).toBeCloseTo(0.5);
+    const soft = recipeForIntensity('happy', 0.2);
+    expect(soft.Expressions_eyeSquintL_max).toBeGreaterThan(0);
+    expect(soft.Expressions_mouthSmile_max ?? 0).toBeLessThan(
+      w.Expressions_mouthSmile_max,
+    );
   });
 
   it('neutral clears weights', () => {
