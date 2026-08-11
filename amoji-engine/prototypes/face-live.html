@@ -848,6 +848,8 @@
         <div class="row" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeCopy">Copy summary <kbd>C</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnable">Enable Extreme <kbd>⇧X</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnableBody">Enable body <kbd>⇧B</kbd></button>
           <button type="button" id="btnDisneyExtremeBundle">All readout <kbd>A</kbd></button>
           <button type="button" id="btnDisneyExtremeDiff">Diff baseline <kbd>D</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
@@ -893,6 +895,7 @@
             <button type="button" id="btnDisneyExtremePasteHistShare">Paste hist share <kbd>Alt+I</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeHistShare">Merge hist share <kbd>⇧Alt+I</kbd></button>
             <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFavList">Copy fav list <kbd>⇧Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFav">Copy fav JSON <kbd>G</kbd></button>
             <button type="button" id="btnDisneyExtremePasteFav">Paste fav JSON <kbd>⇧G</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeFav">Merge fav JSON <kbd>Alt+G</kbd></button>
@@ -928,6 +931,7 @@
             <button type="button" id="btnDisneyExtremeCopyPinBundle">Copy pin bundle <kbd>⇧Alt+A</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyPinFp">Copy pin fp <kbd>⇧Alt+P</kbd></button>
             <button type="button" id="btnDisneyExtremeFocusPanel">Focus Extreme panel <kbd>Alt+X</kbd></button>
+            <button type="button" id="btnDisneyExtremeEnableFocus">Enable + focus <kbd>⇧Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd></button>
@@ -2200,6 +2204,67 @@
         return true;
       }
 
+      function enableDisneyExtreme() {
+        if (!disneyExtremeEl) {
+          flashDisneyExtremeStatus('extreme · missing');
+          return false;
+        }
+        if (!disneyExtremeEl.checked) {
+          disneyExtremeEl.checked = true;
+          disneyExtremeEl.dispatchEvent(new Event('change'));
+          flashDisneyExtremeStatus('extreme · enabled');
+          return true;
+        }
+        flashDisneyExtremeStatus('extreme · already on');
+        return true;
+      }
+
+      function enableDisneyExtremeBodyApply() {
+        if (!disneyExtremeEl) {
+          flashDisneyExtremeStatus('extreme · missing');
+          return false;
+        }
+        let changed = false;
+        if (!disneyExtremeEl.checked) {
+          disneyExtremeEl.checked = true;
+          disneyExtremeEl.dispatchEvent(new Event('change'));
+          changed = true;
+        }
+        if (disneyExtremeBodyEl && !disneyExtremeBodyEl.checked) {
+          disneyExtremeBodyEl.checked = true;
+          disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+          changed = true;
+        }
+        flashDisneyExtremeStatus(
+          changed ? 'body · enabled' : 'body · already on',
+        );
+        return true;
+      }
+
+      function enableFocusDisneyExtremePanel() {
+        enableDisneyExtreme();
+        return focusDisneyExtremePanel();
+      }
+
+      async function copyDisneyExtremeBaselineFavoritesList() {
+        const text = formatDisneyExtremeBaselineFavoritesList(
+          extremeBaselineFavorites,
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
       async function copyDisneyExtremeBaselineStacksSummary() {
         const text = formatDisneyExtremeBaselineStacksSummaryLabel({
           history: extremeBaselineHistory,
@@ -3264,6 +3329,14 @@
         copyDisneyExtremeSummary();
       });
 
+      document.getElementById('btnDisneyExtremeEnable')?.addEventListener('click', () => {
+        enableDisneyExtreme();
+      });
+
+      document.getElementById('btnDisneyExtremeEnableBody')?.addEventListener('click', () => {
+        enableDisneyExtremeBodyApply();
+      });
+
       document.getElementById('btnDisneyExtremeCopyEase')?.addEventListener('click', () => {
         copyDisneyExtremeEaseSvg();
       });
@@ -3408,6 +3481,10 @@
         flashDisneyExtremeBaselineFavoritesList();
       });
 
+      document.getElementById('btnDisneyExtremeCopyFavList')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineFavoritesList();
+      });
+
       document.getElementById('btnDisneyExtremeCopyFav')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineFavoritesJson();
       });
@@ -3546,6 +3623,10 @@
 
       document.getElementById('btnDisneyExtremeFocusPanel')?.addEventListener('click', () => {
         focusDisneyExtremePanel();
+      });
+
+      document.getElementById('btnDisneyExtremeEnableFocus')?.addEventListener('click', () => {
+        enableFocusDisneyExtremePanel();
       });
 
       document.getElementById('btnDisneyExtremeUnstarFav')?.addEventListener('click', () => {
@@ -4606,6 +4687,16 @@
           disneyExtremeEl.dispatchEvent(new Event('change'));
           return;
         }
+        if (resolved.action === 'enableExtreme') {
+          ev.preventDefault();
+          enableDisneyExtreme();
+          return;
+        }
+        if (resolved.action === 'enableFocusExtremePanel') {
+          ev.preventDefault();
+          enableFocusDisneyExtremePanel();
+          return;
+        }
         if (resolved.action === 'toggleBodyApply') {
           ev.preventDefault();
           if (!disneyExtremeEl.checked) {
@@ -4619,6 +4710,11 @@
             disneyExtremeBodyEl.checked = !disneyExtremeBodyEl.checked;
             disneyExtremeBodyEl.dispatchEvent(new Event('change'));
           }
+          return;
+        }
+        if (resolved.action === 'enableBodyApply') {
+          ev.preventDefault();
+          enableDisneyExtremeBodyApply();
           return;
         }
         if (resolved.action === 'showHelp') {
@@ -4798,6 +4894,11 @@
         if (resolved.action === 'unstarBaselineFavorite') {
           ev.preventDefault();
           unstarDisneyExtremeBaselineFavorite();
+          return;
+        }
+        if (resolved.action === 'copyBaselineFavoritesList') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineFavoritesList();
           return;
         }
         if (resolved.action === 'copyBaselineFavoritesJson') {

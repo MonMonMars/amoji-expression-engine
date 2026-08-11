@@ -320,7 +320,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 307 | Extreme Shift+P replace pin | Done |
 | Phase 308 | Extreme Shift+N copy factors label | Done |
 | Phase 309 | Extreme ⇧Alt+R jump pin summary | Done |
-| Phase 310+ | Further production polish… | Specced |
+| Phase 310 | Extreme ⇧Alt+S copy fav list | Done |
+| Phase 311 | Extreme Shift+X enable Extreme | Done |
+| Phase 312 | Extreme Shift+B enable body | Done |
+| Phase 313 | Extreme ⇧Alt+X enable + focus | Done |
+| Phase 314+ | Further production polish… | Specced |
 
 ## Quick start
 

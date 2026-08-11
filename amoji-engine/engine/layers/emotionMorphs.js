@@ -517,8 +517,11 @@ export const DISNEY_EXTREME_DEFAULTS = {
 /** Shared Face Live Extreme hotkey catalog (help legend + key resolve). */
 export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'toggle', keys: ['x', 'X'], help: 'X', kind: 'action' },
+  { id: 'enableExtreme', help: 'Shift+X enable', kind: 'note' },
   { id: 'focusExtremePanel', help: 'Alt+X focus panel', kind: 'note' },
+  { id: 'enableFocusExtremePanel', help: '⇧Alt+X enable+focus', kind: 'note' },
   { id: 'toggleBodyApply', keys: ['b', 'B'], help: 'B body', kind: 'action' },
+  { id: 'enableBodyApply', help: 'Shift+B enable body', kind: 'note' },
   { id: 'pasteBaselineStacksShareUrl', help: 'Alt+B paste stacks', kind: 'note' },
   { id: 'mergeBaselineStacksShareUrl', help: '⇧Alt+B merge stacks', kind: 'note' },
   {
@@ -608,6 +611,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'starBaselineFavorite', keys: ['s', 'S'], help: 'S star fav', kind: 'action' },
   { id: 'showBaselineFavorites', help: 'Shift+S fav list', kind: 'note' },
   { id: 'unstarBaselineFavorite', help: 'Alt+S unstar fav', kind: 'note' },
+  { id: 'copyBaselineFavoritesList', help: '⇧Alt+S copy fav list', kind: 'note' },
   { id: 'copyBaselineFavoritesJson', keys: ['g', 'G'], help: 'G copy fav JSON', kind: 'action' },
   { id: 'pasteBaselineFavoritesJson', help: 'Shift+G paste fav', kind: 'note' },
   { id: 'mergeBaselineFavoritesJson', help: 'Alt+G merge fav', kind: 'note' },

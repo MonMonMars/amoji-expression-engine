@@ -68,8 +68,11 @@ export function disneyExtremeUiDefaults() {
 /**
  * Resolve Face Live Disney Extreme hotkey.
  * - `x` / `X` → toggle master
+ * - `Shift+X` → enable Extreme (force on)
  * - `Alt+X` → focus / scroll Extreme panel into view
+ * - `Shift+Alt+X` → enable Extreme and focus panel
  * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
+ * - `Shift+B` → enable Apply to body/head (force on; enables Extreme if needed)
  * - `Alt+B` → paste Extreme baseline stacks share URL (`#dxb=`)
  * - `Shift+Alt+B` → merge Extreme baseline stacks share URL into stacks
  * - `h` / `H` / `?` → flash hotkey help on status
@@ -139,6 +142,7 @@ export function disneyExtremeUiDefaults() {
  * - `s` / `S` → star current Extreme factors into favorites
  * - `Shift+S` → flash Extreme favorites list
  * - `Alt+S` → unstar matching Extreme favorite
+ * - `Shift+Alt+S` → copy Extreme favorites list text to clipboard
  * - `g` / `G` → copy Extreme baseline favorites JSON
  * - `Shift+G` → paste Extreme baseline favorites JSON from clipboard
  * - `Alt+G` → merge Extreme baseline favorites JSON into current favorites
@@ -178,7 +182,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / Shift+N factors label / Shift+P replace pin / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / ⇧Alt+S copy fav list / Alt+W wipe stacks / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / ⇧Alt+X enable+focus / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / Shift+N factors label / Shift+P replace pin / Shift+X enable / Shift+B enable body / Alt+1–4 fav jump exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -502,8 +506,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'copySummary' && ev.shiftKey) {
       return { ok: true, action: 'copySnapshotDiff' };
     }
+    if (entry.id === 'toggle' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'enableFocusExtremePanel' };
+    }
     if (entry.id === 'toggle' && ev.altKey) {
       return { ok: true, action: 'focusExtremePanel' };
+    }
+    if (entry.id === 'toggle' && ev.shiftKey) {
+      return { ok: true, action: 'enableExtreme' };
     }
     if (entry.id === 'undoBaseline' && ev.altKey && ev.shiftKey) {
       return { ok: true, action: 'cycleBaselineRedoPrev' };
@@ -525,6 +535,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'toggleBodyApply' && ev.altKey) {
       return { ok: true, action: 'pasteBaselineStacksShareUrl' };
+    }
+    if (entry.id === 'toggleBodyApply' && ev.shiftKey) {
+      return { ok: true, action: 'enableBodyApply' };
     }
     if (entry.id === 'showBaselineHistory' && ev.altKey && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineStacksSummary' };
@@ -582,6 +595,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copySnapshotShareUrl' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineHistoryShareUrl' };
+    }
+    if (entry.id === 'starBaselineFavorite' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineFavoritesList' };
     }
     if (entry.id === 'starBaselineFavorite' && ev.altKey) {
       return { ok: true, action: 'unstarBaselineFavorite' };
