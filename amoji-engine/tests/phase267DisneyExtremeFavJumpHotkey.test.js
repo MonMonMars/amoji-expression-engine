@@ -11,11 +11,13 @@ import * as engine from '../engine/index.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('Phase 267 Extreme Alt+1–4 favorite jump', () => {
+describe('Phase 267 Extreme Alt+1–8 favorite jump', () => {
   it('maps Alt digits to fav jump and wires Face Live', () => {
     expect(disneyExtremeFavoriteJumpIndex('1')).toBe(0);
     expect(disneyExtremeFavoriteJumpIndex('4')).toBe(3);
-    expect(disneyExtremeFavoriteJumpIndex('5')).toBe(null);
+    expect(disneyExtremeFavoriteJumpIndex('5')).toBe(4);
+    expect(disneyExtremeFavoriteJumpIndex('8')).toBe(7);
+    expect(disneyExtremeFavoriteJumpIndex('9')).toBe(null);
     expect(resolveDisneyExtremeHotkey({ key: '2', altKey: true })).toEqual({
       ok: true,
       action: 'jumpBaselineFavorite',
@@ -26,10 +28,15 @@ describe('Phase 267 Extreme Alt+1–4 favorite jump', () => {
       action: 'jumpBaselineHistory',
       index: 0,
     });
-    expect(resolveDisneyExtremeHotkey({ key: '5', altKey: true }).ok).toBe(
-      false,
+    expect(resolveDisneyExtremeHotkey({ key: '5', altKey: true })).toEqual({
+      ok: true,
+      action: 'jumpBaselineFavorite',
+      index: 4,
+    });
+    expect(resolveDisneyExtremeHotkey({ key: '9', altKey: true }).action).toBe(
+      'jumpBaselineHistoryTipSummary',
     );
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt+1–4 fav jump');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt+1–8 fav jump');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain("resolved.action === 'jumpBaselineFavorite'");
     expect(src).toContain('jumpDisneyExtremeBaselineFavorite(resolved.index)');

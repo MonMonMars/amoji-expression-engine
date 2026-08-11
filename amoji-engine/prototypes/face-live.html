@@ -872,7 +872,8 @@
           <button type="button" id="btnDisneyExtremeJumpFavTip">Jump fav tip <kbd>0</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavTipSummary">Jump fav tip summary <kbd>⇧0</kbd></button>
           <button type="button" id="btnDisneyExtremeTips">Tips readout <kbd>Alt+0</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–4</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyTips">Copy tips <kbd>⇧Alt+0</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
           <summary title="Alt+T / Shift+T toggle · ⇧Alt+T open · remembered">More Extreme IO · SVG · JSON · share · fav</summary>
@@ -959,14 +960,14 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · ⇧Alt+1–4 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
         <div
           class="row"
           id="disneyExtremeFavorites"
-          title="Starred favorites · click jump · S star · Alt+S unstar · Ctrl+click unstar · ⇧S list · Q/⇧Q cycle · Alt+1–4 jump · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Alt+W wipe stacks · Z/⇧Z/Alt+Z/V/⇧V stacks"
+          title="Starred favorites · click jump · S star · Alt+S unstar · Ctrl+click unstar · ⇧S list · Q/⇧Q cycle · Alt+1–8 jump · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Alt+W wipe stacks · Z/⇧Z/Alt+Z/V/⇧V stacks"
         >
           <span class="extreme-hist-empty">fav · empty</span>
         </div>
@@ -2142,6 +2143,27 @@
           }),
         );
         return true;
+      }
+
+      async function copyDisneyExtremeBaselineTips() {
+        const text = formatDisneyExtremeBaselineTipsLabel({
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
       }
 
       function cycleDisneyExtremeBaselineFavorite(opts = {}) {
@@ -3782,6 +3804,10 @@
 
       document.getElementById('btnDisneyExtremeTips')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineTips();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyTips')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineTips();
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -5661,6 +5687,11 @@
         if (resolved.action === 'showBaselineTips') {
           ev.preventDefault();
           flashDisneyExtremeBaselineTips();
+          return;
+        }
+        if (resolved.action === 'copyBaselineTips') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineTips();
           return;
         }
         if (resolved.action === 'copySummary') {

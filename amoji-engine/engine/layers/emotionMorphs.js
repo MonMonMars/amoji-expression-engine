@@ -692,8 +692,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'jump',
   },
   { id: 'jumpBaselineRedo', help: 'Shift+1–8 redo jump', kind: 'note' },
-  { id: 'jumpBaselineFavorite', help: 'Alt+1–4 fav jump', kind: 'note' },
-  { id: 'jumpBaselineFavoriteSummary', help: '⇧Alt+1–4 fav jump summary', kind: 'note' },
+  { id: 'jumpBaselineFavorite', help: 'Alt+1–8 fav jump', kind: 'note' },
+  { id: 'jumpBaselineFavoriteSummary', help: '⇧Alt+1–8 fav jump summary', kind: 'note' },
   { id: 'jumpBaselineHistoryTip', keys: ['9'], help: '9 jump hist tip', kind: 'action' },
   { id: 'jumpBaselineRedoTip', help: 'Shift+9 jump redo tip', kind: 'note' },
   { id: 'jumpBaselineHistoryTipSummary', help: 'Alt+9 jump hist tip summary', kind: 'note' },
@@ -701,6 +701,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineFavoriteTip', keys: ['0'], help: '0 jump fav tip', kind: 'action' },
   { id: 'jumpBaselineFavoriteTipSummary', help: 'Shift+0 jump fav tip summary', kind: 'note' },
   { id: 'showBaselineTips', help: 'Alt+0 tips readout', kind: 'note' },
+  { id: 'copyBaselineTips', help: '⇧Alt+0 copy tips', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -1855,7 +1856,7 @@ export function captureDisneyExtremeBaseline(snapOrOpts) {
 }
 
 export const DISNEY_EXTREME_BASELINE_HISTORY_LIMIT = 8;
-export const DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT = 4;
+export const DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT = 8;
 
 /**
  * Push a captured baseline onto a history stack (skips duplicate of tip).

@@ -28,7 +28,7 @@ describe('Phase 252 Extreme favorites S / Shift+S', () => {
     ).toBe('showBaselineFavorites');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('S star fav');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Shift+S fav list');
-    expect(DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT).toBe(4);
+    expect(DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT).toBe(8);
 
     const a = buildDisneyExtremeLiveSnapshot({
       enabled: true,

@@ -277,7 +277,7 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 264 | Extreme stacks share URL `#dxb=` / V | Done |
 | Phase 265 | Extreme multi-hash load single toast | Done |
 | Phase 266 | Extreme Alt+S unstar favorite | Done |
-| Phase 267 | Extreme Alt+1–4 favorite jump | Done |
+| Phase 267 | Extreme Alt+1–8 favorite jump | Done |
 | Phase 268 | Extreme kit share URL `#dxs=`+`#dxb=` / Shift+V | Done |
 | Phase 269 | Extreme active favorite chip highlight | Done |
 | Phase 270 | Extreme Alt+W wipe stacks | Done |
@@ -336,7 +336,7 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 323 | Extreme ⇧Alt+K clear hist keep redo | Done |
 | Phase 324 | Extreme ⇧Alt+G copy fav+json | Done |
 | Phase 325 | Extreme ⇧Alt+Z copy stacks+json | Done |
-| Phase 326 | Extreme ⇧Alt+1–4 fav jump summary | Done |
+| Phase 326 | Extreme ⇧Alt+1–8 fav jump summary | Done |
 | Phase 327 | Extreme 9 jump hist tip | Done |
 | Phase 328 | Extreme Shift+9 jump redo tip | Done |
 | Phase 329 | Extreme 0 jump fav tip | Done |
@@ -344,7 +344,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 331 | Extreme Alt+9 jump hist tip summary | Done |
 | Phase 332 | Extreme ⇧Alt+9 jump redo tip summary | Done |
 | Phase 333 | Extreme Alt+0 tips readout | Done |
-| Phase 334+ | Further production polish… | Specced |
+| Phase 334 | Extreme favorites capacity 8 | Done |
+| Phase 335 | Extreme Alt+1–8 fav jump | Done |
+| Phase 336 | Extreme ⇧Alt+1–8 fav jump summary | Done |
+| Phase 337 | Extreme ⇧Alt+0 copy tips | Done |
+| Phase 338+ | Further production polish… | Specced |
 
 ## Quick start
 
