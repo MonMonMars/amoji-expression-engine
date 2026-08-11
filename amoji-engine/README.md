@@ -400,7 +400,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 387 | Extreme mix strip + F4 | Done |
 | Phase 388 | Extreme neck strip + F5 | Done |
 | Phase 389 | Extreme tips/capacity F6–F7 | Done |
-| Phase 390+ | Further production polish… | Specced |
+| Phase 390 | Extreme F8 roots strip | Done |
+| Phase 391 | Extreme F9 active strip | Done |
+| Phase 392 | Extreme F10 pin strip + copy | Done |
+| Phase 393 | Extreme F11 dirty strip | Done |
+| Phase 394+ | Further production polish… | Specced |
 
 ## Quick start
 

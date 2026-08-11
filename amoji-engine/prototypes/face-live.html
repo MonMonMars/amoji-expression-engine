@@ -980,6 +980,14 @@
           <button type="button" id="btnDisneyExtremeCopyTipsFKey">Copy tips <kbd>⇧F6</kbd></button>
           <button type="button" id="btnDisneyExtremeCapacityFKey">Capacity strip <kbd>F7</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyCapacityFKey">Copy capacity <kbd>⇧F7</kbd></button>
+          <button type="button" id="btnDisneyExtremeRootsFKey">Roots strip <kbd>F8</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyRootsFKey">Copy roots <kbd>⇧F8</kbd></button>
+          <button type="button" id="btnDisneyExtremeActiveFKey">Active strip <kbd>F9</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyActiveFKey">Copy active <kbd>⇧F9</kbd></button>
+          <button type="button" id="btnDisneyExtremePinStripFKey">Pin strip <kbd>F10</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyPinStrip">Copy pin strip <kbd>⇧F10</kbd></button>
+          <button type="button" id="btnDisneyExtremeDirtyStripFKey">Dirty strip <kbd>F11</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey">Copy dirty <kbd>⇧F11</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
@@ -1105,28 +1113,28 @@
           <div
             class="status"
             id="disneyExtremeRoots"
-            title="Root hist/redo/fav · \\ flash · ⇧\\ copy · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · click flash · dbl-click copy"
+            title="Root hist/redo/fav · \\ flash · ⇧\\ copy · F8 flash · ⇧F8 copy · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · click flash · dbl-click copy"
           >
             roots · hist · empty · redo · empty · fav · empty
           </div>
           <div
             class="status"
             id="disneyExtremeActive"
-            title="Active hist/redo/fav chips · ⇧Alt+Space flash · Enter copy · click flash · dbl-click copy"
+            title="Active hist/redo/fav chips · ⇧Alt+Space flash · Enter copy · F9 flash · ⇧F9 copy · click flash · dbl-click copy"
           >
             active · hist · — · redo · — · fav · —
           </div>
           <div
             class="status"
             id="disneyExtremePin"
-            title="Pinned baseline · ⇧Enter flash · Alt+R jump · ⇧Alt+R jump summary · click flash · dbl-click jump summary"
+            title="Pinned baseline · ⇧Enter flash · F10 flash · ⇧F10 copy · Alt+R jump · ⇧Alt+R jump summary · click flash · dbl-click jump summary"
           >
             pin · none
           </div>
           <div
             class="status"
             id="disneyExtremeDirty"
-            title="Pin drift · Home flash · End copy · click flash · dbl-click copy"
+            title="Pin drift · Home flash · End copy · F11 flash · ⇧F11 copy · click flash · dbl-click copy"
           >
             dirty · none
           </div>
@@ -2367,6 +2375,25 @@
           formatDisneyExtremeBaselinePinStripLabel(lastExtremeBaselineSnap),
         );
         return true;
+      }
+
+      async function copyDisneyExtremeBaselinePinStrip() {
+        const text = formatDisneyExtremeBaselinePinStripLabel(
+          lastExtremeBaselineSnap,
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
       }
 
       function flashDisneyExtremeBaselineDirtyStrip(extremeSnap) {
@@ -4764,6 +4791,38 @@
         copyDisneyExtremeBaselineStacksCapacity();
       });
 
+      document.getElementById('btnDisneyExtremeRootsFKey')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineRoots();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyRootsFKey')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineRoots();
+      });
+
+      document.getElementById('btnDisneyExtremeActiveFKey')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineActive();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyActiveFKey')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineActive();
+      });
+
+      document.getElementById('btnDisneyExtremePinStripFKey')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselinePinStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyPinStrip')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselinePinStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeDirtyStripFKey')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineDirtyStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyDirtyStripFKey')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineDirtyStrip();
+      });
+
       document.getElementById('disneyExtremeStripsSummary')?.addEventListener('dblclick', (ev) => {
         ev.preventDefault();
         copyDisneyExtremeBaselineStripsSummary();
@@ -6808,6 +6867,11 @@
         if (resolved.action === 'showBaselinePinStrip') {
           ev.preventDefault();
           flashDisneyExtremeBaselinePinStrip();
+          return;
+        }
+        if (resolved.action === 'copyBaselinePinStrip') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselinePinStrip();
           return;
         }
         if (resolved.action === 'showBaselineHudBundle') {

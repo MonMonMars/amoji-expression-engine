@@ -236,6 +236,14 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+F6` → copy Extreme tips strip
  * - `F7` → flash Extreme capacity strip
  * - `Shift+F7` → copy Extreme capacity strip
+ * - `F8` → flash Extreme roots strip
+ * - `Shift+F8` → copy Extreme roots strip
+ * - `F9` → flash Extreme active strip
+ * - `Shift+F9` → copy Extreme active strip
+ * - `F10` → flash Extreme pin strip
+ * - `Shift+F10` → copy Extreme pin strip
+ * - `F11` → flash Extreme dirty strip
+ * - `Shift+F11` → copy Extreme dirty strip
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -882,6 +890,30 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBaselineCapacityFKey') {
       return { ok: true, action: 'showBaselineStacksCapacity' };
+    }
+    if (entry.id === 'showBaselineRootsFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineRoots' };
+    }
+    if (entry.id === 'showBaselineRootsFKey') {
+      return { ok: true, action: 'showBaselineRoots' };
+    }
+    if (entry.id === 'showBaselineActiveFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineActive' };
+    }
+    if (entry.id === 'showBaselineActiveFKey') {
+      return { ok: true, action: 'showBaselineActive' };
+    }
+    if (entry.id === 'showBaselinePinStripFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselinePinStrip' };
+    }
+    if (entry.id === 'showBaselinePinStripFKey') {
+      return { ok: true, action: 'showBaselinePinStrip' };
+    }
+    if (entry.id === 'showBaselineDirtyStripFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineDirtyStrip' };
+    }
+    if (entry.id === 'showBaselineDirtyStripFKey') {
+      return { ok: true, action: 'showBaselineDirtyStrip' };
     }
     return { ok: true, action: entry.id };
   }
