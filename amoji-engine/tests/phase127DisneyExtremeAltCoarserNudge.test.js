@@ -30,11 +30,14 @@ describe('Phase 127 Extreme Alt coarser nudge steps', () => {
       }).delta,
     ).toBe(0.2);
     expect(
-      resolveDisneyExtremeHotkey({ key: 'x', altKey: true }).ok,
+      resolveDisneyExtremeHotkey({ key: 'a', altKey: true }).ok,
     ).toBe(false);
     expect(
-      resolveDisneyExtremeHotkey({ key: 'x', altKey: true }).reason,
+      resolveDisneyExtremeHotkey({ key: 'a', altKey: true }).reason,
     ).toBe('modifier');
+    expect(
+      resolveDisneyExtremeHotkey({ key: 'x', altKey: true }).action,
+    ).toBe('focusExtremePanel');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt coarser');
     expect(engine.DISNEY_EXTREME_FACTOR_COARSER_MULT).toBe(
       DISNEY_EXTREME_FACTOR_COARSE_MULT * 2,

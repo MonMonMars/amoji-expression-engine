@@ -517,6 +517,7 @@ export const DISNEY_EXTREME_DEFAULTS = {
 /** Shared Face Live Extreme hotkey catalog (help legend + key resolve). */
 export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'toggle', keys: ['x', 'X'], help: 'X', kind: 'action' },
+  { id: 'focusExtremePanel', help: 'Alt+X focus panel', kind: 'note' },
   { id: 'toggleBodyApply', keys: ['b', 'B'], help: 'B body', kind: 'action' },
   { id: 'pasteBaselineStacksShareUrl', help: 'Alt+B paste stacks', kind: 'note' },
   { id: 'mergeBaselineStacksShareUrl', help: '⇧Alt+B merge stacks', kind: 'note' },
@@ -571,6 +572,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pasteSnapshotShareUrl', help: 'Alt+J paste snap', kind: 'note' },
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
+  { id: 'showBaselinePin', help: 'Alt+D pin summary', kind: 'note' },
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
   { id: 'clearBaselinePin', help: 'Alt+K clear pin', kind: 'note' },
@@ -590,6 +592,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineHistoryShareUrl', help: 'Shift+Y share hist', kind: 'note' },
   { id: 'copyBaselineRedoShareUrl', help: 'Alt+Y share redo', kind: 'note' },
   { id: 'pasteBaselineRedoShareUrl', help: '⇧Alt+Y paste redo', kind: 'note' },
+  { id: 'mergeBaselineRedoShareUrl', help: '⇧Alt+O merge redo share', kind: 'note' },
   { id: 'starBaselineFavorite', keys: ['s', 'S'], help: 'S star fav', kind: 'action' },
   { id: 'showBaselineFavorites', help: 'Shift+S fav list', kind: 'note' },
   { id: 'unstarBaselineFavorite', help: 'Alt+S unstar fav', kind: 'note' },
@@ -628,6 +631,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineStacksShareUrl', keys: ['v', 'V'], help: 'V share stacks', kind: 'action' },
   { id: 'copyBaselineKitShareUrl', help: 'Shift+V share kit', kind: 'note' },
   { id: 'pasteBaselineKitShareUrl', help: 'Alt+V paste kit', kind: 'note' },
+  { id: 'mergeBaselineKitShareUrl', help: '⇧Alt+V merge kit', kind: 'note' },
   { id: 'cycleBaselineFavoriteNext', keys: ['q', 'Q'], help: 'Q next fav', kind: 'action' },
   { id: 'cycleBaselineFavoritePrev', help: 'Shift+Q prev fav', kind: 'note' },
   { id: 'cycleBaselineHistoryNext', help: 'Alt+Q next hist', kind: 'note' },

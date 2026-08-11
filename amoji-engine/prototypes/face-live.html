@@ -875,6 +875,7 @@
             <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
             <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeRedo">Merge redo JSON <kbd>Alt+O</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeRedoShare">Merge redo share <kbd>⇧Alt+O</kbd></button>
             <button type="button" id="btnDisneyExtremeShareHist">Copy hist share <kbd>⇧Y</kbd></button>
             <button type="button" id="btnDisneyExtremeShareRedo">Copy redo share <kbd>Alt+Y</kbd></button>
             <button type="button" id="btnDisneyExtremePasteRedoShare">Paste redo share <kbd>⇧Alt+Y</kbd></button>
@@ -896,6 +897,7 @@
             <button type="button" id="btnDisneyExtremeStacksList">Stacks summary <kbd>Alt+L</kbd></button>
             <button type="button" id="btnDisneyExtremeClearPin">Clear pin only <kbd>Alt+K</kbd></button>
             <button type="button" id="btnDisneyExtremePasteKit">Paste kit share <kbd>Alt+V</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeKit">Merge kit share <kbd>⇧Alt+V</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyStacks">Copy stacks JSON <kbd>Z</kbd></button>
             <button type="button" id="btnDisneyExtremePasteStacks">Paste stacks JSON <kbd>⇧Z</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacks">Merge stacks JSON <kbd>Alt+Z</kbd></button>
@@ -912,6 +914,8 @@
             <button type="button" id="btnDisneyExtremePasteStacksShare">Paste stacks share <kbd>Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacksShare">Merge stacks share <kbd>⇧Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeSharePin">Share pin <kbd>Alt+C</kbd></button>
+            <button type="button" id="btnDisneyExtremePinSummary">Pin summary <kbd>Alt+D</kbd></button>
+            <button type="button" id="btnDisneyExtremeFocusPanel">Focus Extreme panel <kbd>Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd></button>
@@ -2053,6 +2057,31 @@
         return true;
       }
 
+      function flashDisneyExtremeBaselinePinSummary() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        flashDisneyExtremeStatus(
+          `pin · ${formatDisneyExtremeBaselineHistoryEntry(lastExtremeBaselineSnap, {
+            index: 1,
+            kind: 'hist',
+          })}`,
+        );
+        return true;
+      }
+
+      function focusDisneyExtremePanel() {
+        const panel = document.getElementById('disneyExtremePanel');
+        if (!panel) {
+          flashDisneyExtremeStatus('panel · missing');
+          return false;
+        }
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        flashDisneyExtremeStatus('panel · focused');
+        return true;
+      }
+
       async function copyDisneyExtremeBaselineStacksSummary() {
         const text = formatDisneyExtremeBaselineStacksSummaryLabel({
           history: extremeBaselineHistory,
@@ -3176,6 +3205,10 @@
         pasteDisneyExtremeBaselineRedoJson({ merge: true });
       });
 
+      document.getElementById('btnDisneyExtremeMergeRedoShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineRedoShareUrl({ merge: true });
+      });
+
       document.getElementById('btnDisneyExtremeUndoBase')?.addEventListener('click', () => {
         undoDisneyExtremeBaseline();
       });
@@ -3256,6 +3289,10 @@
         pasteDisneyExtremeBaselineKitShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeMergeKit')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineKitShareUrl({ merge: true });
+      });
+
       document.getElementById('btnDisneyExtremeCopyStacks')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineStacksJson();
       });
@@ -3318,6 +3355,14 @@
 
       document.getElementById('btnDisneyExtremeSharePin')?.addEventListener('click', () => {
         copyDisneyExtremeBaselinePinShareUrl();
+      });
+
+      document.getElementById('btnDisneyExtremePinSummary')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselinePinSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeFocusPanel')?.addEventListener('click', () => {
+        focusDisneyExtremePanel();
       });
 
       document.getElementById('btnDisneyExtremeUnstarFav')?.addEventListener('click', () => {
@@ -4503,6 +4548,11 @@
           pasteDisneyExtremeBaselineKitShareUrl();
           return;
         }
+        if (resolved.action === 'mergeBaselineKitShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineKitShareUrl({ merge: true });
+          return;
+        }
         if (resolved.action === 'cycleBaselineFavoriteNext') {
           ev.preventDefault();
           cycleDisneyExtremeBaselineFavorite();
@@ -4538,6 +4588,16 @@
           jumpDisneyExtremeBaselinePin();
           return;
         }
+        if (resolved.action === 'showBaselinePin') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselinePinSummary();
+          return;
+        }
+        if (resolved.action === 'focusExtremePanel') {
+          ev.preventDefault();
+          focusDisneyExtremePanel();
+          return;
+        }
         if (resolved.action === 'copyBaselineStacksSummary') {
           ev.preventDefault();
           copyDisneyExtremeBaselineStacksSummary();
@@ -4571,6 +4631,11 @@
         if (resolved.action === 'mergeBaselineRedoJson') {
           ev.preventDefault();
           pasteDisneyExtremeBaselineRedoJson({ merge: true });
+          return;
+        }
+        if (resolved.action === 'mergeBaselineRedoShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineRedoShareUrl({ merge: true });
           return;
         }
         if (resolved.action === 'undoBaseline') {
