@@ -678,7 +678,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -747,6 +747,7 @@
           <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
           <button type="button" id="btnDisneyExtremeBundle">All readout <kbd>A</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1133,6 +1134,8 @@
         buildDisneyExtremeLiveSnapshot,
         formatDisneyExtremeBundleLabel,
         formatDisneyExtremeLiveHudFromSnapshot,
+        disneyExtremeSnapshotFingerprint,
+        serializeDisneyExtremeSnapshot,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1455,6 +1458,7 @@
       }
 
       let disneyExtremeStatusHoldUntil = 0;
+      let lastExtremeSparkFp = '';
       function flashDisneyExtremeStatus(text, holdMs = DISNEY_EXTREME_STATUS_HOLD_MS) {
         if (disneyExtremeStatus) disneyExtremeStatus.textContent = text;
         const ms =
@@ -1677,6 +1681,10 @@
         copyDisneyExtremeBundle();
       });
 
+      document.getElementById('btnDisneyExtremeCopyJson')?.addEventListener('click', () => {
+        copyDisneyExtremeSnapshotJson();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1755,6 +1763,25 @@
         }
         flashDisneyExtremeStatus(
           ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeSnapshotJson() {
+        const json = serializeDisneyExtremeSnapshot(disneyExtremeSnapshot(), {
+          pretty: true,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(json);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? 'copied · snapshot JSON' : 'copy failed · snapshot JSON',
         );
         return ok;
       }
@@ -1989,6 +2016,11 @@
         if (resolved.action === 'copyBundle') {
           ev.preventDefault();
           copyDisneyExtremeBundle();
+          return;
+        }
+        if (resolved.action === 'copySnapshotJson') {
+          ev.preventDefault();
+          copyDisneyExtremeSnapshotJson();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -5257,77 +5289,95 @@
           disneyExtremeStatus.textContent = extremeHud.status;
         }
         if (hudExtreme) hudExtreme.textContent = extremeHud.pill;
-        if (disneyExtremeEaseSpark) {
-          disneyExtremeEaseSpark.classList.toggle('is-off', !disneyExtremeOn);
-          const spark = buildDisneyExtremeEaseSparkSvg({
-            markerT: disneyExtremeOn ? shapeInt : undefined,
-            width: 140,
-            height: 28,
-            stroke: disneyExtremeOn ? undefined : 'rgba(126,200,255,0.45)',
-            markerStroke: disneyExtremeOn ? undefined : 'rgba(255,180,84,0.45)',
-            fill: disneyExtremeOn
-              ? undefined
-              : 'rgba(126,200,255,0.06)',
-          });
-          disneyExtremeEaseSpark.innerHTML = spark.svg;
-        }
-        if (hudExtremeSpark) {
-          hudExtremeSpark.classList.toggle('is-off', !disneyExtremeOn);
-          const mini = buildDisneyExtremeEaseSparkSvg({
-            markerT: disneyExtremeOn ? shapeInt : undefined,
-            width: 52,
-            height: 16,
-            stroke: disneyExtremeOn ? '#7ec8ff' : 'rgba(126,200,255,0.4)',
-            markerStroke: disneyExtremeOn ? '#ffb454' : 'rgba(255,180,84,0.4)',
-            fill: disneyExtremeOn
-              ? 'rgba(126,200,255,0.16)'
-              : 'rgba(126,200,255,0.05)',
-            peakGuide: 'rgba(255,255,255,0.12)',
-          });
-          hudExtremeSpark.innerHTML = mini.svg;
-        }
-        if (hudExtremeFactors) {
-          hudExtremeFactors.classList.toggle('is-off', !disneyExtremeOn);
-          const miniFactors = buildDisneyExtremeFactorBarsSvg({
-            enabled: disneyExtremeOn,
-            shapeFactor: extremeSnap.shapeFactor,
-            bodyOn,
-            bodyFactor: extremeSnap.bodyFactor,
-            eyeFactor: extremeSnap.eyeFactor,
-            mouthFactor: extremeSnap.mouthFactor,
-            width: 56,
-            height: 20,
-          });
-          hudExtremeFactors.innerHTML = miniFactors.svg;
-        }
-        if (hudBodySpark) {
-          const bodyMixOn = disneyExtremeOn && bodyOn;
-          hudBodySpark.classList.toggle('is-off', !bodyMixOn);
-          const miniBody = buildDisneyExtremeBodyMixSparkSvg({
-            markerT: bodyMixOn ? bodyInt : undefined,
-            width: 52,
-            height: 16,
-            stroke: bodyMixOn ? '#9ddea6' : 'rgba(157,222,166,0.4)',
-            markerStroke: bodyMixOn ? '#ffb454' : 'rgba(255,180,84,0.4)',
-            fill: bodyMixOn
-              ? 'rgba(157,222,166,0.16)'
-              : 'rgba(157,222,166,0.05)',
-            capGuide: 'rgba(255,255,255,0.12)',
-          });
-          hudBodySpark.innerHTML = miniBody.svg;
-        }
-        if (disneyExtremeBodySpark) {
-          const bodyMixOn = disneyExtremeOn && bodyOn;
-          disneyExtremeBodySpark.classList.toggle('is-off', !bodyMixOn);
-          const bodySpark = buildDisneyExtremeBodyMixSparkSvg({
-            markerT: bodyMixOn ? bodyInt : undefined,
-            width: 140,
-            height: 28,
-            stroke: bodyMixOn ? undefined : 'rgba(157,222,166,0.45)',
-            markerStroke: bodyMixOn ? undefined : 'rgba(255,180,84,0.45)',
-            fill: bodyMixOn ? undefined : 'rgba(157,222,166,0.06)',
-          });
-          disneyExtremeBodySpark.innerHTML = bodySpark.svg;
+        const extremeFp = disneyExtremeSnapshotFingerprint(extremeSnap);
+        if (extremeFp !== lastExtremeSparkFp) {
+          lastExtremeSparkFp = extremeFp;
+          if (disneyExtremeEaseSpark) {
+            disneyExtremeEaseSpark.classList.toggle('is-off', !disneyExtremeOn);
+            const spark = buildDisneyExtremeEaseSparkSvg({
+              markerT: disneyExtremeOn ? shapeInt : undefined,
+              width: 140,
+              height: 28,
+              stroke: disneyExtremeOn ? undefined : 'rgba(126,200,255,0.45)',
+              markerStroke: disneyExtremeOn ? undefined : 'rgba(255,180,84,0.45)',
+              fill: disneyExtremeOn
+                ? undefined
+                : 'rgba(126,200,255,0.06)',
+            });
+            disneyExtremeEaseSpark.innerHTML = spark.svg;
+          }
+          if (hudExtremeSpark) {
+            hudExtremeSpark.classList.toggle('is-off', !disneyExtremeOn);
+            const mini = buildDisneyExtremeEaseSparkSvg({
+              markerT: disneyExtremeOn ? shapeInt : undefined,
+              width: 52,
+              height: 16,
+              stroke: disneyExtremeOn ? '#7ec8ff' : 'rgba(126,200,255,0.4)',
+              markerStroke: disneyExtremeOn ? '#ffb454' : 'rgba(255,180,84,0.4)',
+              fill: disneyExtremeOn
+                ? 'rgba(126,200,255,0.16)'
+                : 'rgba(126,200,255,0.05)',
+              peakGuide: 'rgba(255,255,255,0.12)',
+            });
+            hudExtremeSpark.innerHTML = mini.svg;
+          }
+          if (hudExtremeFactors) {
+            hudExtremeFactors.classList.toggle('is-off', !disneyExtremeOn);
+            const miniFactors = buildDisneyExtremeFactorBarsSvg({
+              enabled: disneyExtremeOn,
+              shapeFactor: extremeSnap.shapeFactor,
+              bodyOn,
+              bodyFactor: extremeSnap.bodyFactor,
+              eyeFactor: extremeSnap.eyeFactor,
+              mouthFactor: extremeSnap.mouthFactor,
+              width: 56,
+              height: 20,
+            });
+            hudExtremeFactors.innerHTML = miniFactors.svg;
+          }
+          if (hudBodySpark) {
+            const bodyMixOn = disneyExtremeOn && bodyOn;
+            hudBodySpark.classList.toggle('is-off', !bodyMixOn);
+            const miniBody = buildDisneyExtremeBodyMixSparkSvg({
+              markerT: bodyMixOn ? bodyInt : undefined,
+              width: 52,
+              height: 16,
+              stroke: bodyMixOn ? '#9ddea6' : 'rgba(157,222,166,0.4)',
+              markerStroke: bodyMixOn ? '#ffb454' : 'rgba(255,180,84,0.4)',
+              fill: bodyMixOn
+                ? 'rgba(157,222,166,0.16)'
+                : 'rgba(157,222,166,0.05)',
+              capGuide: 'rgba(255,255,255,0.12)',
+            });
+            hudBodySpark.innerHTML = miniBody.svg;
+          }
+          if (disneyExtremeBodySpark) {
+            const bodyMixOn = disneyExtremeOn && bodyOn;
+            disneyExtremeBodySpark.classList.toggle('is-off', !bodyMixOn);
+            const bodySpark = buildDisneyExtremeBodyMixSparkSvg({
+              markerT: bodyMixOn ? bodyInt : undefined,
+              width: 140,
+              height: 28,
+              stroke: bodyMixOn ? undefined : 'rgba(157,222,166,0.45)',
+              markerStroke: bodyMixOn ? undefined : 'rgba(255,180,84,0.45)',
+              fill: bodyMixOn ? undefined : 'rgba(157,222,166,0.06)',
+            });
+            disneyExtremeBodySpark.innerHTML = bodySpark.svg;
+          }
+          if (disneyExtremeFactorBars) {
+            disneyExtremeFactorBars.classList.toggle('is-off', !disneyExtremeOn);
+            const bars = buildDisneyExtremeFactorBarsSvg({
+              enabled: disneyExtremeOn,
+              shapeFactor: extremeSnap.shapeFactor,
+              bodyOn,
+              bodyFactor: extremeSnap.bodyFactor,
+              eyeFactor: extremeSnap.eyeFactor,
+              mouthFactor: extremeSnap.mouthFactor,
+              width: 160,
+              height: 44,
+            });
+            disneyExtremeFactorBars.innerHTML = bars.svg;
+          }
         }
         if (disneyExtremeBodyMixLabelEl) {
           disneyExtremeBodyMixLabelEl.textContent = formatDisneyExtremeBodyMixLabel({
@@ -5341,20 +5391,6 @@
             enabled: disneyExtremeOn,
             markerT: disneyExtremeOn ? shapeInt : undefined,
           });
-        }
-        if (disneyExtremeFactorBars) {
-          disneyExtremeFactorBars.classList.toggle('is-off', !disneyExtremeOn);
-          const bars = buildDisneyExtremeFactorBarsSvg({
-            enabled: disneyExtremeOn,
-            shapeFactor: extremeSnap.shapeFactor,
-            bodyOn,
-            bodyFactor: extremeSnap.bodyFactor,
-            eyeFactor: extremeSnap.eyeFactor,
-            mouthFactor: extremeSnap.mouthFactor,
-            width: 160,
-            height: 44,
-          });
-          disneyExtremeFactorBars.innerHTML = bars.svg;
         }
         if (disneyExtremeFactorBarsLabel) {
           disneyExtremeFactorBarsLabel.textContent =

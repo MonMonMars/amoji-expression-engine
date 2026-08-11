@@ -15,6 +15,6 @@ describe('Phase 143 Extreme HUD mini body mix spark', () => {
     expect(src).toContain(
       "hudBodySpark.classList.toggle('is-off', !bodyMixOn)",
     );
-    expect(src).toContain('buildDisneyExtremeBodyMixSparkSvg({\n            markerT: bodyMixOn ? bodyInt');
+    expect(src).toContain('buildDisneyExtremeBodyMixSparkSvg({\n              markerT: bodyMixOn ? bodyInt');
   });
 });

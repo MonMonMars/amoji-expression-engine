@@ -558,6 +558,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
+  { id: 'copySnapshotJson', keys: ['j', 'J'], help: 'J json', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -923,4 +924,61 @@ export function formatDisneyExtremeLiveHudFromSnapshot(snap) {
     mouthFactor: snap.mouthFactor,
     ease: snap.ease,
   });
+}
+
+/**
+ * Stable fingerprint for Extreme snapshot-driven SVG rebuilds.
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null|undefined} snap
+ * @returns {string}
+ */
+export function disneyExtremeSnapshotFingerprint(snap) {
+  if (!snap || !snap.enabled) return 'off';
+  return [
+    snap.bodyOn ? 1 : 0,
+    Number(snap.shapeInt).toFixed(3),
+    Number(snap.bodyInt).toFixed(3),
+    Number(snap.shapeFactor).toFixed(2),
+    Number(snap.bodyFactor).toFixed(2),
+    Number(snap.eyeFactor).toFixed(2),
+    Number(snap.mouthFactor).toFixed(2),
+    Number(snap.ease).toFixed(3),
+    Number(snap.recipe).toFixed(3),
+    Number(snap.bodyMix).toFixed(3),
+  ].join('|');
+}
+
+export const DISNEY_EXTREME_SNAPSHOT_JSON_KIND =
+  'amoji.disneyExtreme.snapshot.v1';
+
+/**
+ * Serialize an Extreme snapshot to JSON (clipboard / export).
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|object} [snapOrOpts]
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function serializeDisneyExtremeSnapshot(snapOrOpts = {}, opts = {}) {
+  const snap =
+    snapOrOpts &&
+    typeof snapOrOpts === 'object' &&
+    typeof snapOrOpts.shapeInt === 'number' &&
+    typeof snapOrOpts.ease === 'number'
+      ? snapOrOpts
+      : buildDisneyExtremeLiveSnapshot(snapOrOpts);
+  const payload = {
+    kind: DISNEY_EXTREME_SNAPSHOT_JSON_KIND,
+    enabled: !!snap.enabled,
+    intensity: Number(snap.intensity) || 0,
+    shapeFactor: Number(snap.shapeFactor),
+    bodyFactor: Number(snap.bodyFactor),
+    eyeFactor: Number(snap.eyeFactor),
+    mouthFactor: Number(snap.mouthFactor),
+    bodyOn: !!snap.bodyOn,
+    shapeInt: Number(snap.shapeInt),
+    bodyInt: Number(snap.bodyInt),
+    ease: Number(snap.ease),
+    recipe: Number(snap.recipe),
+    bodyMix: Number(snap.bodyMix),
+    neckBlend: Number(snap.neckBlend),
+  };
+  return JSON.stringify(payload, null, opts.pretty ? 2 : 0);
 }

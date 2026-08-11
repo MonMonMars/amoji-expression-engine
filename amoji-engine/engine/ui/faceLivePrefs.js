@@ -75,6 +75,7 @@ export function disneyExtremeUiDefaults() {
  * - `n` / `N` → flash neck blend / body mix label on status
  * - `a` / `A` → flash combined Extreme bundle readout
  * - `Shift+A` → copy Extreme bundle text to clipboard
+ * - `j` / `J` → copy Extreme snapshot JSON to clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults

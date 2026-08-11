@@ -14,7 +14,7 @@ describe('Phase 152 Extreme HUD mini factor bars', () => {
     expect(src).toContain(
       "hudExtremeFactors.classList.toggle('is-off', !disneyExtremeOn)",
     );
-    expect(src).toContain('buildDisneyExtremeFactorBarsSvg({\n            enabled: disneyExtremeOn');
+    expect(src).toContain('buildDisneyExtremeFactorBarsSvg({\n              enabled: disneyExtremeOn');
     expect(src).toContain('width: 56');
     expect(src).toContain('height: 20');
   });
