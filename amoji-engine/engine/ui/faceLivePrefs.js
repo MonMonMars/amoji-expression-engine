@@ -158,19 +158,32 @@ export const DISNEY_EXTREME_NUDGE_FLASH_MS = 700;
 
 /**
  * Status copy for a factor nudge flash.
+ * Optional `delta` appends · Δstep when non-default (Shift/Alt coarse).
  * @param {string} action
  * @param {number|string} value
+ * @param {{ delta?: number }} [opts]
  * @returns {string}
  */
-export function formatDisneyExtremeNudgeFlash(action, value) {
+export function formatDisneyExtremeNudgeFlash(action, value, opts = {}) {
   const v = typeof value === 'number' ? value : Number(value);
   const shown = Number.isFinite(v) ? v.toFixed(2) : '—';
   const a = String(action || '');
-  if (a.includes('Shape')) return `shape × ${shown}`;
-  if (a.includes('Body')) return `body × ${shown}`;
-  if (a.includes('Eye')) return `eye × ${shown}`;
-  if (a.includes('Mouth')) return `mouth × ${shown}`;
-  return `× ${shown}`;
+  let label = `× ${shown}`;
+  if (a.includes('Shape')) label = `shape × ${shown}`;
+  else if (a.includes('Body')) label = `body × ${shown}`;
+  else if (a.includes('Eye')) label = `eye × ${shown}`;
+  else if (a.includes('Mouth')) label = `mouth × ${shown}`;
+  const absDelta =
+    typeof opts.delta === 'number' && Number.isFinite(opts.delta)
+      ? Math.abs(opts.delta)
+      : null;
+  if (
+    absDelta != null &&
+    absDelta > DISNEY_EXTREME_FACTOR_STEP + 1e-9
+  ) {
+    return `${label} · Δ${absDelta.toFixed(2)}`;
+  }
+  return label;
 }
 
 /**

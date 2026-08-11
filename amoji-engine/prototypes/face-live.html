@@ -1587,7 +1587,9 @@
           ev.preventDefault();
           if (disneyExtremeNudgeHold) disneyExtremeNudgeHold.lastFireMs = now;
           flashDisneyExtremeStatus(
-            formatDisneyExtremeNudgeFlash(resolved.action, nextVal),
+            formatDisneyExtremeNudgeFlash(resolved.action, nextVal, {
+              delta: resolved.delta,
+            }),
             DISNEY_EXTREME_NUDGE_FLASH_MS,
           );
         }

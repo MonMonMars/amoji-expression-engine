@@ -32,7 +32,7 @@ describe('Phase 125 Extreme nudge factor flash', () => {
     expect(src).toContain('formatDisneyExtremeNudgeFlash');
     expect(src).toContain('DISNEY_EXTREME_NUDGE_FLASH_MS');
     expect(src).toContain(
-      'flashDisneyExtremeStatus(\n            formatDisneyExtremeNudgeFlash(resolved.action, nextVal)',
+      'formatDisneyExtremeNudgeFlash(resolved.action, nextVal, {\n              delta: resolved.delta,\n            })',
     );
   });
 });
