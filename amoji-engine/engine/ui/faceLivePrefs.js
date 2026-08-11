@@ -27,6 +27,10 @@ export function defaultFaceLivePrefs() {
     fingerEmblemSyncOn: true,
     audioSync: true,
     surfaceLevel: 6,
+    probeToastSoundMuted: false,
+    probeToastHapticMuted: false,
+    probeToastLinkMute: true,
+    probeToastVolume: 1,
   };
 }
 
@@ -47,6 +51,13 @@ export function normalizeFaceLivePrefs(raw) {
     fingerEmblemSyncOn: raw.fingerEmblemSyncOn !== false,
     audioSync: raw.audioSync !== false,
     surfaceLevel: Number(raw.surfaceLevel) || base.surfaceLevel,
+    probeToastSoundMuted: !!raw.probeToastSoundMuted,
+    probeToastHapticMuted: !!raw.probeToastHapticMuted,
+    probeToastLinkMute: raw.probeToastLinkMute !== false,
+    probeToastVolume:
+      typeof raw.probeToastVolume === 'number'
+        ? Math.max(0, Math.min(1, raw.probeToastVolume))
+        : base.probeToastVolume,
   };
 }
 

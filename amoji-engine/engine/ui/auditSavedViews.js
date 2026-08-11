@@ -1247,6 +1247,27 @@ export function createAuditSavedViews(opts = {}) {
         folder,
       });
     },
+    exportStarredFolder(folderName, exportOpts = {}) {
+      const folder = String(folderName || '').trim();
+      if (!folder) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views_export',
+            ok: false,
+            reason: 'missing_folder',
+            count: 0,
+            folder: null,
+            starredOnly: true,
+          },
+          {},
+        );
+      }
+      return exportAuditSavedViewsJson(views, {
+        ...exportOpts,
+        starredOnly: true,
+        folder,
+      });
+    },
     importJson(raw, importOpts = {}) {
       const imported = importAuditSavedViewsJson(raw, {
         max,

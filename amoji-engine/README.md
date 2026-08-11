@@ -65,7 +65,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 52 | Toast haptic stub · views import merge starred · robot slew cancel | Done |
 | Phase 53 | Toast haptic mute · views import folder filter · latency cancel | Done |
 | Phase 54 | Toast linked mute · views export folder · threat/sigh cancel | Done |
-| Phase 55+ | Further production polish… | Specced |
+| Phase 55 | Toast feedback prefs persist · export starred+folder · turn cancel | Done |
+| Phase 56+ | Further production polish… | Specced |
 
 ## Quick start
 
