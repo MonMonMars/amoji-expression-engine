@@ -72,6 +72,39 @@ export function sortAuditViewsByStar(views) {
 }
 
 /**
+ * Filter views by starred-only and/or folder.
+ * @param {object[]} views
+ * @param {{ starredOnly?: boolean, folder?: string|null }} [opts]
+ */
+export function filterAuditSavedViews(views, opts = {}) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  const folderFilter =
+    opts.folder != null && String(opts.folder).trim() !== ''
+      ? String(opts.folder).trim()
+      : null;
+  const filtered = list.filter((v) => {
+    if (opts.starredOnly && !v.starred) return false;
+    if (folderFilter) {
+      const vFolder = String(v.folder || '').trim() || 'Inbox';
+      if (vFolder !== folderFilter) return false;
+    }
+    return true;
+  });
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_filter',
+      ok: true,
+      views: filtered,
+      count: filtered.length,
+      total: list.length,
+      starredOnly: !!opts.starredOnly,
+      folder: folderFilter,
+    },
+    {},
+  );
+}
+
+/**
  * Reorder views by moving one id to a new index.
  * @param {object[]} views
  * @param {string} idOrName

@@ -660,6 +660,7 @@
         <div id="ttsSlaSpark" class="sla-spark" title="Click sparkline for probe detail" role="button" tabindex="0"></div>
         <div class="row" style="margin-top:6px;">
           <button type="button" id="btnProbeCopy">Copy probe</button>
+          <button type="button" id="btnProbeToastMute">Toast sound</button>
         </div>
         <pre id="ttsProbeDetail" style="max-height:72px;margin-top:6px;">probe · click sparkline</pre>
       </div>
@@ -736,6 +737,10 @@
         <select id="prefsAuditFolderFilter" class="ctl" style="margin-top:4px;">
           <option value="">All folders</option>
         </select>
+        <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
+          <input id="prefsAuditStarredOnly" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Starred only</span>
+        </label>
         <select id="prefsAuditSavedViews" class="ctl" style="margin-top:4px;">
           <option value="">Saved views…</option>
         </select>
@@ -878,6 +883,7 @@
         createAuditSavedViews,
         buildAuditViewShareSnapshot,
         decodeAuditViewHash,
+        filterAuditSavedViews,
       } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
@@ -1064,6 +1070,7 @@
       let prefsAuditRegex = false;
       let prefsAuditRange = 'all';
       let prefsAuditFolderFilter = '';
+      let prefsAuditStarredOnly = false;
       let lastProbeDetail = null;
       let probeToastVisible = false;
       let probeToastCompareOn = false;
@@ -1114,6 +1121,7 @@
         for (const f of grouped.folders || []) {
           if (filterFolder && f.name !== filterFolder) continue;
           for (const v of f.views) {
+            if (prefsAuditStarredOnly && !v.starred) continue;
             visible.push({ ...v, _folderLabel: f.name });
             const opt = document.createElement('option');
             opt.value = v.id;
@@ -1277,7 +1285,8 @@
           reason !== 'cycle_pick' &&
           reason !== 'blink_pick' &&
           reason !== 'livelink_pick' &&
-          reason !== 'stepout_pick'
+          reason !== 'stepout_pick' &&
+          reason !== 'leak_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1296,7 +1305,8 @@
           reason === 'cycle_pick' ||
           reason === 'blink_pick' ||
           reason === 'livelink_pick' ||
-          reason === 'stepout_pick'
+          reason === 'stepout_pick' ||
+          reason === 'leak_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2056,9 +2066,11 @@
         refreshTemporalStatus();
       });
       document.getElementById('btnLeak').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('leak_pick');
         temporal.forceLeak(temporal.moodEmotion || 'fear');
       });
       document.getElementById('btnMoodFear').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('leak_pick');
         if (temporal.moodEmotion === 'fear') {
           temporal.setMood(null, 0);
           e.currentTarget.classList.remove('primary');
@@ -2398,6 +2410,25 @@
         });
         document.getElementById('btnProbeCopy')?.addEventListener('click', () => {
           copyProbeDetail();
+        });
+        function syncProbeToastMuteUi() {
+          const btn = document.getElementById('btnProbeToastMute');
+          if (!btn) return;
+          const muted = probeToastSound.muted;
+          btn.textContent = muted ? 'Toast muted' : 'Toast sound';
+          btn.classList.toggle('primary', !muted);
+          btn.title = muted
+            ? 'Unmute probe toast sound cue'
+            : 'Mute probe toast sound cue';
+        }
+        syncProbeToastMuteUi();
+        document.getElementById('btnProbeToastMute')?.addEventListener('click', () => {
+          probeToastSound.toggleMute();
+          syncProbeToastMuteUi();
+          setTtsStatus(
+            probeToastSound.muted ? 'probe toast muted' : 'probe toast sound on',
+            'ok',
+          );
         });
         async function runProbeToastAction(actionId) {
           const resolved = resolveProbeToastAction(actionId, {
@@ -2805,6 +2836,18 @@
         document.getElementById('prefsAuditFolderFilter')?.addEventListener('change', (ev) => {
           prefsAuditFolderFilter = ev.target.value || '';
           refreshAuditSavedViewsUi();
+        });
+        document.getElementById('prefsAuditStarredOnly')?.addEventListener('change', (ev) => {
+          prefsAuditStarredOnly = !!ev.target.checked;
+          refreshAuditSavedViewsUi();
+          const filtered = filterAuditSavedViews(auditSavedViews.views, {
+            starredOnly: prefsAuditStarredOnly,
+            folder: prefsAuditFolderFilter || null,
+          });
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = prefsAuditStarredOnly
+            ? `prefs · starred only · ${filtered.count}/${filtered.total}`
+            : `prefs · showing ${filtered.count} views`;
         });
         document.getElementById('btnPrefsAuditSetFolder')?.addEventListener('click', () => {
           const sel = document.getElementById('prefsAuditSavedViews');

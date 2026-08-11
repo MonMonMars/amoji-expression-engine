@@ -123,6 +123,18 @@ export function createProbeToastSound(opts = {}) {
         {},
       );
     },
+    toggleMute() {
+      muted = !muted;
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_sound',
+          action: 'toggle_mute',
+          ok: true,
+          muted,
+        },
+        {},
+      );
+    },
     /**
      * @param {{ tone?: string, event?: string }} [playOpts]
      */

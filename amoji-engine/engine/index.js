@@ -531,6 +531,7 @@ export {
   reorderAuditSavedViews,
   applyAuditViewsOrder,
   sortAuditViewsByStar,
+  filterAuditSavedViews,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
   renameAuditSavedView,
