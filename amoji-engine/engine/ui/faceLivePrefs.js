@@ -63,17 +63,19 @@ export function disneyExtremeUiDefaults() {
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
- * - `[` / `]` → nudge shape × (when Extreme is on; Shift = coarse 0.10)
- * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift = coarse)
- * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse)
- * - `;` / `'` → nudge mouth × (when Extreme is on; Shift = coarse)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift allowed for coarse nudges).
+ * - `[` / `]` → nudge shape × (when Extreme is on; Shift = coarse 0.10; Alt = coarser 0.20)
+ * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
+ * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
+ * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding; Shift/Alt allowed for nudge steps).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
  */
 export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
 export const DISNEY_EXTREME_FACTOR_COARSE_MULT = 2;
+/** Alt nudge multiplier (0.20 steps). Takes precedence over Shift. */
+export const DISNEY_EXTREME_FACTOR_COARSER_MULT = 4;
 export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = DISNEY_EXTREME_FACTOR_STEP;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
@@ -89,12 +91,24 @@ export const DISNEY_EXTREME_NUDGE_REPEAT_INITIAL_MS = 320;
 export const DISNEY_EXTREME_NUDGE_REPEAT_INTERVAL_MS = 55;
 
 /**
- * Nudge step size — Shift doubles for coarse tuning.
- * @param {boolean} [shiftKey]
+ * Nudge step size — Shift ×2 (0.10), Alt ×4 (0.20; wins over Shift).
+ * @param {boolean|{ shiftKey?: boolean, altKey?: boolean }} [shiftOrOpts]
+ * @param {boolean} [altKey]
  * @returns {number}
  */
-export function disneyExtremeNudgeStep(shiftKey = false) {
-  return DISNEY_EXTREME_FACTOR_STEP * (shiftKey ? DISNEY_EXTREME_FACTOR_COARSE_MULT : 1);
+export function disneyExtremeNudgeStep(shiftOrOpts = false, altKey = false) {
+  let shift = false;
+  let alt = false;
+  if (typeof shiftOrOpts === 'object' && shiftOrOpts) {
+    shift = !!shiftOrOpts.shiftKey;
+    alt = !!shiftOrOpts.altKey;
+  } else {
+    shift = !!shiftOrOpts;
+    alt = !!altKey;
+  }
+  if (alt) return DISNEY_EXTREME_FACTOR_STEP * DISNEY_EXTREME_FACTOR_COARSER_MULT;
+  if (shift) return DISNEY_EXTREME_FACTOR_STEP * DISNEY_EXTREME_FACTOR_COARSE_MULT;
+  return DISNEY_EXTREME_FACTOR_STEP;
 }
 
 /**
@@ -234,7 +248,7 @@ export function nudgeDisneyExtremeMouthFactor(current, delta = DISNEY_EXTREME_FA
 
 export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   if (!ev || ev.defaultPrevented) return { ok: false, reason: 'none' };
-  if (ev.metaKey || ev.ctrlKey || ev.altKey) return { ok: false, reason: 'modifier' };
+  if (ev.metaKey || ev.ctrlKey) return { ok: false, reason: 'modifier' };
   const key = String(ev.key || '');
   if (key === 'Escape') {
     if (opts.holdingStatus) return { ok: true, action: 'clearStatusHold' };
@@ -248,6 +262,28 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     tag === 'SELECT' ||
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
+  // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys.
+  if (ev.altKey) {
+    const nudgeKeys = new Set([
+      '[',
+      '{',
+      ']',
+      '}',
+      '-',
+      '_',
+      '=',
+      '+',
+      ',',
+      '<',
+      '.',
+      '>',
+      ';',
+      ':',
+      "'",
+      '"',
+    ]);
+    if (!nudgeKeys.has(key)) return { ok: false, reason: 'modifier' };
+  }
   if (key === 'x' || key === 'X') return { ok: true, action: 'toggle' };
   if (key === 'b' || key === 'B') return { ok: true, action: 'toggleBodyApply' };
   if (key === 'h' || key === 'H' || key === '?') {
@@ -255,7 +291,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   }
   if (key === 'c' || key === 'C') return { ok: true, action: 'copySummary' };
   if (key === 'r' || key === 'R') return { ok: true, action: 'resetDefaults' };
-  const step = disneyExtremeNudgeStep(!!ev.shiftKey);
+  const step = disneyExtremeNudgeStep({
+    shiftKey: !!ev.shiftKey,
+    altKey: !!ev.altKey,
+  });
   if (key === '[' || key === '{') {
     return {
       ok: true,
