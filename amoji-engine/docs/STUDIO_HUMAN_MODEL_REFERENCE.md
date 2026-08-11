@@ -158,6 +158,9 @@ Amoji engine (ND “systemic emotion”)
 35. ~~**Live Link soak** (synthetic publish + `/stats` + memory/HTTP harness)~~ ✓
 36. ~~**Easter egg apply** (multi-egg cues + Face Live panel)~~ ✓
 37. ~~**Chassis pack variants** (expressive desktop · quiet lobby)~~ ✓
+38. ~~**UE Mac Live Link soak notes** (checklist + consumer `--soak` / `/stats`)~~ ✓
+39. ~~**More easter staging** (chin-think / nape-anxiety / open-palm honesty)~~ ✓
+40. ~~**Chassis SKUs** (desktop quiet · lab demo + product-line helpers)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -189,4 +192,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (UE Mac consumer soak notes, more easter staging, additional chassis product SKUs).
+Next code increment: further polish (UE Control Rig remap samples, more robot DOF packs, real TTS HTTP endpoint wiring when credentials exist).

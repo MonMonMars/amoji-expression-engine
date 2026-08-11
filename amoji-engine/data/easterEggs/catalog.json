@@ -52,6 +52,36 @@
       "behaviors": {
         "ui_only": { "note": "No runtime behavior — educational flag only" }
       }
+    },
+    "chinTouchThinking": {
+      "id": "chinTouchThinking",
+      "label": "Chin-touch = deep thought myth",
+      "enabledDefault": false,
+      "debunkedBy": "Adaptor without diagnostic value — also comfort, habit, camera framing",
+      "disclaimer": "Stage thinking beat only — not a measure of cognition.",
+      "behaviors": {
+        "stage_think": { "adaptor": "chinTouch", "lookY": 0.25, "useCase": "theatrical 'pondering' hold" }
+      }
+    },
+    "napeTouchAnxietyTell": {
+      "id": "napeTouchAnxietyTell",
+      "label": "Nape-touch = anxiety 'tell' myth",
+      "enabledDefault": false,
+      "debunkedBy": "Self-soothe adaptors are not reliable anxiety diagnostics",
+      "disclaimer": "Optional nervous-business staging — not clinical anxiety detection.",
+      "behaviors": {
+        "stage_nervous": { "adaptor": "napeTouch", "lookX": 0.2, "lookY": -0.1, "useCase": "comedic / thriller nervous beat" }
+      }
+    },
+    "openPalmHonesty": {
+      "id": "openPalmHonesty",
+      "label": "Open palms = honesty myth",
+      "enabledDefault": false,
+      "debunkedBy": "Gesture folklore; palms also mark emphasis, invitation, or rest",
+      "disclaimer": "Stylized sincerity display only — never treat as truthfulness evidence.",
+      "behaviors": {
+        "stage_sincere": { "pose": "rest", "lookY": 0.15, "useCase": "earnest appeal staging; handOpen bias via rest pose" }
+      }
     }
   }
 }

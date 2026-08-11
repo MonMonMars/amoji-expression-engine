@@ -33,6 +33,22 @@ export function listChassis() {
 }
 
 /**
+ * List chassis for a product line (base + variants).
+ * @param {string} productLine
+ */
+export function listChassisByProductLine(productLine) {
+  return listChassis().filter((c) => c.productLine === productLine);
+}
+
+/**
+ * List variant SKUs of a base chassis id.
+ * @param {string} baseId
+ */
+export function listChassisVariants(baseId) {
+  return listChassis().filter((c) => c.variantOf === baseId || c.id === baseId);
+}
+
+/**
  * Resolve chassis → pack (override packId if chassis provided).
  * @param {string} [packId]
  * @param {string} [chassisId]

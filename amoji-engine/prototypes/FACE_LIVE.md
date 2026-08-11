@@ -48,7 +48,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Layer B neck/shoulder:** emotion-driven head tilt + accessory-muscle breath; Threat freeze / Sigh; head-down×gaze lock → anger vs sad
 - **Layer -1 Mood:** slow-transition background mood (embarrassed/anxious/…) biases intensity + leaks signature morphs; retarget HUD for body points
 - **Layer D Discretion:** emotion continuity across picks; Gap improv (blocked while Script hold); passive mood leak
-- **Easter eggs:** multi-toggle (NLP gaze / nose-touch / aversion / crossed arms) — default off, locked for corporate/care/education, non-science
+- **Easter eggs:** multi-toggle (NLP / nose / aversion / arms / chin-think / nape / open-palm) — default off, locked for corporate/care/education, non-science
 - **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge; soak with `npm run livelink:soak` (+ `/stats`)
@@ -59,7 +59,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
 - **TTS speak**: Mock synthesize / Step fixture WAV / attach audio file → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
-- **Chassis calib**: desktop-buddy (+ expressive) / lobby-companion (+ quiet) / lab-humanoid — gains, invert, deadzone, slew
+- **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 
 ## Code
 

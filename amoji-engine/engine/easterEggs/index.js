@@ -127,6 +127,30 @@ export function crossedArmsCue(opts = {}) {
 }
 
 /**
+ * Chin-touch = deep thought myth.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function chinTouchThinkingCue(opts = {}) {
+  return resolveEasterEgg('chinTouchThinking', 'stage_think', opts);
+}
+
+/**
+ * Nape-touch = anxiety tell myth.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function napeTouchAnxietyCue(opts = {}) {
+  return resolveEasterEgg('napeTouchAnxietyTell', 'stage_nervous', opts);
+}
+
+/**
+ * Open palms = honesty myth.
+ * @param {{ personaId?: string, enabled?: boolean }} [opts]
+ */
+export function openPalmHonestyCue(opts = {}) {
+  return resolveEasterEgg('openPalmHonesty', 'stage_sincere', opts);
+}
+
+/**
  * Apply enabled egg behavior → runtime cue deltas for Face Live / gesture layers.
  * Returns null behavior fields when egg is off/locked/ui-only.
  *

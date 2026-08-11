@@ -403,6 +403,18 @@
           <input id="eggArms" type="checkbox" data-egg="crossedArmsClosed" />
           <span style="font-size:0.8rem;color:var(--muted)">Egg: crossed arms closed</span>
         </label>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggChin" type="checkbox" data-egg="chinTouchThinking" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: chin-touch thinking</span>
+        </label>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggNape" type="checkbox" data-egg="napeTouchAnxietyTell" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: nape anxiety tell</span>
+        </label>
+        <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;">
+          <input id="eggPalm" type="checkbox" data-egg="openPalmHonesty" />
+          <span style="font-size:0.8rem;color:var(--muted)">Egg: open-palm honesty</span>
+        </label>
         <div class="status" id="eggStatus">eggs off · non-science</div>
       </div>
 
@@ -680,12 +692,18 @@
         noseTouchTell: false,
         gazeAversionGuilt: false,
         crossedArmsClosed: false,
+        chinTouchThinking: false,
+        napeTouchAnxietyTell: false,
+        openPalmHonesty: false,
       };
       const eggEls = {
         nlpGazeConvention: document.getElementById('eggNlp'),
         noseTouchTell: document.getElementById('eggNose'),
         gazeAversionGuilt: document.getElementById('eggAvert'),
         crossedArmsClosed: document.getElementById('eggArms'),
+        chinTouchThinking: document.getElementById('eggChin'),
+        napeTouchAnxietyTell: document.getElementById('eggNape'),
+        openPalmHonesty: document.getElementById('eggPalm'),
       };
       let eggAdaptorHint = null;
       let eggPoseHint = null;
@@ -789,6 +807,27 @@
           selections.push({
             eggId: 'crossedArmsClosed',
             behaviorKey: 'stage_cross',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.chinTouchThinking) {
+          selections.push({
+            eggId: 'chinTouchThinking',
+            behaviorKey: 'stage_think',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.napeTouchAnxietyTell) {
+          selections.push({
+            eggId: 'napeTouchAnxietyTell',
+            behaviorKey: 'stage_nervous',
+            enabled: true,
+          });
+        }
+        if (eggEnabled.openPalmHonesty) {
+          selections.push({
+            eggId: 'openPalmHonesty',
+            behaviorKey: 'stage_sincere',
             enabled: true,
           });
         }
@@ -1858,6 +1897,27 @@
                 selections.push({
                   eggId: 'gazeAversionGuilt',
                   behaviorKey: 'stage_avert',
+                  enabled: true,
+                });
+              }
+              if (eggEnabled.chinTouchThinking) {
+                selections.push({
+                  eggId: 'chinTouchThinking',
+                  behaviorKey: 'stage_think',
+                  enabled: true,
+                });
+              }
+              if (eggEnabled.napeTouchAnxietyTell) {
+                selections.push({
+                  eggId: 'napeTouchAnxietyTell',
+                  behaviorKey: 'stage_nervous',
+                  enabled: true,
+                });
+              }
+              if (eggEnabled.openPalmHonesty) {
+                selections.push({
+                  eggId: 'openPalmHonesty',
+                  behaviorKey: 'stage_sincere',
                   enabled: true,
                 });
               }

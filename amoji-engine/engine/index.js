@@ -218,6 +218,9 @@ export {
   noseTouchCue,
   gazeAversionCue,
   crossedArmsCue,
+  chinTouchThinkingCue,
+  napeTouchAnxietyCue,
+  openPalmHonestyCue,
   applyEasterEggCue,
   mergeEasterEggCues,
 } from './easterEggs/index.js';
@@ -305,6 +308,8 @@ export {
   DEFAULT_CHASSIS,
   REGION_GAIN_MAP,
   listChassis,
+  listChassisByProductLine,
+  listChassisVariants,
   getChassis,
   resolvePackForChassis,
   applyDeadzone,

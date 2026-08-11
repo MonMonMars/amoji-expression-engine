@@ -127,6 +127,57 @@
         "elbow_L": { "scale": 0.65, "maxDeltaPerSec": 1.1 },
         "elbow_R": { "scale": 0.65, "maxDeltaPerSec": 1.1 }
       }
+    },
+    "desktop-buddy-quiet": {
+      "id": "desktop-buddy-quiet",
+      "label": "Desktop buddy · quiet",
+      "packId": "face-servo-12",
+      "productLine": "toy-robot",
+      "variantOf": "desktop-buddy",
+      "description": "Close-up camera SKU — softer mouth/expression, tighter slew.",
+      "gains": {
+        "expression": 0.7,
+        "mouth": 0.75,
+        "eye": 1,
+        "body": 1
+      },
+      "joints": {
+        "brow_L": { "scale": 0.75, "deadzone": 0.05 },
+        "brow_R": { "scale": 0.75, "deadzone": 0.05 },
+        "eye_tilt_L": { "invert": true, "scale": 0.95 },
+        "eye_tilt_R": { "invert": true, "scale": 0.95 },
+        "jaw": { "scale": 0.7, "maxDeltaPerSec": 1.8 },
+        "mouth_corner_L": { "scale": 0.8, "deadzone": 0.04 },
+        "mouth_corner_R": { "scale": 0.8, "deadzone": 0.04 },
+        "lid_L": { "maxDeltaPerSec": 3 },
+        "lid_R": { "maxDeltaPerSec": 3 }
+      }
+    },
+    "lab-humanoid-demo": {
+      "id": "lab-humanoid-demo",
+      "label": "Lab humanoid · demo",
+      "packId": "humanoid-stub",
+      "productLine": "humanoid",
+      "variantOf": "lab-humanoid",
+      "description": "Trade-show SKU — readable face/body, still conservative leg slew.",
+      "gains": {
+        "expression": 1.15,
+        "mouth": 1.1,
+        "eye": 1.05,
+        "body": 1
+      },
+      "joints": {
+        "hip_L": { "scale": 0.85, "maxDeltaPerSec": 1.3 },
+        "hip_R": { "scale": 0.85, "maxDeltaPerSec": 1.3 },
+        "knee_L": { "scale": 0.9, "maxDeltaPerSec": 1.8 },
+        "knee_R": { "scale": 0.9, "maxDeltaPerSec": 1.8 },
+        "ankle_L": { "scale": 0.75, "maxDeltaPerSec": 1.4 },
+        "ankle_R": { "scale": 0.75, "maxDeltaPerSec": 1.4 },
+        "pelvis_yaw": { "scale": 0.8, "maxDeltaPerSec": 1.0 },
+        "spine_bend": { "scale": 0.9, "maxDeltaPerSec": 0.95 },
+        "neck_pitch": { "scale": 1.0, "maxDeltaPerSec": 1.6 },
+        "jaw": { "scale": 1.1, "maxDeltaPerSec": 3.2 }
+      }
     }
   },
   "regionGainMap": {

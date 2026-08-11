@@ -1,6 +1,6 @@
 # Amoji → Unreal Live Link (ARKit 52)
 
-Cloud agents cannot run Unreal (no GPU / Epic). On your Mac:
+Cloud agents cannot run Unreal (no GPU / Epic). On your **Mac**:
 
 ## 1. Start the Amoji bridge
 
@@ -8,10 +8,10 @@ Cloud agents cannot run Unreal (no GPU / Epic). On your Mac:
 cd amoji-engine
 npm run livelink
 # WS  ws://127.0.0.1:7878
-# HTTP http://127.0.0.1:7879/publish  + /last + /health
+# HTTP http://127.0.0.1:7879/publish  + /last + /health + /stats
 ```
 
-## 2. Drive from Face Live
+## 2. Drive from Face Live (or soak CLI)
 
 ```bash
 npm run face-live
@@ -19,6 +19,16 @@ npm run face-live
 ```
 
 Face Live POSTs ARKit frames (compliance-gated) to `/publish`.
+
+Synthetic soak (no Face Live UI):
+
+```bash
+# Terminal A: npm run livelink
+# Terminal B:
+npm run livelink:soak -- --duration 10 --fps 30
+# or memory-only (no bridge):
+npm run livelink:soak -- --memory --duration 2 --fps 60
+```
 
 ## 3. Consume in Unreal
 
@@ -35,6 +45,35 @@ spec = importlib.util.spec_from_file_location(
 mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
 mod.start_polling(actor_label="AmojiSakura", http_url="http://127.0.0.1:7879/last", hz=30)
 ```
+
+Dry-run outside UE (bridge must be publishing):
+
+```bash
+python3 assets/characters/jp-female-v0/unreal/AmojiLiveLinkConsumer.py --soak 5
+```
+
+## Mac soak checklist (UE side)
+
+Use this after bridge + soak (or Face Live pub) are running:
+
+| Step | Check | Pass criteria |
+|---|---|---|
+| Bridge health | `curl -s http://127.0.0.1:7879/health` | `ok: true`, `frame` climbing |
+| Bridge stats | `curl -s http://127.0.0.1:7879/stats` | `published` ↑, `p95LatencyMs` reasonable for LAN |
+| Last frame | `curl -s http://127.0.0.1:7879/last \| jq '.blendShapes.jawOpen'` | Non-null number while soaking |
+| Consumer dry-run | `python3 …/AmojiLiveLinkConsumer.py --soak 5` | `framesSeen ≥ expected`, few errors |
+| UE morph apply | Actor label `AmojiSakura`, ARKit morph names | Jaw/smile visibly move; console `[amoji-livelink]` quiet |
+| Drop soak | Stop soak; `/stats` `avgFps` settles | No stuck morphs after last frame |
+
+Suggested soak load:
+
+```bash
+npm run livelink:soak -- --duration 30 --fps 30
+# Watch /stats in another terminal:
+watch -n1 'curl -s http://127.0.0.1:7879/stats'
+```
+
+Pass bar (LAN, same machine): drop rate &lt; 5%, consumer `errors == 0`, jawOpen tracks smile cycle.
 
 ## Frame schema
 
@@ -54,3 +93,12 @@ mod.start_polling(actor_label="AmojiSakura", http_url="http://127.0.0.1:7879/las
 ## Optional: Epic Live Link Face plugin
 
 If you prefer the stock UDP Live Link Face source, write a tiny converter that maps this JSON into the plugin’s subject — same channel names.
+
+## Consumer helpers
+
+| Function | Role |
+|---|---|
+| `start_polling` / `stop_polling` | Background `/last` → morph targets |
+| `fetch_stats` | Read bridge `/stats` |
+| `soak_report(seconds, hz)` | Count frames / errors for Mac validation |
+| `python3 …Consumer.py --soak N` | CLI dry-run soak |
