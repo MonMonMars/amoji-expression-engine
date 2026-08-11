@@ -185,6 +185,10 @@ export function disneyExtremeUiDefaults() {
  * - `1`–`8` → jump to Extreme baseline history entry by index
  * - `Shift+1`–`8` → jump to Extreme baseline redo entry by index
  * - `Alt+1`–`4` → jump to Extreme favorite by index
+ * - `Shift+Alt+1`–`4` → jump Extreme favorite then flash entry summary
+ * - `9` → jump to latest Extreme baseline history entry
+ * - `Shift+9` → jump to latest Extreme baseline redo entry
+ * - `0` → jump to latest Extreme favorite
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -198,7 +202,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / ⇧Alt+G copy fav+json / Alt+Z merge stacks / ⇧Alt+Z copy stacks+json / Alt+S unstar fav / ⇧Alt+S copy fav list / Alt+W wipe stacks / ⇧Alt+W wipe all / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / ⇧Alt+K clear hist keep redo / Alt+L stacks / Alt+V paste kit / Alt+T/Shift+T more IO / ⇧Alt+T open more IO / Alt+H copy help / Shift+H copy hist list / ⇧Alt+H copy redo list / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Shift+R reset+all / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / ⇧Alt+X enable+focus / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / ⇧Alt+E/M copy label+svg / ⇧Alt+N copy neck+factors / Shift+N factors label / Shift+P replace pin / Shift+X enable / Shift+B enable body / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / ⇧Alt+G copy fav+json / Alt+Z merge stacks / ⇧Alt+Z copy stacks+json / Alt+S unstar fav / ⇧Alt+S copy fav list / Alt+W wipe stacks / ⇧Alt+W wipe all / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / ⇧Alt+K clear hist keep redo / Alt+L stacks / Alt+V paste kit / Alt+T/Shift+T more IO / ⇧Alt+T open more IO / Alt+H copy help / Shift+H copy hist list / ⇧Alt+H copy redo list / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Shift+R reset+all / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / ⇧Alt+X enable+focus / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / ⇧Alt+E/M copy label+svg / ⇧Alt+N copy neck+factors / Shift+N factors label / Shift+P replace pin / Shift+X enable / Shift+B enable body / Alt+1–4 fav jump / ⇧Alt+1–4 fav jump summary exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -690,9 +694,27 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'cycleBaselineFavoriteNext' && ev.shiftKey) {
       return { ok: true, action: 'cycleBaselineFavoritePrev' };
     }
+    if (entry.id === 'jumpBaselineHistoryTip' && ev.shiftKey) {
+      return { ok: true, action: 'jumpBaselineRedoTip' };
+    }
+    if (entry.id === 'jumpBaselineHistoryTip' && ev.altKey) {
+      return { ok: false, reason: 'modifier' };
+    }
+    if (entry.id === 'jumpBaselineFavoriteTip' && (ev.altKey || ev.shiftKey)) {
+      return { ok: false, reason: 'modifier' };
+    }
     return { ok: true, action: entry.id };
   }
   if (entry.kind === 'jump') {
+    if (ev.altKey && ev.shiftKey) {
+      const favIndex = disneyExtremeFavoriteJumpIndex(key);
+      if (favIndex == null) return { ok: false, reason: 'key' };
+      return {
+        ok: true,
+        action: 'jumpBaselineFavoriteSummary',
+        index: favIndex,
+      };
+    }
     if (ev.altKey) {
       const favIndex = disneyExtremeFavoriteJumpIndex(key);
       if (favIndex == null) return { ok: false, reason: 'key' };

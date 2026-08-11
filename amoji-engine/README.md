@@ -336,7 +336,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 323 | Extreme ⇧Alt+K clear hist keep redo | Done |
 | Phase 324 | Extreme ⇧Alt+G copy fav+json | Done |
 | Phase 325 | Extreme ⇧Alt+Z copy stacks+json | Done |
-| Phase 326+ | Further production polish… | Specced |
+| Phase 326 | Extreme ⇧Alt+1–4 fav jump summary | Done |
+| Phase 327 | Extreme 9 jump hist tip | Done |
+| Phase 328 | Extreme Shift+9 jump redo tip | Done |
+| Phase 329 | Extreme 0 jump fav tip | Done |
+| Phase 330+ | Further production polish… | Specced |
 
 ## Quick start
 

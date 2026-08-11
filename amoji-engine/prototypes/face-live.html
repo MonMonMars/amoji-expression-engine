@@ -865,6 +865,10 @@
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
           <button type="button" id="btnDisneyExtremeHistList">History list <kbd>L</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyHistList">Copy hist list <kbd>⇧H</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistTip">Jump hist tip <kbd>9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoTip">Jump redo tip <kbd>⇧9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavTip">Jump fav tip <kbd>0</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavSummary">Jump fav summary <kbd>⇧Alt+1–4</kbd></button>
         </div>
         <details id="disneyExtremeMore">
           <summary title="Alt+T / Shift+T toggle · ⇧Alt+T open · remembered">More Extreme IO · SVG · JSON · share · fav</summary>
@@ -2036,6 +2040,48 @@
         const fp = disneyExtremeSnapshotFingerprintShort(snap);
         flashDisneyExtremeStatus(`fav · jump F#${index + 1} · fp ${fp}`);
         return true;
+      }
+
+      function jumpDisneyExtremeBaselineFavoriteSummary(index) {
+        if (!jumpDisneyExtremeBaselineFavorite(index)) return false;
+        const snap = extremeBaselineFavorites[index];
+        syncDisneyExtremeFavoritesUi();
+        flashDisneyExtremeStatus(
+          `fav · ${formatDisneyExtremeBaselineHistoryEntry(snap, {
+            index: index + 1,
+            kind: 'fav',
+          })}`,
+        );
+        return true;
+      }
+
+      function jumpDisneyExtremeBaselineHistoryTip() {
+        const n = extremeBaselineHistory.length;
+        if (!n) {
+          flashDisneyExtremeStatus('hist · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineHistory(n - 1);
+      }
+
+      function jumpDisneyExtremeBaselineRedoTip() {
+        const n = extremeBaselineRedo.length;
+        if (!n) {
+          flashDisneyExtremeStatus('redo · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineRedo(n - 1);
+      }
+
+      function jumpDisneyExtremeBaselineFavoriteTip() {
+        const n = extremeBaselineFavorites.length;
+        if (!n) {
+          flashDisneyExtremeStatus('fav · empty');
+          return false;
+        }
+        const ok = jumpDisneyExtremeBaselineFavorite(n - 1);
+        if (ok) syncDisneyExtremeFavoritesUi();
+        return ok;
       }
 
       function cycleDisneyExtremeBaselineFavorite(opts = {}) {
@@ -3648,6 +3694,23 @@
 
       document.getElementById('btnDisneyExtremeCopyHistList')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineHistoryList();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpHistTip')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineHistoryTip();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpRedoTip')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineRedoTip();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpFavTip')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselineFavoriteTip();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
+        const tip = extremeBaselineFavorites.length - 1;
+        jumpDisneyExtremeBaselineFavoriteSummary(tip);
       });
 
       document.getElementById('btnDisneyExtremeCopyRedoList')?.addEventListener('click', () => {
@@ -5482,6 +5545,26 @@
         if (resolved.action === 'jumpBaselineFavorite') {
           ev.preventDefault();
           jumpDisneyExtremeBaselineFavorite(resolved.index);
+          return;
+        }
+        if (resolved.action === 'jumpBaselineFavoriteSummary') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineFavoriteSummary(resolved.index);
+          return;
+        }
+        if (resolved.action === 'jumpBaselineHistoryTip') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineHistoryTip();
+          return;
+        }
+        if (resolved.action === 'jumpBaselineRedoTip') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineRedoTip();
+          return;
+        }
+        if (resolved.action === 'jumpBaselineFavoriteTip') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselineFavoriteTip();
           return;
         }
         if (resolved.action === 'copySummary') {
