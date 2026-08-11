@@ -353,4 +353,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (Phase 94 TBD).
+Next code increment: further production polish (Phase 95 TBD).
