@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "model": "Cohen-Massaro 1993 dominance functions (jaw / width / corner articulators)",
+  "note": "Lower anticipatoryRate = earlier look-ahead. Lower carryoverRate = longer trail. MBP lip/jaw peak is extreme so closure wins overlaps.",
+  "articulators": ["jaw", "width", "corner"],
+  "dominance": {
+    "AI": {
+      "jaw":    { "peakMagnitude": 0.9,  "anticipatoryRate": 6, "carryoverRate": 7 },
+      "width":  { "peakMagnitude": 0.75, "anticipatoryRate": 5, "carryoverRate": 6 },
+      "corner": { "peakMagnitude": 0.35, "anticipatoryRate": 8, "carryoverRate": 8 }
+    },
+    "E": {
+      "jaw":    { "peakMagnitude": 0.55, "anticipatoryRate": 7, "carryoverRate": 8 },
+      "width":  { "peakMagnitude": 0.85, "anticipatoryRate": 5, "carryoverRate": 6 },
+      "corner": { "peakMagnitude": 0.3,  "anticipatoryRate": 8, "carryoverRate": 8 }
+    },
+    "O": {
+      "jaw":    { "peakMagnitude": 0.8,  "anticipatoryRate": 4, "carryoverRate": 5 },
+      "width":  { "peakMagnitude": 0.95, "anticipatoryRate": 3, "carryoverRate": 4 },
+      "corner": { "peakMagnitude": 0.5,  "anticipatoryRate": 4, "carryoverRate": 5 }
+    },
+    "U": {
+      "jaw":    { "peakMagnitude": 0.7,  "anticipatoryRate": 3.5, "carryoverRate": 4.5 },
+      "width":  { "peakMagnitude": 1.0,  "anticipatoryRate": 2.5, "carryoverRate": 3.5 },
+      "corner": { "peakMagnitude": 0.55, "anticipatoryRate": 3, "carryoverRate": 4 }
+    },
+    "FV": {
+      "jaw":    { "peakMagnitude": 0.85, "anticipatoryRate": 7, "carryoverRate": 9 },
+      "width":  { "peakMagnitude": 0.7,  "anticipatoryRate": 6, "carryoverRate": 7 },
+      "corner": { "peakMagnitude": 0.4,  "anticipatoryRate": 7, "carryoverRate": 8 }
+    },
+    "L": {
+      "jaw":    { "peakMagnitude": 0.5,  "anticipatoryRate": 7, "carryoverRate": 8 },
+      "width":  { "peakMagnitude": 0.45, "anticipatoryRate": 6, "carryoverRate": 7 },
+      "corner": { "peakMagnitude": 0.25, "anticipatoryRate": 8, "carryoverRate": 8 }
+    },
+    "MBP": {
+      "jaw":    { "peakMagnitude": 1.35, "anticipatoryRate": 8, "carryoverRate": 10 },
+      "width":  { "peakMagnitude": 1.2,  "anticipatoryRate": 7, "carryoverRate": 9 },
+      "corner": { "peakMagnitude": 0.6,  "anticipatoryRate": 7, "carryoverRate": 8 }
+    },
+    "CONS": {
+      "jaw":    { "peakMagnitude": 0.4,  "anticipatoryRate": 9, "carryoverRate": 10 },
+      "width":  { "peakMagnitude": 0.35, "anticipatoryRate": 8, "carryoverRate": 9 },
+      "corner": { "peakMagnitude": 0.2,  "anticipatoryRate": 9, "carryoverRate": 10 }
+    },
+    "REST": {
+      "jaw":    { "peakMagnitude": 0.15, "anticipatoryRate": 4, "carryoverRate": 4 },
+      "width":  { "peakMagnitude": 0.15, "anticipatoryRate": 4, "carryoverRate": 4 },
+      "corner": { "peakMagnitude": 0.1,  "anticipatoryRate": 5, "carryoverRate": 5 }
+    }
+  }
+}

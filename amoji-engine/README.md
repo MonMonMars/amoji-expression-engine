@@ -13,8 +13,9 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 0 | Repo skeleton + compliance gate (pure-generation boundary) | Done |
 | Phase 1 | 8 basic emotions + 2D canvas lab + point catalogs (24/57/77) | Done |
 | Phase 2 | Muscle M1–M21 perimeter + Preston Blair visemes + LOCKED/CLAMPED/OPEN mouth resolve | Done (MVP discrete) |
-| Phase 3 | Blink / micro-leak / Step-Out temporal layer + Live Link bridge | Done (engine + Face Live + UE consumer stub) |
-| Phase 4+ | Personas, Layer T, coarticulation… | Specced in `docs/source/` |
+| Phase 3 | Blink / micro-leak / Step-Out temporal layer + Live Link bridge | Done |
+| Phase 4 | Cohen–Massaro coarticulation + Layer I personas / breath / 90s idle | Done |
+| Phase 5+ | Layer T latency bridge, compound emotion engine, full Layer W gait… | Specced in `docs/source/` |
 
 ## Quick start
 

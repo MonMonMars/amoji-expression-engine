@@ -129,8 +129,11 @@ Amoji engine (ND “systemic emotion”)
 6. ~~**Hand-tune intensity sculpts** (non-linear per-tier recipes)~~ ✓
 7. ~~**Unreal Live Link consumer** for ARKit vector~~ ✓ (bridge + UE Python stub)
 8. ~~**Phase 3 timeline** (blink / leak / Step-Out)~~ ✓
-9. Cohen–Massaro coarticulation (continuous visemes)
-10. Persona idle variants / Layer I full breath ladder
+9. ~~**Cohen–Massaro coarticulation** (continuous visemes)~~ ✓
+10. ~~**Persona idle variants / Layer I breath ladder**~~ ✓
+11. Layer T latency bridge / improvised reaction
+12. Compound emotion engine (region-locked blends)
+13. Full Layer W gait styles
 ---
 
 ## 7. What *not* to copy blindly

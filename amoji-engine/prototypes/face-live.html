@@ -218,6 +218,23 @@
       </div>
 
       <div class="group">
+        <div class="label">Persona / Layer I idle</div>
+        <select id="personaSel" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;">
+          <option value="companion">Companion</option>
+          <option value="corporate">Corporate</option>
+          <option value="care">Care</option>
+          <option value="education">Education</option>
+          <option value="home">Home</option>
+        </select>
+        <div class="seg three" id="arousalSeg" style="margin-top:8px;">
+          <button type="button" data-arousal="calm" class="active">Calm</button>
+          <button type="button" data-arousal="alert">Alert</button>
+          <button type="button" data-arousal="tense">Tense</button>
+        </div>
+        <div class="status" id="idleStatus">idle —</div>
+      </div>
+
+      <div class="group">
         <div class="label">Phase 3 timeline</div>
         <div class="row">
           <button type="button" id="btnStepOut">Step-Out next</button>
@@ -290,6 +307,10 @@
         TemporalLayer,
       } from '/engine/layers/temporalLayer.js';
       import {
+        IdleController,
+        PERSONAS,
+      } from '/engine/layers/idleMode.js';
+      import {
         morphsToLiveLinkFrame,
       } from '/engine/export/liveLinkFace.js';
 
@@ -329,7 +350,9 @@
       let liveLinkOn = false;
       const temporal = new TemporalLayer({ recipes: HI_RECIPES });
       temporal.setEmotion(emotion, intensity);
+      const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
       const temporalStatus = document.getElementById('temporalStatus');
+      const idleStatus = document.getElementById('idleStatus');
 
       function refreshTemporalStatus() {
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
@@ -657,6 +680,20 @@
         refreshTemporalStatus();
       });
 
+      document.getElementById('personaSel').addEventListener('change', (e) => {
+        idle.setPersona(e.target.value);
+      });
+      document.getElementById('arousalSeg').addEventListener('click', (ev) => {
+        const btn = ev.target.closest('button[data-arousal]');
+        if (!btn) return;
+        idle.setArousal(btn.dataset.arousal);
+        document.querySelectorAll('#arousalSeg button').forEach((b) => {
+          b.classList.toggle('active', b.dataset.arousal === idle.arousal);
+        });
+        // map arousal to temporal tense flag
+        temporal.tense = idle.arousal === 'tense' || idle.arousal === 'alert';
+      });
+
       function tick() {
         const dt = clock.getDelta();
         frames += 1;
@@ -685,16 +722,21 @@
           }
         }
 
-        // Naughty Dog: idle motion overlays emotion — does not replace it.
+        // Naughty Dog: idle motion overlays emotion — Layer I breath + persona variants.
         if (spinOn && model) model.rotation.y += dt * 0.6;
+        const idleState = idle.tick(dt);
         if (idleOn && model && !mixer) {
-          const t = clock.elapsedTime;
-          model.rotation.y = Math.sin(t * 0.7) * 0.15;
-          // light breath proxy (Layer I lite)
-          model.position.y = Math.sin(t * 1.4) * 0.01;
-          model.scale.setScalar(1 + Math.sin(t * 0.35) * 0.002);
+          const ch = idleState.channels;
+          model.rotation.y = ch.headYaw + Math.sin(clock.elapsedTime * 0.35) * 0.02;
+          model.position.y = ch.headY + ch.chest;
+          model.scale.setScalar(ch.scalePulse);
+          if (lod === 'hi') {
+            lookX = Math.max(-1, Math.min(1, lookX * 0.85 + ch.lookX));
+            lookY = Math.max(-1, Math.min(1, lookY * 0.85 + ch.lookY));
+          }
         }
         if (mixer) mixer.update(dt);
+        idleStatus.textContent = `${PERSONAS[idle.personaId]?.label || idle.personaId} · ${idleState.arousal} · ${idleState.variant} · ${idleState.breath.bpm.toFixed(0)} bpm · next ${idleState.nextVariantIn.toFixed(0)}s`;
 
         const temporalState = temporal.tick(dt);
         const morphs = availableMorphs();
@@ -704,6 +746,14 @@
           temporalState.displayIntensity,
           morphs,
         );
+        if (idleState.channels.softSmile > 0.01 && lod === 'hi') {
+          if (morphs.includes('Expressions_mouthSmile_max')) {
+            targets.Expressions_mouthSmile_max = Math.max(
+              targets.Expressions_mouthSmile_max || 0,
+              idleState.channels.softSmile,
+            );
+          }
+        }
         if (temporalState.residualEmotion && temporalState.residualIntensity > 0.02) {
           const residual = emotionToMorphWeights(
             lod,

@@ -94,13 +94,17 @@
         </label>
         <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
           <input id="speak" type="checkbox" checked />
-          Play speech (discrete visemes)
+          Play speech
+        </label>
+        <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
+          <input id="coart" type="checkbox" checked />
+          Cohen–Massaro coarticulation
         </label>
         <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
           <input id="overdrive" type="checkbox" />
           Unlock overdrive (&gt;1.0)
         </label>
-        <p class="note">Upper face = emotion. Mouth = viseme override. MBP forces jaw=0. Coarticulation TODO.</p>
+        <p class="note">Upper face = emotion. Mouth = viseme override / dominance blend. MBP forces jaw=0.</p>
         <code id="frameMeta"></code>
       </aside>
     </div>
@@ -117,6 +121,7 @@
       const overdriveEl = document.getElementById('overdrive');
       const speechEl = document.getElementById('speech');
       const speakEl = document.getElementById('speak');
+      const coartEl = document.getElementById('coart');
       const tLabel = document.getElementById('tLabel');
       const frameMeta = document.getElementById('frameMeta');
 
@@ -172,17 +177,22 @@
         stopSpeech();
         let t = Number(intensityEl.value);
         tLabel.textContent = t.toFixed(2);
-        const perf = performSpeech(speechEl.value || 'mama papa', emotionEl.value, t);
+        const mode = coartEl.checked ? 'coarticulated' : 'discrete';
+        const perf = performSpeech(speechEl.value || 'mama papa', emotionEl.value, t, {
+          mode,
+          fps: 24,
+        });
         frames = perf.frames;
         frameIdx = 0;
+        const intervalMs = mode === 'coarticulated' ? 1000 / (perf.fps || 24) : 140;
         timer = setInterval(() => {
           if (!frames.length) return;
           const f = frames[frameIdx % frames.length];
           frameIdx += 1;
-          const mouth = f.meta?.mouth;
-          frameMeta.textContent = `${f.meta?.char ?? ''} → ${f.meta?.viseme ?? ''} · jaw=${mouth?.jaw?.toFixed?.(2) ?? '?'}`;
-          drawFrame(f.params, `${f.emotion} · ${f.meta?.viseme} · "${f.meta?.char}"`);
-        }, 140);
+          frameMeta.textContent = `${perf.mode} · ${f.meta?.viseme || ''} · jaw=${(f.meta?.mouth?.jaw ?? 0).toFixed(2)}`;
+          drawFrame(f.params, `${emotionEl.value} · ${f.meta?.viseme || ''}`);
+          if (frameIdx >= frames.length) stopSpeech();
+        }, intervalMs);
       }
 
       function refresh() {
@@ -198,6 +208,7 @@
         if (e.key === 'Enter') refresh();
       });
       speakEl.addEventListener('change', refresh);
+      coartEl.addEventListener('change', refresh);
       refresh();
     </script>
   </body>

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "variantRotateSec": 90,
+  "personas": {
+    "companion": {
+      "label": "Companion",
+      "bpm": [17, 22],
+      "breathDepth": 0.85,
+      "breathRegularity": 0.75,
+      "saccadeAmp": 0.14,
+      "headDrift": 0.12,
+      "variants": ["breath", "lookAround", "headBob", "softSmile"],
+      "playfulness": 0.7
+    },
+    "corporate": {
+      "label": "Corporate",
+      "bpm": [15, 17],
+      "breathDepth": 0.35,
+      "breathRegularity": 0.95,
+      "saccadeAmp": 0.05,
+      "headDrift": 0.04,
+      "variants": ["breath", "microShift", "breath", "still"],
+      "playfulness": 0.15
+    },
+    "care": {
+      "label": "Care / medical",
+      "bpm": [15, 18],
+      "breathDepth": 0.55,
+      "breathRegularity": 0.98,
+      "saccadeAmp": 0.07,
+      "headDrift": 0.06,
+      "variants": ["breath", "softAttend", "breath", "microShift"],
+      "playfulness": 0.25
+    },
+    "education": {
+      "label": "Education",
+      "bpm": [16, 20],
+      "breathDepth": 0.65,
+      "breathRegularity": 0.85,
+      "saccadeAmp": 0.1,
+      "headDrift": 0.09,
+      "variants": ["breath", "lookAround", "headBob", "breath"],
+      "playfulness": 0.55
+    },
+    "home": {
+      "label": "Home service",
+      "bpm": [15, 18],
+      "breathDepth": 0.6,
+      "breathRegularity": 0.9,
+      "saccadeAmp": 0.08,
+      "headDrift": 0.07,
+      "variants": ["breath", "softSmile", "microShift", "breath"],
+      "playfulness": 0.4
+    }
+  },
+  "arousalLadder": {
+    "calm": { "bpmMul": 1.0, "depthMul": 1.0, "accessory": 0.05 },
+    "alert": { "bpmMul": 1.25, "depthMul": 0.85, "accessory": 0.35 },
+    "tense": { "bpmMul": 1.45, "depthMul": 0.7, "accessory": 0.55 },
+    "exhausted": { "bpmMul": 0.85, "depthMul": 1.15, "accessory": 0.25 }
+  }
+}

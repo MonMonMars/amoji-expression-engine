@@ -40,6 +40,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Toggle **Texture** 512 / 1K / 2K (does not reload mesh)
 - Emotion buttons + intensity slider (hand-tuned subtle/medium/peak sculpts)
 - **Phase 3:** Step-Out next · Force leak · Mood fear · emotion-modulated blink
+- **Persona / Layer I:** companion·corporate·care·education·home + calm/alert/tense breath ladder (90s variant rotate)
 - **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
 - Idle sway / turntable / cycle emotions / blink
@@ -51,6 +52,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - UI: `prototypes/face-live.html`
 - Mapping: `engine/layers/emotionMorphs.js` + `data/emotions/intensity-sculpt-recipes.json`
 - Temporal: `engine/layers/temporalLayer.js`
+- Idle / personas: `engine/layers/idleMode.js` + `data/personas/catalog.json`
+- Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Eyes: `engine/layers/eyeLook.js`
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`

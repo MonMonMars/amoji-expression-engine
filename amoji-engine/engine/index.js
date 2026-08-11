@@ -32,6 +32,25 @@ export {
 } from './layers/resolveMouth.js';
 export { performSpeech } from './layers/performSpeech.js';
 export {
+  dominanceWeight,
+  timedVisemeSequence,
+  resolveMouthAtTime,
+  resolveArticulatorAtTime,
+  sampleCoarticulatedFrames,
+  peakVisemeAt,
+  DOMINANCE_TABLE,
+} from './layers/coarticulation.js';
+export {
+  PERSONAS,
+  AROUSAL_LADDER,
+  VARIANT_ROTATE_SEC,
+  getPersona,
+  resolveBreath,
+  pickIdleVariant,
+  evaluateIdle,
+  IdleController,
+} from './layers/idleMode.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,
