@@ -536,7 +536,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>[</kbd><kbd>]</kbd></span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -600,7 +600,7 @@
         <div class="row" style="margin-top:6px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults</button>
         </div>
-        <div class="status" id="disneyExtremeStatus">extreme off · X toggle · [ ] shape</div>
+        <div class="status" id="disneyExtremeStatus">extreme off · X · [ ] shape · , . eye · ; ' mouth</div>
       </div>
 
       <div class="group">
@@ -1019,6 +1019,8 @@
         disneyExtremeUiDefaults,
         resolveDisneyExtremeHotkey,
         nudgeDisneyExtremeShapeFactor,
+        nudgeDisneyExtremeEyeFactor,
+        nudgeDisneyExtremeMouthFactor,
         summarizeDisneyExtremePrefs,
       } from '/engine/ui/faceLivePrefs.js';
       import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
@@ -1395,20 +1397,48 @@
           disneyExtremeEl.dispatchEvent(new Event('change'));
           return;
         }
+        if (!disneyExtremeEl.checked) return;
+        const applyFactorNudge = (el, nudger) => {
+          if (!el || el.disabled) return false;
+          el.value = String(nudger(Number(el.value), resolved.delta));
+          el.dispatchEvent(new Event('input'));
+          el.dispatchEvent(new Event('change'));
+          return true;
+        };
         if (
           resolved.action === 'nudgeShapeDown' ||
           resolved.action === 'nudgeShapeUp'
         ) {
-          if (!disneyExtremeEl.checked || !disneyExtremeFactorEl) return;
-          ev.preventDefault();
-          disneyExtremeFactorEl.value = String(
-            nudgeDisneyExtremeShapeFactor(
-              Number(disneyExtremeFactorEl.value || 1.6),
-              resolved.delta,
-            ),
-          );
-          disneyExtremeFactorEl.dispatchEvent(new Event('input'));
-          disneyExtremeFactorEl.dispatchEvent(new Event('change'));
+          if (
+            applyFactorNudge(disneyExtremeFactorEl, nudgeDisneyExtremeShapeFactor)
+          ) {
+            ev.preventDefault();
+          }
+          return;
+        }
+        if (
+          resolved.action === 'nudgeEyeDown' ||
+          resolved.action === 'nudgeEyeUp'
+        ) {
+          if (
+            applyFactorNudge(disneyExtremeEyeFactorEl, nudgeDisneyExtremeEyeFactor)
+          ) {
+            ev.preventDefault();
+          }
+          return;
+        }
+        if (
+          resolved.action === 'nudgeMouthDown' ||
+          resolved.action === 'nudgeMouthUp'
+        ) {
+          if (
+            applyFactorNudge(
+              disneyExtremeMouthFactorEl,
+              nudgeDisneyExtremeMouthFactor,
+            )
+          ) {
+            ev.preventDefault();
+          }
         }
       });
       let lookX = 0;

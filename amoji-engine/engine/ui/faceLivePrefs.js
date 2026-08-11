@@ -58,15 +58,46 @@ export function disneyExtremeUiDefaults() {
 /**
  * Resolve Face Live Disney Extreme hotkey.
  * - `x` / `X` → toggle master
- * - `[` / `]` → nudge shape × (Face Live applies only when Extreme is on)
+ * - `[` / `]` → nudge shape × (when Extreme is on)
+ * - `,` / `.` → nudge eyes × (when Extreme is on)
+ * - `;` / `'` → nudge mouth × (when Extreme is on)
  * Ignores when typing in form fields or with modifier keys.
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string }} [opts]
- * @returns {{ ok: boolean, action?: 'toggle'|'nudgeShapeDown'|'nudgeShapeUp', delta?: number, reason?: string }}
+ * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
  */
-export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = 0.05;
+export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
+export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = DISNEY_EXTREME_FACTOR_STEP;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MIN = 1;
 export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
+export const DISNEY_EXTREME_EYE_FACTOR_MIN = 1;
+export const DISNEY_EXTREME_EYE_FACTOR_MAX = 2.2;
+export const DISNEY_EXTREME_MOUTH_FACTOR_MIN = 1;
+export const DISNEY_EXTREME_MOUTH_FACTOR_MAX = 2.2;
+
+/**
+ * Nudge / clamp a Disney Extreme factor slider value.
+ * @param {number} current
+ * @param {number} [delta]
+ * @param {{ min?: number, max?: number, fallback?: number, step?: number }} [range]
+ * @returns {number}
+ */
+export function nudgeDisneyExtremeFactor(current, delta = DISNEY_EXTREME_FACTOR_STEP, range = {}) {
+  const step =
+    typeof range.step === 'number' && range.step > 0
+      ? range.step
+      : DISNEY_EXTREME_FACTOR_STEP;
+  const min = typeof range.min === 'number' ? range.min : DISNEY_EXTREME_SHAPE_FACTOR_MIN;
+  const max = typeof range.max === 'number' ? range.max : DISNEY_EXTREME_SHAPE_FACTOR_MAX;
+  const fallback =
+    typeof range.fallback === 'number' ? range.fallback : defaultFaceLivePrefs().disneyExtremeFactor;
+  const d =
+    typeof delta === 'number' && Number.isFinite(delta) ? delta : step;
+  const raw =
+    typeof current === 'number' && Number.isFinite(current) ? current : fallback;
+  const next = Math.round((raw + d) / step) * step;
+  return Math.max(min, Math.min(max, Number(next.toFixed(2))));
+}
 
 /**
  * Nudge / clamp Disney Extreme shape factor (slider range 1..1.8, step 0.05).
@@ -74,22 +105,38 @@ export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
  * @param {number} [delta]
  * @returns {number}
  */
-export function nudgeDisneyExtremeShapeFactor(current, delta = DISNEY_EXTREME_SHAPE_FACTOR_STEP) {
-  const step =
-    typeof delta === 'number' && Number.isFinite(delta)
-      ? delta
-      : DISNEY_EXTREME_SHAPE_FACTOR_STEP;
-  const raw =
-    typeof current === 'number' && Number.isFinite(current)
-      ? current
-      : defaultFaceLivePrefs().disneyExtremeFactor;
-  const next =
-    Math.round((raw + step) / DISNEY_EXTREME_SHAPE_FACTOR_STEP) *
-    DISNEY_EXTREME_SHAPE_FACTOR_STEP;
-  return Math.max(
-    DISNEY_EXTREME_SHAPE_FACTOR_MIN,
-    Math.min(DISNEY_EXTREME_SHAPE_FACTOR_MAX, Number(next.toFixed(2))),
-  );
+export function nudgeDisneyExtremeShapeFactor(current, delta = DISNEY_EXTREME_FACTOR_STEP) {
+  return nudgeDisneyExtremeFactor(current, delta, {
+    min: DISNEY_EXTREME_SHAPE_FACTOR_MIN,
+    max: DISNEY_EXTREME_SHAPE_FACTOR_MAX,
+    fallback: defaultFaceLivePrefs().disneyExtremeFactor,
+  });
+}
+
+/**
+ * Nudge / clamp Disney Extreme eye factor (1..2.2).
+ * @param {number} current
+ * @param {number} [delta]
+ */
+export function nudgeDisneyExtremeEyeFactor(current, delta = DISNEY_EXTREME_FACTOR_STEP) {
+  return nudgeDisneyExtremeFactor(current, delta, {
+    min: DISNEY_EXTREME_EYE_FACTOR_MIN,
+    max: DISNEY_EXTREME_EYE_FACTOR_MAX,
+    fallback: defaultFaceLivePrefs().disneyExtremeEyeFactor,
+  });
+}
+
+/**
+ * Nudge / clamp Disney Extreme mouth factor (1..2.2).
+ * @param {number} current
+ * @param {number} [delta]
+ */
+export function nudgeDisneyExtremeMouthFactor(current, delta = DISNEY_EXTREME_FACTOR_STEP) {
+  return nudgeDisneyExtremeFactor(current, delta, {
+    min: DISNEY_EXTREME_MOUTH_FACTOR_MIN,
+    max: DISNEY_EXTREME_MOUTH_FACTOR_MAX,
+    fallback: defaultFaceLivePrefs().disneyExtremeMouthFactor,
+  });
 }
 
 export function resolveDisneyExtremeHotkey(ev, opts = {}) {
@@ -109,14 +156,42 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     return {
       ok: true,
       action: 'nudgeShapeDown',
-      delta: -DISNEY_EXTREME_SHAPE_FACTOR_STEP,
+      delta: -DISNEY_EXTREME_FACTOR_STEP,
     };
   }
   if (key === ']' || key === '}') {
     return {
       ok: true,
       action: 'nudgeShapeUp',
-      delta: DISNEY_EXTREME_SHAPE_FACTOR_STEP,
+      delta: DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === ',') {
+    return {
+      ok: true,
+      action: 'nudgeEyeDown',
+      delta: -DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === '.') {
+    return {
+      ok: true,
+      action: 'nudgeEyeUp',
+      delta: DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === ';' || key === ':') {
+    return {
+      ok: true,
+      action: 'nudgeMouthDown',
+      delta: -DISNEY_EXTREME_FACTOR_STEP,
+    };
+  }
+  if (key === "'" || key === '"') {
+    return {
+      ok: true,
+      action: 'nudgeMouthUp',
+      delta: DISNEY_EXTREME_FACTOR_STEP,
     };
   }
   return { ok: false, reason: 'key' };

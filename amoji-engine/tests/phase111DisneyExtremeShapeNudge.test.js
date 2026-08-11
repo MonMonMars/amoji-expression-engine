@@ -46,8 +46,7 @@ describe('Phase 111 Disney Extreme shape factor nudge hotkeys', () => {
     expect(src).toContain("resolved.action === 'nudgeShapeDown'");
     expect(src).toContain("resolved.action === 'nudgeShapeUp'");
     expect(src).toContain('<kbd>[</kbd><kbd>]</kbd>');
-    expect(src).toContain(
-      'disneyExtremeFactorEl.dispatchEvent(new Event(\'input\'))',
-    );
+    expect(src).toContain('applyFactorNudge(disneyExtremeFactorEl');
+    expect(src).toContain("el.dispatchEvent(new Event('input'))");
   });
 });
