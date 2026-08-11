@@ -1172,7 +1172,10 @@
         const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
         const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
         const shapeInt = Math.min(2.0, intensity * shapeFactor);
-        if (tierHint) tierHint.textContent = tierLabel(shapeInt);
+        if (tierHint) {
+          const base = tierLabel(shapeInt);
+          tierHint.textContent = disneyExtremeOn ? `${base} · shape ${shapeInt.toFixed(2)}` : base;
+        }
       }
       if (disneyExtremeEyeFactorEl) {
         disneyExtremeEyeFactorEl.value = String(

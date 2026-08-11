@@ -11,7 +11,7 @@ describe('Disney Extreme tier hint uses shapeInt', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('function updateTierHintForDisneyExtreme()');
     expect(src).toContain('const shapeInt = Math.min(2.0, intensity * shapeFactor);');
-    expect(src).toContain('tierHint.textContent = tierLabel(shapeInt);');
+    expect(src).toContain('shape ${shapeInt.toFixed(2)}');
     expect(src).toContain('updateTierHintForDisneyExtreme();');
   });
 });
