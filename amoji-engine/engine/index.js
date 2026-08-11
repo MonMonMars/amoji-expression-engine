@@ -258,6 +258,8 @@ export {
   formatDisneyExtremeLiveHud,
   formatDisneyExtremeHotkeyHelp,
   DISNEY_EXTREME_HOTKEY_HELP,
+  DISNEY_EXTREME_STATUS_HOLD_MS,
+  shouldHoldDisneyExtremeStatus,
   computeDisneyExtremeIntensities,
   DISNEY_EXTREME_DEFAULTS,
   normalizeMorphName,

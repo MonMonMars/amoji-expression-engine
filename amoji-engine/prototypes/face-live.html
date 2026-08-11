@@ -955,6 +955,8 @@
         amplifyDisneyExtremeMorphs,
         formatDisneyExtremeLiveHud,
         formatDisneyExtremeHotkeyHelp,
+        DISNEY_EXTREME_STATUS_HOLD_MS,
+        shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
       } from '/engine/layers/emotionMorphs.js';
       import {
@@ -1243,6 +1245,16 @@
         );
       }
 
+      let disneyExtremeStatusHoldUntil = 0;
+      function flashDisneyExtremeStatus(text, holdMs = DISNEY_EXTREME_STATUS_HOLD_MS) {
+        if (disneyExtremeStatus) disneyExtremeStatus.textContent = text;
+        const ms =
+          typeof holdMs === 'number' && holdMs > 0
+            ? holdMs
+            : DISNEY_EXTREME_STATUS_HOLD_MS;
+        disneyExtremeStatusHoldUntil = performance.now() + ms;
+      }
+
       function updateTierHintForDisneyExtreme() {
         const disneyExtremeOn = disneyExtremeEl?.checked || false;
         const { shapeInt } = computeDisneyExtremeIntensities(intensity, {
@@ -1394,6 +1406,7 @@
         syncDisneyExtremePrefsSummary();
         updateTierHintForDisneyExtreme();
         persistPrefs();
+        flashDisneyExtremeStatus('reset · × defaults');
       }
 
       async function copyDisneyExtremeSummary() {
@@ -1420,11 +1433,9 @@
         } catch {
           ok = false;
         }
-        if (disneyExtremeStatus) {
-          disneyExtremeStatus.textContent = ok
-            ? `copied · ${text}`
-            : `copy failed · ${text}`;
-        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
         return ok;
       }
 
@@ -1462,11 +1473,11 @@
         }
         if (resolved.action === 'showHelp') {
           ev.preventDefault();
-          if (disneyExtremeStatus) {
-            disneyExtremeStatus.textContent = formatDisneyExtremeHotkeyHelp({
+          flashDisneyExtremeStatus(
+            formatDisneyExtremeHotkeyHelp({
               enabled: !!disneyExtremeEl.checked,
-            });
-          }
+            }),
+          );
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -4716,7 +4727,15 @@
             ? Number(disneyExtremeMouthFactorEl.value || 1.5)
             : 1.5,
         });
-        if (disneyExtremeStatus) disneyExtremeStatus.textContent = extremeHud.status;
+        if (
+          disneyExtremeStatus &&
+          !shouldHoldDisneyExtremeStatus(
+            disneyExtremeStatusHoldUntil,
+            performance.now(),
+          )
+        ) {
+          disneyExtremeStatus.textContent = extremeHud.status;
+        }
         if (hudExtreme) hudExtreme.textContent = extremeHud.pill;
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)

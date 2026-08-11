@@ -247,6 +247,19 @@ export function formatDisneyExtremeHotkeyHelp(opts = {}) {
   return `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_HELP}`;
 }
 
+/** How long Copy / Help / Reset flashes stick before live HUD resumes. */
+export const DISNEY_EXTREME_STATUS_HOLD_MS = 2200;
+
+/**
+ * Whether Face Live should keep a flashed Extreme status instead of live HUD.
+ * @param {number|null|undefined} holdUntilMs
+ * @param {number} [nowMs]
+ * @returns {boolean}
+ */
+export function shouldHoldDisneyExtremeStatus(holdUntilMs, nowMs = Date.now()) {
+  return typeof holdUntilMs === 'number' && Number.isFinite(holdUntilMs) && holdUntilMs > nowMs;
+}
+
 /**
  * Classify a morph key as eye-ish or mouth-ish for Disney Extreme amplify.
  * @param {string} key
