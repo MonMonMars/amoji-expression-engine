@@ -1150,86 +1150,10 @@
       const disneyExtremeBodyFactorEl = document.getElementById('disneyExtremeBodyFactor');
       const disneyExtremeEyeFactorEl = document.getElementById('disneyExtremeEyeFactor');
       const disneyExtremeMouthFactorEl = document.getElementById('disneyExtremeMouthFactor');
-
-      // Restore Disney Extreme prefs into UI before we apply disabled/enabled guards.
-      if (disneyExtremeEl && disneyExtremeFactorEl) {
-        disneyExtremeEl.checked = !!savedPrefs.disneyExtreme;
-        disneyExtremeFactorEl.value = String(
-          savedPrefs.disneyExtremeFactor ?? disneyExtremeFactorEl.value ?? 1.6,
-        );
-      }
-      if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
-        disneyExtremeBodyEl.checked = !!savedPrefs.disneyExtremeBody;
-        disneyExtremeBodyFactorEl.value = String(
-          savedPrefs.disneyExtremeBodyFactor ??
-            disneyExtremeBodyFactorEl.value ??
-            1.6,
-        );
-      }
-
-      function updateTierHintForDisneyExtreme() {
-        const disneyExtremeOn = disneyExtremeEl?.checked || false;
-        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
-        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
-        const shapeInt = Math.min(2.0, intensity * shapeFactor);
-        if (tierHint) {
-          const base = tierLabel(shapeInt);
-          tierHint.textContent = disneyExtremeOn ? `${base} · shape ${shapeInt.toFixed(2)}` : base;
-        }
-      }
-      if (disneyExtremeEyeFactorEl) {
-        disneyExtremeEyeFactorEl.value = String(
-          savedPrefs.disneyExtremeEyeFactor ?? disneyExtremeEyeFactorEl.value ?? 1.4,
-        );
-      }
-      if (disneyExtremeMouthFactorEl) {
-        disneyExtremeMouthFactorEl.value = String(
-          savedPrefs.disneyExtremeMouthFactor ??
-            disneyExtremeMouthFactorEl.value ??
-            1.5,
-        );
-      }
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
       const lookYVal = document.getElementById('lookYVal');
-
-      if (disneyExtremeEl && disneyExtremeFactorEl) {
-        disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
-        disneyExtremeEl.addEventListener('change', () => {
-          disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
-          updateTierHintForDisneyExtreme();
-        });
-      }
-
-      if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
-        const syncBodyUi = () => {
-          // Body deform is only meaningful when the master Disney Extreme is on.
-          const masterOn = !!disneyExtremeEl?.checked;
-          disneyExtremeBodyFactorEl.disabled = !masterOn || !disneyExtremeBodyEl.checked;
-        };
-        syncBodyUi();
-        disneyExtremeBodyEl.addEventListener('change', syncBodyUi);
-        disneyExtremeEl?.addEventListener('change', () => {
-          syncBodyUi();
-          updateTierHintForDisneyExtreme();
-        });
-      }
-
-      const syncEyeMouthUi = () => {
-        const masterOn = !!disneyExtremeEl?.checked;
-        if (disneyExtremeEyeFactorEl) {
-          disneyExtremeEyeFactorEl.disabled = !masterOn;
-        }
-        if (disneyExtremeMouthFactorEl) {
-          disneyExtremeMouthFactorEl.disabled = !masterOn;
-        }
-      };
-      syncEyeMouthUi();
-      disneyExtremeEl?.addEventListener('change', () => {
-        syncEyeMouthUi();
-        updateTierHintForDisneyExtreme();
-      });
 
       let lod = 'hi';
       let texLod = 'mid';
@@ -1246,6 +1170,96 @@
       let emotion = savedPrefs.emotion || 'happy';
       let intensity =
         typeof savedPrefs.intensity === 'number' ? savedPrefs.intensity : 0.7;
+
+      function updateTierHintForDisneyExtreme() {
+        const disneyExtremeOn = disneyExtremeEl?.checked || false;
+        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
+        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
+        const shapeInt = Math.min(2.0, intensity * shapeFactor);
+        if (tierHint) {
+          const base = tierLabel(shapeInt);
+          tierHint.textContent = disneyExtremeOn
+            ? `${base} · shape ${shapeInt.toFixed(2)}`
+            : base;
+        }
+      }
+
+      // Restore Disney Extreme prefs after savedPrefs is available.
+      if (disneyExtremeEl && disneyExtremeFactorEl) {
+        disneyExtremeEl.checked = !!savedPrefs.disneyExtreme;
+        disneyExtremeFactorEl.value = String(
+          savedPrefs.disneyExtremeFactor ?? disneyExtremeFactorEl.value ?? 1.6,
+        );
+      }
+      if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
+        disneyExtremeBodyEl.checked = savedPrefs.disneyExtremeBody !== false;
+        disneyExtremeBodyFactorEl.value = String(
+          savedPrefs.disneyExtremeBodyFactor ??
+            disneyExtremeBodyFactorEl.value ??
+            1.6,
+        );
+      }
+      if (disneyExtremeEyeFactorEl) {
+        disneyExtremeEyeFactorEl.value = String(
+          savedPrefs.disneyExtremeEyeFactor ?? disneyExtremeEyeFactorEl.value ?? 1.4,
+        );
+      }
+      if (disneyExtremeMouthFactorEl) {
+        disneyExtremeMouthFactorEl.value = String(
+          savedPrefs.disneyExtremeMouthFactor ??
+            disneyExtremeMouthFactorEl.value ??
+            1.5,
+        );
+      }
+
+      if (disneyExtremeEl && disneyExtremeFactorEl) {
+        disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+        disneyExtremeEl.addEventListener('change', () => {
+          disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+          updateTierHintForDisneyExtreme();
+          persistPrefs();
+        });
+        disneyExtremeFactorEl.addEventListener('input', () => {
+          updateTierHintForDisneyExtreme();
+        });
+        disneyExtremeFactorEl.addEventListener('change', () => persistPrefs());
+      }
+
+      if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
+        const syncBodyUi = () => {
+          // Body deform is only meaningful when the master Disney Extreme is on.
+          const masterOn = !!disneyExtremeEl?.checked;
+          disneyExtremeBodyFactorEl.disabled =
+            !masterOn || !disneyExtremeBodyEl.checked;
+        };
+        syncBodyUi();
+        disneyExtremeBodyEl.addEventListener('change', () => {
+          syncBodyUi();
+          persistPrefs();
+        });
+        disneyExtremeEl?.addEventListener('change', () => {
+          syncBodyUi();
+          updateTierHintForDisneyExtreme();
+        });
+        disneyExtremeBodyFactorEl.addEventListener('change', () => persistPrefs());
+      }
+
+      const syncEyeMouthUi = () => {
+        const masterOn = !!disneyExtremeEl?.checked;
+        if (disneyExtremeEyeFactorEl) {
+          disneyExtremeEyeFactorEl.disabled = !masterOn;
+        }
+        if (disneyExtremeMouthFactorEl) {
+          disneyExtremeMouthFactorEl.disabled = !masterOn;
+        }
+      };
+      syncEyeMouthUi();
+      disneyExtremeEl?.addEventListener('change', () => {
+        syncEyeMouthUi();
+        updateTierHintForDisneyExtreme();
+      });
+      disneyExtremeEyeFactorEl?.addEventListener('change', () => persistPrefs());
+      disneyExtremeMouthFactorEl?.addEventListener('change', () => persistPrefs());
       let lookX = 0;
       let lookY = 0;
       let trackCamera = true;
