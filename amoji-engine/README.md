@@ -316,7 +316,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 303 | Extreme ⇧Alt+D copy pin summary | Done |
 | Phase 304 | Extreme ⇧Alt+P copy pin fingerprint | Done |
 | Phase 305 | Extreme ⇧Alt+C paste pin share | Done |
-| Phase 306+ | Further production polish… | Specced |
+| Phase 306 | Extreme ⇧Alt+J paste snap live | Done |
+| Phase 307 | Extreme Shift+P replace pin | Done |
+| Phase 308 | Extreme Shift+N copy factors label | Done |
+| Phase 309 | Extreme ⇧Alt+R jump pin summary | Done |
+| Phase 310+ | Further production polish… | Specced |
 
 ## Quick start
 

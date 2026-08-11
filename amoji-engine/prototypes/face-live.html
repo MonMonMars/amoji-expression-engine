@@ -870,10 +870,12 @@
             <button type="button" id="btnDisneyExtremeCopyMixLabel">Copy mix label <kbd>Alt+M</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyNeckLabel">Copy neck label <kbd>Alt+N</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFactorsLabel">Copy factors label <kbd>⇧N</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
             <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
             <button type="button" id="btnDisneyExtremePasteSnapShare">Paste snap share <kbd>Alt+J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteSnapLive">Paste snap live <kbd>⇧Alt+J</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyDiff">Copy diff <kbd>⇧C</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyRedo">Copy redo JSON <kbd>O</kbd></button>
             <button type="button" id="btnDisneyExtremePasteRedo">Paste redo JSON <kbd>⇧O</kbd></button>
@@ -913,6 +915,8 @@
             <button type="button" id="btnDisneyExtremeNextRedo">Next redo <kbd>Alt+U</kbd></button>
             <button type="button" id="btnDisneyExtremePrevRedo">Prev redo <kbd>⇧Alt+U</kbd></button>
             <button type="button" id="btnDisneyExtremeJumpPin">Jump pin <kbd>Alt+R</kbd></button>
+            <button type="button" id="btnDisneyExtremeJumpPinSummary">Jump pin summary <kbd>⇧Alt+R</kbd></button>
+            <button type="button" id="btnDisneyExtremeReplacePin">Replace pin <kbd>⇧P</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyStacksSummary">Copy stacks summary <kbd>⇧Alt+L</kbd></button>
             <button type="button" id="btnDisneyExtremePasteStacksShare">Paste stacks share <kbd>Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacksShare">Merge stacks share <kbd>⇧Alt+B</kbd></button>
@@ -2065,6 +2069,12 @@
         return true;
       }
 
+      function jumpDisneyExtremeBaselinePinSummary() {
+        if (!jumpDisneyExtremeBaselinePin()) return false;
+        flashDisneyExtremeBaselinePinSummary();
+        return true;
+      }
+
       function flashDisneyExtremeBaselinePinSummary() {
         if (!lastExtremeBaselineSnap) {
           flashDisneyExtremeStatus('pin · none');
@@ -2295,7 +2305,7 @@
         });
       }
 
-      async function pasteDisneyExtremeSnapshotShareUrl() {
+      async function pasteDisneyExtremeSnapshotShareUrl(opts = {}) {
         let text = '';
         try {
           if (navigator.clipboard?.readText) {
@@ -2313,9 +2323,16 @@
           return false;
         }
         applyDisneyExtremeSnapshot(decoded.snap, { applyIntensity: true });
-        setDisneyExtremeBaseline(decoded.snap);
+        const liveOnly = !!opts.liveOnly;
+        if (!liveOnly) {
+          setDisneyExtremeBaseline(decoded.snap);
+        }
         const fp = disneyExtremeSnapshotFingerprintShort(decoded.snap);
-        flashDisneyExtremeStatus(`pasted · snap share · fp ${fp}`);
+        flashDisneyExtremeStatus(
+          liveOnly
+            ? `pasted · snap live · fp ${fp}`
+            : `pasted · snap share · fp ${fp}`,
+        );
         return true;
       }
 
@@ -2825,6 +2842,16 @@
         return true;
       }
 
+      function replaceDisneyExtremeBaselinePin() {
+        const snap = disneyExtremeSnapshot();
+        lastExtremeBaselineSnap = saveDisneyExtremeBaseline(snap).snap;
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(`pinned · replace · fp ${fp}`);
+        return true;
+      }
+
       function pinDisneyExtremeBaselineFromChip(snap, opts = {}) {
         if (!snap) {
           flashDisneyExtremeStatus('pin · chip · invalid');
@@ -3261,6 +3288,10 @@
         copyDisneyExtremeFactorBarsSvg();
       });
 
+      document.getElementById('btnDisneyExtremeCopyFactorsLabel')?.addEventListener('click', () => {
+        copyDisneyExtremeFactorBarsLabel();
+      });
+
       document.getElementById('btnDisneyExtremeBundle')?.addEventListener('click', () => {
         flashDisneyExtremeBundle();
       });
@@ -3279,6 +3310,10 @@
 
       document.getElementById('btnDisneyExtremePasteSnapShare')?.addEventListener('click', () => {
         pasteDisneyExtremeSnapshotShareUrl();
+      });
+
+      document.getElementById('btnDisneyExtremePasteSnapLive')?.addEventListener('click', () => {
+        pasteDisneyExtremeSnapshotShareUrl({ liveOnly: true });
       });
 
       document.getElementById('btnDisneyExtremeDiff')?.addEventListener('click', () => {
@@ -3459,6 +3494,14 @@
 
       document.getElementById('btnDisneyExtremeJumpPin')?.addEventListener('click', () => {
         jumpDisneyExtremeBaselinePin();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpPinSummary')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselinePinSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeReplacePin')?.addEventListener('click', () => {
+        replaceDisneyExtremeBaselinePin();
       });
 
       document.getElementById('btnDisneyExtremeCopyStacksSummary')?.addEventListener('click', () => {
@@ -4413,6 +4456,23 @@
         return ok;
       }
 
+      async function copyDisneyExtremeFactorBarsLabel() {
+        const text = formatDisneyExtremeFactorBarsLabel(disneyExtremeFactorOpts());
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
       disneyExtremeEaseSpark?.addEventListener('click', () => {
         flashDisneyExtremeEaseCurve();
       });
@@ -4620,6 +4680,11 @@
           copyDisneyExtremeFactorBarsSvg();
           return;
         }
+        if (resolved.action === 'copyFactorBarsLabel') {
+          ev.preventDefault();
+          copyDisneyExtremeFactorBarsLabel();
+          return;
+        }
         if (resolved.action === 'showNeckBlend') {
           ev.preventDefault();
           flashDisneyExtremeNeck();
@@ -4663,6 +4728,11 @@
         if (resolved.action === 'pasteSnapshotShareUrl') {
           ev.preventDefault();
           pasteDisneyExtremeSnapshotShareUrl();
+          return;
+        }
+        if (resolved.action === 'pasteSnapshotShareUrlLive') {
+          ev.preventDefault();
+          pasteDisneyExtremeSnapshotShareUrl({ liveOnly: true });
           return;
         }
         if (resolved.action === 'showSnapshotDiff') {
@@ -4818,6 +4888,16 @@
         if (resolved.action === 'jumpBaselinePin') {
           ev.preventDefault();
           jumpDisneyExtremeBaselinePin();
+          return;
+        }
+        if (resolved.action === 'jumpBaselinePinSummary') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselinePinSummary();
+          return;
+        }
+        if (resolved.action === 'replaceBaselinePin') {
+          ev.preventDefault();
+          replaceDisneyExtremeBaselinePin();
           return;
         }
         if (resolved.action === 'showBaselinePin') {
