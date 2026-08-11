@@ -266,6 +266,23 @@
         color: var(--ink);
         line-height: 1.35;
       }
+      #probeDetailToast .toast-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      #probeDetailToast .toast-actions button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.75rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -331,6 +348,7 @@
       <div id="probeDetailToast" role="status" aria-live="polite">
         <p class="toast-title" id="probeToastTitle">Probe detail</p>
         <p class="toast-detail" id="probeToastDetail">—</p>
+        <div class="toast-actions" id="probeToastActions"></div>
       </div>
       <div id="surfaceOverlay">
         <div id="glowOrb"></div>
@@ -660,6 +678,16 @@
           <option value="export">export</option>
         </select>
         <input id="prefsAuditSearch" class="ctl" type="search" placeholder="Search audit…" style="margin-top:4px;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+        <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
+          <input id="prefsAuditRegex" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Regex search</span>
+        </label>
+        <select id="prefsAuditRange" class="ctl" style="margin-top:4px;">
+          <option value="all">Any time</option>
+          <option value="1h">Last 1 hour</option>
+          <option value="24h">Last 24 hours</option>
+          <option value="7d">Last 7 days</option>
+        </select>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
@@ -753,7 +781,12 @@
         startGatewayHealthPoll,
         stopGatewayHealthPoll,
       } from '/engine/tts/ttsHealth.js';
-      import { createGatewayHealthHistory, buildHealthProbeCopyPayload, describeHealthProbeToast } from '/engine/tts/ttsHealthHistory.js';
+      import {
+        createGatewayHealthHistory,
+        buildHealthProbeCopyPayload,
+        describeHealthProbeToast,
+        resolveProbeToastAction,
+      } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import {
         listRemapProfiles,
@@ -925,6 +958,8 @@
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
+      let prefsAuditRegex = false;
+      let prefsAuditRange = 'all';
       let lastProbeDetail = null;
       let probeToastTimer = null;
       function refreshPrefsAuditUi() {
@@ -932,11 +967,21 @@
           limit: 6,
           action: prefsAuditFilter,
           query: prefsAuditQuery,
+          regex: prefsAuditRegex,
+          rangePreset: prefsAuditRange,
         });
         const statusEl = document.getElementById('prefsAuditStatus');
         const logEl = document.getElementById('prefsAuditLog');
         if (statusEl) statusEl.textContent = fmt.text;
         if (logEl) logEl.textContent = fmt.lines.length ? fmt.lines.join('\n') : '—';
+      }
+      function hideProbeToast() {
+        const el = document.getElementById('probeDetailToast');
+        el?.classList.remove('show');
+        if (probeToastTimer) {
+          clearTimeout(probeToastTimer);
+          probeToastTimer = null;
+        }
       }
       function showProbeToast(detail) {
         const toast = describeHealthProbeToast(detail);
@@ -944,8 +989,19 @@
         if (!el || !toast.show) return;
         const titleEl = document.getElementById('probeToastTitle');
         const detailEl = document.getElementById('probeToastDetail');
+        const actionsEl = document.getElementById('probeToastActions');
         if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
         if (detailEl) detailEl.textContent = toast.detail || '';
+        if (actionsEl) {
+          actionsEl.innerHTML = '';
+          for (const a of toast.actions || []) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.action = a.id;
+            btn.textContent = a.label;
+            actionsEl.appendChild(btn);
+          }
+        }
         el.classList.remove('ok', 'bad', 'warn');
         if (toast.tone) el.classList.add(toast.tone);
         el.classList.add('show');
@@ -974,13 +1030,15 @@
           reason !== 'finger_pick' &&
           reason !== 'chassis_pick' &&
           reason !== 'pack_pick' &&
-          reason !== 'remap_pick'
+          reason !== 'remap_pick' &&
+          reason !== 'surface_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
           reason === 'chassis_pick' ||
           reason === 'pack_pick' ||
-          reason === 'remap_pick'
+          reason === 'remap_pick' ||
+          reason === 'surface_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2072,6 +2130,37 @@
         document.getElementById('btnProbeCopy')?.addEventListener('click', () => {
           copyProbeDetail();
         });
+        document.getElementById('probeToastActions')?.addEventListener('click', async (ev) => {
+          const btn = ev.target.closest('button[data-action]');
+          if (!btn) return;
+          const resolved = resolveProbeToastAction(btn.dataset.action, {
+            detail: lastProbeDetail,
+          });
+          if (!resolved.ok) return;
+          if (resolved.action === 'copy' && resolved.copy?.ok) {
+            try {
+              if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(resolved.copy.copyText);
+              } else {
+                const ta = document.createElement('textarea');
+                ta.value = resolved.copy.copyText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+              }
+              setTtsStatus('probe detail copied', 'ok');
+            } catch (err) {
+              setTtsStatus(String(err.message || err), 'bad');
+            }
+          }
+          if (resolved.reprobe) {
+            hideProbeToast();
+            refreshGatewayHealth();
+            return;
+          }
+          if (resolved.dismiss) hideProbeToast();
+        });
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
             gatewayHealthHistory.clear();
@@ -2298,6 +2387,14 @@
           prefsAuditQuery = ev.target.value || '';
           refreshPrefsAuditUi();
         });
+        document.getElementById('prefsAuditRegex')?.addEventListener('change', (ev) => {
+          prefsAuditRegex = !!ev.target.checked;
+          refreshPrefsAuditUi();
+        });
+        document.getElementById('prefsAuditRange')?.addEventListener('change', (ev) => {
+          prefsAuditRange = ev.target.value || 'all';
+          refreshPrefsAuditUi();
+        });
         refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
@@ -2402,6 +2499,7 @@
         }
       }
       surfaceSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('surface_pick');
         applySurfaceLevel(surfaceSel.value);
       });
       applySurfaceLevel(6, { applyHints: false });

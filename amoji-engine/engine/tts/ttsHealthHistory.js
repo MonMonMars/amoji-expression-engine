@@ -393,13 +393,21 @@ export function buildHealthProbeCopyPayload(detail) {
 
 export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
 
+/** Default toast action ids for Face Live probe toast. */
+export const PROBE_TOAST_ACTIONS = [
+  { id: 'copy', label: 'Copy' },
+  { id: 'reprobe', label: 'Re-probe' },
+  { id: 'dismiss', label: 'Dismiss' },
+];
+
 /**
  * Build a toast payload when a sparkline probe is inspected.
  * @param {{ ok?: boolean, lines?: string[], text?: string, sample?: object }|null} detail
- * @param {{ dismissMs?: number }} [opts]
+ * @param {{ dismissMs?: number, actions?: Array<{ id: string, label: string }> }} [opts]
  */
 export function describeHealthProbeToast(detail, opts = {}) {
   const dismissMs = opts.dismissMs ?? PROBE_DETAIL_TOAST_DISMISS_MS;
+  const actions = Array.isArray(opts.actions) ? opts.actions : PROBE_TOAST_ACTIONS;
   if (!detail || detail.ok === false) {
     return applyComplianceGate(
       {
@@ -407,6 +415,7 @@ export function describeHealthProbeToast(detail, opts = {}) {
         show: false,
         reason: 'no_probe',
         dismissMs,
+        actions: [],
       },
       {},
     );
@@ -435,6 +444,68 @@ export function describeHealthProbeToast(detail, opts = {}) {
       message: `${title} · ${detailLine}`,
       lines,
       dismissMs,
+      actions,
+      canCopy: true,
+      canReprobe: true,
+    },
+    {},
+  );
+}
+
+/**
+ * Resolve a probe toast action id → next UI intent.
+ * @param {string} actionId
+ * @param {{ detail?: object|null }} [ctx]
+ */
+export function resolveProbeToastAction(actionId, ctx = {}) {
+  const id = String(actionId || '');
+  if (id === 'copy') {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: true,
+        action: 'copy',
+        copy: buildHealthProbeCopyPayload(ctx.detail || null),
+        dismiss: false,
+        reprobe: false,
+      },
+      {},
+    );
+  }
+  if (id === 'reprobe') {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: true,
+        action: 'reprobe',
+        copy: null,
+        dismiss: true,
+        reprobe: true,
+      },
+      {},
+    );
+  }
+  if (id === 'dismiss') {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: true,
+        action: 'dismiss',
+        copy: null,
+        dismiss: true,
+        reprobe: false,
+      },
+      {},
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_action',
+      ok: false,
+      action: id || null,
+      error: 'unknown_action',
+      dismiss: false,
+      reprobe: false,
     },
     {},
   );

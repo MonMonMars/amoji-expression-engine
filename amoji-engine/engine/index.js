@@ -476,7 +476,9 @@ export {
   formatHealthProbeDetail,
   buildHealthProbeCopyPayload,
   PROBE_DETAIL_TOAST_DISMISS_MS,
+  PROBE_TOAST_ACTIONS,
   describeHealthProbeToast,
+  resolveProbeToastAction,
   createGatewayHealthHistory,
 } from './tts/ttsHealthHistory.js';
 export {
@@ -511,6 +513,7 @@ export {
   normalizeShareAuditEntry,
   formatShareAuditLog,
   filterShareAuditEntries,
+  resolveAuditDateRange,
   listShareAuditActions,
   exportShareAuditJson,
   createPrefsShareAudit,

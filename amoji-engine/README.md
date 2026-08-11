@@ -47,7 +47,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 34 | Sparkline probe detail · audit export JSON · finger-pick cancel | Done |
 | Phase 35 | Probe copy · audit clear/filter · chassis/pack cancel | Done |
 | Phase 36 | Probe toast · audit search · Live Link remap cancel | Done |
-| Phase 37+ | Further production polish… | Specced |
+| Phase 37 | Probe toast actions · audit regex/range · surface cancel | Done |
+| Phase 38+ | Further production polish… | Specced |
 
 ## Quick start
 
