@@ -5,6 +5,10 @@
  */
 import sculptData from '../../data/emotions/intensity-sculpt-recipes.json' with { type: 'json' };
 import { applyYouthfulSmileBias } from './smileLaugh.js';
+import {
+  disneyExtremeBodyMix,
+  DISNEY_EXTREME_NECK_SCALE_BLEND,
+} from './neckShoulder.js';
 
 export const EMOTIONS = [
   'happy',
@@ -552,6 +556,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
+  { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -805,4 +810,94 @@ export function computeDisneyExtremeIntensities(baseIntensity, opts = {}) {
     bodyInt: Math.min(intensityCap, raw * bodyMul),
     intensityCap,
   };
+}
+
+/**
+ * Unified Extreme live snapshot (ints + ease/recipe/mix/neck + factors).
+ * @param {{
+ *   enabled?: boolean,
+ *   intensity?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ *   bodyOn?: boolean,
+ * }} [opts]
+ * @returns {{
+ *   enabled: boolean,
+ *   intensity: number,
+ *   shapeFactor: number,
+ *   bodyFactor: number,
+ *   eyeFactor: number,
+ *   mouthFactor: number,
+ *   bodyOn: boolean,
+ *   shapeInt: number,
+ *   bodyInt: number,
+ *   ease: number,
+ *   recipe: number,
+ *   bodyMix: number,
+ *   neckBlend: number,
+ * }}
+ */
+export function buildDisneyExtremeLiveSnapshot(opts = {}) {
+  const enabled = !!opts.enabled;
+  const intensity =
+    typeof opts.intensity === 'number' && Number.isFinite(opts.intensity)
+      ? Math.max(0, opts.intensity)
+      : 0;
+  const factors = normalizeDisneyExtremeFactors({
+    shapeFactor: opts.shapeFactor,
+    bodyFactor: opts.bodyFactor,
+    eyeFactor: opts.eyeFactor,
+    mouthFactor: opts.mouthFactor,
+    bodyOn: opts.bodyOn,
+  });
+  const ints = computeDisneyExtremeIntensities(intensity, {
+    enabled,
+    shapeFactor: factors.shape,
+    bodyOn: factors.bodyOn,
+    bodyFactor: factors.body,
+  });
+  return {
+    enabled,
+    intensity,
+    shapeFactor: factors.shape,
+    bodyFactor: factors.body,
+    eyeFactor: factors.eye,
+    mouthFactor: factors.mouth,
+    bodyOn: ints.bodyOn,
+    shapeInt: ints.shapeInt,
+    bodyInt: ints.bodyInt,
+    ease: easeEmotionIntensity(ints.shapeInt),
+    recipe: disneyExtremeRecipeOverdriveScale(ints.shapeInt),
+    bodyMix: disneyExtremeBodyMix(ints.bodyInt),
+    neckBlend: DISNEY_EXTREME_NECK_SCALE_BLEND,
+  };
+}
+
+/**
+ * One-line Extreme bundle readout (A hotkey / combined flash).
+ * Accepts a snapshot or the same opts as `buildDisneyExtremeLiveSnapshot`.
+ * @param {object} [snapOrOpts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBundleLabel(snapOrOpts = {}) {
+  const snap =
+    snapOrOpts &&
+    typeof snapOrOpts === 'object' &&
+    typeof snapOrOpts.shapeInt === 'number' &&
+    typeof snapOrOpts.ease === 'number'
+      ? snapOrOpts
+      : buildDisneyExtremeLiveSnapshot(snapOrOpts);
+  if (!snap.enabled) {
+    return 'extreme off · A all · E ease · M mix · F factors · N neck';
+  }
+  const recipeBit =
+    snap.shapeInt > 1 + 1e-9
+      ? ` · recipe ×${Number(snap.recipe).toFixed(2)}`
+      : '';
+  const mixBit = snap.bodyOn
+    ? ` · mix ${Number(snap.bodyMix).toFixed(2)} · neck ${Number(snap.neckBlend).toFixed(2)}`
+    : ' · body off';
+  return `shape ${Number(snap.shapeInt).toFixed(2)} · ease ${Number(snap.ease).toFixed(2)}${recipeBit}${mixBit} · eye×${Number(snap.eyeFactor).toFixed(2)} · mouth×${Number(snap.mouthFactor).toFixed(2)}`;
 }

@@ -164,7 +164,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 151 | Extreme live HUD neck blend | Done |
 | Phase 152 | Extreme HUD mini factor bars | Done |
 | Phase 153 | Extreme N neck flash + HUD factors click | Done |
-| Phase 154+ | Further production polish… | Specced |
+| Phase 154 | Extreme live snapshot helper | Done |
+| Phase 155 | Extreme bundle label | Done |
+| Phase 156 | Extreme A hotkey flash bundle | Done |
+| Phase 157 | Extreme summary recipe + neck | Done |
+| Phase 158+ | Further production polish… | Specced |
 
 ## Quick start
 

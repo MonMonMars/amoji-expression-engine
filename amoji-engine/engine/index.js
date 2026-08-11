@@ -280,6 +280,8 @@ export {
   DISNEY_EXTREME_STATUS_HOLD_MS,
   shouldHoldDisneyExtremeStatus,
   computeDisneyExtremeIntensities,
+  buildDisneyExtremeLiveSnapshot,
+  formatDisneyExtremeBundleLabel,
   DISNEY_EXTREME_DEFAULTS,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
   DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN,
