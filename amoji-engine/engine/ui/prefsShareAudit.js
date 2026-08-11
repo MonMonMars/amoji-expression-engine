@@ -32,18 +32,23 @@ export function normalizeShareAuditEntry(entry, opts = {}) {
 /**
  * Format audit entries for a compact status / pre dump.
  * @param {object[]} entries
- * @param {{ limit?: number }} [opts]
+ * @param {{ limit?: number, action?: string|null }} [opts]
  */
 export function formatShareAuditLog(entries, opts = {}) {
   const limit = opts.limit ?? 8;
-  const list = (Array.isArray(entries) ? entries : []).slice(-limit);
+  const filtered = filterShareAuditEntries(entries, { action: opts.action });
+  const list = filtered.slice(-limit);
   if (!list.length) {
     return applyComplianceGate(
       {
         kind: 'prefs_share_audit_format',
-        text: 'share audit · empty',
+        text: opts.action
+          ? `share audit · no ${opts.action}`
+          : 'share audit · empty',
         lines: [],
         count: 0,
+        filter: opts.action || null,
+        total: Array.isArray(entries) ? entries.length : 0,
       },
       {},
     );
@@ -55,12 +60,41 @@ export function formatShareAuditLog(entries, opts = {}) {
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_format',
-      text: `share audit · ${list.length}`,
+      text: opts.action
+        ? `share audit · ${list.length}/${filtered.length} · ${opts.action}`
+        : `share audit · ${list.length}`,
       lines,
       count: list.length,
+      filter: opts.action || null,
+      total: Array.isArray(entries) ? entries.length : list.length,
     },
     {},
   );
+}
+
+/**
+ * Filter audit entries by action (`all` / empty = no filter).
+ * @param {object[]} entries
+ * @param {{ action?: string|null }} [opts]
+ */
+export function filterShareAuditEntries(entries, opts = {}) {
+  const list = (Array.isArray(entries) ? entries : []).map((e) =>
+    normalizeShareAuditEntry(e),
+  );
+  const action = opts.action && opts.action !== 'all' ? String(opts.action) : null;
+  if (!action) return list;
+  return list.filter((e) => e.action === action);
+}
+
+/**
+ * List known audit action keys for UI filters.
+ */
+export function listShareAuditActions(entries) {
+  const set = new Set();
+  for (const e of Array.isArray(entries) ? entries : []) {
+    if (e?.action) set.add(e.action);
+  }
+  return ['all', ...Array.from(set).sort()];
 }
 
 /**
@@ -189,6 +223,12 @@ export function createPrefsShareAudit(opts = {}) {
     },
     format(fmtOpts = {}) {
       return formatShareAuditLog(entries, fmtOpts);
+    },
+    filter(action) {
+      return filterShareAuditEntries(entries, { action });
+    },
+    actions() {
+      return listShareAuditActions(entries);
     },
     exportJson(exportOpts = {}) {
       return exportShareAuditJson(entries, exportOpts);

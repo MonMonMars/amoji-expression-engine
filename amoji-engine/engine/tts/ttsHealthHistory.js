@@ -301,6 +301,7 @@ export function formatHealthProbeDetail(sample, opts = {}) {
         ok: false,
         text: 'probe · none',
         lines: [],
+        copyText: '',
       },
       {},
     );
@@ -335,6 +336,56 @@ export function formatHealthProbeDetail(sample, opts = {}) {
       text: lines[0],
       lines,
       sample,
+      copyText: lines.join('\n'),
+    },
+    {},
+  );
+}
+
+/**
+ * Build a clipboard-ready payload from probe detail (or raw lines).
+ * @param {{ ok?: boolean, lines?: string[], copyText?: string, text?: string }|string|null} detail
+ */
+export function buildHealthProbeCopyPayload(detail) {
+  if (!detail) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_copy',
+        ok: false,
+        copyText: '',
+        message: 'nothing to copy',
+      },
+      {},
+    );
+  }
+  if (typeof detail === 'string') {
+    const text = detail.trim();
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_copy',
+        ok: !!text && text !== 'probe · click sparkline' && text !== 'probe · none',
+        copyText: text,
+        message: text ? 'probe detail ready' : 'nothing to copy',
+      },
+      {},
+    );
+  }
+  const copyText =
+    detail.copyText ||
+    (Array.isArray(detail.lines) && detail.lines.length
+      ? detail.lines.join('\n')
+      : detail.text || '');
+  const ok =
+    detail.ok !== false &&
+    !!copyText &&
+    copyText !== 'probe · none' &&
+    copyText !== 'probe · click sparkline';
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_copy',
+      ok,
+      copyText: ok ? copyText : '',
+      message: ok ? 'probe detail ready' : 'nothing to copy',
     },
     {},
   );

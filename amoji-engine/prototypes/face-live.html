@@ -562,6 +562,9 @@
         <div class="status" id="ttsStatus">tts idle</div>
         <div class="status" id="ttsHealthChip">gateway · idle</div>
         <div id="ttsSlaSpark" class="sla-spark" title="Click sparkline for probe detail" role="button" tabindex="0"></div>
+        <div class="row" style="margin-top:6px;">
+          <button type="button" id="btnProbeCopy">Copy probe</button>
+        </div>
         <pre id="ttsProbeDetail" style="max-height:72px;margin-top:6px;">probe · click sparkline</pre>
       </div>
 
@@ -608,8 +611,16 @@
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
         <div class="status" id="prefsAuditStatus">share audit · empty</div>
+        <select id="prefsAuditFilter" class="ctl" style="margin-top:4px;">
+          <option value="all">All actions</option>
+          <option value="share">share</option>
+          <option value="qr">qr</option>
+          <option value="revoke">revoke</option>
+          <option value="export">export</option>
+        </select>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
+          <button type="button" id="btnPrefsAuditClear">Clear audit</button>
         </div>
         <pre id="prefsAuditLog" style="max-height:88px;">—</pre>
         <div id="prefsQrWrap" style="display:none;margin-top:8px;">
@@ -700,7 +711,7 @@
         startGatewayHealthPoll,
         stopGatewayHealthPoll,
       } from '/engine/tts/ttsHealth.js';
-      import { createGatewayHealthHistory } from '/engine/tts/ttsHealthHistory.js';
+      import { createGatewayHealthHistory, buildHealthProbeCopyPayload } from '/engine/tts/ttsHealthHistory.js';
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import {
         listRemapProfiles,
@@ -870,8 +881,13 @@
       let compoundCrossfadeT0 = 0;
       const gatewayHealthHistory = createGatewayHealthHistory();
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
+      let prefsAuditFilter = 'all';
+      let lastProbeDetail = null;
       function refreshPrefsAuditUi() {
-        const fmt = prefsShareAudit.format({ limit: 6 });
+        const fmt = prefsShareAudit.format({
+          limit: 6,
+          action: prefsAuditFilter,
+        });
         const statusEl = document.getElementById('prefsAuditStatus');
         const logEl = document.getElementById('prefsAuditLog');
         if (statusEl) statusEl.textContent = fmt.text;
@@ -892,8 +908,15 @@
           if (compoundSel) compoundSel.value = '';
         }
         compoundCrossfade = null;
-        if (reason !== 'emblem_pick' && reason !== 'finger_pick') {
+        if (
+          reason !== 'emblem_pick' &&
+          reason !== 'finger_pick' &&
+          reason !== 'chassis_pick' &&
+          reason !== 'pack_pick'
+        ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
+        } else if (reason === 'chassis_pick' || reason === 'pack_pick') {
+          fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
         return cancelled;
       }
@@ -1157,11 +1180,13 @@
       }
       applyFingerPreset(fingerPresetId);
       robotPackSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('pack_pick');
         robotPackId = robotPackSel.value || DEFAULT_ROBOT_PACK;
         refreshRobotStatus();
         persistPrefs();
       });
       chassisSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('chassis_pick');
         chassisId = chassisSel.value || DEFAULT_CHASSIS;
         const c = getChassis(chassisId);
         if (c) {
@@ -1917,6 +1942,7 @@
           if (!ttsSlaSpark) return;
           if (!gatewayHealthHistory.size) {
             ttsSlaSpark.innerHTML = '';
+            lastProbeDetail = null;
             if (ttsProbeDetail) ttsProbeDetail.textContent = 'probe · click sparkline';
             return;
           }
@@ -1929,10 +1955,35 @@
           const xRatio =
             rect.width > 0 ? (ev.clientX - rect.left) / rect.width : 1;
           const detail = gatewayHealthHistory.probeDetail(xRatio);
+          lastProbeDetail = detail;
           if (ttsProbeDetail) {
             ttsProbeDetail.textContent = detail.ok
               ? detail.lines.join('\n')
               : 'probe · none';
+          }
+        }
+        async function copyProbeDetail() {
+          const payload = buildHealthProbeCopyPayload(
+            lastProbeDetail || ttsProbeDetail?.textContent || '',
+          );
+          if (!payload.ok) {
+            setTtsStatus(payload.message || 'nothing to copy', 'warn');
+            return;
+          }
+          try {
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(payload.copyText);
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = payload.copyText;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              ta.remove();
+            }
+            setTtsStatus('probe detail copied', 'ok');
+          } catch (err) {
+            setTtsStatus(String(err.message || err), 'bad');
           }
         }
         ttsSlaSpark?.addEventListener('click', (ev) => {
@@ -1942,11 +1993,15 @@
           if (ev.key !== 'Enter' && ev.key !== ' ') return;
           ev.preventDefault();
           const detail = gatewayHealthHistory.probeDetail(1);
+          lastProbeDetail = detail;
           if (ttsProbeDetail) {
             ttsProbeDetail.textContent = detail.ok
               ? detail.lines.join('\n')
               : 'probe · none';
           }
+        });
+        document.getElementById('btnProbeCopy')?.addEventListener('click', () => {
+          copyProbeDetail();
         });
         function applyHealthChip(health) {
           if (!health || health.status === 'no_endpoint') {
@@ -2159,6 +2214,16 @@
           refreshPrefsAuditUi();
           prefsStatus.className = 'status ok';
           prefsStatus.textContent = `prefs · audit exported · ${exported.count}`;
+        });
+        document.getElementById('btnPrefsAuditClear')?.addEventListener('click', () => {
+          prefsShareAudit.clear();
+          refreshPrefsAuditUi();
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = 'prefs · audit cleared';
+        });
+        document.getElementById('prefsAuditFilter')?.addEventListener('change', (ev) => {
+          prefsAuditFilter = ev.target.value || 'all';
+          refreshPrefsAuditUi();
         });
         refreshPrefsAuditUi();
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
