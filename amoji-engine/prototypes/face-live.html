@@ -811,6 +811,7 @@
           <button type="button" id="btnDisneyExtremeShare">Copy share link <kbd>Y</kbd></button>
           <button type="button" id="btnDisneyExtremeHistList">History list <kbd>L</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
+          <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
         </div>
         <div
           class="row"
@@ -844,8 +845,8 @@
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot JSON · Meta preview · double-click paste from clipboard" style="cursor:pointer;">
-          Drop snapshot JSON · Meta preview · dbl-click paste
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot or hist JSON · Meta preview · double-click paste snapshot · I paste hist" style="cursor:pointer;">
+          Drop snapshot / hist JSON · Meta preview · dbl-click paste · I hist
         </div>
       </div>
 
@@ -1224,6 +1225,8 @@
         formatDisneyExtremeBaselineHistoryEntry,
         formatDisneyExtremeBaselineHistoryList,
         serializeDisneyExtremeBaselineHistory,
+        parseDisneyExtremeBaselineHistory,
+        formatDisneyExtremeBaselineHistoryPreviewLabel,
         formatDisneyExtremeSnapshotPreviewLabel,
         pushDisneyExtremeBaselineHistory,
         popDisneyExtremeBaselineHistory,
@@ -1677,6 +1680,41 @@
         return ok;
       }
 
+      function applyDisneyExtremeBaselineHistory(history, opts = {}) {
+        const list = Array.isArray(history) ? history : [];
+        extremeBaselineHistory = list.slice();
+        persistDisneyExtremeBaselineHistory();
+        clearDisneyExtremeBaselineRedoStack();
+        syncDisneyExtremeHistoryUi();
+        const count = extremeBaselineHistory.length;
+        if (!opts.silent) {
+          flashDisneyExtremeStatus(
+            count > 0
+              ? `imported · hist ${count}`
+              : 'imported · hist · empty',
+          );
+        }
+        return true;
+      }
+
+      async function pasteDisneyExtremeBaselineHistoryJson() {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · hist clipboard');
+          return false;
+        }
+        const parsed = parseDisneyExtremeBaselineHistory(text);
+        if (!parsed.ok) {
+          flashDisneyExtremeStatus(`paste failed · hist · ${parsed.error}`);
+          return false;
+        }
+        return applyDisneyExtremeBaselineHistory(parsed.history);
+      }
+
       function setDisneyExtremeBaseline(snap) {
         if (lastExtremeBaselineSnap) {
           extremeBaselineHistory = pushDisneyExtremeBaselineHistory(
@@ -2002,6 +2040,10 @@
         copyDisneyExtremeBaselineHistoryJson();
       });
 
+      document.getElementById('btnDisneyExtremePasteHist')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineHistoryJson();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -2235,9 +2277,25 @@
       async function handleDisneyExtremeSnapshotDrop(ev, opts = {}) {
         const preview = !!opts.preview || !!ev.metaKey;
         const text = await readDisneyExtremeDropText(ev.dataTransfer);
+        const histParsed = parseDisneyExtremeBaselineHistory(text);
+        if (histParsed.ok) {
+          if (preview) {
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineHistoryPreviewLabel(
+                histParsed.history,
+              ),
+            );
+            return true;
+          }
+          return applyDisneyExtremeBaselineHistory(histParsed.history);
+        }
         const parsed = parseDisneyExtremeSnapshot(text);
         if (!parsed.ok) {
-          flashDisneyExtremeStatus(`drop failed · ${parsed.error}`);
+          flashDisneyExtremeStatus(
+            histParsed.error === 'kind'
+              ? `drop failed · ${parsed.error}`
+              : `drop failed · ${parsed.error}`,
+          );
           return false;
         }
         if (preview) {
@@ -2705,6 +2763,11 @@
         if (resolved.action === 'copyBaselineHistoryJson') {
           ev.preventDefault();
           copyDisneyExtremeBaselineHistoryJson();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineHistoryJson') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineHistoryJson();
           return;
         }
         if (resolved.action === 'copySummary') {

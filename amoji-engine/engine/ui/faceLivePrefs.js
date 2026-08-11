@@ -87,6 +87,7 @@ export function disneyExtremeUiDefaults() {
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
+ * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline

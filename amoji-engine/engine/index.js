@@ -306,6 +306,8 @@ export {
   formatDisneyExtremeBaselineHistoryEntry,
   formatDisneyExtremeBaselineHistoryList,
   serializeDisneyExtremeBaselineHistory,
+  parseDisneyExtremeBaselineHistory,
+  formatDisneyExtremeBaselineHistoryPreviewLabel,
   formatDisneyExtremeSnapshotPreviewLabel,
   saveDisneyExtremeBaseline,
   loadDisneyExtremeBaseline,

@@ -569,7 +569,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
-  { id: 'dropSnapshotJson', help: 'drop JSON · Meta preview · dbl-click paste', kind: 'note' },
+  { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
+  { id: 'dropSnapshotJson', help: 'drop JSON · hist or snap · Meta preview · dbl-click paste', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1474,6 +1475,64 @@ export function serializeDisneyExtremeBaselineHistory(history, opts = {}) {
     null,
     opts.pretty ? 2 : 0,
   );
+}
+
+/**
+ * Parse clipboard / export JSON into an Extreme baseline history stack.
+ * @param {string|object|null|undefined} input
+ * @returns {{ ok: true, history: object[] }|{ ok: false, error: string }}
+ */
+export function parseDisneyExtremeBaselineHistory(input) {
+  let obj = input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) return { ok: false, error: 'empty' };
+    try {
+      obj = JSON.parse(trimmed);
+    } catch {
+      return { ok: false, error: 'invalid_json' };
+    }
+  }
+  if (!obj || typeof obj !== 'object') {
+    return { ok: false, error: 'invalid_payload' };
+  }
+  if (obj.kind !== DISNEY_EXTREME_BASELINE_HISTORY_JSON_KIND) {
+    return { ok: false, error: 'kind' };
+  }
+  if (!Array.isArray(obj.items)) {
+    return { ok: false, error: 'items' };
+  }
+  const history = [];
+  for (const item of obj.items) {
+    const snap = parseDisneyExtremeSnapshot(item);
+    if (snap.ok) history.push(snap.snap);
+  }
+  return {
+    ok: true,
+    history: history.slice(-DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+  };
+}
+
+/**
+ * Dry-run preview label for an Extreme baseline history payload.
+ * @param {object[]|{ history?: object[] }|null|undefined} historyOrOpts
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHistoryPreviewLabel(
+  historyOrOpts = {},
+) {
+  const list = Array.isArray(historyOrOpts)
+    ? historyOrOpts
+    : Array.isArray(historyOrOpts?.history)
+      ? historyOrOpts.history
+      : null;
+  if (!list) return 'preview · hist · invalid';
+  if (!list.length) return 'preview · hist · empty';
+  const tip = formatDisneyExtremeBaselineHistoryEntry(list[list.length - 1], {
+    index: list.length,
+    compact: true,
+  });
+  return `preview · hist ${list.length} · tip ${tip}`;
 }
 
 /**
