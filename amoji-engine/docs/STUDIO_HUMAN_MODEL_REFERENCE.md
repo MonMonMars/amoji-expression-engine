@@ -251,6 +251,9 @@ Amoji engine (ND “systemic emotion”)
 128. ~~**Probe toast haptic stub** (`createProbeToastHaptic` · vibrate on show)~~ ✓
 129. ~~**Audit views import merge starred** (`mergeStarredOnly` · import checkbox)~~ ✓
 130. ~~**Cancel compound on robot slew** (Slew toggle clears lifecycle)~~ ✓
+131. ~~**Probe toast haptic mute** (`toggleMute` · Toast haptic button)~~ ✓
+132. ~~**Audit views import folder filter** (`folder` on merge import · checkbox)~~ ✓
+133. ~~**Cancel compound on latency** (Latency bridge clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -282,4 +285,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast haptic mute, views import folder filter, cancel on robot pack).
+Next code increment: further polish (toast haptic + sound linked mute, views export folder filter, cancel on threat/sigh).

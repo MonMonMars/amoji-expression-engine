@@ -661,6 +661,7 @@
         <div class="row" style="margin-top:6px;">
           <button type="button" id="btnProbeCopy">Copy probe</button>
           <button type="button" id="btnProbeToastMute">Toast sound</button>
+          <button type="button" id="btnProbeToastHapticMute">Toast haptic</button>
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <span style="font-size:0.8rem;color:var(--muted);min-width:4.5rem;">Toast vol</span>
@@ -774,6 +775,10 @@
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
           <span style="font-size:0.8rem;color:var(--muted)">Import merge starred only</span>
+        </label>
+        <label class="row" style="align-items:center;gap:8px;margin-top:4px;">
+          <input id="prefsAuditImportFolderOnly" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Import merge folder filter</span>
         </label>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
@@ -1306,7 +1311,8 @@
           reason !== 'improv_pick' &&
           reason !== 'arousal_pick' &&
           reason !== 'robotwalk_pick' &&
-          reason !== 'robotslew_pick'
+          reason !== 'robotslew_pick' &&
+          reason !== 'latency_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1330,7 +1336,8 @@
           reason === 'improv_pick' ||
           reason === 'arousal_pick' ||
           reason === 'robotwalk_pick' ||
-          reason === 'robotslew_pick'
+          reason === 'robotslew_pick' ||
+          reason === 'latency_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2147,6 +2154,7 @@
       });
 
       document.getElementById('btnLatency').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('latency_pick');
         if (latency.active) {
           latency.resolve();
           e.currentTarget.classList.remove('primary');
@@ -2456,6 +2464,27 @@
           syncProbeToastMuteUi();
           setTtsStatus(
             probeToastSound.muted ? 'probe toast muted' : 'probe toast sound on',
+            'ok',
+          );
+        });
+        function syncProbeToastHapticMuteUi() {
+          const btn = document.getElementById('btnProbeToastHapticMute');
+          if (!btn) return;
+          const muted = probeToastHaptic.muted;
+          btn.textContent = muted ? 'Haptic muted' : 'Toast haptic';
+          btn.classList.toggle('primary', !muted);
+          btn.title = muted
+            ? 'Unmute probe toast haptic cue'
+            : 'Mute probe toast haptic cue';
+        }
+        syncProbeToastHapticMuteUi();
+        document.getElementById('btnProbeToastHapticMute')?.addEventListener('click', () => {
+          probeToastHaptic.toggleMute();
+          syncProbeToastHapticMuteUi();
+          setTtsStatus(
+            probeToastHaptic.muted
+              ? 'probe toast haptic muted'
+              : 'probe toast haptic on',
             'ok',
           );
         });
@@ -3230,9 +3259,25 @@
             const mergeStarredOnly = !!document.getElementById(
               'prefsAuditImportStarredOnly',
             )?.checked;
+            const folderOnly = !!document.getElementById(
+              'prefsAuditImportFolderOnly',
+            )?.checked;
+            const folderEl = document.getElementById('prefsAuditViewFolder');
+            const folder = folderOnly
+              ? prefsAuditFolderFilter ||
+                folderEl?.value?.trim() ||
+                ''
+              : '';
+            if (folderOnly && !folder) {
+              prefsStatus.className = 'status bad';
+              prefsStatus.textContent =
+                'prefs · pick a folder for import folder filter';
+              return;
+            }
             const imported = auditSavedViews.importJson(text, {
               merge: true,
               mergeStarredOnly,
+              folder: folder || null,
             });
             if (!imported.ok) {
               prefsStatus.className = 'status bad';
@@ -3241,8 +3286,11 @@
             }
             refreshAuditSavedViewsUi();
             prefsStatus.className = 'status ok';
-            prefsStatus.textContent = mergeStarredOnly
-              ? `prefs · starred merge · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
+            const bits = [];
+            if (mergeStarredOnly) bits.push('starred');
+            if (folder) bits.push(`folder ${folder}`);
+            prefsStatus.textContent = bits.length
+              ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
               : `prefs · views imported · ${imported.count}`;
           } catch (err) {
             prefsStatus.className = 'status bad';

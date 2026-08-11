@@ -15,18 +15,19 @@ export const PROBE_TOAST_HAPTIC_PATTERN = {
  * Resolve whether / how to trigger a probe toast haptic cue.
  * @param {{
  *   enabled?: boolean,
+ *   muted?: boolean,
  *   tone?: string|null,
  *   event?: string,
  * }} [opts]
  */
 export function resolveProbeToastHaptic(opts = {}) {
-  if (opts.enabled === false) {
+  if (opts.enabled === false || opts.muted) {
     return applyComplianceGate(
       {
         kind: 'tts_gateway_health_probe_toast_haptic',
         ok: false,
         vibrate: false,
-        reason: 'disabled',
+        reason: opts.muted ? 'muted' : 'disabled',
         pattern: null,
       },
       {},
@@ -71,6 +72,7 @@ export function resolveProbeToastHaptic(opts = {}) {
  */
 export function createProbeToastHaptic(opts = {}) {
   let enabled = opts.enabled !== false;
+  let muted = false;
   const vibrateFn =
     opts.vibrate ??
     (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function'
@@ -80,6 +82,9 @@ export function createProbeToastHaptic(opts = {}) {
   return {
     get enabled() {
       return enabled;
+    },
+    get muted() {
+      return muted;
     },
     setEnabled(on) {
       enabled = !!on;
@@ -93,12 +98,37 @@ export function createProbeToastHaptic(opts = {}) {
         {},
       );
     },
+    setMuted(on) {
+      muted = !!on;
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_haptic',
+          action: 'set_muted',
+          ok: true,
+          muted,
+        },
+        {},
+      );
+    },
+    toggleMute() {
+      muted = !muted;
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_haptic',
+          action: 'toggle_mute',
+          ok: true,
+          muted,
+        },
+        {},
+      );
+    },
     /**
      * @param {{ tone?: string, event?: string }} [playOpts]
      */
     play(playOpts = {}) {
       const resolved = resolveProbeToastHaptic({
         enabled,
+        muted,
         tone: playOpts.tone,
         event: playOpts.event || 'show',
       });

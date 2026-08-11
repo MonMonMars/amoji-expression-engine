@@ -361,7 +361,12 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
  * Merge imported views into an existing list.
  * @param {object[]} existing
  * @param {object[]} incoming
- * @param {{ mergeStarredOnly?: boolean, max?: number, now?: number }} [opts]
+ * @param {{
+ *   mergeStarredOnly?: boolean,
+ *   folder?: string|null,
+ *   max?: number,
+ *   now?: number,
+ * }} [opts]
  */
 export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
   const list = Array.isArray(existing) ? existing.slice() : [];
@@ -369,6 +374,10 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
     normalizeAuditSavedView(v, { now: opts.now }),
   );
   const mergeStarredOnly = !!opts.mergeStarredOnly;
+  const folderFilter =
+    opts.folder != null && String(opts.folder).trim() !== ''
+      ? String(opts.folder).trim()
+      : null;
   let added = 0;
   let updated = 0;
   let skipped = 0;
@@ -376,6 +385,13 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
     if (mergeStarredOnly && !v.starred) {
       skipped += 1;
       continue;
+    }
+    if (folderFilter) {
+      const vFolder = String(v.folder || '').trim() || 'Inbox';
+      if (vFolder !== folderFilter) {
+        skipped += 1;
+        continue;
+      }
     }
     const idx = list.findIndex(
       (x) => x.name.toLowerCase() === v.name.toLowerCase(),
@@ -400,6 +416,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
       updated,
       skipped,
       mergeStarredOnly,
+      folder: folderFilter,
       count: views.length,
     },
     {},
@@ -1208,8 +1225,13 @@ export function createAuditSavedViews(opts = {}) {
       });
       if (!imported.ok) return imported;
       if (importOpts.merge) {
+        const folder =
+          importOpts.folder != null && String(importOpts.folder).trim() !== ''
+            ? String(importOpts.folder).trim()
+            : null;
         const merged = mergeAuditSavedViewsImport(views, imported.views, {
           mergeStarredOnly: importOpts.mergeStarredOnly,
+          folder,
           max,
           now: importOpts.now,
         });
@@ -1223,6 +1245,7 @@ export function createAuditSavedViews(opts = {}) {
             count: views.length,
             merge: true,
             mergeStarredOnly: !!importOpts.mergeStarredOnly,
+            folder,
             added: merged.added,
             updated: merged.updated,
             skipped: merged.skipped,
@@ -1241,6 +1264,7 @@ export function createAuditSavedViews(opts = {}) {
           count: views.length,
           merge: !!importOpts.merge,
           mergeStarredOnly: !!importOpts.mergeStarredOnly,
+          folder: importOpts.folder || null,
         },
         {},
       );
