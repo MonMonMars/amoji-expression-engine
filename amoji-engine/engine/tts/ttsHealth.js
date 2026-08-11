@@ -142,3 +142,96 @@ export async function probeTtsGateway(opts = {}) {
     if (timer) clearTimeout(timer);
   }
 }
+
+/** @type {ReturnType<typeof setInterval>|null} */
+let activePollTimer = null;
+/** @type {number} */
+let activePollGen = 0;
+
+/**
+ * Stop any active gateway health poll started by {@link startGatewayHealthPoll}.
+ */
+export function stopGatewayHealthPoll() {
+  if (activePollTimer != null) {
+    clearInterval(activePollTimer);
+    activePollTimer = null;
+  }
+  activePollGen += 1;
+  return applyComplianceGate(
+    { kind: 'tts_gateway_health_poll', action: 'stop', ok: true },
+    {},
+  );
+}
+
+/**
+ * Poll TTS gateway health on an interval. Replaces any previous poll.
+ * When endpoint is empty, stops and optionally notifies idle.
+ *
+ * @param {{
+ *   getEndpoint?: () => string,
+ *   endpoint?: string,
+ *   intervalMs?: number,
+ *   token?: string,
+ *   fetchImpl?: typeof fetch,
+ *   timeoutMs?: number,
+ *   onResult?: (result: object) => void,
+ *   immediate?: boolean,
+ * }} [opts]
+ */
+export function startGatewayHealthPoll(opts = {}) {
+  stopGatewayHealthPoll();
+  const intervalMs = Math.max(2000, opts.intervalMs ?? 8000);
+  const gen = activePollGen;
+  const resolveEndpoint = () => {
+    if (typeof opts.getEndpoint === 'function') {
+      return String(opts.getEndpoint() || '').trim();
+    }
+    return String(opts.endpoint || '').trim();
+  };
+
+  const tick = async () => {
+    if (gen !== activePollGen) return;
+    const endpoint = resolveEndpoint();
+    if (!endpoint) {
+      opts.onResult?.(
+        applyComplianceGate(
+          {
+            kind: 'tts_gateway_health',
+            ok: false,
+            status: 'no_endpoint',
+            tone: 'warn',
+            message: 'no endpoint',
+          },
+          {},
+        ),
+      );
+      return;
+    }
+    const result = await probeTtsGateway({
+      endpoint,
+      token: opts.token,
+      fetchImpl: opts.fetchImpl,
+      timeoutMs: opts.timeoutMs,
+    });
+    if (gen !== activePollGen) return;
+    opts.onResult?.(result);
+  };
+
+  if (opts.immediate !== false) {
+    void tick();
+  }
+  activePollTimer = setInterval(() => {
+    void tick();
+  }, intervalMs);
+
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_poll',
+      action: 'start',
+      ok: true,
+      intervalMs,
+      stop: stopGatewayHealthPoll,
+    },
+    {},
+  );
+}

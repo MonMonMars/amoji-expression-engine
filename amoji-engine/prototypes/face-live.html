@@ -536,6 +536,7 @@
         <div class="row" style="margin-top:8px;">
           <button type="button" id="btnPrefsExport">Export prefs</button>
           <button type="button" id="btnPrefsImport">Import prefs</button>
+          <button type="button" id="btnPrefsShare">Copy share link</button>
         </div>
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
@@ -602,17 +603,25 @@
       import {
         syncEmblemToFinger,
         syncFingerToEmblem,
-        syncAffectToFinger,
         fingerPresetForEmblem,
       } from '/engine/export/emblemFingerSync.js';
-      import { stageAffect } from '/engine/export/affectStaging.js';
+      import {
+        stageAffect,
+        stageCompoundAffect,
+      } from '/engine/export/affectStaging.js';
       import {
         loadFaceLivePrefs,
         saveFaceLivePrefs,
         exportFaceLivePrefsJson,
         importFaceLivePrefsJson,
+        loadFaceLivePrefsFromHash,
+        buildPrefsShareUrl,
       } from '/engine/ui/faceLivePrefs.js';
-      import { probeTtsGateway } from '/engine/tts/ttsHealth.js';
+      import {
+        probeTtsGateway,
+        startGatewayHealthPoll,
+        stopGatewayHealthPoll,
+      } from '/engine/tts/ttsHealth.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -716,7 +725,16 @@
 
       let lod = 'hi';
       let texLod = 'mid';
-      const savedPrefs = loadFaceLivePrefs().prefs;
+      const hashPrefs = loadFaceLivePrefsFromHash();
+      let savedPrefs = loadFaceLivePrefs().prefs;
+      if (hashPrefs.ok && hashPrefs.prefs) {
+        savedPrefs = { ...savedPrefs, ...hashPrefs.prefs };
+        try {
+          saveFaceLivePrefs(hashPrefs.prefs);
+        } catch {
+          /* ignore */
+        }
+      }
       let emotion = savedPrefs.emotion || 'happy';
       let intensity =
         typeof savedPrefs.intensity === 'number' ? savedPrefs.intensity : 0.7;
@@ -931,6 +949,20 @@
       }
       compoundSel.addEventListener('change', () => {
         compoundId = compoundSel.value;
+        if (!compoundId || !affectFingerSyncOn) return;
+        const staged = stageCompoundAffect(compoundId, intensity);
+        if (staged.ok && staged.synced && staged.fingerPresetId) {
+          applyFingerPreset(staged.fingerPresetId, { fromEmblem: true });
+          fingerStatus.textContent = `fingers · ${staged.fingerPresetId} · compound ${staged.band}`;
+          if (staged.lookBias) {
+            lookX = staged.lookBias.lookX || lookX;
+            lookY = staged.lookBias.lookY || lookY;
+            lookXEl.value = String(lookX);
+            lookYEl.value = String(lookY);
+            lookXVal.textContent = lookX.toFixed(2);
+            lookYVal.textContent = lookY.toFixed(2);
+          }
+        }
       });
       for (const [id, def] of Object.entries(GESTURE_EMBLEMS)) {
         const opt = document.createElement('option');
@@ -1747,25 +1779,52 @@
         ttsAudioSync?.addEventListener('change', () => persistPrefs());
 
         const ttsHealthChip = document.getElementById('ttsHealthChip');
-        async function refreshGatewayHealth() {
-          const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
-          if (!endpoint) {
+        function applyHealthChip(health) {
+          if (!health || health.status === 'no_endpoint') {
             ttsHealthChip.className = 'status';
             ttsHealthChip.textContent = 'gateway · idle';
             return;
           }
-          ttsHealthChip.textContent = 'gateway · probing…';
-          const health = await probeTtsGateway({ endpoint });
           ttsHealthChip.className = `status ${health.tone || ''}`;
           ttsHealthChip.textContent = `gateway · ${health.message}`;
+        }
+        async function refreshGatewayHealth() {
+          const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
+          if (!endpoint) {
+            applyHealthChip({ status: 'no_endpoint' });
+            return;
+          }
+          ttsHealthChip.textContent = 'gateway · probing…';
+          const health = await probeTtsGateway({ endpoint });
+          applyHealthChip(health);
+        }
+        function syncGatewayHealthPoll() {
+          const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
+          if (!endpoint) {
+            stopGatewayHealthPoll();
+            applyHealthChip({ status: 'no_endpoint' });
+            return;
+          }
+          startGatewayHealthPoll({
+            getEndpoint: () =>
+              document.getElementById('ttsEndpoint')?.value?.trim() || '',
+            intervalMs: 8000,
+            onResult: applyHealthChip,
+          });
         }
         document.getElementById('btnTtsHealth').addEventListener('click', () => {
           refreshGatewayHealth();
         });
-        ttsPresetSel.addEventListener('change', () => {
-          const ep = document.getElementById('ttsEndpoint')?.value?.trim();
-          if (ep) setTimeout(() => refreshGatewayHealth(), 50);
+        document.getElementById('ttsEndpoint')?.addEventListener('change', () => {
+          persistPrefs();
+          syncGatewayHealthPoll();
         });
+        ttsPresetSel.addEventListener('change', () => {
+          setTimeout(() => syncGatewayHealthPoll(), 50);
+        });
+        if (document.getElementById('ttsEndpoint')?.value?.trim()) {
+          syncGatewayHealthPoll();
+        }
       }
 
       // Prefs export / import
@@ -1786,6 +1845,38 @@
         document.getElementById('btnPrefsImport').addEventListener('click', () => {
           document.getElementById('prefsImportFile').click();
         });
+        document.getElementById('btnPrefsShare').addEventListener('click', async () => {
+          persistPrefs();
+          const share = buildPrefsShareUrl(loadFaceLivePrefs().prefs);
+          try {
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(share.url);
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = share.url;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              ta.remove();
+            }
+            prefsStatus.className = 'status ok';
+            prefsStatus.textContent = 'prefs · share link copied';
+            if (share.hash) {
+              try {
+                history.replaceState(null, '', `#${share.hash}`);
+              } catch {
+                /* ignore */
+              }
+            }
+          } catch (err) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = String(err.message || err);
+          }
+        });
+        if (hashPrefs.ok) {
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = 'prefs · loaded from URL hash';
+        }
         document.getElementById('prefsImportFile').addEventListener('change', async (ev) => {
           const file = ev.target.files?.[0];
           if (!file) return;

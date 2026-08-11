@@ -179,6 +179,9 @@ Amoji engine (ND “systemic emotion”)
 56. ~~**Prefs export/import JSON** (Face Live download / file restore)~~ ✓
 57. ~~**Affect staging** (intensity bands + mood aliases + look bias)~~ ✓
 58. ~~**Gateway health chip** (`probeTtsGateway` · Probe gateway button)~~ ✓
+59. ~~**Auto gateway health poll** (`startGatewayHealthPoll` · 8s interval)~~ ✓
+60. ~~**Prefs share URL hash** (`#flp=` encode/decode · Copy share link)~~ ✓
+61. ~~**Compound affect staging** (`stageCompoundAffect` · primary-weighted fingers)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -210,4 +213,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (auto health poll interval, prefs share URL hash, more compound affect staging).
+Next code increment: further polish (poll backoff on consecutive failures, prefs QR/short-link helper, compound→emblem crossfade).

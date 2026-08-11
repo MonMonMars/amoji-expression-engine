@@ -6,6 +6,7 @@ import {
   fingerPresetForAffect,
   syncAffectToFinger,
 } from '../export/emblemFingerSync.js';
+import { getCompound } from '../layers/compoundEmotion.js';
 
 /** Soft aliases for mood-ish emotion labels → catalog keys */
 export const AFFECT_ALIASES = {
@@ -111,6 +112,97 @@ export function stageAffect(emotion, intensity = 0.7, opts = {}) {
       gesture,
       digits: synced?.digits || null,
       lookBias,
+      scientific: false,
+    },
+    {},
+  );
+}
+
+/**
+ * Blend two look biases.
+ * @param {{ lookX?: number, lookY?: number }} a
+ * @param {{ lookX?: number, lookY?: number }} b
+ * @param {number} wA weight for a (0..1)
+ */
+function blendLook(a, b, wA = 0.6) {
+  const wB = 1 - wA;
+  return {
+    lookX: (a?.lookX || 0) * wA + (b?.lookX || 0) * wB,
+    lookY: (a?.lookY || 0) * wA + (b?.lookY || 0) * wB,
+  };
+}
+
+/**
+ * Blend fist/open gesture maps (primary-weighted).
+ * @param {Record<string, number>|null} a
+ * @param {Record<string, number>|null} b
+ * @param {number} wA
+ */
+function blendGesture(a, b, wA = 0.65) {
+  if (!a && !b) return null;
+  if (!a) return { ...b };
+  if (!b) return { ...a };
+  const wB = 1 - wA;
+  /** @type {Record<string, number>} */
+  const out = { ...a };
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) {
+    const va = typeof a[k] === 'number' ? a[k] : 0;
+    const vb = typeof b[k] === 'number' ? b[k] : 0;
+    out[k] = Math.max(0, Math.min(1.25, va * wA + vb * wB));
+  }
+  return out;
+}
+
+/**
+ * Stage finger/look cues for a region-locked compound emotion.
+ * Primary affect owns fingers; secondary softens look + gesture blend.
+ *
+ * @param {string} compoundId
+ * @param {number} [intensity]
+ * @param {{ articulate?: boolean, primaryWeight?: number }} [opts]
+ */
+export function stageCompoundAffect(compoundId, intensity = 0.7, opts = {}) {
+  const def = getCompound(compoundId);
+  if (!def) {
+    return applyComplianceGate(
+      {
+        kind: 'affect_staging_compound',
+        ok: false,
+        error: 'unknown_compound',
+        compoundId,
+        scientific: false,
+      },
+      {},
+    );
+  }
+  const t = Number(intensity) || 0;
+  const wP = Math.max(0.5, Math.min(0.85, opts.primaryWeight ?? 0.65));
+  const primary = stageAffect(def.primary, t, opts);
+  const secondary = stageAffect(def.secondary, t * 0.9, opts);
+  const band = affectStagingBand(t);
+  const gesture = blendGesture(primary.gesture, secondary.gesture, wP);
+  const lookBias = blendLook(primary.lookBias, secondary.lookBias, wP);
+
+  return applyComplianceGate(
+    {
+      kind: 'affect_staging_compound',
+      ok: true,
+      compoundId,
+      label: def.label,
+      primary: def.primary,
+      secondary: def.secondary,
+      intensity: t,
+      band,
+      scale: affectBandScale(band),
+      primaryWeight: wP,
+      fingerPresetId: primary.fingerPresetId || secondary.fingerPresetId || null,
+      secondaryFingerPresetId: secondary.fingerPresetId || null,
+      synced: !!(primary.synced || secondary.synced),
+      gesture,
+      digits: primary.digits || secondary.digits || null,
+      lookBias,
+      ownership: def.ownership || null,
       scientific: false,
     },
     {},

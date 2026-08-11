@@ -107,4 +107,6 @@ AMOJI_TTS_ENDPOINT="$AMOJI_TTS_GATEWAY/synthesize" npm run tts:smoke
 Pass criteria: `ok: true`, `hasToken: true` when token set, `phonemeCount > 0`, `audioUrl` present.  
 401/403 → check Bearer header (`Authorization: Bearer …`). Empty gateway + Gateway preset → Face Live shows “set AMOJI_TTS_GATEWAY”.
 
-Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js` + `ttsSmoke.js` + `ttsPresets.js`.
+Face Live **Probe gateway** runs `probeTtsGateway` (and auto-polls ~8s via `startGatewayHealthPoll` while an endpoint is set). Chip tones: `ok` / `warn` (auth) / `bad`.
+
+Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js` + `ttsSmoke.js` + `ttsPresets.js` + `ttsHealth.js`.

@@ -449,12 +449,19 @@ export {
   loadFaceLivePrefs,
   saveFaceLivePrefs,
   clearFaceLivePrefs,
+  compactPrefsForHash,
+  encodePrefsHash,
+  decodePrefsHash,
+  loadFaceLivePrefsFromHash,
+  buildPrefsShareUrl,
   exportFaceLivePrefsJson,
   importFaceLivePrefsJson,
 } from './ui/faceLivePrefs.js';
 export {
   healthUrlForEndpoint,
   probeTtsGateway,
+  startGatewayHealthPoll,
+  stopGatewayHealthPoll,
 } from './tts/ttsHealth.js';
 export {
   AFFECT_ALIASES,
@@ -462,4 +469,5 @@ export {
   affectStagingBand,
   affectBandScale,
   stageAffect,
+  stageCompoundAffect,
 } from './export/affectStaging.js';

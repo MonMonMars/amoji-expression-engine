@@ -142,6 +142,123 @@ export function clearFaceLivePrefs(opts = {}) {
 }
 
 /**
+ * Compact prefs for URL hash (drop nullish / defaults where safe).
+ * @param {object} prefs
+ */
+export function compactPrefsForHash(prefs) {
+  const full = normalizeFaceLivePrefs(prefs);
+  const base = defaultFaceLivePrefs();
+  /** @type {Record<string, any>} */
+  const out = {};
+  for (const [k, v] of Object.entries(full)) {
+    if (k === 'version' || k === 'updatedAt') continue;
+    if (v === base[k]) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+/**
+ * Encode prefs → URL hash fragment (`#flp=...` base64url JSON).
+ * @param {object} [prefs]
+ */
+export function encodePrefsHash(prefs) {
+  const compact = compactPrefsForHash(prefs || defaultFaceLivePrefs());
+  const json = JSON.stringify(compact);
+  const b64 =
+    typeof Buffer !== 'undefined'
+      ? Buffer.from(json, 'utf8').toString('base64url')
+      : btoa(unescape(encodeURIComponent(json)))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/g, '');
+  return `flp=${b64}`;
+}
+
+/**
+ * Decode `#flp=...` or raw flp= payload → prefs.
+ * @param {string} hashOrQuery
+ */
+export function decodePrefsHash(hashOrQuery) {
+  if (!hashOrQuery || typeof hashOrQuery !== 'string') {
+    return applyComplianceGate(
+      { kind: 'face_live_prefs_hash', ok: false, error: 'empty' },
+      {},
+    );
+  }
+  let raw = hashOrQuery.replace(/^#/, '');
+  const m = raw.match(/(?:^|&)?flp=([^&]+)/);
+  if (m) raw = m[1];
+  try {
+    const pad = raw.length % 4 === 0 ? '' : '='.repeat(4 - (raw.length % 4));
+    const b64 = raw.replace(/-/g, '+').replace(/_/g, '/') + pad;
+    const json =
+      typeof Buffer !== 'undefined'
+        ? Buffer.from(b64, 'base64').toString('utf8')
+        : decodeURIComponent(escape(atob(b64)));
+    const obj = JSON.parse(json);
+    return applyComplianceGate(
+      {
+        kind: 'face_live_prefs_hash',
+        ok: true,
+        prefs: normalizeFaceLivePrefs(obj),
+      },
+      {},
+    );
+  } catch (err) {
+    return applyComplianceGate(
+      {
+        kind: 'face_live_prefs_hash',
+        ok: false,
+        error: 'decode_failed',
+        message: String(err?.message || err),
+      },
+      {},
+    );
+  }
+}
+
+/**
+ * Read prefs from location.hash if present.
+ * @param {{ hash?: string }} [loc]
+ */
+export function loadFaceLivePrefsFromHash(loc = {}) {
+  const hash =
+    loc.hash ||
+    (typeof location !== 'undefined' ? location.hash : '') ||
+    '';
+  if (!hash.includes('flp=')) {
+    return applyComplianceGate(
+      { kind: 'face_live_prefs_hash', ok: false, error: 'no_flp' },
+      {},
+    );
+  }
+  return decodePrefsHash(hash);
+}
+
+/**
+ * Build share URL with prefs in hash.
+ * @param {object} prefs
+ * @param {{ baseUrl?: string }} [opts]
+ */
+export function buildPrefsShareUrl(prefs, opts = {}) {
+  const base =
+    opts.baseUrl ||
+    (typeof location !== 'undefined'
+      ? `${location.origin}${location.pathname}${location.search}`
+      : '');
+  const frag = encodePrefsHash(prefs);
+  return applyComplianceGate(
+    {
+      kind: 'face_live_prefs_share',
+      url: base ? `${base}#${frag}` : `#${frag}`,
+      hash: frag,
+    },
+    {},
+  );
+}
+
+/**
  * Export prefs as pretty JSON string (no secrets beyond optional endpoint).
  * @param {{ storage?: Storage|null, memory?: boolean, prefs?: object }} [opts]
  */
