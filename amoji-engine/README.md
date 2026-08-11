@@ -184,7 +184,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 171 | Extreme snapshot diff label + dirty | Done |
 | Phase 172 | Extreme D snapshot diff hotkey | Done |
 | Phase 173 | Extreme Face Live diff baseline wiring | Done |
-| Phase 174+ | Further production polish… | Specced |
+| Phase 174 | Extreme dirty HUD bit | Done |
+| Phase 175 | Extreme live dirty pill wiring | Done |
+| Phase 176 | Extreme Shift+D restore baseline | Done |
+| Phase 177 | Extreme Face Live restore baseline wiring | Done |
+| Phase 178+ | Further production polish… | Specced |
 
 ## Quick start
 

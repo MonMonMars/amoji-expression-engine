@@ -78,6 +78,7 @@ export function disneyExtremeUiDefaults() {
  * - `j` / `J` → copy Extreme snapshot JSON to clipboard
  * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
  * - `d` / `D` → flash Extreme snapshot diff vs last copy/paste baseline
+ * - `Shift+D` → restore Extreme factors from last copy/paste baseline
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -318,6 +319,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copySnapshotJson' && ev.shiftKey) {
       return { ok: true, action: 'pasteSnapshotJson' };
+    }
+    if (entry.id === 'showSnapshotDiff' && ev.shiftKey) {
+      return { ok: true, action: 'restoreBaseline' };
     }
     return { ok: true, action: entry.id };
   }

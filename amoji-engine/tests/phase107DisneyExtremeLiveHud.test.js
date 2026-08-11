@@ -60,6 +60,8 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
     expect(src).toContain('id="disneyExtremeStatus"');
     expect(src).toContain('formatDisneyExtremeLiveHud');
     expect(src).toContain('disneyExtremeStatus.textContent = extremeHud.status');
-    expect(src).toContain('hudExtreme.textContent = extremeHud.pill');
+    expect(src).toContain('extremeHud.pill');
+    expect(src).toContain('formatDisneyExtremeDirtyHudBit');
+    expect(src).toContain('hudExtreme.textContent');
   });
 });

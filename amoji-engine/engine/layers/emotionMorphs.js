@@ -561,6 +561,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySnapshotJson', keys: ['j', 'J'], help: 'J json', kind: 'action' },
   { id: 'pasteSnapshotJson', help: 'Shift+J paste json', kind: 'note' },
   { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
+  { id: 'restoreBaseline', help: 'Shift+D restore', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1095,4 +1096,19 @@ export function formatDisneyExtremeSnapshotDiffLabel(diff) {
 export function isDisneyExtremeSnapshotDirty(current, baseline) {
   if (!baseline) return false;
   return !diffDisneyExtremeSnapshots(current, baseline).equal;
+}
+
+/**
+ * Compact dirty/clean bit for Extreme HUD pill / status.
+ * @param {{ hasBaseline?: boolean, dirty?: boolean }} [opts]
+ * @returns {{ bit: string, dirty: boolean, hasBaseline: boolean }}
+ */
+export function formatDisneyExtremeDirtyHudBit(opts = {}) {
+  const hasBaseline = !!opts.hasBaseline;
+  const dirty = hasBaseline && !!opts.dirty;
+  return {
+    hasBaseline,
+    dirty,
+    bit: !hasBaseline ? '' : dirty ? ' · dirty' : ' · clean',
+  };
 }

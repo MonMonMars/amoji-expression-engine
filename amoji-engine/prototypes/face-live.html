@@ -267,6 +267,9 @@
         align-items: center;
         gap: 6px;
       }
+      .pill.pill-x.is-dirty {
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, #ffb454 55%, transparent);
+      }
       .pill.pill-b {
         display: inline-flex;
         align-items: center;
@@ -582,7 +585,7 @@
         <div class="pill">E <strong id="hudEyes">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
-        <div class="pill pill-x">X <strong id="hudExtreme">off</strong><span id="hudExtremeSpark" class="hud-extreme-spark is-off" aria-hidden="true"></span><span id="hudExtremeFactors" class="hud-extreme-factors is-off" aria-hidden="true"></span></div>
+        <div class="pill pill-x" id="pillExtreme">X <strong id="hudExtreme">off</strong><span id="hudExtremeSpark" class="hud-extreme-spark is-off" aria-hidden="true"></span><span id="hudExtremeFactors" class="hud-extreme-factors is-off" aria-hidden="true"></span></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
       </div>
     </div>
@@ -750,6 +753,7 @@
           <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
           <button type="button" id="btnDisneyExtremePasteJson">Paste JSON <kbd>⇧J</kbd></button>
           <button type="button" id="btnDisneyExtremeDiff">Diff baseline <kbd>D</kbd></button>
+          <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1143,6 +1147,7 @@
         diffDisneyExtremeSnapshots,
         formatDisneyExtremeSnapshotDiffLabel,
         isDisneyExtremeSnapshotDirty,
+        formatDisneyExtremeDirtyHudBit,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1396,6 +1401,7 @@
         'disneyExtremeBodyMixLabel',
       );
       const hudExtreme = document.getElementById('hudExtreme');
+      const pillExtreme = document.getElementById('pillExtreme');
       const hudExtremeSpark = document.getElementById('hudExtremeSpark');
       const hudExtremeFactors = document.getElementById('hudExtremeFactors');
       const hudBodySpark = document.getElementById('hudBodySpark');
@@ -1701,6 +1707,10 @@
         flashDisneyExtremeSnapshotDiff();
       });
 
+      document.getElementById('btnDisneyExtremeRestore')?.addEventListener('click', () => {
+        restoreDisneyExtremeBaseline();
+      });
+
       function disneyExtremeFactorOpts() {
         const disneyExtremeOn = !!disneyExtremeEl?.checked;
         return {
@@ -1880,6 +1890,17 @@
         flashDisneyExtremeStatus(
           dirty ? `${label} · dirty` : `${label} · clean`,
         );
+      }
+
+      function restoreDisneyExtremeBaseline() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('restore · no baseline · copy or paste JSON');
+          return false;
+        }
+        applyDisneyExtremeSnapshot(lastExtremeBaselineSnap);
+        const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
+        flashDisneyExtremeStatus(`restored · baseline · fp ${fp}`);
+        return true;
       }
 
       async function copyDisneyExtremeEaseSvg() {
@@ -2127,6 +2148,11 @@
         if (resolved.action === 'showSnapshotDiff') {
           ev.preventDefault();
           flashDisneyExtremeSnapshotDiff();
+          return;
+        }
+        if (resolved.action === 'restoreBaseline') {
+          ev.preventDefault();
+          restoreDisneyExtremeBaseline();
           return;
         }
         if (resolved.action === 'copySummary') {
@@ -5394,7 +5420,17 @@
         ) {
           disneyExtremeStatus.textContent = extremeHud.status;
         }
-        if (hudExtreme) hudExtreme.textContent = extremeHud.pill;
+        if (hudExtreme) {
+          const dirtyHud = formatDisneyExtremeDirtyHudBit({
+            hasBaseline: !!lastExtremeBaselineSnap,
+            dirty: isDisneyExtremeSnapshotDirty(
+              extremeSnap,
+              lastExtremeBaselineSnap,
+            ),
+          });
+          hudExtreme.textContent = `${extremeHud.pill}${dirtyHud.bit}`;
+          pillExtreme?.classList.toggle('is-dirty', dirtyHud.dirty);
+        }
         const extremeFp = disneyExtremeSnapshotFingerprint(extremeSnap);
         if (extremeFp !== lastExtremeSparkFp) {
           lastExtremeSparkFp = extremeFp;
