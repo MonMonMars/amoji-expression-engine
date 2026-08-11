@@ -431,6 +431,19 @@
       </div>
 
       <div class="group">
+        <div class="label">TTS speak (phoneme-timed)</div>
+        <input id="ttsText" class="ctl" type="text" value="Hello mama" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnTtsPlay" class="primary">Play TTS</button>
+          <button type="button" id="btnTtsStop">Stop</button>
+        </div>
+        <div class="row">
+          <button type="button" id="btnTtsFixture">Load Step fixture</button>
+        </div>
+        <div class="status" id="ttsStatus">tts idle</div>
+      </div>
+
+      <div class="group">
         <div class="label">Motion test</div>
         <div class="row">
           <button type="button" id="btnIdle" class="primary">Idle sway</button>
@@ -523,6 +536,8 @@
         ChassisSlewLimiter,
         DEFAULT_CHASSIS,
       } from '/engine/export/chassisCalibrate.js';
+      import { SpeechPlayer } from '/engine/tts/speechPlayer.js';
+      import { mouthChannelsToMorphWeights } from '/engine/tts/mouthMorphs.js';
       import {
         texturePackUrls,
         applyTexturePack,
@@ -631,6 +646,11 @@
       let robotSlewOn = true;
       const robotSlew = new ChassisSlewLimiter(chassisId);
       let lastRobotT = performance.now() / 1000;
+      const speechPlayer = new SpeechPlayer({ emotion: 'happy', intensity: 0.7, fps: 30 });
+      const ttsStatus = document.getElementById('ttsStatus');
+      const ttsTextEl = document.getElementById('ttsText');
+      /** @type {Record<string, number>|null} */
+      let speechMouthMorphs = null;
       /** @type {Record<string, THREE.Object3D>} */
       let boneMap = {};
       /** @type {Record<string, { x: number, y: number, z: number }>} */
@@ -1208,6 +1228,54 @@
         gestures.setSpeaking(!gestures.speaking, 0.65);
         e.currentTarget.classList.toggle('primary', gestures.speaking);
       });
+      function setTtsStatus(msg, tone = '') {
+        ttsStatus.className = `status ${tone}`;
+        ttsStatus.textContent = msg;
+      }
+      document.getElementById('btnTtsPlay').addEventListener('click', () => {
+        const text = ttsTextEl.value || 'Hello mama';
+        speechPlayer.emotion = emotion;
+        speechPlayer.intensity = intensity;
+        const loaded = speechPlayer.loadText(text);
+        if (!loaded.loaded) {
+          setTtsStatus(loaded.error || 'load failed', 'bad');
+          return;
+        }
+        gestures.setSpeaking(true, 0.7);
+        speechPlayer.play();
+        setTtsStatus(
+          `playing · ${loaded.frames}f · ${loaded.duration.toFixed(2)}s · est=${loaded.estimateSource || 'tts'}`,
+          'ok',
+        );
+      });
+      document.getElementById('btnTtsStop').addEventListener('click', () => {
+        speechPlayer.stop();
+        speechMouthMorphs = null;
+        gestures.setSpeaking(false);
+        setTtsStatus('stopped');
+      });
+      document.getElementById('btnTtsFixture').addEventListener('click', async () => {
+        try {
+          const res = await fetch('/data/tts/fixtures/sample-payloads.json');
+          const fixtures = await res.json();
+          speechPlayer.emotion = emotion;
+          speechPlayer.intensity = intensity;
+          const loaded = speechPlayer.loadTts(fixtures.stepAudioEditX);
+          ttsTextEl.value = fixtures.stepAudioEditX.text;
+          if (!loaded.loaded) {
+            setTtsStatus(loaded.error || 'fixture failed', 'bad');
+            return;
+          }
+          gestures.setSpeaking(true, 0.7);
+          speechPlayer.play();
+          setTtsStatus(
+            `Step fixture · ${loaded.provider} · ${loaded.duration.toFixed(2)}s`,
+            'ok',
+          );
+        } catch (err) {
+          setTtsStatus(String(err.message || err), 'bad');
+        }
+      });
       document.getElementById('turnSeg').addEventListener('click', (ev) => {
         const btn = ev.target.closest('button[data-turn]');
         if (!btn) return;
@@ -1396,6 +1464,30 @@
           mergeMorphOverlays(targets, residual);
         }
         mergeMorphOverlays(targets, temporalState.leakWeights);
+
+        // TTS phoneme-timed mouth override (LOCK-style: mouth from speech)
+        if (speechPlayer.playing || (speechPlayer.performance && speechPlayer.t > 0 && speechPlayer.t < speechPlayer.duration)) {
+          const speechTick = speechPlayer.tick(dt);
+          if (speechTick.mouth) {
+            speechMouthMorphs = mouthChannelsToMorphWeights(speechTick.mouth, morphs);
+            mergeMorphOverlays(targets, speechMouthMorphs);
+          }
+          for (const hook of speechTick.hooks || []) {
+            if (hook.hook === 'laugh' || hook.hook === 'chuckle') {
+              smileCtl.startLaugh(Math.max(intensity, 0.75));
+            }
+            if (hook.hook === 'sigh') bodyCtl.triggerSigh();
+          }
+          if (speechTick.done) {
+            gestures.setSpeaking(false);
+            setTtsStatus(`done · ${speechTick.duration.toFixed(2)}s`, 'ok');
+            speechMouthMorphs = null;
+          } else if (speechTick.playing) {
+            setTtsStatus(
+              `${speechTick.viseme} · ${speechTick.t.toFixed(2)}/${speechTick.duration.toFixed(2)}s`,
+            );
+          }
+        }
 
         // Gait HUD + subtle vertical bounce from walk cycle when spin/idle
         const gaitOut = evaluateGait(compoundId ? COMPOUNDS[compoundId].primary : emotion, intensity);

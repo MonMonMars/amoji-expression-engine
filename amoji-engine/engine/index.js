@@ -332,3 +332,19 @@ export {
   envelopeToTimingRow,
   mergeTemporalEnvelopes,
 } from './capture/temporalMerge.js';
+export {
+  TTS_PROVIDERS,
+  detectTtsProvider,
+  extractRawPhonemes,
+  extractRawTags,
+  normalizeTtsPayload,
+  ttsToSpeechContext,
+} from './tts/ttsAdapter.js';
+export {
+  wordToPhones,
+  schedulePhones,
+  estimatePhonemesFromWords,
+  estimatePhonemesFromText,
+} from './tts/estimatePhonemes.js';
+export { SpeechPlayer, frameAtTime } from './tts/speechPlayer.js';
+export { mouthChannelsToMorphWeights } from './tts/mouthMorphs.js';

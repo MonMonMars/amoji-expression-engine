@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "note": "Example production TTS payloads (Step Audio / IndexTTS / Kokoro-shaped). Authoring & tests only.",
+  "stepAudioEditX": {
+    "provider": "step-audio-editx",
+    "text": "Hello mama.",
+    "audioUrl": null,
+    "duration": 1.15,
+    "phonemes": [
+      { "ipa": "h", "start": 0.05, "end": 0.12 },
+      { "ipa": "ə", "start": 0.12, "end": 0.2 },
+      { "ipa": "l", "start": 0.2, "end": 0.28 },
+      { "ipa": "oʊ", "start": 0.28, "end": 0.42 },
+      { "ipa": "sil", "start": 0.42, "end": 0.5 },
+      { "ipa": "m", "start": 0.5, "end": 0.58 },
+      { "ipa": "ɑ", "start": 0.58, "end": 0.7 },
+      { "ipa": "m", "start": 0.7, "end": 0.78 },
+      { "ipa": "ɑ", "start": 0.78, "end": 0.95 },
+      { "ipa": "sil", "start": 0.95, "end": 1.1 }
+    ],
+    "tags": [
+      { "tag": "breathing", "timestamp": 0.02 },
+      { "tag": "chuckle", "timestamp": 1.05 }
+    ]
+  },
+  "indexTts2": {
+    "provider": "indextts2",
+    "text": "Hi there",
+    "duration_ms": 780,
+    "alignment": [
+      ["HH", 0.0, 0.08],
+      ["AY1", 0.08, 0.28],
+      ["sil", 0.28, 0.36],
+      ["DH", 0.36, 0.44],
+      ["EH1", 0.44, 0.58],
+      ["R", 0.58, 0.72]
+    ],
+    "para": [{ "type": "breath", "t": 0.01 }]
+  },
+  "kokoro": {
+    "provider": "kokoro",
+    "text": "Okay",
+    "tokens": [
+      { "phoneme": "oʊ", "start": 0.0, "end": 0.18 },
+      { "phoneme": "k", "start": 0.18, "end": 0.28 },
+      { "phoneme": "eɪ", "start": 0.28, "end": 0.55 }
+    ]
+  },
+  "wordsOnly": {
+    "provider": "generic-asr-align",
+    "text": "mama papa",
+    "words": [
+      { "word": "mama", "start": 0.0, "end": 0.45 },
+      { "word": "papa", "start": 0.55, "end": 1.05 }
+    ]
+  }
+}

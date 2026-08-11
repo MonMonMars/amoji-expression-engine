@@ -57,6 +57,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
+- **TTS speak**: text estimate or Step Audio fixture → phoneme-timed mouth overlay + para hooks
 - **Chassis calib**: desktop-buddy / lobby-companion / lab-humanoid — gains, invert, deadzone, slew
 
 ## Code
@@ -78,6 +79,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Script: `engine/layers/scriptLine.js` + `data/script/line-schema.json` (`performScript`)
 - Smile / laugh: `engine/layers/smileLaugh.js` + `data/emotions/smile-types.json`
 - Phoneme timing: `engine/layers/phonemeTiming.js` + `data/visemes/phoneme-to-viseme.json`
+- TTS wiring: `engine/tts/*` + `docs/TTS_WIRING.md` + `data/tts/fixtures/`
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`

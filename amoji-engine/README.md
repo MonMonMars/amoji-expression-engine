@@ -27,7 +27,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 14 | MediaPipe Capture Studio (webcam/video → NDJSON) | Done |
 | Phase 15 | Bake → emotion-timing (Step-Out / attack / blink) | Done |
 | Phase 16 | Chassis calibration (scale/slew) on robot packs | Done |
-| Phase 17+ | Production TTS wiring, polish… | Specced |
+| Phase 17 | Production TTS wiring (adapter + SpeechPlayer) | Done |
+| Phase 18+ | Actor discretion UX depth, polish… | Specced |
 
 ## Quick start
 
@@ -63,6 +64,8 @@ Do **not** special-case the renderer for the new emotion.
 Mouth override is LOCKED / CLAMPED / OPEN (not additive). MBP always forces `jaw = 0`.
 
 Continuous speech: `performSpeech(text, emotion, t, { mode: 'coarticulated' })` uses Cohen–Massaro dominance functions (`engine/layers/coarticulation.js`).
+
+Production TTS: `normalizeTtsPayload` / `SpeechPlayer` — see `docs/TTS_WIRING.md`.
 
 ## Capture → bake (authoring)
 
