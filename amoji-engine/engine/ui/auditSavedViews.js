@@ -13,9 +13,11 @@ export const AUDIT_SAVED_VIEWS_MAX = 12;
 export function normalizeAuditSavedView(raw, opts = {}) {
   const now = opts.now ?? Date.now();
   const name = String(raw?.name || '').trim() || 'Untitled';
+  const folder = String(raw?.folder || '').trim();
   return {
     id: raw?.id || `view-${now}-${Math.random().toString(36).slice(2, 7)}`,
     name,
+    folder,
     action: raw?.action && raw.action !== 'all' ? String(raw.action) : 'all',
     query: raw?.query != null ? String(raw.query) : '',
     regex: !!raw?.regex,
@@ -27,18 +29,52 @@ export function normalizeAuditSavedView(raw, opts = {}) {
 /**
  * Snapshot current audit UI filters into a saved view payload.
  * @param {object} filters
- * @param {{ name?: string, now?: number }} [opts]
+ * @param {{ name?: string, folder?: string, now?: number }} [opts]
  */
 export function snapshotAuditView(filters = {}, opts = {}) {
   return normalizeAuditSavedView(
     {
       name: opts.name,
+      folder: opts.folder ?? filters.folder,
       action: filters.action,
       query: filters.query,
       regex: filters.regex,
       rangePreset: filters.rangePreset,
     },
     { now: opts.now },
+  );
+}
+
+/**
+ * Group saved views by folder (empty folder → "Inbox").
+ * @param {object[]} views
+ */
+export function groupAuditViewsByFolder(views) {
+  /** @type {Map<string, object[]>} */
+  const map = new Map();
+  for (const v of Array.isArray(views) ? views : []) {
+    const key = String(v?.folder || '').trim() || 'Inbox';
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(v);
+  }
+  const folders = [...map.keys()].sort((a, b) => {
+    if (a === 'Inbox') return -1;
+    if (b === 'Inbox') return 1;
+    return a.localeCompare(b);
+  });
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_folders',
+      ok: true,
+      folders: folders.map((name) => ({
+        name,
+        views: map.get(name) || [],
+        count: (map.get(name) || []).length,
+      })),
+      folderNames: folders,
+      count: folders.length,
+    },
+    {},
   );
 }
 
@@ -196,6 +232,7 @@ export function compactAuditViewForShare(view) {
   /** @type {Record<string, unknown>} */
   const out = {};
   if (v.name && v.name !== 'Untitled') out.n = v.name;
+  if (v.folder) out.f = v.folder;
   if (v.action && v.action !== 'all') out.a = v.action;
   if (v.query) out.q = v.query;
   if (v.regex) out.r = 1;
@@ -212,6 +249,7 @@ export function expandAuditViewFromShare(compact, opts = {}) {
   return normalizeAuditSavedView(
     {
       name: compact?.n || compact?.name,
+      folder: compact?.f || compact?.folder,
       action: compact?.a || compact?.action,
       query: compact?.q ?? compact?.query,
       regex: compact?.r ?? compact?.regex,
@@ -411,8 +449,16 @@ export function createAuditSavedViews(opts = {}) {
       const idx = views.findIndex(
         (v) => v.name.toLowerCase() === view.name.toLowerCase(),
       );
-      if (idx >= 0) views[idx] = { ...view, id: views[idx].id };
-      else views.push(view);
+      if (idx >= 0) {
+        views[idx] = {
+          ...view,
+          id: views[idx].id,
+          folder:
+            saveOpts.folder != null || filters.folder != null
+              ? view.folder
+              : views[idx].folder || view.folder,
+        };
+      } else views.push(view);
       while (views.length > max) views.shift();
       save();
       return applyComplianceGate(
@@ -420,7 +466,7 @@ export function createAuditSavedViews(opts = {}) {
           kind: 'prefs_share_audit_views',
           action: 'save',
           ok: true,
-          view,
+          view: idx >= 0 ? views[idx] : view,
           count: views.length,
         },
         {},
@@ -559,8 +605,13 @@ export function createAuditSavedViews(opts = {}) {
           query: src.query,
           regex: src.regex,
           rangePreset: src.rangePreset,
+          folder: dupOpts.folder != null ? dupOpts.folder : src.folder,
         },
-        { name: uniqueRequested, now: dupOpts.now },
+        {
+          name: uniqueRequested,
+          folder: dupOpts.folder != null ? dupOpts.folder : src.folder,
+          now: dupOpts.now,
+        },
       );
       return applyComplianceGate(
         {
@@ -573,6 +624,45 @@ export function createAuditSavedViews(opts = {}) {
         },
         {},
       );
+    },
+    setFolder(idOrName, folderName, folderOpts = {}) {
+      const key = String(idOrName || '');
+      const idx = views.findIndex(
+        (v) =>
+          v.id === key || v.name.toLowerCase() === key.toLowerCase(),
+      );
+      if (idx < 0) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'set_folder',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      const folder = String(folderName || '').trim();
+      views[idx] = normalizeAuditSavedView(
+        { ...views[idx], folder, savedAt: folderOpts.now ?? Date.now() },
+        { now: folderOpts.now },
+      );
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'set_folder',
+          ok: true,
+          view: views[idx],
+          folder: views[idx].folder,
+          count: views.length,
+        },
+        {},
+      );
+    },
+    folders() {
+      return groupAuditViewsByFolder(views);
     },
     clear() {
       views = [];

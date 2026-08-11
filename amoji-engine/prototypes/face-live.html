@@ -692,6 +692,13 @@
           <input id="prefsAuditViewName" class="ctl" type="text" placeholder="View name" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
           <button type="button" id="btnPrefsAuditSaveView">Save view</button>
         </div>
+        <div class="row" style="margin-top:4px;">
+          <input id="prefsAuditViewFolder" class="ctl" type="text" placeholder="Folder (optional)" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+          <button type="button" id="btnPrefsAuditSetFolder">Set folder</button>
+        </div>
+        <select id="prefsAuditFolderFilter" class="ctl" style="margin-top:4px;">
+          <option value="">All folders</option>
+        </select>
         <select id="prefsAuditSavedViews" class="ctl" style="margin-top:4px;">
           <option value="">Saved views…</option>
         </select>
@@ -807,6 +814,7 @@
         createGatewayHealthHistory,
         buildHealthProbeCopyPayload,
         describeHealthProbeToast,
+        describeProbeToastSlaBadge,
         resolveProbeToastAction,
         resolveProbeToastShortcut,
       } from '/engine/tts/ttsHealthHistory.js';
@@ -1003,6 +1011,7 @@
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
       let prefsAuditRange = 'all';
+      let prefsAuditFolderFilter = '';
       let lastProbeDetail = null;
       let probeToastVisible = false;
       let probeToastCompareOn = false;
@@ -1021,6 +1030,24 @@
       }
       function refreshAuditSavedViewsUi(selectedId = '') {
         const sel = document.getElementById('prefsAuditSavedViews');
+        const folderSel = document.getElementById('prefsAuditFolderFilter');
+        const grouped = auditSavedViews.folders();
+        if (folderSel) {
+          const currentFolder = prefsAuditFolderFilter;
+          folderSel.innerHTML = '';
+          const allOpt = document.createElement('option');
+          allOpt.value = '';
+          allOpt.textContent = 'All folders';
+          folderSel.appendChild(allOpt);
+          for (const f of grouped.folders || []) {
+            const opt = document.createElement('option');
+            opt.value = f.name;
+            opt.textContent = `${f.name} (${f.count})`;
+            folderSel.appendChild(opt);
+          }
+          folderSel.value = currentFolder || '';
+          if (folderSel.value !== currentFolder) prefsAuditFolderFilter = folderSel.value;
+        }
         if (!sel) return;
         const current = selectedId || sel.value || '';
         sel.innerHTML = '';
@@ -1028,12 +1055,19 @@
         placeholder.value = '';
         placeholder.textContent = 'Saved views…';
         sel.appendChild(placeholder);
-        for (const v of auditSavedViews.views) {
-          const opt = document.createElement('option');
-          opt.value = v.id;
-          opt.textContent = v.name;
-          if (v.id === current) opt.selected = true;
-          sel.appendChild(opt);
+        const filterFolder = prefsAuditFolderFilter;
+        for (const f of grouped.folders || []) {
+          if (filterFolder && f.name !== filterFolder) continue;
+          for (const v of f.views) {
+            const opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent =
+              !filterFolder && f.name !== 'Inbox'
+                ? `${f.name} / ${v.name}`
+                : v.name;
+            if (v.id === current) opt.selected = true;
+            sel.appendChild(opt);
+          }
         }
       }
       function applyAuditView(view) {
@@ -1046,10 +1080,12 @@
         const searchEl = document.getElementById('prefsAuditSearch');
         const regexEl = document.getElementById('prefsAuditRegex');
         const rangeEl = document.getElementById('prefsAuditRange');
+        const folderEl = document.getElementById('prefsAuditViewFolder');
         if (filterEl) filterEl.value = prefsAuditFilter;
         if (searchEl) searchEl.value = prefsAuditQuery;
         if (regexEl) regexEl.checked = prefsAuditRegex;
         if (rangeEl) rangeEl.value = prefsAuditRange;
+        if (folderEl) folderEl.value = view.folder || '';
         refreshPrefsAuditUi();
       }
       function hideProbeToast() {
@@ -1078,6 +1114,7 @@
             : '';
         let title = `${toast.title || 'Probe detail'}${histLabel}`;
         let detailText = `${toast.detail || ''} · [ ] history · = compare · c r p esc`;
+        const slaBadge = describeProbeToastSlaBadge(gatewayHealthHistory.summarize());
         if (probeToastCompareOn && probeToastHistory.previous) {
           const cmp = compareProbeToastDetails(
             detail,
@@ -1087,6 +1124,8 @@
             title = `${cmp.title}${histLabel}`;
             detailText = cmp.lines?.join(' · ') || cmp.detail;
           }
+        } else if (slaBadge.show) {
+          title = `${title} · ${slaBadge.text}`;
         }
         if (titleEl) titleEl.textContent = title;
         if (detailEl) detailEl.textContent = detailText;
@@ -1149,7 +1188,9 @@
           reason !== 'laugh_pick' &&
           reason !== 'gaze_pick' &&
           reason !== 'look_pick' &&
-          reason !== 'idle_pick'
+          reason !== 'idle_pick' &&
+          reason !== 'spin_pick' &&
+          reason !== 'cycle_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1163,7 +1204,9 @@
           reason === 'laugh_pick' ||
           reason === 'gaze_pick' ||
           reason === 'look_pick' ||
-          reason === 'idle_pick'
+          reason === 'idle_pick' ||
+          reason === 'spin_pick' ||
+          reason === 'cycle_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1901,10 +1944,12 @@
         e.currentTarget.classList.toggle('primary', idleOn);
       });
       document.getElementById('btnSpin').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('spin_pick');
         spinOn = !spinOn;
         e.currentTarget.classList.toggle('primary', spinOn);
       });
       document.getElementById('btnCycle').addEventListener('click', (e) => {
+        cancelActiveCompoundLifecycle('cycle_pick');
         cycleOn = !cycleOn;
         e.currentTarget.classList.toggle('primary', cycleOn);
       });
@@ -2631,19 +2676,50 @@
         });
         document.getElementById('btnPrefsAuditSaveView')?.addEventListener('click', () => {
           const nameEl = document.getElementById('prefsAuditViewName');
+          const folderEl = document.getElementById('prefsAuditViewFolder');
           const name = nameEl?.value?.trim() || `View ${auditSavedViews.size + 1}`;
+          const folder = folderEl?.value?.trim() || '';
           const saved = auditSavedViews.save(
             {
               action: prefsAuditFilter,
               query: prefsAuditQuery,
               regex: prefsAuditRegex,
               rangePreset: prefsAuditRange,
+              folder,
             },
-            { name },
+            { name, folder },
           );
           refreshAuditSavedViewsUi(saved.view?.id);
           prefsStatus.className = 'status ok';
-          prefsStatus.textContent = `prefs · saved view “${saved.view?.name}”`;
+          prefsStatus.textContent = saved.view?.folder
+            ? `prefs · saved “${saved.view.name}” in ${saved.view.folder}`
+            : `prefs · saved view “${saved.view?.name}”`;
+        });
+        document.getElementById('prefsAuditFolderFilter')?.addEventListener('change', (ev) => {
+          prefsAuditFolderFilter = ev.target.value || '';
+          refreshAuditSavedViewsUi();
+        });
+        document.getElementById('btnPrefsAuditSetFolder')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          const folderEl = document.getElementById('prefsAuditViewFolder');
+          const folder = folderEl?.value?.trim() || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a saved view for folder';
+            return;
+          }
+          const moved = auditSavedViews.setFolder(id, folder);
+          if (!moved.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · set folder failed';
+            return;
+          }
+          refreshAuditSavedViewsUi(moved.view?.id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = moved.view?.folder
+            ? `prefs · moved to “${moved.view.folder}”`
+            : 'prefs · moved to Inbox';
         });
         document.getElementById('prefsAuditSavedViews')?.addEventListener('change', (ev) => {
           const id = ev.target.value;

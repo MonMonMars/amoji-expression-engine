@@ -58,9 +58,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
 - **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up · chin-rest · self-hug · fists (emblem / affect / adaptor sync)
-- **Prefs**: Face Live restores from `localStorage`; share audit with filter / search / **regex** / **time range** / **saved views** (export/import/delete/rename/duplicate/**share `#flv=`**) / Export / Clear
-- **TTS speak**: Probe gateway sparkline → probe toast (**Prev / Next / Compare / Copy / Re-probe / Pin / Dismiss**, shortcuts **[ ] = c r p esc**, history + compare, **Tab** focus trap, **hover pause**) → **Copy probe**
-- **Compound emotions**: lifecycle cancelled by emotion / emblem / finger / chassis / pack / remap / surface / persona / mood / smile / laugh / gaze / look / **idle** picks
+- **Prefs**: Face Live restores from `localStorage`; share audit with filter / search / **regex** / **time range** / **saved views** (folders · export/import/delete/rename/duplicate/share `#flv=`) / Export / Clear
+- **TTS speak**: Probe gateway sparkline → probe toast (**Prev / Next / Compare / Copy / Re-probe / Pin / Dismiss**, **SLA badge**, shortcuts **[ ] = c r p esc**, history + compare, **Tab** focus trap, **hover pause**) → **Copy probe**
+- **Compound emotions**: lifecycle cancelled by emotion / emblem / finger / chassis / pack / remap / surface / persona / mood / smile / laugh / gaze / look / idle / **spin / cycle** picks
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 

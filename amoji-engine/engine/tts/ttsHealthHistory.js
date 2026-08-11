@@ -134,6 +134,52 @@ export function formatHealthSlaChip(latest, sla) {
 }
 
 /**
+ * Compact SLA badge for probe toast title/detail.
+ * @param {object|null} sla
+ * @param {{ latest?: object|null }} [opts]
+ */
+export function describeProbeToastSlaBadge(sla, opts = {}) {
+  if (!sla || typeof sla.uptimePct !== 'number' || !sla.sampleCount) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_sla_badge',
+        ok: false,
+        show: false,
+        reason: 'no_sla',
+        text: '',
+        tone: '',
+      },
+      {},
+    );
+  }
+  const bits = [`SLA ${sla.uptimePct}%`];
+  if (typeof sla.latencyP50Ms === 'number') {
+    bits.push(`p50 ${Math.round(sla.latencyP50Ms)}ms`);
+  }
+  if (sla.streak) {
+    bits.push(sla.streak > 0 ? `↑${sla.streak}` : `↓${Math.abs(sla.streak)}`);
+  }
+  const tone =
+    sla.tone ||
+    opts.latest?.tone ||
+    (sla.uptimePct >= 95 ? 'ok' : sla.uptimePct >= 80 ? 'warn' : 'bad');
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_sla_badge',
+      ok: true,
+      show: true,
+      text: bits.join(' · '),
+      tone,
+      uptimePct: sla.uptimePct,
+      latencyP50Ms: sla.latencyP50Ms ?? null,
+      streak: sla.streak ?? 0,
+      sampleCount: sla.sampleCount,
+    },
+    {},
+  );
+}
+
+/**
  * Build sparkline points (0..1 normalized latency; ok flag) from samples.
  * @param {object[]} samples
  * @param {{ maxPoints?: number }} [opts]
