@@ -216,7 +216,10 @@ export function disneyExtremeUiDefaults() {
  * - `PageDown` → flash Extreme strips summary
  * - `Shift+PageDown` → copy Extreme strips summary
  * - `ArrowDown` / `ArrowUp` → cycle Extreme history next / previous
+ * - `Shift+ArrowDown` / `Shift+ArrowUp` → cycle Extreme redo next / previous
  * - `ArrowRight` / `ArrowLeft` → cycle Extreme favorite next / previous
+ * - `Delete` / `Backspace` → clear Extreme active chips / status hold
+ * - `Insert` → pin current Extreme factors as baseline
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -792,6 +795,15 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       return { ok: true, action: 'copyBaselineStripsSummary' };
     }
     if (entry.id === 'arrowCycleHistory') {
+      if (ev.shiftKey) {
+        return {
+          ok: true,
+          action:
+            key === 'ArrowUp'
+              ? 'cycleBaselineRedoPrev'
+              : 'cycleBaselineRedoNext',
+        };
+      }
       return {
         ok: true,
         action:
@@ -808,6 +820,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
             ? 'cycleBaselineFavoritePrev'
             : 'cycleBaselineFavoriteNext',
       };
+    }
+    if (entry.id === 'clearActiveChipsKey') {
+      return { ok: true, action: 'clearStatusHold' };
+    }
+    if (entry.id === 'pinBaselineInsert') {
+      return { ok: true, action: 'pinBaseline' };
     }
     return { ok: true, action: entry.id };
   }

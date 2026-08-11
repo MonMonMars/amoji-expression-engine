@@ -384,7 +384,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 371 | Extreme Shift+PageDown copy strips | Done |
 | Phase 372 | Extreme ↓↑ cycle hist | Done |
 | Phase 373 | Extreme →← cycle fav | Done |
-| Phase 374+ | Further production polish… | Specced |
+| Phase 374 | Extreme ⇧↓↑ cycle redo | Done |
+| Phase 375 | Extreme HUD bundle includes dirty | Done |
+| Phase 376 | Extreme Delete clear active | Done |
+| Phase 377 | Extreme Insert pin base | Done |
+| Phase 378+ | Further production polish… | Specced |
 
 ## Quick start
 

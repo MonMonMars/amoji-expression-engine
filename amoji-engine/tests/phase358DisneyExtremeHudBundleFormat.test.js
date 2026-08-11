@@ -29,13 +29,15 @@ describe('Phase 358 Extreme HUD bundle formatters', () => {
     expect(summary).toContain('hist 1/8');
     expect(summary).toContain('active ·');
     expect(summary).toContain('pin ·');
+    expect(summary).toContain('dirty ·');
     const bundle = formatDisneyExtremeBaselineHudBundleLabel(stacks, opts);
     expect(bundle).toContain('tips ·');
     expect(bundle).toContain('roots ·');
     expect(bundle).toContain('stacks ·');
     expect(bundle).toContain('active ·');
     expect(bundle).toContain('pin ·');
-    expect(bundle.split('\n')).toHaveLength(5);
+    expect(bundle).toContain('dirty ·');
+    expect(bundle.split('\n')).toHaveLength(6);
     expect(typeof engine.formatDisneyExtremeBaselineHudBundleSummary).toBe(
       'function',
     );

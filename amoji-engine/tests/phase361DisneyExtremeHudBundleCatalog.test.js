@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 describe('Phase 361 Extreme HUD bundle catalog note', () => {
   it('documents hud bundle in catalog and Face Live history title', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain(
-      'hud bundle · tips/roots/cap/active/pin',
+      'hud bundle · tips/roots/cap/active/pin/dirty',
     );
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('Alt+Enter hud');

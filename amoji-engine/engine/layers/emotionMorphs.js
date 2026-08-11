@@ -748,7 +748,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
   { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
   { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
-  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin', kind: 'note' },
+  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin/dirty', kind: 'note' },
   {
     id: 'showBaselineDirtyStrip',
     keys: ['Home'],
@@ -783,10 +783,23 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     help: '↓↑ cycle hist',
     kind: 'action',
   },
+  { id: 'arrowCycleRedo', help: '⇧↓↑ cycle redo', kind: 'note' },
   {
     id: 'arrowCycleFavorite',
     keys: ['ArrowRight', 'ArrowLeft'],
     help: '→← cycle fav',
+    kind: 'action',
+  },
+  {
+    id: 'clearActiveChipsKey',
+    keys: ['Delete', 'Backspace'],
+    help: 'Delete clear active',
+    kind: 'action',
+  },
+  {
+    id: 'pinBaselineInsert',
+    keys: ['Insert'],
+    help: 'Insert pin base',
     kind: 'action',
   },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
@@ -2267,6 +2280,10 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
  *   redoIndex?: number|null,
  *   favoriteIndex?: number|null,
  *   pin?: object|null,
+ *   hasBaseline?: boolean,
+ *   dirty?: boolean,
+ *   fp?: string,
+ *   changeCount?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2284,11 +2301,18 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
     favoriteIndex: opts.favoriteIndex,
   });
   const pin = formatDisneyExtremeBaselinePinStripLabel(opts.pin);
-  return `hud · ${capacity} · ${active} · ${pin}`;
+  const dirty = formatDisneyExtremeBaselineDirtyStripLabel({
+    hasBaseline:
+      opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+    dirty: opts.dirty,
+    fp: opts.fp,
+    changeCount: opts.changeCount,
+  });
+  return `hud · ${capacity} · ${active} · ${pin} · ${dirty}`;
 }
 
 /**
- * Multiline Extreme HUD bundle for clipboard (tips/roots/capacity/active/pin).
+ * Multiline Extreme HUD bundle for clipboard (tips/roots/capacity/active/pin/dirty).
  * @param {{
  *   history?: object[]|null,
  *   redo?: object[]|null,
@@ -2299,6 +2323,10 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
  *   redoIndex?: number|null,
  *   favoriteIndex?: number|null,
  *   pin?: object|null,
+ *   hasBaseline?: boolean,
+ *   dirty?: boolean,
+ *   fp?: string,
+ *   changeCount?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2316,6 +2344,13 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
       favoriteIndex: opts.favoriteIndex,
     }),
     formatDisneyExtremeBaselinePinStripLabel(opts.pin),
+    formatDisneyExtremeBaselineDirtyStripLabel({
+      hasBaseline:
+        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+      dirty: opts.dirty,
+      fp: opts.fp,
+      changeCount: opts.changeCount,
+    }),
   ].join('\n');
 }
 
