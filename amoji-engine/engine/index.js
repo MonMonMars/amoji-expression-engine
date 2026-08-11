@@ -282,6 +282,7 @@ export {
   computeDisneyExtremeIntensities,
   buildDisneyExtremeLiveSnapshot,
   formatDisneyExtremeBundleLabel,
+  shouldAutoCaptureDisneyExtremeBaseline,
   formatDisneyExtremeLiveHudFromSnapshot,
   disneyExtremeSnapshotFingerprint,
   disneyExtremeSnapshotFingerprintShort,

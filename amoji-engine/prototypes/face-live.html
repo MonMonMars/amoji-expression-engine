@@ -1167,6 +1167,7 @@
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
         formatDisneyExtremeBundleLabel,
+        shouldAutoCaptureDisneyExtremeBaseline,
         formatDisneyExtremeLiveHudFromSnapshot,
         disneyExtremeSnapshotFingerprint,
         disneyExtremeSnapshotFingerprintShort,
@@ -1526,6 +1527,23 @@
         return lastExtremeBaselineSnap;
       }
 
+      function maybeAutoBaselineDisneyExtreme(opts = {}) {
+        if (
+          !shouldAutoCaptureDisneyExtremeBaseline({
+            enabled: !!disneyExtremeEl?.checked,
+            baseline: lastExtremeBaselineSnap,
+          })
+        ) {
+          return false;
+        }
+        const snap = disneyExtremeSnapshot();
+        setDisneyExtremeBaseline(snap);
+        if (opts.silent) return true;
+        const fp = disneyExtremeSnapshotFingerprintShort(snap);
+        flashDisneyExtremeStatus(`auto base · fp ${fp}`);
+        return true;
+      }
+
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
         disneyExtremeStatus.title = summarizeDisneyExtremePrefs(
@@ -1611,6 +1629,7 @@
         disneyExtremeEl.addEventListener('change', () => {
           disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
           updateTierHintForDisneyExtreme();
+          maybeAutoBaselineDisneyExtreme();
           syncDisneyExtremePrefsSummary();
           persistPrefs();
         });
@@ -1824,6 +1843,8 @@
         });
       }
 
+      maybeAutoBaselineDisneyExtreme({ silent: true });
+
       function flashDisneyExtremeEaseCurve() {
         const snap = disneyExtremeSnapshot();
         flashDisneyExtremeStatus(
@@ -1866,12 +1887,16 @@
 
       function flashDisneyExtremeBundle() {
         flashDisneyExtremeStatus(
-          formatDisneyExtremeBundleLabel(disneyExtremeSnapshot()),
+          formatDisneyExtremeBundleLabel(disneyExtremeSnapshot(), {
+            baseline: lastExtremeBaselineSnap,
+          }),
         );
       }
 
       async function copyDisneyExtremeBundle() {
-        const text = formatDisneyExtremeBundleLabel(disneyExtremeSnapshot());
+        const text = formatDisneyExtremeBundleLabel(disneyExtremeSnapshot(), {
+          baseline: lastExtremeBaselineSnap,
+        });
         let ok = false;
         try {
           if (navigator.clipboard?.writeText) {

@@ -888,10 +888,12 @@ export function buildDisneyExtremeLiveSnapshot(opts = {}) {
 /**
  * One-line Extreme bundle readout (A hotkey / combined flash).
  * Accepts a snapshot or the same opts as `buildDisneyExtremeLiveSnapshot`.
+ * Optional `opts.baseline` appends clean/dirty×N + short fp (same bit as HUD).
  * @param {object} [snapOrOpts]
+ * @param {{ baseline?: object|null }} [opts]
  * @returns {string}
  */
-export function formatDisneyExtremeBundleLabel(snapOrOpts = {}) {
+export function formatDisneyExtremeBundleLabel(snapOrOpts = {}, opts = {}) {
   const snap =
     snapOrOpts &&
     typeof snapOrOpts === 'object' &&
@@ -899,17 +901,41 @@ export function formatDisneyExtremeBundleLabel(snapOrOpts = {}) {
     typeof snapOrOpts.ease === 'number'
       ? snapOrOpts
       : buildDisneyExtremeLiveSnapshot(snapOrOpts);
+  let label;
   if (!snap.enabled) {
-    return 'extreme off · A all · E ease · M mix · F factors · N neck';
+    label = 'extreme off · A all · E ease · M mix · F factors · N neck';
+  } else {
+    const recipeBit =
+      snap.shapeInt > 1 + 1e-9
+        ? ` · recipe ×${Number(snap.recipe).toFixed(2)}`
+        : '';
+    const mixBit = snap.bodyOn
+      ? ` · mix ${Number(snap.bodyMix).toFixed(2)} · neck ${Number(snap.neckBlend).toFixed(2)}`
+      : ' · body off';
+    label = `shape ${Number(snap.shapeInt).toFixed(2)} · ease ${Number(snap.ease).toFixed(2)}${recipeBit}${mixBit} · eye×${Number(snap.eyeFactor).toFixed(2)} · mouth×${Number(snap.mouthFactor).toFixed(2)}`;
   }
-  const recipeBit =
-    snap.shapeInt > 1 + 1e-9
-      ? ` · recipe ×${Number(snap.recipe).toFixed(2)}`
-      : '';
-  const mixBit = snap.bodyOn
-    ? ` · mix ${Number(snap.bodyMix).toFixed(2)} · neck ${Number(snap.neckBlend).toFixed(2)}`
-    : ' · body off';
-  return `shape ${Number(snap.shapeInt).toFixed(2)} · ease ${Number(snap.ease).toFixed(2)}${recipeBit}${mixBit} · eye×${Number(snap.eyeFactor).toFixed(2)} · mouth×${Number(snap.mouthFactor).toFixed(2)}`;
+  if (!opts.baseline) return label;
+  const diff = diffDisneyExtremeSnapshots(snap, opts.baseline);
+  const dirtyHud = formatDisneyExtremeDirtyHudBit({
+    hasBaseline: true,
+    dirty: !diff.equal,
+    changeCount: diff.changes.length,
+    fp: disneyExtremeSnapshotFingerprintShort(opts.baseline),
+  });
+  return `${label}${dirtyHud.bit}`;
+}
+
+/**
+ * Whether Extreme should auto-capture a dirty-tracking baseline.
+ * True when Extreme is on and no baseline is set yet.
+ * @param {{ enabled?: boolean, hasBaseline?: boolean, baseline?: object|null }} [opts]
+ * @returns {boolean}
+ */
+export function shouldAutoCaptureDisneyExtremeBaseline(opts = {}) {
+  if (!opts.enabled) return false;
+  if (opts.hasBaseline) return false;
+  if (opts.baseline) return false;
+  return true;
 }
 
 /**

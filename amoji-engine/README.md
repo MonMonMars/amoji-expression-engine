@@ -220,7 +220,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 207 | Extreme Shift+U redo baseline | Done |
 | Phase 208 | Extreme Face Live redo wiring | Done |
 | Phase 209 | Extreme baseline redo depth + tooltip | Done |
-| Phase 210+ | Further production polish… | Specced |
+| Phase 210 | Extreme auto-capture baseline helper | Done |
+| Phase 211 | Extreme Face Live auto-baseline wiring | Done |
+| Phase 212 | Extreme bundle label dirty bit | Done |
+| Phase 213 | Extreme Face Live bundle dirty wiring | Done |
+| Phase 214+ | Further production polish… | Specced |
 
 ## Quick start
 

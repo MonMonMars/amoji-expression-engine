@@ -18,7 +18,7 @@ describe('Phase 159 Extreme Face Live snapshot wiring', () => {
       'formatDisneyExtremeLiveHudFromSnapshot(extremeSnap)',
     );
     expect(src).toContain(
-      'formatDisneyExtremeBundleLabel(disneyExtremeSnapshot())',
+      'formatDisneyExtremeBundleLabel(disneyExtremeSnapshot()',
     );
     expect(src).toContain('shapeFactor: extremeSnap.shapeFactor');
   });
