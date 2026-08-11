@@ -2016,32 +2016,32 @@ export function formatDisneyExtremeBaselineTipsLabel(stacks = {}) {
   const bits = [];
   if (hist.length) {
     bits.push(
-      formatDisneyExtremeBaselineHistoryEntry(hist[hist.length - 1], {
+      `hist · ${formatDisneyExtremeBaselineHistoryEntry(hist[hist.length - 1], {
         index: hist.length,
         compact: true,
-      }),
+      })}`,
     );
   } else {
     bits.push('hist · empty');
   }
   if (redo.length) {
     bits.push(
-      formatDisneyExtremeBaselineHistoryEntry(redo[redo.length - 1], {
+      `redo · ${formatDisneyExtremeBaselineHistoryEntry(redo[redo.length - 1], {
         index: redo.length,
         compact: true,
         kind: 'redo',
-      }),
+      })}`,
     );
   } else {
     bits.push('redo · empty');
   }
   if (fav.length) {
     bits.push(
-      formatDisneyExtremeBaselineHistoryEntry(fav[fav.length - 1], {
+      `fav · ${formatDisneyExtremeBaselineHistoryEntry(fav[fav.length - 1], {
         index: fav.length,
         compact: true,
         kind: 'fav',
-      }),
+      })}`,
     );
   } else {
     bits.push('fav · empty');
