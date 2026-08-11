@@ -45,11 +45,12 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Layer T:** Sim AI latency (gaze → pensive filler → secondary) + Improv noise
 - **Layer W gait HUD:** speed / stride / arm origin / footfall weight
 - **Layer G gesture:** Emblem select / Wave / Speaking (Illustrator) / turn Regulators — Affect from emotion, Adaptor after ~3s gap; drives Sakura arm bones
+- **Layer B neck/shoulder:** emotion-driven head tilt + accessory-muscle breath; Threat freeze / Sigh; head-down×gaze lock → anger vs sad
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
 - Idle sway / turntable / cycle emotions / blink
-- HUD: mesh LOD, tex LOD, surface level, gesture layer, triangle count, emotion, FPS
+- HUD: mesh LOD, tex LOD, surface level, gesture layer, body mode, triangle count, emotion, FPS
 - Debug: active morphs + **ARKit 52** nonzero export preview
 
 ## Code
@@ -62,6 +63,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Compounds: `engine/layers/compoundEmotion.js` + `data/compounds/region-ownership.json`
 - Gait: `engine/layers/gait.js` + `data/gait/emotion-gait.json`
 - Gesture: `engine/layers/gesture.js` + `data/gestures/catalog.json`
+- Body: `engine/layers/neckShoulder.js` + `data/body/emotion-neck-shoulder.json`
+- Phoneme timing: `engine/layers/phonemeTiming.js` + `data/visemes/phoneme-to-viseme.json`
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Eyes: `engine/layers/eyeLook.js`

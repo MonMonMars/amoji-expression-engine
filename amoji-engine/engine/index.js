@@ -106,6 +106,27 @@ export {
   uncannyRiskTone,
 } from './layers/surfaceRenderer.js';
 export {
+  BODY_NEUTRAL,
+  BODY_BY_EMOTION,
+  THREAT_FREEZE,
+  GAZE_COMBO,
+  classifyHeadGazeCombo,
+  evaluateBody,
+  sampleBodyPose,
+  applyBodyBones,
+  BodyController,
+} from './layers/neckShoulder.js';
+export {
+  PHONEME_TO_VISEME,
+  phonemeToViseme,
+  normalizePhonemeEvents,
+  phonemesToTimedVisemes,
+  phonemeTimelineDuration,
+  samplePhonemeTimedFrames,
+  normalizeParalinguisticTags,
+  paralinguisticToHook,
+} from './layers/phonemeTiming.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

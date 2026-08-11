@@ -136,6 +136,8 @@ Amoji engine (ND “systemic emotion”)
 13. ~~**Layer W gait styles**~~ ✓
 14. ~~**Full Layer G gesture stack** (Emblem → Adaptor)~~ ✓
 15. ~~**Surface Renderer level switcher**~~ ✓
+16. ~~**Layer B neck/shoulder/breath** (`accessoryMuscleActivation`)~~ ✓
+17. ~~**TTS phoneme timing** → coarticulated visemes~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

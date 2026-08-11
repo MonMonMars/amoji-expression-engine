@@ -101,10 +101,14 @@
           Cohen–Massaro coarticulation
         </label>
         <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
+          <input id="phoneme" type="checkbox" />
+          TTS phoneme timestamps (demo)
+        </label>
+        <label class="row" style="grid-template-columns: auto 1fr; align-items: center;">
           <input id="overdrive" type="checkbox" />
           Unlock overdrive (&gt;1.0)
         </label>
-        <p class="note">Upper face = emotion. Mouth = viseme override / dominance blend. MBP forces jaw=0.</p>
+        <p class="note">Upper face = emotion. Mouth = viseme override / dominance blend. MBP forces jaw=0. Phoneme mode uses production-style timestamps.</p>
         <code id="frameMeta"></code>
       </aside>
     </div>
@@ -122,8 +126,35 @@
       const speechEl = document.getElementById('speech');
       const speakEl = document.getElementById('speak');
       const coartEl = document.getElementById('coart');
+      const phonemeEl = document.getElementById('phoneme');
       const tLabel = document.getElementById('tLabel');
       const frameMeta = document.getElementById('frameMeta');
+
+      /** Demo ARPAbet-ish timeline for "mama papa" when TTS stamps aren't wired. */
+      function demoPhonemesFor(text) {
+        const t = (text || 'mama papa').toLowerCase();
+        if (t.includes('mama')) {
+          return [
+            { phoneme: 'm', start: 0.0, end: 0.09 },
+            { phoneme: 'ɑ', start: 0.09, end: 0.2 },
+            { phoneme: 'm', start: 0.2, end: 0.29 },
+            { phoneme: 'ɑ', start: 0.29, end: 0.4 },
+            { phoneme: 'sil', start: 0.4, end: 0.48 },
+            { phoneme: 'p', start: 0.48, end: 0.56 },
+            { phoneme: 'ɑ', start: 0.56, end: 0.68 },
+            { phoneme: 'p', start: 0.68, end: 0.76 },
+            { phoneme: 'ɑ', start: 0.76, end: 0.9 },
+          ];
+        }
+        // Fallback: equal-ish slots from characters via synthetic onsets
+        const chars = [...t];
+        const slot = 0.09;
+        return chars.map((ch, i) => ({
+          phoneme: /[mbp]/i.test(ch) ? ch : /[aeiou]/i.test(ch) ? 'ɑ' : ch === ' ' ? 'sil' : 't',
+          start: i * slot,
+          end: (i + 1) * slot,
+        }));
+      }
 
       for (const id of BASIC_EMOTIONS) {
         const opt = document.createElement('option');
@@ -177,14 +208,18 @@
         stopSpeech();
         let t = Number(intensityEl.value);
         tLabel.textContent = t.toFixed(2);
-        const mode = coartEl.checked ? 'coarticulated' : 'discrete';
+        const usePhonemes = phonemeEl.checked;
+        const mode = usePhonemes ? 'phoneme_timed' : coartEl.checked ? 'coarticulated' : 'discrete';
         const perf = performSpeech(speechEl.value || 'mama papa', emotionEl.value, t, {
           mode,
           fps: 24,
+          phonemes: usePhonemes ? demoPhonemesFor(speechEl.value) : undefined,
+          paralinguistics: usePhonemes ? [{ tag: 'breathing', t: 0 }] : undefined,
         });
         frames = perf.frames;
         frameIdx = 0;
-        const intervalMs = mode === 'coarticulated' ? 1000 / (perf.fps || 24) : 140;
+        const intervalMs =
+          mode === 'discrete' ? 140 : 1000 / (perf.fps || 24);
         timer = setInterval(() => {
           if (!frames.length) return;
           const f = frames[frameIdx % frames.length];
@@ -209,6 +244,7 @@
       });
       speakEl.addEventListener('change', refresh);
       coartEl.addEventListener('change', refresh);
+      phonemeEl.addEventListener('change', refresh);
       refresh();
     </script>
   </body>

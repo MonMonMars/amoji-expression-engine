@@ -244,6 +244,7 @@
         <div class="pill">Tex <strong id="hudTex">—</strong></div>
         <div class="pill">Surf <strong id="hudSurf">6</strong></div>
         <div class="pill">G <strong id="hudGesture">—</strong></div>
+        <div class="pill">B <strong id="hudBody">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
@@ -299,6 +300,15 @@
           <button type="button" data-turn="pause">Pause</button>
         </div>
         <div class="status" id="gestureStatus">gesture —</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Layer B · Neck / shoulder</div>
+        <div class="row">
+          <button type="button" id="btnThreat">Threat freeze</button>
+          <button type="button" id="btnSigh">Sigh</button>
+        </div>
+        <div class="status" id="bodyStatus">body —</div>
       </div>
 
       <div class="group">
@@ -442,6 +452,10 @@
         applyGestureBones,
       } from '/engine/layers/gesture.js';
       import {
+        BodyController,
+        applyBodyBones,
+      } from '/engine/layers/neckShoulder.js';
+      import {
         SURFACE_LEVEL_IDS,
         getSurfaceLevel,
         renderSurface,
@@ -491,6 +505,7 @@
       const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
       const latency = new LatencyBridge({ personaId: 'companion', lang: 'zh' });
       const gestures = new GestureController({ anxiety: 0.35 });
+      const bodyCtl = new BodyController();
       let compoundId = '';
       let walkPhase = 0;
       let surfaceLevel = 6;
@@ -499,11 +514,13 @@
       let boneMap = {};
       /** @type {Record<string, { x: number, y: number, z: number }>} */
       let boneRest = {};
+      const BODY_BONE_RE = /^(upperarm|lowerarm|hand)_[LR]$|^(head|neck|spine0[123]|clavicle_[LR])$/;
       const temporalStatus = document.getElementById('temporalStatus');
       const idleStatus = document.getElementById('idleStatus');
       const latencyStatus = document.getElementById('latencyStatus');
       const gaitStatus = document.getElementById('gaitStatus');
       const gestureStatus = document.getElementById('gestureStatus');
+      const bodyStatus = document.getElementById('bodyStatus');
       const surfaceStatus = document.getElementById('surfaceStatus');
       const compoundSel = document.getElementById('compoundSel');
       const emblemSel = document.getElementById('emblemSel');
@@ -697,31 +714,19 @@
         morphMeshes = collectMorphMeshes(model);
         boneMap = {};
         boneRest = {};
-        model.traverse((c) => {
-          if (!c.name) return;
-          if (/^(upperarm|lowerarm|hand)_[LR]$/.test(c.name)) {
-            boneMap[c.name] = c;
-            boneRest[c.name] = {
-              x: c.rotation.x,
-              y: c.rotation.y,
-              z: c.rotation.z,
-            };
-          }
-        });
-        // Fallback: skeleton bone list (some exporters skip hierarchy names)
+        const captureBone = (c) => {
+          if (!c?.name || !BODY_BONE_RE.test(c.name) || boneMap[c.name]) return;
+          boneMap[c.name] = c;
+          boneRest[c.name] = {
+            x: c.rotation.x,
+            y: c.rotation.y,
+            z: c.rotation.z,
+          };
+        };
+        model.traverse((c) => captureBone(c));
         model.traverse((c) => {
           if (!c.isSkinnedMesh || !c.skeleton) return;
-          for (const b of c.skeleton.bones) {
-            if (!b?.name || boneMap[b.name]) continue;
-            if (/^(upperarm|lowerarm|hand)_[LR]$/.test(b.name)) {
-              boneMap[b.name] = b;
-              boneRest[b.name] = {
-                x: b.rotation.x,
-                y: b.rotation.y,
-                z: b.rotation.z,
-              };
-            }
-          }
+          for (const b of c.skeleton.bones) captureBone(b);
         });
         // IdleSway clip fights Layer G arm drives — Layer I root sway covers ambience.
         mixer = null;
@@ -972,6 +977,15 @@
       });
       applySurfaceLevel(6, { applyHints: false });
 
+      document.getElementById('btnThreat').addEventListener('click', () => {
+        bodyCtl.triggerThreat();
+        bodyStatus.textContent = 'threat freeze ON';
+      });
+      document.getElementById('btnSigh').addEventListener('click', () => {
+        bodyCtl.triggerSigh();
+        bodyStatus.textContent = 'sigh (exhale emphasis)';
+      });
+
       function tick() {
         const dt = clock.getDelta();
         frames += 1;
@@ -1087,6 +1101,22 @@
         if (emblemSel.value && !gestures.emblem) {
           emblemSel.value = '';
         }
+
+        // Layer B — neck/shoulder/breath (accessoryMuscleActivation)
+        const gazeLock = 1 - Math.min(1, Math.hypot(lookX, lookY));
+        const bodyState = bodyCtl.tick(dt, {
+          emotion: displayEmo,
+          intensity: displayInt,
+          lookX,
+          lookY,
+          gazeLock,
+        });
+        if (model && boneMap.head) {
+          applyBodyBones(boneMap, boneRest, bodyState.pose, 1);
+        }
+        const b = bodyState.body;
+        bodyStatus.textContent = `${bodyState.emotion} · ama ${b.accessoryMuscleActivation.toFixed(2)} · ${b.breathingMode} · ${bodyState.gazeCombo}${bodyState.threatFreezeT > 0 ? ' · FREEZE' : ''}${bodyState.sighT > 0 ? ' · sigh' : ''}`;
+        document.getElementById('hudBody').textContent = b.breathingMode;
 
         // Surface Renderer — same Layer 1 → level-specific params
         const surf = renderSurface(

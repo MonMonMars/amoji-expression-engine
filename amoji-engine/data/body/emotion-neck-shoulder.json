@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "neutral": {
+    "headTiltLateral": 0,
+    "headTiltVertical": 0,
+    "headTiltSpeed": "normal",
+    "shoulderRoundness": 0,
+    "chestExpansion": 0,
+    "accessoryMuscleActivation": 0.08,
+    "breathingRate": 1.0,
+    "breathingDepth": "medium",
+    "breathingRegularity": "regular",
+    "inhaleBias": 0.5
+  },
+  "byEmotion": {
+    "happy": {
+      "headTiltLateral": 0.15,
+      "headTiltVertical": 0.3,
+      "headTiltSpeed": "normal",
+      "shoulderRoundness": 0.35,
+      "chestExpansion": 0.25,
+      "accessoryMuscleActivation": 0.1,
+      "breathingRate": 1.15,
+      "breathingDepth": "deep",
+      "breathingRegularity": "regular",
+      "inhaleBias": 0.55
+    },
+    "smile_open": {
+      "headTiltLateral": 0.2,
+      "headTiltVertical": 0.35,
+      "headTiltSpeed": "normal",
+      "shoulderRoundness": 0.4,
+      "chestExpansion": 0.35,
+      "accessoryMuscleActivation": 0.12,
+      "breathingRate": 1.2,
+      "breathingDepth": "deep",
+      "breathingRegularity": "regular",
+      "inhaleBias": 0.55
+    },
+    "sad": {
+      "headTiltLateral": 0.05,
+      "headTiltVertical": -0.7,
+      "headTiltSpeed": "slow",
+      "shoulderRoundness": -0.75,
+      "chestExpansion": -0.55,
+      "accessoryMuscleActivation": 0.15,
+      "breathingRate": 0.85,
+      "breathingDepth": "shallow",
+      "breathingRegularity": "irregular",
+      "inhaleBias": 0.4
+    },
+    "angry": {
+      "headTiltLateral": 0,
+      "headTiltVertical": -0.3,
+      "headTiltSpeed": "quick",
+      "shoulderRoundness": 0.55,
+      "chestExpansion": 0.45,
+      "accessoryMuscleActivation": 0.75,
+      "breathingRate": 1.55,
+      "breathingDepth": "shallow",
+      "breathingRegularity": "irregular",
+      "inhaleBias": 0.45,
+      "requiresGazeLock": true
+    },
+    "fear": {
+      "headTiltLateral": -0.1,
+      "headTiltVertical": -0.2,
+      "headTiltSpeed": "quick",
+      "shoulderRoundness": -0.25,
+      "chestExpansion": -0.4,
+      "accessoryMuscleActivation": 0.85,
+      "breathingRate": 1.8,
+      "breathingDepth": "shallow",
+      "breathingRegularity": "irregular",
+      "inhaleBias": 0.35
+    },
+    "surprised": {
+      "headTiltLateral": 0,
+      "headTiltVertical": 0.25,
+      "headTiltSpeed": "quick",
+      "shoulderRoundness": 0.2,
+      "chestExpansion": 0.7,
+      "accessoryMuscleActivation": 0.4,
+      "breathingRate": 1.4,
+      "breathingDepth": "deep",
+      "breathingRegularity": "held",
+      "inhaleBias": 0.7
+    },
+    "disgust": {
+      "headTiltLateral": 0.35,
+      "headTiltVertical": -0.1,
+      "headTiltSpeed": "normal",
+      "shoulderRoundness": -0.15,
+      "chestExpansion": -0.3,
+      "accessoryMuscleActivation": 0.25,
+      "breathingRate": 1.05,
+      "breathingDepth": "shallow",
+      "breathingRegularity": "regular",
+      "inhaleBias": 0.4
+    },
+    "thinking": {
+      "headTiltLateral": 0.45,
+      "headTiltVertical": 0.05,
+      "headTiltSpeed": "slow",
+      "shoulderRoundness": 0.05,
+      "chestExpansion": 0,
+      "accessoryMuscleActivation": 0.05,
+      "breathingRate": 0.75,
+      "breathingDepth": "medium",
+      "breathingRegularity": "regular",
+      "inhaleBias": 0.5
+    },
+    "neutral": {
+      "headTiltLateral": 0,
+      "headTiltVertical": 0,
+      "headTiltSpeed": "normal",
+      "shoulderRoundness": 0,
+      "chestExpansion": 0,
+      "accessoryMuscleActivation": 0.08,
+      "breathingRate": 1.0,
+      "breathingDepth": "medium",
+      "breathingRegularity": "regular",
+      "inhaleBias": 0.5
+    }
+  },
+  "threatFreeze": {
+    "note": "Sudden threat freezes postural sway — opposite of sustained anxiety sway",
+    "swayMul": 0.08,
+    "accessoryBoost": 0.2,
+    "durationSec": 0.45
+  },
+  "gazeCombo": {
+    "angryGazeLockThreshold": 0.55,
+    "avoidThreshold": 0.35
+  }
+}

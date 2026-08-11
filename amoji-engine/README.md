@@ -17,7 +17,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 4 | Cohen–Massaro coarticulation + Layer I personas / breath / 90s idle | Done |
 | Phase 5 | Layer T latency bridge + compound emotions + Layer W gait | Done |
 | Phase 6 | Layer G gesture stack (Emblem→Adaptor) + Surface Renderer L1–10 | Done |
-| Phase 7+ | Production TTS phoneme timing, full body retarget polish… | Specced |
+| Phase 7 | Layer B neck/shoulder/breath + TTS phoneme timing | Done |
+| Phase 8+ | Full body retarget polish, smile typology, laugh torso PD… | Specced |
 
 ## Quick start
 
