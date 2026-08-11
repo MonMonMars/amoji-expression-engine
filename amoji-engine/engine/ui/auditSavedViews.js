@@ -593,6 +593,7 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
  *   inheritExportMeta?: boolean,
  *   max?: number,
  *   now?: number,
+ *   shiftMerge?: boolean,
  * }} [opts]
  */
 export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
@@ -684,7 +685,16 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
     appendOnly,
   });
   const mode = appendOnly ? 'append' : 'merge';
-  const label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}`;
+  const mergeHint = formatAuditViewsImportDryRunMergeHint(raw, {
+    ...opts,
+    replace,
+    appendOnly,
+    shiftMerge: !!opts.shiftMerge,
+  });
+  let label = `dry-run ${mode} · +${merged.added} · ~${merged.updated} · skip ${merged.skipped}`;
+  if (mergeHint.ok && mergeHint.hint && opts.shiftMerge) {
+    label = `${label} · ${mergeHint.hint}`;
+  }
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_views_import_dry_run',
@@ -697,9 +707,53 @@ export function previewAuditViewsImportDryRun(existing, raw, opts = {}) {
       skipped: merged.skipped,
       count: incoming.length,
       label,
+      hint: mergeHint.ok ? mergeHint.hint : null,
+      shiftMerge: !!opts.shiftMerge,
       mergeStarredOnly,
       toastInHashOnly,
       folder,
+    },
+    {},
+  );
+}
+
+/**
+ * Merge-mode dry-run hint (Meta+Shift) combining mode label + inherit hint.
+ * @param {object|string} raw
+ * @param {{
+ *   replace?: boolean,
+ *   appendOnly?: boolean,
+ *   shiftMerge?: boolean,
+ *   mergeStarredOnly?: boolean,
+ *   mergeStarredOnlyExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
+ *   folder?: string|null,
+ *   folderExplicit?: boolean,
+ *   inheritExportMeta?: boolean,
+ * }} [opts]
+ */
+export function formatAuditViewsImportDryRunMergeHint(raw, opts = {}) {
+  const inherit = formatAuditViewsImportInheritHint(raw, opts);
+  const mode = opts.replace
+    ? 'Alt replace'
+    : opts.appendOnly
+      ? 'Ctrl append'
+      : opts.shiftMerge
+        ? 'Shift merge'
+        : 'Merge';
+  /** @type {string[]} */
+  const parts = [`${mode} dry-run`];
+  if (inherit.ok && inherit.hint) parts.push(inherit.hint);
+  const hint = parts.join(' · ');
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_dry_run_hint',
+      ok: inherit.ok,
+      hint,
+      shiftMerge: !!opts.shiftMerge,
+      inherited: inherit.ok ? inherit.inherited : [],
+      fromExportMeta: inherit.ok ? inherit.fromExportMeta : false,
     },
     {},
   );

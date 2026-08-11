@@ -153,10 +153,18 @@
       #discResidualBar.pulse {
         animation: discResidualPulse 0.55s ease-out;
       }
+      #discResidualBar.pulse-residue {
+        animation: discResidualPulseResidue 0.7s ease-out;
+      }
       @keyframes discResidualPulse {
         0% { opacity: 1; filter: brightness(1); }
         35% { opacity: 1; filter: brightness(1.45); }
         100% { opacity: 1; filter: brightness(1); }
+      }
+      @keyframes discResidualPulseResidue {
+        0% { opacity: 1; filter: brightness(1) saturate(1); }
+        40% { opacity: 1; filter: brightness(1.65) saturate(1.35); }
+        100% { opacity: 1; filter: brightness(1) saturate(1); }
       }
       pre {
         margin: 0;
@@ -886,6 +894,7 @@
       import {
         DiscretionController,
         hasContinuityResidual,
+        continuityResidualDeliverPulseClass,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
         resetContinuityResidualPeak,
@@ -1434,6 +1443,7 @@
           reason !== 'tts_endpoint_tab_blur_pick' &&
           reason !== 'tts_endpoint_focus_pick' &&
           reason !== 'tts_endpoint_cut_pick' &&
+          reason !== 'tts_endpoint_select_all_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2170,15 +2180,15 @@
         e.currentTarget.classList.toggle('primary', next);
         discStatus.textContent = next ? 'script pending — improv blocked' : 'script gap open';
       });
-      function pulseDiscResidualBar() {
+      function pulseDiscResidualBar(pulseClass = 'pulse') {
         if (!discResidualBar) return;
-        discResidualBar.classList.remove('pulse');
+        discResidualBar.classList.remove('pulse', 'pulse-residue');
         void discResidualBar.offsetWidth;
-        discResidualBar.classList.add('pulse');
+        discResidualBar.classList.add(pulseClass);
         discResidualBar.addEventListener(
           'animationend',
           () => {
-            discResidualBar.classList.remove('pulse');
+            discResidualBar.classList.remove('pulse', 'pulse-residue');
           },
           { once: true },
         );
@@ -2194,9 +2204,10 @@
         });
         if (cont.residual) {
           cancelActiveCompoundLifecycle('deliver_residue_pick');
+          const pulse = continuityResidualDeliverPulseClass(cont);
+          if (pulse.pulseClass) pulseDiscResidualBar(pulse.pulseClass);
         }
         discResidualPeak = resetContinuityResidualPeak(cont).peak;
-        pulseDiscResidualBar();
         discContStatus.textContent = cont.residual
           ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
           : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2909,7 +2920,9 @@
         });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
           if (ev.key === 'Tab') ttsEndpointTabbing = true;
-          if (ev.key === 'Enter') {
+          if ((ev.ctrlKey || ev.metaKey) && (ev.key === 'a' || ev.key === 'A')) {
+            cancelActiveCompoundLifecycle('tts_endpoint_select_all_pick');
+          } else if (ev.key === 'Enter') {
             cancelActiveCompoundLifecycle('tts_endpoint_enter_pick');
             persistPrefs();
             syncGatewayHealthPoll();
@@ -3806,6 +3819,8 @@
                   {
                     replace: dropAction.replace,
                     appendOnly: dropAction.appendOnly,
+                    shiftMerge:
+                      dropAction.shiftKey && dropAction.merge && !dropAction.appendOnly,
                     mergeStarredOnly,
                     mergeStarredOnlyExplicit: mergeStarredOnly,
                     toastInHashOnly: toastHashOnly,
@@ -3817,7 +3832,9 @@
                 );
                 prefsStatus.className = dry.ok ? 'status ok' : 'status bad';
                 prefsStatus.textContent = dry.ok
-                  ? `prefs · ${dry.label}`
+                  ? dry.hint && dropAction.shiftKey
+                    ? `prefs · ${dry.label}`
+                    : `prefs · ${dry.label}`
                   : 'prefs · dry-run failed';
                 return;
               }

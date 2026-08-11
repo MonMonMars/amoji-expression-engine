@@ -93,6 +93,23 @@ export function hasContinuityResidual(continuity, minIntensity = 0.02) {
 }
 
 /**
+ * Pulse class for residual bar when deliver leaves continuity residue.
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null } | null} continuity
+ */
+export function continuityResidualDeliverPulseClass(continuity) {
+  const pulse = hasContinuityResidual(continuity);
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_deliver_pulse',
+      ok: pulse,
+      pulseClass: pulse ? 'pulse-residue' : null,
+      emotion: continuity?.residual?.emotion ?? null,
+    },
+    {},
+  );
+}
+
+/**
  * Exponential decay of continuity residual intensity (half-life based).
  * @param {{ residual?: { emotion?: string, intensity?: number } | null, blend?: number } | null} continuity
  * @param {number} dt seconds since last tick
