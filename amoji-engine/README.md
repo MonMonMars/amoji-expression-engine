@@ -180,7 +180,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 167 | Extreme short fingerprint | Done |
 | Phase 168 | Extreme Shift+J paste snapshot JSON | Done |
 | Phase 169 | Extreme Face Live paste JSON wiring | Done |
-| Phase 170+ | Further production polish… | Specced |
+| Phase 170 | Extreme snapshot diff | Done |
+| Phase 171 | Extreme snapshot diff label + dirty | Done |
+| Phase 172 | Extreme D snapshot diff hotkey | Done |
+| Phase 173 | Extreme Face Live diff baseline wiring | Done |
+| Phase 174+ | Further production polish… | Specced |
 
 ## Quick start
 

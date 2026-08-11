@@ -77,6 +77,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+A` → copy Extreme bundle text to clipboard
  * - `j` / `J` → copy Extreme snapshot JSON to clipboard
  * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
+ * - `d` / `D` → flash Extreme snapshot diff vs last copy/paste baseline
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults

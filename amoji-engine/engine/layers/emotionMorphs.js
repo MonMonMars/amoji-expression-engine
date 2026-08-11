@@ -560,6 +560,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
   { id: 'copySnapshotJson', keys: ['j', 'J'], help: 'J json', kind: 'action' },
   { id: 'pasteSnapshotJson', help: 'Shift+J paste json', kind: 'note' },
+  { id: 'showSnapshotDiff', keys: ['d', 'D'], help: 'D diff', kind: 'action' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -1035,4 +1036,63 @@ export function disneyExtremeSnapshotFingerprintShort(snap, opts = {}) {
   }
   const hex = (h >>> 0).toString(16).padStart(8, '0');
   return hex.slice(0, length);
+}
+
+const DISNEY_EXTREME_SNAPSHOT_DIFF_FIELDS = [
+  'enabled',
+  'bodyOn',
+  'shapeFactor',
+  'bodyFactor',
+  'eyeFactor',
+  'mouthFactor',
+  'intensity',
+];
+
+/**
+ * Field-level diff between two Extreme snapshots (or opts).
+ * @param {object|null|undefined} a
+ * @param {object|null|undefined} b
+ * @returns {{ equal: boolean, changes: string[] }}
+ */
+export function diffDisneyExtremeSnapshots(a, b) {
+  const left = a && typeof a === 'object' && typeof a.shapeInt === 'number'
+    ? a
+    : buildDisneyExtremeLiveSnapshot(a || { enabled: false });
+  const right = b && typeof b === 'object' && typeof b.shapeInt === 'number'
+    ? b
+    : buildDisneyExtremeLiveSnapshot(b || { enabled: false });
+  const changes = [];
+  for (const key of DISNEY_EXTREME_SNAPSHOT_DIFF_FIELDS) {
+    const lv = left[key];
+    const rv = right[key];
+    if (typeof lv === 'boolean' || typeof rv === 'boolean') {
+      if (!!lv !== !!rv) changes.push(key);
+      continue;
+    }
+    if (Math.abs(Number(lv) - Number(rv)) > 1e-6) changes.push(key);
+  }
+  return { equal: changes.length === 0, changes };
+}
+
+/**
+ * One-line label for an Extreme snapshot diff.
+ * @param {{ equal?: boolean, changes?: string[] }|null|undefined} diff
+ * @returns {string}
+ */
+export function formatDisneyExtremeSnapshotDiffLabel(diff) {
+  if (!diff || diff.equal || !diff.changes?.length) {
+    return 'diff · match';
+  }
+  return `diff · ${diff.changes.join(' · ')}`;
+}
+
+/**
+ * Whether current Extreme snap differs from a baseline snap.
+ * @param {object|null|undefined} current
+ * @param {object|null|undefined} baseline
+ * @returns {boolean}
+ */
+export function isDisneyExtremeSnapshotDirty(current, baseline) {
+  if (!baseline) return false;
+  return !diffDisneyExtremeSnapshots(current, baseline).equal;
 }
