@@ -18,7 +18,7 @@ import { listFingerPresets, resolveFingerPreset } from '../engine/export/fingerP
 describe('Phase 27 Face Live prefs', () => {
   it('normalizes and clamps intensity', () => {
     const n = normalizeFaceLivePrefs({ intensity: 9, emotion: 'sad' });
-    expect(n.intensity).toBe(1.25);
+    expect(n.intensity).toBe(2.0);
     expect(n.emotion).toBe('sad');
     expect(n.version).toBe(defaultFaceLivePrefs().version);
   });

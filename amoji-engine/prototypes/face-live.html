@@ -1150,6 +1150,34 @@
       const disneyExtremeBodyFactorEl = document.getElementById('disneyExtremeBodyFactor');
       const disneyExtremeEyeFactorEl = document.getElementById('disneyExtremeEyeFactor');
       const disneyExtremeMouthFactorEl = document.getElementById('disneyExtremeMouthFactor');
+
+      // Restore Disney Extreme prefs into UI before we apply disabled/enabled guards.
+      if (disneyExtremeEl && disneyExtremeFactorEl) {
+        disneyExtremeEl.checked = !!savedPrefs.disneyExtreme;
+        disneyExtremeFactorEl.value = String(
+          savedPrefs.disneyExtremeFactor ?? disneyExtremeFactorEl.value ?? 1.6,
+        );
+      }
+      if (disneyExtremeBodyEl && disneyExtremeBodyFactorEl) {
+        disneyExtremeBodyEl.checked = !!savedPrefs.disneyExtremeBody;
+        disneyExtremeBodyFactorEl.value = String(
+          savedPrefs.disneyExtremeBodyFactor ??
+            disneyExtremeBodyFactorEl.value ??
+            1.6,
+        );
+      }
+      if (disneyExtremeEyeFactorEl) {
+        disneyExtremeEyeFactorEl.value = String(
+          savedPrefs.disneyExtremeEyeFactor ?? disneyExtremeEyeFactorEl.value ?? 1.4,
+        );
+      }
+      if (disneyExtremeMouthFactorEl) {
+        disneyExtremeMouthFactorEl.value = String(
+          savedPrefs.disneyExtremeMouthFactor ??
+            disneyExtremeMouthFactorEl.value ??
+            1.5,
+        );
+      }
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
       const lookXVal = document.getElementById('lookXVal');
@@ -1612,6 +1640,20 @@
           saveFaceLivePrefs({
             emotion,
             intensity,
+            disneyExtreme: !!document.getElementById('disneyExtreme')?.checked,
+            disneyExtremeFactor: Number(
+              document.getElementById('disneyExtremeFactor')?.value || 1.6,
+            ),
+            disneyExtremeBody: !!document.getElementById('disneyExtremeBody')?.checked,
+            disneyExtremeBodyFactor: Number(
+              document.getElementById('disneyExtremeBodyFactor')?.value || 1.6,
+            ),
+            disneyExtremeEyeFactor: Number(
+              document.getElementById('disneyExtremeEyeFactor')?.value || 1.4,
+            ),
+            disneyExtremeMouthFactor: Number(
+              document.getElementById('disneyExtremeMouthFactor')?.value || 1.5,
+            ),
             personaId: idle.personaId,
             chassisId,
             robotPackId,

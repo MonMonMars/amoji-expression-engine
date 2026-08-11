@@ -17,6 +17,13 @@ export function defaultFaceLivePrefs() {
     version: FACE_LIVE_PREFS_VERSION,
     emotion: 'happy',
     intensity: 0.7,
+    // Disney Extreme — separate shape multipliers + optional body/head deform.
+    disneyExtreme: false,
+    disneyExtremeFactor: 1.6,
+    disneyExtremeBody: true,
+    disneyExtremeBodyFactor: 1.6,
+    disneyExtremeEyeFactor: 1.4,
+    disneyExtremeMouthFactor: 1.5,
     personaId: 'companion',
     chassisId: 'desktop-buddy',
     robotPackId: 'face-servo-12',
@@ -46,8 +53,26 @@ export function normalizeFaceLivePrefs(raw) {
     version: FACE_LIVE_PREFS_VERSION,
     intensity:
       typeof raw.intensity === 'number'
-        ? Math.max(0, Math.min(1.25, raw.intensity))
+        ? Math.max(0, Math.min(2.0, raw.intensity))
         : base.intensity,
+    disneyExtreme: !!raw.disneyExtreme,
+    disneyExtremeFactor:
+      typeof raw.disneyExtremeFactor === 'number'
+        ? Math.max(1, Math.min(1.8, raw.disneyExtremeFactor))
+        : base.disneyExtremeFactor,
+    disneyExtremeBody: raw.disneyExtremeBody !== false,
+    disneyExtremeBodyFactor:
+      typeof raw.disneyExtremeBodyFactor === 'number'
+        ? Math.max(1, Math.min(1.8, raw.disneyExtremeBodyFactor))
+        : base.disneyExtremeBodyFactor,
+    disneyExtremeEyeFactor:
+      typeof raw.disneyExtremeEyeFactor === 'number'
+        ? Math.max(1, Math.min(2.2, raw.disneyExtremeEyeFactor))
+        : base.disneyExtremeEyeFactor,
+    disneyExtremeMouthFactor:
+      typeof raw.disneyExtremeMouthFactor === 'number'
+        ? Math.max(1, Math.min(2.2, raw.disneyExtremeMouthFactor))
+        : base.disneyExtremeMouthFactor,
     fingerEmblemSyncOn: raw.fingerEmblemSyncOn !== false,
     audioSync: raw.audioSync !== false,
     surfaceLevel: Number(raw.surfaceLevel) || base.surfaceLevel,
