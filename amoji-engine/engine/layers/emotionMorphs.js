@@ -718,6 +718,15 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineRedoRoot', help: 'Alt+/ jump redo root', kind: 'note' },
   { id: 'jumpBaselineFavoriteRoot', help: '⇧Alt+/ jump fav root', kind: 'note' },
   {
+    id: 'jumpBaselineHistoryRootSummary',
+    keys: [' '],
+    help: 'Space jump hist root summary',
+    kind: 'action',
+  },
+  { id: 'jumpBaselineRedoRootSummary', help: 'Shift+Space jump redo root summary', kind: 'note' },
+  { id: 'jumpBaselineFavoriteRootSummary', help: 'Alt+Space jump fav root summary', kind: 'note' },
+  { id: 'showBaselineActive', help: '⇧Alt+Space active chips', kind: 'note' },
+  {
     id: 'showBaselineRoots',
     keys: ['\\', '|'],
     help: '\\ roots readout',
@@ -728,6 +737,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'capacityBadges', help: 'chip rows · capacity', kind: 'note' },
   { id: 'capacityStrip', help: 'capacity strip · live', kind: 'note' },
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
+  { id: 'activeStrip', help: 'active strip · live', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -2123,6 +2133,25 @@ export function formatDisneyExtremeBaselineRootsLabel(stacks = {}) {
     bits.push('fav · empty');
   }
   return `roots · ${bits.join(' · ')}`;
+}
+
+/**
+ * Readout of active hist / redo / fav chip indices (1-based), without applying.
+ * @param {{
+ *   historyIndex?: number|null,
+ *   redoIndex?: number|null,
+ *   favoriteIndex?: number|null,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineActiveLabel(opts = {}) {
+  const bit = (kind, index) => {
+    if (index == null) return `${kind} · —`;
+    const n = Number(index);
+    if (!Number.isInteger(n) || n < 0) return `${kind} · —`;
+    return `${kind} · #${n + 1}`;
+  };
+  return `active · ${bit('hist', opts.historyIndex)} · ${bit('redo', opts.redoIndex)} · ${bit('fav', opts.favoriteIndex)}`;
 }
 
 /**

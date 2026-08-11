@@ -201,6 +201,10 @@ export function disneyExtremeUiDefaults() {
  * - `/` → jump to oldest Extreme baseline history entry
  * - `Alt+/` → jump to oldest Extreme baseline redo entry
  * - `Shift+Alt+/` → jump to oldest Extreme favorite
+ * - `Space` → jump oldest history then flash entry summary
+ * - `Shift+Space` → jump oldest redo then flash entry summary
+ * - `Alt+Space` → jump oldest favorite then flash entry summary
+ * - `Shift+Alt+Space` → flash active hist/redo/fav chip indices
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -429,12 +433,13 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J/C/D/X/A/E/M/N and Alt+1–8 fav jump / Alt+9/0 tip helpers / Alt+/ root jumps.
+  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J/C/D/X/A/E/M/N and Alt+1–8 fav jump / Alt+9/0 tip helpers / Alt+/ root jumps / Alt+Space root summary.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-8]$/.test(lower);
     const tipDigit = lower === '9' || lower === '0';
     const rootSlash = lower === '/';
+    const rootSpace = key === ' ';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -464,7 +469,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       lower !== 'n' &&
       !favJumpDigit &&
       !tipDigit &&
-      !rootSlash
+      !rootSlash &&
+      !rootSpace
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -742,6 +748,19 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'jumpBaselineHistoryRoot' && ev.altKey) {
       return { ok: true, action: 'jumpBaselineRedoRoot' };
+    }
+    if (
+      entry.id === 'jumpBaselineHistoryRootSummary' &&
+      ev.altKey &&
+      ev.shiftKey
+    ) {
+      return { ok: true, action: 'showBaselineActive' };
+    }
+    if (entry.id === 'jumpBaselineHistoryRootSummary' && ev.altKey) {
+      return { ok: true, action: 'jumpBaselineFavoriteRootSummary' };
+    }
+    if (entry.id === 'jumpBaselineHistoryRootSummary' && ev.shiftKey) {
+      return { ok: true, action: 'jumpBaselineRedoRootSummary' };
     }
     return { ok: true, action: entry.id };
   }

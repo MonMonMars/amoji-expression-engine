@@ -351,6 +351,7 @@ export {
   formatDisneyExtremeBaselineRedoList,
   formatDisneyExtremeBaselineTipsLabel,
   formatDisneyExtremeBaselineRootsLabel,
+  formatDisneyExtremeBaselineActiveLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
   formatDisneyExtremeBaselineChipDiffLabel,
   formatDisneyExtremeBaselineChipCompareLabel,
