@@ -90,6 +90,21 @@ Pass bar (LAN, same machine): drop rate &lt; 5%, consumer `errors == 0`, jawOpen
 
 52 channels match Apple ARKit / Live Link Face names (`data/arkit/arkit-mapping.json`).
 
+## Optional: Control Rig remap
+
+ARKit channel names may not match your UE morph / Control Rig controls. Sample profiles live in:
+
+- `data/ue/control-rig-arkit-remap.json` — `identity` · `sakura-expression` · `metahuman-ctrlrig-sample`
+- `engine/export/controlRigRemap.js` — `remapArkitToMorphs` / `remapLiveLinkFrame`
+
+```js
+import { remapLiveLinkFrame } from './engine/export/controlRigRemap.js';
+const ueFrame = remapLiveLinkFrame(arkitFrame, { profileId: 'sakura-expression' });
+// ueFrame.morphs['Expressions_jawOpen_max'] …
+```
+
+In the UE consumer, either rename morph targets to ARKit names, or apply the sample map before `set_morph_target`.
+
 ## Optional: Epic Live Link Face plugin
 
 If you prefer the stock UDP Live Link Face source, write a tiny converter that maps this JSON into the plugin’s subject — same channel names.

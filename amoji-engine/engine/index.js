@@ -383,3 +383,19 @@ export {
   playWithProvider,
   DEFAULT_TTS_ENDPOINT,
 } from './tts/ttsProvider.js';
+export {
+  TTS_CONFIG_KEYS,
+  resolveTtsConfig,
+  createTtsProviderFromConfig,
+  setBrowserTtsConfig,
+} from './tts/ttsConfig.js';
+export {
+  CONTROL_RIG_REMAP_CATALOG,
+  DEFAULT_REMAP_PROFILE,
+  listRemapProfiles,
+  getRemapProfile,
+  invertRemap,
+  remapArkitToMorphs,
+  remapMorphsToArkit,
+  remapLiveLinkFrame,
+} from './export/controlRigRemap.js';

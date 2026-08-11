@@ -33,7 +33,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 20 | TTS provider client (mock/HTTP + audioUrl E2E) | Done |
 | Phase 21 | Live Link soak · easter apply · chassis variants | Done |
 | Phase 22 | UE Mac soak notes · staging eggs · chassis SKUs | Done |
-| Phase 23+ | Further production polish… | Specced |
+| Phase 23 | Control Rig remap · hands DOF pack · TTS HTTP config | Done |
+| Phase 24+ | Further production polish… | Specced |
 
 ## Quick start
 

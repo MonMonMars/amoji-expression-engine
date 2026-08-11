@@ -205,6 +205,7 @@ export function createTtsProvider(cfg = {}) {
       endpoint: cfg.endpoint || DEFAULT_TTS_ENDPOINT,
       providerHint: cfg.provider,
       headers: cfg.headers,
+      fetchImpl: cfg.fetchImpl,
     });
   }
   return new MockTtsProvider({

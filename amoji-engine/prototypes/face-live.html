@@ -480,6 +480,10 @@
           <button type="button" id="btnTtsFixture">Load Step fixture</button>
           <button type="button" id="btnTtsSynth">Mock synthesize</button>
         </div>
+        <input id="ttsEndpoint" class="ctl" type="text" placeholder="TTS HTTP endpoint (optional)" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnTtsHttp">HTTP synthesize</button>
+        </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:8px;">
           <input id="ttsAudioSync" type="checkbox" checked />
           <span style="font-size:0.8rem;color:var(--muted)">Audio sync (fixture WAV / demo tone)</span>
@@ -589,6 +593,11 @@
         MockTtsProvider,
         playWithProvider,
       } from '/engine/tts/ttsProvider.js';
+      import {
+        setBrowserTtsConfig,
+        createTtsProviderFromConfig,
+        resolveTtsConfig,
+      } from '/engine/tts/ttsConfig.js';
       import { estimatePhonemesFromText } from '/engine/tts/estimatePhonemes.js';
       import {
         texturePackUrls,
@@ -1501,6 +1510,52 @@
           setTtsStatus(String(err.message || err), 'bad');
         }
       });
+      document.getElementById('btnTtsHttp').addEventListener('click', async () => {
+        try {
+          const endpoint = document.getElementById('ttsEndpoint')?.value?.trim() || '';
+          const cfg = setBrowserTtsConfig({
+            endpoint,
+            type: endpoint ? 'http' : 'mock',
+            provider: 'auto',
+          });
+          if (!cfg.readyForHttp) {
+            setTtsStatus('set TTS HTTP endpoint (or use Mock synthesize)', 'bad');
+            return;
+          }
+          speechPlayer.emotion = emotion;
+          speechPlayer.intensity = intensity;
+          const provider = createTtsProviderFromConfig(cfg);
+          const played = await playWithProvider(
+            speechPlayer,
+            provider,
+            { text: ttsTextEl.value || 'Hello, mama.', emotion },
+            { demoToneFallback: !!ttsAudioSync?.checked },
+          );
+          if (!played.ok) {
+            setTtsStatus(
+              played.error || played.detail?.error || played.loaded?.error || 'HTTP TTS failed',
+              'bad',
+            );
+            return;
+          }
+          gestures.setSpeaking(true, 0.7);
+          setTtsStatus(
+            `http · ${played.provider || cfg.provider} · ${played.syncMode} · ${Number(played.duration || 0).toFixed(2)}s`,
+            'ok',
+          );
+        } catch (err) {
+          setTtsStatus(String(err.message || err), 'bad');
+        }
+      });
+      // Show config hint once
+      {
+        const hint = resolveTtsConfig();
+        if (hint.readyForHttp) {
+          const el = document.getElementById('ttsEndpoint');
+          if (el && hint.endpoint) el.value = hint.endpoint;
+          setTtsStatus(`TTS config · http ready (${hint.provider})`);
+        }
+      }
       document.getElementById('ttsAudioFile').addEventListener('change', async (ev) => {
         const file = ev.target.files?.[0];
         if (!file) return;

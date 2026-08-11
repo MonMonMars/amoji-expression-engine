@@ -57,9 +57,10 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
-- **TTS speak**: Mock synthesize / Step fixture WAV / attach audio file → phoneme mouth + sync
+- **TTS speak**: Mock synthesize / HTTP synthesize (endpoint) / Step fixture WAV / attach audio → phoneme mouth + sync
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
-- **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
+- **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
+- **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / humanoid-stub
 
 ## Code
 
@@ -84,9 +85,10 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
-- ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
-- Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
+- ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `controlRigRemap.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
+- Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json` (incl. `upper-body-hands`)
 - Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew + variants)
+- TTS config: `engine/tts/ttsConfig.js` (env / `__AMOJI_TTS__`)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
 - YT/video batch: `tools/yt-capture/` + `prototypes/yt-capture-batch.html` — prep clip → quality gate → bake

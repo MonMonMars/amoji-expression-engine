@@ -178,6 +178,34 @@
         "neck_pitch": { "scale": 1.0, "maxDeltaPerSec": 1.6 },
         "jaw": { "scale": 1.1, "maxDeltaPerSec": 3.2 }
       }
+    },
+    "lobby-companion-hands": {
+      "id": "lobby-companion-hands",
+      "label": "Lobby companion · hands",
+      "packId": "upper-body-hands",
+      "productLine": "companion-robot",
+      "variantOf": "lobby-companion",
+      "description": "Upper-body + hand DOF SKU — readable fist/open for greeter gestures.",
+      "gains": {
+        "expression": 1,
+        "mouth": 1.05,
+        "eye": 0.95,
+        "body": 0.8
+      },
+      "joints": {
+        "neck_pitch": { "scale": 0.7, "maxDeltaPerSec": 1.2 },
+        "neck_yaw": { "scale": 0.65, "maxDeltaPerSec": 1.4 },
+        "hand_L_fist": { "scale": 1.1, "maxDeltaPerSec": 2.5 },
+        "hand_R_fist": { "scale": 1.1, "maxDeltaPerSec": 2.5 },
+        "hand_L_open": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "hand_R_open": { "scale": 1.05, "maxDeltaPerSec": 2.2 },
+        "thumb_L": { "scale": 1, "maxDeltaPerSec": 2 },
+        "thumb_R": { "scale": 1, "maxDeltaPerSec": 2 },
+        "index_L": { "scale": 1, "maxDeltaPerSec": 2 },
+        "index_R": { "scale": 1, "maxDeltaPerSec": 2 },
+        "elbow_L": { "scale": 0.9, "maxDeltaPerSec": 1.5 },
+        "elbow_R": { "scale": 0.9, "maxDeltaPerSec": 1.5 }
+      }
     }
   },
   "regionGainMap": {
@@ -188,6 +216,7 @@
     "neck": "body",
     "shoulder": "body",
     "arm": "body",
+    "hand": "body",
     "spine": "body",
     "pelvis": "body",
     "leg": "body"

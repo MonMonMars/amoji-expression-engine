@@ -15,18 +15,20 @@ import { resolveMouth } from '../engine/layers/resolveMouth.js';
 import { evaluateEmotion } from '../engine/layers/emotionFormulas.js';
 
 describe('robot pack catalog', () => {
-  it('lists three packs with increasing DOF', () => {
+  it('lists packs with increasing DOF including hands', () => {
     const packs = listRobotPacks();
-    expect(packs.map((p) => p.id)).toEqual([
-      'face-servo-12',
-      'upper-body-companion',
-      'humanoid-stub',
-    ]);
+    const ids = packs.map((p) => p.id);
+    expect(ids).toContain('face-servo-12');
+    expect(ids).toContain('upper-body-companion');
+    expect(ids).toContain('humanoid-stub');
+    expect(ids).toContain('upper-body-hands');
     const face = packs.find((p) => p.id === 'face-servo-12');
     const upper = packs.find((p) => p.id === 'upper-body-companion');
+    const hands = packs.find((p) => p.id === 'upper-body-hands');
     const human = packs.find((p) => p.id === 'humanoid-stub');
     expect(face.dof).toBe(12);
     expect(upper.dof).toBeGreaterThan(face.dof);
+    expect(hands.dof).toBe(upper.dof + 8);
     expect(human.dof).toBeGreaterThan(upper.dof);
   });
 

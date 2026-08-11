@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "note": "Sample Control Rig / morph remaps: Amoji ARKit 52 ↔ custom UE morph names. Pure generation export aid — not biometric capture.",
+  "profiles": {
+    "identity": {
+      "id": "identity",
+      "label": "Identity (ARKit names)",
+      "description": "No remap — Live Link Face / ARKit morph targets already match channel names.",
+      "direction": "arkit_to_morph",
+      "map": {}
+    },
+    "sakura-expression": {
+      "id": "sakura-expression",
+      "label": "Sakura Expressions_* sample",
+      "description": "Map ARKit → common Sakura / jp-female Expression morph naming (partial sample).",
+      "direction": "arkit_to_morph",
+      "map": {
+        "jawOpen": "Expressions_jawOpen_max",
+        "mouthSmileLeft": "Expressions_mouthSmileL_max",
+        "mouthSmileRight": "Expressions_mouthSmileR_max",
+        "mouthFrownLeft": "Expressions_mouthFrownL_max",
+        "mouthFrownRight": "Expressions_mouthFrownR_max",
+        "eyeBlinkLeft": "Expressions_eyeBlinkL_max",
+        "eyeBlinkRight": "Expressions_eyeBlinkR_max",
+        "eyeWideLeft": "Expressions_eyeWideL_max",
+        "eyeWideRight": "Expressions_eyeWideR_max",
+        "browInnerUp": "Expressions_browsMidVert_max",
+        "browDownLeft": "Expressions_browSqueezeL_max",
+        "browDownRight": "Expressions_browSqueezeR_max",
+        "browOuterUpLeft": "Expressions_browOutVertL_max",
+        "browOuterUpRight": "Expressions_browOutVertR_max",
+        "mouthPucker": "Expressions_mouthPucker_max",
+        "mouthFunnel": "Expressions_mouthFunnel_max",
+        "cheekPuff": "Expressions_cheekPuff_max",
+        "noseSneerLeft": "Expressions_noseSneerL_max",
+        "noseSneerRight": "Expressions_noseSneerR_max"
+      }
+    },
+    "metahuman-ctrlrig-sample": {
+      "id": "metahuman-ctrlrig-sample",
+      "label": "MetaHuman Control Rig sample",
+      "description": "Illustrative ARKit → CTRL_Expressions_* style names. Tune per MetaHuman version / Control Rig.",
+      "direction": "arkit_to_morph",
+      "map": {
+        "jawOpen": "CTRL_Expressions_jawOpen",
+        "mouthSmileLeft": "CTRL_Expressions_mouthSmile_L",
+        "mouthSmileRight": "CTRL_Expressions_mouthSmile_R",
+        "mouthFrownLeft": "CTRL_Expressions_mouthFrown_L",
+        "mouthFrownRight": "CTRL_Expressions_mouthFrown_R",
+        "eyeBlinkLeft": "CTRL_Expressions_eyeBlink_L",
+        "eyeBlinkRight": "CTRL_Expressions_eyeBlink_R",
+        "eyeWideLeft": "CTRL_Expressions_eyeWiden_L",
+        "eyeWideRight": "CTRL_Expressions_eyeWiden_R",
+        "browInnerUp": "CTRL_Expressions_browInnerUp",
+        "browDownLeft": "CTRL_Expressions_browDown_L",
+        "browDownRight": "CTRL_Expressions_browDown_R",
+        "browOuterUpLeft": "CTRL_Expressions_browOuterUp_L",
+        "browOuterUpRight": "CTRL_Expressions_browOuterUp_R",
+        "mouthClose": "CTRL_Expressions_mouthClose",
+        "tongueOut": "CTRL_Expressions_tongueOut"
+      }
+    }
+  }
+}

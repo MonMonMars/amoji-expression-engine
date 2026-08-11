@@ -68,6 +68,26 @@
         "ankle_L": { "unit": "rad", "min": -0.45, "max": 0.45, "rest": 0, "region": "leg" },
         "ankle_R": { "unit": "rad", "min": -0.45, "max": 0.45, "rest": 0, "region": "leg" }
       }
+    },
+    "upper-body-hands": {
+      "id": "upper-body-hands",
+      "label": "Upper-body + hands (8 DOF hands)",
+      "productLine": "companion-robot",
+      "surfaceLevel": 10,
+      "rateHz": 24,
+      "protocol": "json-joints-v1",
+      "description": "Extends upper-body companion with bilateral fist/open/thumb/index for Layer G hand poses.",
+      "extends": "upper-body-companion",
+      "joints": {
+        "hand_L_fist": { "unit": "norm", "min": 0, "max": 1, "rest": 0, "region": "hand" },
+        "hand_R_fist": { "unit": "norm", "min": 0, "max": 1, "rest": 0, "region": "hand" },
+        "hand_L_open": { "unit": "norm", "min": 0, "max": 1, "rest": 0.35, "region": "hand" },
+        "hand_R_open": { "unit": "norm", "min": 0, "max": 1, "rest": 0.35, "region": "hand" },
+        "thumb_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.2, "region": "hand" },
+        "thumb_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.2, "region": "hand" },
+        "index_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" },
+        "index_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0.15, "region": "hand" }
+      }
     }
   },
   "emotionFaceHints": {

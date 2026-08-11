@@ -161,6 +161,9 @@ Amoji engine (ND “systemic emotion”)
 38. ~~**UE Mac Live Link soak notes** (checklist + consumer `--soak` / `/stats`)~~ ✓
 39. ~~**More easter staging** (chin-think / nape-anxiety / open-palm honesty)~~ ✓
 40. ~~**Chassis SKUs** (desktop quiet · lab demo + product-line helpers)~~ ✓
+41. ~~**UE Control Rig remap samples** (Sakura / MetaHuman profile maps)~~ ✓
+42. ~~**Hands DOF pack** (`upper-body-hands` + lobby-hands chassis)~~ ✓
+43. ~~**TTS HTTP config wiring** (env / `__AMOJI_TTS__` → provider; Face Live endpoint)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -192,4 +195,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (UE Control Rig remap samples, more robot DOF packs, real TTS HTTP endpoint wiring when credentials exist).
+Next code increment: further polish (more Control Rig profiles, finger articulation depth, authenticated TTS smoke against a real endpoint).

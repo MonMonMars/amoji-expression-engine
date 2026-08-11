@@ -51,14 +51,22 @@ Face Live checkbox **Audio sync** uses fixture WAV (`hello-mama.wav`) when prese
 
 ```js
 import { MockTtsProvider, HttpTtsProvider, playWithProvider, SpeechPlayer } from './engine/index.js';
+import { resolveTtsConfig, createTtsProviderFromConfig } from './engine/index.js';
 
 const player = new SpeechPlayer({ emotion: 'happy' });
 const mock = new MockTtsProvider(); // phonemes + /data/tts/fixtures/hello-mama.wav
 await playWithProvider(player, mock, { text: 'Hello mama.', emotion: 'happy' });
 
-// Real service:
+// Config from env (AMOJI_TTS_ENDPOINT / AMOJI_TTS_TOKEN / AMOJI_TTS_PROVIDER)
+// or browser globalThis.__AMOJI_TTS__ — falls back to mock when unset:
+const provider = createTtsProviderFromConfig();
+await playWithProvider(player, provider, { text: '你好', emotion: 'happy' });
+
+// Explicit HTTP:
 const http = new HttpTtsProvider({ endpoint: 'https://your-tts/synthesize' });
 await playWithProvider(player, http, { text: '你好', emotion: 'happy' });
 ```
 
-Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js`.
+Face Live: paste endpoint → **HTTP synthesize** (uses `setBrowserTtsConfig`). No secrets committed.
+
+Expected HTTP JSON: phonemes/alignment + `audioUrl` (or `audioBase64`). See `engine/tts/ttsProvider.js` + `ttsConfig.js`.
