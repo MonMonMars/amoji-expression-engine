@@ -110,7 +110,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 97 | Prefs dropzone modifier wiring | Done |
 | Phase 98 | Prefs drop refresh order test | Done |
 | Phase 99 | Prefs drop sets preview text before refresh | Done |
-| Phase 100+ | Further production polish… | Specced |
+| Phase 100 | Prefs drop sets preview label before refresh | Done |
+| Phase 101+ | Further production polish… | Specced |
 
 ## Quick start
 
