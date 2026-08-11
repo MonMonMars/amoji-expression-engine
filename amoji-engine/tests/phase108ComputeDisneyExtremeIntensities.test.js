@@ -54,7 +54,7 @@ describe('Phase 108 computeDisneyExtremeIntensities', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('computeDisneyExtremeIntensities');
     expect(src).toContain('computeDisneyExtremeIntensities(intensity');
-    expect(src).toContain('computeDisneyExtremeIntensities(displayInt');
+    expect(src).toContain('disneyExtremeSnapshot(displayInt');
     expect(src).toContain('intensity: bodyInt');
   });
 });

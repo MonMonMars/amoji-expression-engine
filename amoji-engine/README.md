@@ -168,7 +168,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 155 | Extreme bundle label | Done |
 | Phase 156 | Extreme A hotkey flash bundle | Done |
 | Phase 157 | Extreme summary recipe + neck | Done |
-| Phase 158+ | Further production polish… | Specced |
+| Phase 158 | Extreme HUD from snapshot | Done |
+| Phase 159 | Extreme Face Live snapshot wiring | Done |
+| Phase 160 | Extreme Shift+A copy bundle | Done |
+| Phase 161 | Extreme bundle copy text stable | Done |
+| Phase 162+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -34,6 +34,6 @@ describe('Phase 122 Extreme HUD ease + body mix readout', () => {
   it('Face Live passes disneyExtremeBodyMix into the HUD helper', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('disneyExtremeBodyMix');
-    expect(src).toContain('bodyMix: disneyExtremeBodyMix(bodyInt)');
+    expect(src).toContain('formatDisneyExtremeLiveHudFromSnapshot(extremeSnap)');
   });
 });

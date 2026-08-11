@@ -282,6 +282,7 @@ export {
   computeDisneyExtremeIntensities,
   buildDisneyExtremeLiveSnapshot,
   formatDisneyExtremeBundleLabel,
+  formatDisneyExtremeLiveHudFromSnapshot,
   DISNEY_EXTREME_DEFAULTS,
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
   DISNEY_EXTREME_RECIPE_OVERDRIVE_GAIN,

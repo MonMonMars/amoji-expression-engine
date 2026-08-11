@@ -557,6 +557,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
+  { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
   { id: 'clearStatusHold', keys: ['Escape'], help: 'Esc clear', kind: 'escape' },
   { id: 'holdNudges', help: 'hold nudges', kind: 'note' },
   { id: 'shiftCoarse', help: 'Shift coarse', kind: 'note' },
@@ -900,4 +901,26 @@ export function formatDisneyExtremeBundleLabel(snapOrOpts = {}) {
     ? ` · mix ${Number(snap.bodyMix).toFixed(2)} · neck ${Number(snap.neckBlend).toFixed(2)}`
     : ' · body off';
   return `shape ${Number(snap.shapeInt).toFixed(2)} · ease ${Number(snap.ease).toFixed(2)}${recipeBit}${mixBit} · eye×${Number(snap.eyeFactor).toFixed(2)} · mouth×${Number(snap.mouthFactor).toFixed(2)}`;
+}
+
+/**
+ * Map a live Extreme snapshot into `formatDisneyExtremeLiveHud` output.
+ * @param {ReturnType<typeof buildDisneyExtremeLiveSnapshot>|null|undefined} snap
+ * @returns {ReturnType<typeof formatDisneyExtremeLiveHud>}
+ */
+export function formatDisneyExtremeLiveHudFromSnapshot(snap) {
+  if (!snap || !snap.enabled) {
+    return formatDisneyExtremeLiveHud({ enabled: false });
+  }
+  return formatDisneyExtremeLiveHud({
+    enabled: true,
+    shapeInt: snap.shapeInt,
+    bodyInt: snap.bodyInt,
+    bodyOn: snap.bodyOn,
+    bodyMix: snap.bodyMix,
+    neckBlend: snap.bodyOn ? snap.neckBlend : undefined,
+    eyeFactor: snap.eyeFactor,
+    mouthFactor: snap.mouthFactor,
+    ease: snap.ease,
+  });
 }

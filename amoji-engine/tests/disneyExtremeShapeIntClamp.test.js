@@ -9,7 +9,7 @@ const faceLivePath = fileURLToPath(
 describe('Disney Extreme shapeInt clamp', () => {
   it('clamps shapeInt via computeDisneyExtremeIntensities', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('computeDisneyExtremeIntensities(displayInt');
+    expect(src).toContain('disneyExtremeSnapshot(displayInt');
     expect(src).toContain('shapeFactor:');
   });
 });

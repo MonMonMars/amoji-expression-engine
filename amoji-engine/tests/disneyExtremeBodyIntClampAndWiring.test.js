@@ -10,7 +10,7 @@ describe('Disney Extreme bodyInt clamp + wiring', () => {
   it('computes bodyInt via helper and passes it to bodyCtl.tick', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
 
-    expect(src).toContain('computeDisneyExtremeIntensities(displayInt');
+    expect(src).toContain('disneyExtremeSnapshot(displayInt');
     expect(src).toContain('bodyOn:');
     expect(src).toContain('bodyFactor:');
     expect(src).toContain('intensity: bodyInt');

@@ -47,6 +47,6 @@ describe('Phase 126 Extreme X pill ease + mix', () => {
   it('Face Live still drives hudExtreme from extremeHud.pill', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('hudExtreme.textContent = extremeHud.pill');
-    expect(src).toContain('bodyMix: disneyExtremeBodyMix(bodyInt)');
+    expect(src).toContain('formatDisneyExtremeLiveHudFromSnapshot(extremeSnap)');
   });
 });

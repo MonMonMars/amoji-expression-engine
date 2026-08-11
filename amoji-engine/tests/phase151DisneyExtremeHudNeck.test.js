@@ -40,8 +40,7 @@ describe('Phase 151 Extreme live HUD neck blend', () => {
   it('Face Live passes neckBlend into live HUD', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('DISNEY_EXTREME_NECK_SCALE_BLEND');
-    expect(src).toContain(
-      'neckBlend: bodyOn ? DISNEY_EXTREME_NECK_SCALE_BLEND : undefined',
-    );
+    expect(src).toContain('formatDisneyExtremeLiveHudFromSnapshot(extremeSnap)');
+    expect(src).toContain('disneyExtremeSnapshot(displayInt)');
   });
 });

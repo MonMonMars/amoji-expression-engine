@@ -74,6 +74,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+F` → copy factor bars SVG to clipboard
  * - `n` / `N` → flash neck blend / body mix label on status
  * - `a` / `A` → flash combined Extreme bundle readout
+ * - `Shift+A` → copy Extreme bundle text to clipboard
  * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
@@ -308,6 +309,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showFactorBars' && ev.shiftKey) {
       return { ok: true, action: 'copyFactorBars' };
+    }
+    if (entry.id === 'showBundle' && ev.shiftKey) {
+      return { ok: true, action: 'copyBundle' };
     }
     return { ok: true, action: entry.id };
   }
