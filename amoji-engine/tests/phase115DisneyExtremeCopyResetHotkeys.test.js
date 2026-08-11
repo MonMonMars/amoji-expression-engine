@@ -27,7 +27,7 @@ describe('Phase 115 Extreme C copy + R reset hotkeys', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('C copy');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('R reset');
     expect(formatDisneyExtremeHotkeyHelp()).toContain(
-      'C copy · Shift+C copy diff · R reset',
+      'C copy · Shift+C copy diff · Alt+C share pin · R reset',
     );
   });
 

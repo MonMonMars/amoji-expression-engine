@@ -880,10 +880,12 @@
             <button type="button" id="btnDisneyExtremePasteRedoShare">Paste redo share <kbd>⇧Alt+Y</kbd></button>
             <button type="button" id="btnDisneyExtremeShareFav">Copy fav share <kbd>T</kbd></button>
             <button type="button" id="btnDisneyExtremePasteFavShare">Paste fav share <kbd>Alt+F</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeFavShare">Merge fav share <kbd>⇧Alt+F</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHist">Copy hist JSON <kbd>⇧L</kbd></button>
             <button type="button" id="btnDisneyExtremePasteHist">Paste hist JSON <kbd>I</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeHist">Merge hist JSON <kbd>⇧I</kbd></button>
             <button type="button" id="btnDisneyExtremePasteHistShare">Paste hist share <kbd>Alt+I</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeHistShare">Merge hist share <kbd>⇧Alt+I</kbd></button>
             <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFav">Copy fav JSON <kbd>G</kbd></button>
             <button type="button" id="btnDisneyExtremePasteFav">Paste fav JSON <kbd>⇧G</kbd></button>
@@ -908,6 +910,8 @@
             <button type="button" id="btnDisneyExtremeJumpPin">Jump pin <kbd>Alt+R</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyStacksSummary">Copy stacks summary <kbd>⇧Alt+L</kbd></button>
             <button type="button" id="btnDisneyExtremePasteStacksShare">Paste stacks share <kbd>Alt+B</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeStacksShare">Merge stacks share <kbd>⇧Alt+B</kbd></button>
+            <button type="button" id="btnDisneyExtremeSharePin">Share pin <kbd>Alt+C</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd></button>
@@ -3204,6 +3208,10 @@
         pasteDisneyExtremeBaselineFavoritesShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeMergeFavShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineFavoritesShareUrl({ merge: true });
+      });
+
       document.getElementById('btnDisneyExtremeHistList')?.addEventListener('click', () => {
         flashDisneyExtremeBaselineHistoryList();
       });
@@ -3304,6 +3312,14 @@
         pasteDisneyExtremeBaselineStacksShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremeMergeStacksShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineStacksShareUrl({ merge: true });
+      });
+
+      document.getElementById('btnDisneyExtremeSharePin')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselinePinShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremeUnstarFav')?.addEventListener('click', () => {
         unstarDisneyExtremeBaselineFavorite();
       });
@@ -3342,6 +3358,10 @@
 
       document.getElementById('btnDisneyExtremePasteHistShare')?.addEventListener('click', () => {
         pasteDisneyExtremeBaselineHistoryShareUrl();
+      });
+
+      document.getElementById('btnDisneyExtremeMergeHistShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineHistoryShareUrl({ merge: true });
       });
 
       function disneyExtremeFactorOpts() {
@@ -3549,6 +3569,30 @@
           ok
             ? `copied · share link · fp ${fp}`
             : `copy failed · share · ${share.hash}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBaselinePinShareUrl() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('share pin · none');
+          return false;
+        }
+        const share = buildDisneyExtremeSnapshotShareUrl(lastExtremeBaselineSnap);
+        const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(share.url);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · pin share · fp ${fp}`
+            : `copy failed · pin share · ${share.hash}`,
         );
         return ok;
       }
@@ -4504,6 +4548,16 @@
           pasteDisneyExtremeBaselineStacksShareUrl();
           return;
         }
+        if (resolved.action === 'mergeBaselineStacksShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineStacksShareUrl({ merge: true });
+          return;
+        }
+        if (resolved.action === 'copyBaselinePinShareUrl') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselinePinShareUrl();
+          return;
+        }
         if (resolved.action === 'copyBaselineRedoJson') {
           ev.preventDefault();
           copyDisneyExtremeBaselineRedoJson();
@@ -4554,6 +4608,11 @@
           pasteDisneyExtremeBaselineFavoritesShareUrl();
           return;
         }
+        if (resolved.action === 'mergeBaselineFavoritesShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineFavoritesShareUrl({ merge: true });
+          return;
+        }
         if (resolved.action === 'showBaselineHistory') {
           ev.preventDefault();
           flashDisneyExtremeBaselineHistoryList();
@@ -4577,6 +4636,11 @@
         if (resolved.action === 'pasteBaselineHistoryShareUrl') {
           ev.preventDefault();
           pasteDisneyExtremeBaselineHistoryShareUrl();
+          return;
+        }
+        if (resolved.action === 'mergeBaselineHistoryShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineHistoryShareUrl({ merge: true });
           return;
         }
         if (resolved.action === 'mergeBaselineHistoryJson') {

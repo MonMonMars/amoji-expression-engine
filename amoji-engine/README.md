@@ -300,7 +300,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 287 | Extreme Alt+I paste hist share | Done |
 | Phase 288 | Extreme ⇧Alt+Y paste redo share | Done |
 | Phase 289 | Extreme Alt+J paste snap share | Done |
-| Phase 290+ | Further production polish… | Specced |
+| Phase 290 | Extreme ⇧Alt+F merge fav share | Done |
+| Phase 291 | Extreme ⇧Alt+I merge hist share | Done |
+| Phase 292 | Extreme ⇧Alt+B merge stacks share | Done |
+| Phase 293 | Extreme Alt+C share pin | Done |
+| Phase 294+ | Further production polish… | Specced |
 
 ## Quick start
 

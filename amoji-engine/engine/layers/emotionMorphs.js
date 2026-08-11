@@ -519,6 +519,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'toggle', keys: ['x', 'X'], help: 'X', kind: 'action' },
   { id: 'toggleBodyApply', keys: ['b', 'B'], help: 'B body', kind: 'action' },
   { id: 'pasteBaselineStacksShareUrl', help: 'Alt+B paste stacks', kind: 'note' },
+  { id: 'mergeBaselineStacksShareUrl', help: '⇧Alt+B merge stacks', kind: 'note' },
   {
     id: 'nudgeShape',
     keys: { down: ['[', '{'], up: [']', '}'] },
@@ -549,6 +550,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   },
   { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
   { id: 'copySnapshotDiff', help: 'Shift+C copy diff', kind: 'note' },
+  { id: 'copyBaselinePinShareUrl', help: 'Alt+C share pin', kind: 'note' },
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
   { id: 'jumpBaselinePin', help: 'Alt+R jump pin', kind: 'note' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
@@ -560,6 +562,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showFactorBars', keys: ['f', 'F'], help: 'F factors', kind: 'action' },
   { id: 'copyFactorBars', help: 'Shift+F copy factors', kind: 'note' },
   { id: 'pasteBaselineFavoritesShareUrl', help: 'Alt+F paste fav', kind: 'note' },
+  { id: 'mergeBaselineFavoritesShareUrl', help: '⇧Alt+F merge fav', kind: 'note' },
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
@@ -603,6 +606,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
   { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
   { id: 'pasteBaselineHistoryShareUrl', help: 'Alt+I paste hist share', kind: 'note' },
+  { id: 'mergeBaselineHistoryShareUrl', help: '⇧Alt+I merge hist share', kind: 'note' },
   {
     id: 'jumpBaselineHistory',
     keys: ['1', '2', '3', '4', '5', '6', '7', '8'],
