@@ -662,6 +662,11 @@
           <button type="button" id="btnProbeCopy">Copy probe</button>
           <button type="button" id="btnProbeToastMute">Toast sound</button>
         </div>
+        <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
+          <span style="font-size:0.8rem;color:var(--muted);min-width:4.5rem;">Toast vol</span>
+          <input id="prefsProbeToastVolume" type="range" min="0" max="100" value="100" style="flex:1;" />
+          <span id="prefsProbeToastVolumeVal" style="font-size:0.8rem;color:var(--muted);min-width:2.5rem;">100%</span>
+        </label>
         <pre id="ttsProbeDetail" style="max-height:72px;margin-top:6px;">probe · click sparkline</pre>
       </div>
 
@@ -755,6 +760,7 @@
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditStarAll">Star all</button>
           <button type="button" id="btnPrefsAuditUnstarAll">Unstar all</button>
+          <button type="button" id="btnPrefsAuditClearFolderStars">Clear folder stars</button>
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
@@ -1286,7 +1292,8 @@
           reason !== 'blink_pick' &&
           reason !== 'livelink_pick' &&
           reason !== 'stepout_pick' &&
-          reason !== 'leak_pick'
+          reason !== 'leak_pick' &&
+          reason !== 'improv_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1306,7 +1313,8 @@
           reason === 'blink_pick' ||
           reason === 'livelink_pick' ||
           reason === 'stepout_pick' ||
-          reason === 'leak_pick'
+          reason === 'leak_pick' ||
+          reason === 'improv_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1976,6 +1984,7 @@
         moodCtl.setMood(moodSel.value);
       });
       document.getElementById('btnDiscImprov').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('improv_pick');
         const stimulus = discStimulus.value || 'noise';
         const r = discCtl.tryImprovise(stimulus, { mood: moodCtl.state });
         if (r.blocked) {
@@ -2128,6 +2137,7 @@
         }
       });
       document.getElementById('btnImprov').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('improv_pick');
         const r = improviseReaction({
           stimulus: 'noise',
           mood: temporal.moodEmotion || undefined,
@@ -2429,6 +2439,20 @@
             probeToastSound.muted ? 'probe toast muted' : 'probe toast sound on',
             'ok',
           );
+        });
+        function syncProbeToastVolumeUi() {
+          const slider = document.getElementById('prefsProbeToastVolume');
+          const label = document.getElementById('prefsProbeToastVolumeVal');
+          const pct = Math.round((probeToastSound.volume || 0) * 100);
+          if (slider) slider.value = String(pct);
+          if (label) label.textContent = `${pct}%`;
+        }
+        syncProbeToastVolumeUi();
+        document.getElementById('prefsProbeToastVolume')?.addEventListener('input', (ev) => {
+          const pct = Number(ev.target.value);
+          probeToastSound.setVolume(pct / 100);
+          syncProbeToastVolumeUi();
+          setTtsStatus(`probe toast volume ${Math.round(probeToastSound.volume * 100)}%`, 'ok');
         });
         async function runProbeToastAction(actionId) {
           const resolved = resolveProbeToastAction(actionId, {
@@ -2949,6 +2973,27 @@
           prefsStatus.textContent = folder
             ? `prefs · unstarred ${out.changed} in ${folder}`
             : `prefs · unstarred ${out.changed} views`;
+        });
+        document.getElementById('btnPrefsAuditClearFolderStars')?.addEventListener('click', () => {
+          const folderEl = document.getElementById('prefsAuditViewFolder');
+          const folder =
+            prefsAuditFolderFilter ||
+            folderEl?.value?.trim() ||
+            '';
+          if (!folder) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a folder to clear stars';
+            return;
+          }
+          const out = auditSavedViews.clearStarsInFolder(folder);
+          if (!out.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · clear folder stars failed';
+            return;
+          }
+          refreshAuditSavedViewsUi();
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · cleared ${out.changed} stars in ${folder}`;
         });
         (() => {
           const dragList = document.getElementById('prefsAuditViewsDragList');

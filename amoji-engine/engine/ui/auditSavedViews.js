@@ -72,6 +72,55 @@ export function sortAuditViewsByStar(views) {
 }
 
 /**
+ * Clear starred flags for every view in a named folder (pure).
+ * Requires a non-empty folder; empty folder → missing_folder.
+ * @param {object[]} views
+ * @param {string} folder
+ * @param {{ now?: number }} [opts]
+ */
+export function clearStarsInFolder(views, folder, opts = {}) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  const folderName = String(folder || '').trim();
+  if (!folderName) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_clear_stars',
+        ok: false,
+        reason: 'missing_folder',
+        views: list,
+        changed: 0,
+        folder: null,
+      },
+      {},
+    );
+  }
+  let changed = 0;
+  const next = list.map((v) => {
+    const vFolder = String(v?.folder || '').trim() || 'Inbox';
+    if (vFolder !== folderName) return v;
+    if (!v?.starred) return v;
+    changed += 1;
+    return normalizeAuditSavedView(
+      { ...v, starred: false, savedAt: opts.now ?? Date.now() },
+      { now: opts.now },
+    );
+  });
+  const sorted = sortAuditViewsByStar(next).views;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_clear_stars',
+      ok: true,
+      views: sorted,
+      changed,
+      folder: folderName,
+      count: sorted.length,
+      starredCount: sorted.filter((v) => v.starred).length,
+    },
+    {},
+  );
+}
+
+/**
  * Filter views by starred-only and/or folder.
  * @param {object[]} views
  * @param {{ starredOnly?: boolean, folder?: string|null }} [opts]
@@ -927,6 +976,30 @@ export function createAuditSavedViews(opts = {}) {
     },
     unstarAll(bulkOpts = {}) {
       return this.bulkStar(false, bulkOpts);
+    },
+    /**
+     * Clear stars only inside a named folder (folder required).
+     * @param {string} folder
+     * @param {{ now?: number }} [clearOpts]
+     */
+    clearStarsInFolder(folder, clearOpts = {}) {
+      const cleared = clearStarsInFolder(views, folder, clearOpts);
+      if (!cleared.ok) return cleared;
+      views = cleared.views;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'clear_stars_in_folder',
+          ok: true,
+          folder: cleared.folder,
+          changed: cleared.changed,
+          count: views.length,
+          starredCount: views.filter((v) => v.starred).length,
+          views: views.slice(),
+        },
+        {},
+      );
     },
     folders() {
       return groupAuditViewsByFolder(views);

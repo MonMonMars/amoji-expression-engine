@@ -239,6 +239,9 @@ Amoji engine (ND “systemic emotion”)
 116. ~~**Probe toast mute toggle** (`toggleMute` · Toast sound button)~~ ✓
 117. ~~**Audit views starred-only filter** (`filterAuditSavedViews` · Starred only)~~ ✓
 118. ~~**Cancel compound on mood leak** (Force leak / Mood fear clears lifecycle)~~ ✓
+119. ~~**Probe toast volume slider** (`setVolume` · Toast vol range)~~ ✓
+120. ~~**Audit views clear stars in folder** (`clearStarsInFolder` · Clear folder stars)~~ ✓
+121. ~~**Cancel compound on improv** (Gap improv / Improv noise clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -270,4 +273,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast volume slider, views clear stars in folder, cancel on improv).
+Next code increment: further polish (toast duck on pin, views export starred-only, cancel on arousal).

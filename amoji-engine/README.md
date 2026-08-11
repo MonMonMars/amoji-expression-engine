@@ -59,7 +59,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 46 | Toast markdown · views star · Live Link cancel | Done |
 | Phase 47 | Toast sound cue · views bulk star · step-out cancel | Done |
 | Phase 48 | Toast mute · views starred filter · leak cancel | Done |
-| Phase 49+ | Further production polish… | Specced |
+| Phase 49 | Toast volume · views clear folder stars · improv cancel | Done |
+| Phase 50+ | Further production polish… | Specced |
 
 ## Quick start
 

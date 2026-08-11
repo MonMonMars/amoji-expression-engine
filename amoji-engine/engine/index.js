@@ -532,6 +532,7 @@ export {
   applyAuditViewsOrder,
   sortAuditViewsByStar,
   filterAuditSavedViews,
+  clearStarsInFolder,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
   renameAuditSavedView,
@@ -561,6 +562,8 @@ export {
 export { compareProbeToastDetails } from './ui/probeToastCompare.js';
 export {
   PROBE_TOAST_SOUND_FREQ,
+  PROBE_TOAST_SOUND_BASE_GAIN,
+  clampProbeToastVolume,
   resolveProbeToastSound,
   createProbeToastSound,
 } from './ui/probeToastSound.js';
