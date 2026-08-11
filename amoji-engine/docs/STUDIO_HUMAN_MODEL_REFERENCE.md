@@ -167,6 +167,9 @@ Amoji engine (ND “systemic emotion”)
 44. ~~**More Control Rig profiles** (CC4 · UE5 flat MorphTarget_)~~ ✓
 45. ~~**Finger articulation depth** (`upper-body-fingers` + cascade curls)~~ ✓
 46. ~~**Authenticated TTS smoke** (`npm run tts:smoke` · local echo / real endpoint)~~ ✓
+47. ~~**UE Live Link consumer remap** (`remap_profile` + `--remap-demo`)~~ ✓
+48. ~~**Finger presets UI** (rest/fist/point/wave… → robot gesture)~~ ✓
+49. ~~**TTS provider presets** (mock/Step/Index/Kokoro/local-smoke)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -198,4 +201,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (Live Link remap in UE consumer, gesture→finger presets UI, production TTS provider presets).
+Next code increment: further polish (Face Live Live Link remap profile picker, more finger emblem sync, real gateway TTS presets).

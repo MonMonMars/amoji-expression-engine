@@ -481,6 +481,7 @@
           <button type="button" id="btnTtsSynth">Mock synthesize</button>
         </div>
         <input id="ttsEndpoint" class="ctl" type="text" placeholder="TTS HTTP endpoint (optional)" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;" />
+        <select id="ttsPresetSel" class="ctl" style="margin-top:8px;"></select>
         <div class="row" style="margin-top:8px;">
           <button type="button" id="btnTtsHttp">HTTP synthesize</button>
         </div>
@@ -521,11 +522,13 @@
         <div class="label">Robot driver (L10)</div>
         <select id="robotPackSel" class="ctl"></select>
         <select id="chassisSel" class="ctl" style="margin-top:8px;"></select>
+        <select id="fingerPresetSel" class="ctl" style="margin-top:8px;"></select>
         <div class="row" style="margin-top:8px;">
           <button type="button" id="btnRobotWalk">Walk hips</button>
           <button type="button" id="btnRobotSlew" class="primary">Slew</button>
         </div>
         <div class="status" id="robotStatus">robot off</div>
+        <div class="status" id="fingerStatus">fingers · rest</div>
         <pre id="robotDebug">—</pre>
       </div>
     </aside>
@@ -582,6 +585,11 @@
         DEFAULT_ROBOT_PACK,
       } from '/engine/export/robotDriver.js';
       import {
+        listFingerPresets,
+        resolveFingerPreset,
+        DEFAULT_FINGER_PRESET,
+      } from '/engine/export/fingerPresets.js';
+      import {
         listChassis,
         getChassis,
         ChassisSlewLimiter,
@@ -598,6 +606,11 @@
         createTtsProviderFromConfig,
         resolveTtsConfig,
       } from '/engine/tts/ttsConfig.js';
+      import {
+        listTtsPresets,
+        applyTtsPreset,
+        DEFAULT_TTS_PRESET,
+      } from '/engine/tts/ttsPresets.js';
       import { estimatePhonemesFromText } from '/engine/tts/estimatePhonemes.js';
       import {
         texturePackUrls,
@@ -662,6 +675,8 @@
       const robotStatus = document.getElementById('robotStatus');
       const robotPackSel = document.getElementById('robotPackSel');
       const chassisSel = document.getElementById('chassisSel');
+      const fingerPresetSel = document.getElementById('fingerPresetSel');
+      const fingerStatus = document.getElementById('fingerStatus');
       const intensityEl = document.getElementById('intensity');
       const intensityVal = document.getElementById('intensityVal');
       const intensityMeter = document.getElementById('intensityMeter');
@@ -724,6 +739,9 @@
       let robotWalkOn = false;
       let chassisId = DEFAULT_CHASSIS;
       let robotSlewOn = true;
+      let fingerPresetId = DEFAULT_FINGER_PRESET;
+      /** @type {object|null} */
+      let fingerGesture = resolveFingerPreset(fingerPresetId).gesture || { fist: 0.05, handOpen: 0.4 };
       const robotSlew = new ChassisSlewLimiter(chassisId);
       let lastRobotT = performance.now() / 1000;
       const speechPlayer = new SpeechPlayer({ emotion: 'happy', intensity: 0.7, fps: 30 });
@@ -884,6 +902,13 @@
         if (c.id === chassisId) opt.selected = true;
         chassisSel.appendChild(opt);
       }
+      for (const fp of listFingerPresets()) {
+        const opt = document.createElement('option');
+        opt.value = fp.id;
+        opt.textContent = `Fingers · ${fp.label}`;
+        if (fp.id === fingerPresetId) opt.selected = true;
+        fingerPresetSel.appendChild(opt);
+      }
       function refreshRobotStatus() {
         robotStatus.textContent = [
           `chassis ${chassisId}`,
@@ -893,6 +918,15 @@
           .filter(Boolean)
           .join(' · ');
       }
+      function applyFingerPreset(id) {
+        fingerPresetId = id || DEFAULT_FINGER_PRESET;
+        const resolved = resolveFingerPreset(fingerPresetId);
+        fingerGesture = resolved.gesture || { fist: 0.05, handOpen: 0.4 };
+        fingerStatus.textContent = resolved.error
+          ? `fingers · error`
+          : `fingers · ${resolved.label || fingerPresetId}`;
+      }
+      applyFingerPreset(fingerPresetId);
       robotPackSel.addEventListener('change', () => {
         robotPackId = robotPackSel.value || DEFAULT_ROBOT_PACK;
         refreshRobotStatus();
@@ -907,6 +941,9 @@
         robotSlew.setChassis(chassisId);
         robotSlew.reset();
         refreshRobotStatus();
+      });
+      fingerPresetSel.addEventListener('change', () => {
+        applyFingerPreset(fingerPresetSel.value);
       });
       document.getElementById('btnRobotWalk').addEventListener('click', () => {
         robotWalkOn = !robotWalkOn;
@@ -1547,8 +1584,28 @@
           setTtsStatus(String(err.message || err), 'bad');
         }
       });
-      // Show config hint once
+      // Show config hint once + populate TTS presets
       {
+        const ttsPresetSel = document.getElementById('ttsPresetSel');
+        for (const p of listTtsPresets()) {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = `${p.label}${p.type === 'http' ? ' · HTTP' : ''}`;
+          if (p.id === DEFAULT_TTS_PRESET) opt.selected = true;
+          ttsPresetSel.appendChild(opt);
+        }
+        ttsPresetSel.addEventListener('change', () => {
+          const applied = applyTtsPreset(ttsPresetSel.value, { persistBrowser: true });
+          const el = document.getElementById('ttsEndpoint');
+          if (el && applied.config?.endpoint) el.value = applied.config.endpoint;
+          else if (el && applied.config?.type === 'mock') el.value = '';
+          setTtsStatus(
+            applied.error
+              ? String(applied.error)
+              : `preset · ${applied.label} · ${applied.config?.type || 'mock'}`,
+            applied.error ? 'bad' : '',
+          );
+        });
         const hint = resolveTtsConfig();
         if (hint.readyForHttp) {
           const el = document.getElementById('ttsEndpoint');
@@ -2074,6 +2131,7 @@
             chassisId,
             slew: robotSlewOn ? robotSlew : null,
             dtSec: dtRobot,
+            gesture: fingerGesture,
           });
           const nz = robotFrame.nonzero || {};
           const robotLines = Object.entries(nz)

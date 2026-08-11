@@ -56,10 +56,10 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Idle sway / turntable / cycle emotions / blink
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
-- **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
-- **TTS speak**: Mock synthesize / HTTP synthesize (endpoint) / Step fixture WAV / attach audio → phoneme mouth + sync
-- **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
+- **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch (drives robot hand DOF)
+- **TTS speak**: Mock / HTTP / provider presets / Step fixture WAV / attach audio → phoneme mouth + sync
+- **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 
 ## Code
@@ -86,9 +86,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `liveLinkSoak.js`, `controlRigRemap.js`, `prototypes/livelink-bridge.mjs`, `livelink-soak.mjs`
-- Robot drivers: `engine/export/robotDriver.js` + `fingerArticulation.js` + `data/robots/catalog.json` (hands / fingers packs)
+- Robot drivers: `engine/export/robotDriver.js` + `fingerArticulation.js` + `fingerPresets.js` + `data/robots/catalog.json` + `data/gestures/finger-presets.json`
 - Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew + variants)
-- TTS config: `engine/tts/ttsConfig.js` · smoke `engine/tts/ttsSmoke.js` (`npm run tts:smoke`)
+- TTS config: `engine/tts/ttsConfig.js` · presets `ttsPresets.js` · smoke `ttsSmoke.js` (`npm run tts:smoke`)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
 - YT/video batch: `tools/yt-capture/` + `prototypes/yt-capture-batch.html` — prep clip → quality gate → bake

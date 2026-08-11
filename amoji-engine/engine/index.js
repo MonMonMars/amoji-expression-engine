@@ -399,11 +399,26 @@ export {
   articulateFingers,
 } from './export/fingerArticulation.js';
 export {
+  FINGER_PRESET_CATALOG,
+  DEFAULT_FINGER_PRESET,
+  listFingerPresets,
+  getFingerPreset,
+  resolveFingerPreset,
+} from './export/fingerPresets.js';
+export {
   TTS_CONFIG_KEYS,
   resolveTtsConfig,
   createTtsProviderFromConfig,
   setBrowserTtsConfig,
 } from './tts/ttsConfig.js';
+export {
+  TTS_PRESET_CATALOG,
+  DEFAULT_TTS_PRESET,
+  listTtsPresets,
+  getTtsPreset,
+  applyTtsPreset,
+  createTtsProviderFromPreset,
+} from './tts/ttsPresets.js';
 export {
   startAuthEchoServer,
   runAuthenticatedTtsSmoke,

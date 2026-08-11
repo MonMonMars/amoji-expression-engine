@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "note": "Gesture → finger pose presets for upper-body-hands / fingers packs. Pure generation staging.",
+  "defaultPreset": "rest",
+  "presets": {
+    "rest": {
+      "id": "rest",
+      "label": "Rest",
+      "description": "Neutral open hands",
+      "gesture": { "fist": 0.05, "handOpen": 0.4, "spread": 0.25 }
+    },
+    "fist": {
+      "id": "fist",
+      "label": "Fist",
+      "description": "Closed fists both hands",
+      "gesture": { "fist": 0.92, "handOpen": 0.05, "spread": 0.05 }
+    },
+    "open-palm": {
+      "id": "open-palm",
+      "label": "Open palm",
+      "description": "Wide open sincere palms",
+      "gesture": { "fist": 0, "handOpen": 0.95, "spread": 0.7 }
+    },
+    "point": {
+      "id": "point",
+      "label": "Point",
+      "description": "Index extended, other digits curled (right-biased)",
+      "gesture": {
+        "fist": 0.55,
+        "handOpen": 0.2,
+        "spread": 0.15,
+        "armR": { "index": 0.05, "middle": 0.85, "ring": 0.9, "pinky": 0.9, "thumb": 0.55 },
+        "armL": { "fist": 0.35, "handOpen": 0.35 }
+      }
+    },
+    "ok": {
+      "id": "ok",
+      "label": "OK",
+      "description": "Thumb–index pinch cue via curls",
+      "gesture": {
+        "fist": 0.35,
+        "handOpen": 0.25,
+        "spread": 0.2,
+        "armR": { "thumb": 0.75, "index": 0.7, "middle": 0.15, "ring": 0.1, "pinky": 0.1 }
+      }
+    },
+    "wave": {
+      "id": "wave",
+      "label": "Wave ready",
+      "description": "Open right hand ready for wave emblem",
+      "gesture": {
+        "fist": 0.05,
+        "handOpen": 0.85,
+        "spread": 0.55,
+        "armR": { "handOpen": 0.95, "fist": 0 },
+        "armL": { "fist": 0.15, "handOpen": 0.35 }
+      }
+    },
+    "pinch": {
+      "id": "pinch",
+      "label": "Pinch",
+      "description": "Precision grip staging",
+      "gesture": {
+        "fist": 0.4,
+        "handOpen": 0.15,
+        "spread": 0.1,
+        "armR": { "thumb": 0.8, "index": 0.75, "middle": 0.55, "ring": 0.5, "pinky": 0.45 }
+      }
+    }
+  }
+}

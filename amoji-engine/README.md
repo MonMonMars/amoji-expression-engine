@@ -35,7 +35,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 22 | UE Mac soak notes · staging eggs · chassis SKUs | Done |
 | Phase 23 | Control Rig remap · hands DOF pack · TTS HTTP config | Done |
 | Phase 24 | More remaps · finger articulation · TTS auth smoke | Done |
-| Phase 25+ | Further production polish… | Specced |
+| Phase 25 | UE consumer remap · finger presets UI · TTS presets | Done |
+| Phase 26+ | Further production polish… | Specced |
 
 ## Quick start
 

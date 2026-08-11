@@ -67,7 +67,7 @@ const http = new HttpTtsProvider({ endpoint: 'https://your-tts/synthesize' });
 await playWithProvider(player, http, { text: '你好', emotion: 'happy' });
 ```
 
-Face Live: paste endpoint → **HTTP synthesize** (uses `setBrowserTtsConfig`). No secrets committed.
+Face Live: pick a **TTS preset** (mock / Step / Index / Kokoro / local-smoke) or paste endpoint → **HTTP synthesize**. No secrets committed.
 
 Smoke (auth round-trip):
 

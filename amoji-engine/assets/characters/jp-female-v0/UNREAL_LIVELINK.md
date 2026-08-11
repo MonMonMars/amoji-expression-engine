@@ -44,12 +44,15 @@ spec = importlib.util.spec_from_file_location(
 )
 mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
 mod.start_polling(actor_label="AmojiSakura", http_url="http://127.0.0.1:7879/last", hz=30)
+# Optional Control Rig remap (sakura-expression | metahuman-ctrlrig-sample | cc4-arkit | ue5-morph-flat):
+# mod.start_polling(..., remap_profile="sakura-expression")
 ```
 
 Dry-run outside UE (bridge must be publishing):
 
 ```bash
 python3 assets/characters/jp-female-v0/unreal/AmojiLiveLinkConsumer.py --soak 5
+python3 assets/characters/jp-female-v0/unreal/AmojiLiveLinkConsumer.py --remap-demo sakura-expression
 ```
 
 ## Mac soak checklist (UE side)
@@ -113,7 +116,9 @@ If you prefer the stock UDP Live Link Face source, write a tiny converter that m
 
 | Function | Role |
 |---|---|
-| `start_polling` / `stop_polling` | Background `/last` → morph targets |
+| `start_polling` / `stop_polling` | Background `/last` → morph targets (`remap_profile=…`) |
+| `remap_arkit_to_morphs` | Apply `data/ue/control-rig-arkit-remap.json` in-process |
 | `fetch_stats` | Read bridge `/stats` |
 | `soak_report(seconds, hz)` | Count frames / errors for Mac validation |
 | `python3 …Consumer.py --soak N` | CLI dry-run soak |
+| `python3 …Consumer.py --remap-demo PROFILE` | Print sample remapped morphs |

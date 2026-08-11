@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "note": "Production TTS provider presets — endpoint templates only. Tokens via AMOJI_TTS_TOKEN / Face Live; never commit secrets.",
+  "defaultPreset": "mock",
+  "presets": {
+    "mock": {
+      "id": "mock",
+      "label": "Mock (fixture)",
+      "provider": "mock",
+      "type": "mock",
+      "endpoint": "",
+      "description": "Local Step fixture + hello-mama.wav — no network.",
+      "fixtureKey": "stepAudioEditX",
+      "auth": "none"
+    },
+    "step-audio": {
+      "id": "step-audio",
+      "label": "Step Audio EditX",
+      "provider": "step-audio-editx",
+      "type": "http",
+      "endpoint": "https://api.example.com/v1/tts/step",
+      "description": "Step Audio–shaped phoneme + audioUrl JSON. Replace endpoint with your gateway.",
+      "fixtureKey": "stepAudioEditX",
+      "auth": "bearer"
+    },
+    "indextts2": {
+      "id": "indextts2",
+      "label": "IndexTTS2",
+      "provider": "indextts2",
+      "type": "http",
+      "endpoint": "https://api.example.com/v1/tts/index",
+      "description": "IndexTTS2 alignment + para tags. Replace endpoint with your gateway.",
+      "fixtureKey": "indexTts2",
+      "auth": "bearer"
+    },
+    "kokoro": {
+      "id": "kokoro",
+      "label": "Kokoro",
+      "provider": "kokoro",
+      "type": "http",
+      "endpoint": "https://api.example.com/v1/tts/kokoro",
+      "description": "Kokoro token phonemes. Replace endpoint with your gateway.",
+      "fixtureKey": "kokoro",
+      "auth": "bearer"
+    },
+    "local-smoke": {
+      "id": "local-smoke",
+      "label": "Local auth smoke",
+      "provider": "smoke-echo",
+      "type": "http",
+      "endpoint": "http://127.0.0.1:8791/synthesize",
+      "description": "Matches npm run tts:smoke local echo (set token amoji-smoke-token).",
+      "fixtureKey": "stepAudioEditX",
+      "auth": "bearer",
+      "defaultTokenHint": "amoji-smoke-token"
+    }
+  }
+}
