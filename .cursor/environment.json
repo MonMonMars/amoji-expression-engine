@@ -1,3 +1,15 @@
 {
-  "install": "cd amoji-engine\nnpm install\nnpm test"
+  "name": "Amoji Expression Engine",
+  "install": "cd amoji-engine && npm ci",
+  "terminals": [
+    {
+      "name": "emotion-lab",
+      "command": "cd amoji-engine && npx --yes serve . -p 5173"
+    },
+    {
+      "name": "test-watch",
+      "command": "cd amoji-engine && npm run test:watch"
+    }
+  ],
+  "ports": [5173]
 }
