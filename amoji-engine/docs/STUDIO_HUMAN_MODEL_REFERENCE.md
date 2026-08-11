@@ -152,6 +152,7 @@ Amoji engine (ND “systemic emotion”)
 29. ~~**Bake→emotion-timing** (Step-Out / attack / blink from video envelopes)~~ ✓
 30. ~~**Chassis calibration** (desktop/lobby/lab · scale/deadzone/slew)~~ ✓
 31. ~~**Production TTS wiring** (Step/Index/Kokoro adapter + SpeechPlayer)~~ ✓
+32. ~~**YouTube/video capture** (prep + MediaPipe batch + face quality gates)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

@@ -28,7 +28,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 15 | Bake → emotion-timing (Step-Out / attack / blink) | Done |
 | Phase 16 | Chassis calibration (scale/slew) on robot packs | Done |
 | Phase 17 | Production TTS wiring (adapter + SpeechPlayer) | Done |
-| Phase 18+ | Actor discretion UX depth, polish… | Specced |
+| Phase 18 | YouTube/video capture ingest + face quality gates | Done |
+| Phase 19+ | Actor discretion UX, audio sync polish… | Specced |
 
 ## Quick start
 
@@ -66,6 +67,17 @@ Mouth override is LOCKED / CLAMPED / OPEN (not additive). MBP always forces `jaw
 Continuous speech: `performSpeech(text, emotion, t, { mode: 'coarticulated' })` uses Cohen–Massaro dominance functions (`engine/layers/coarticulation.js`).
 
 Production TTS: `normalizeTtsPayload` / `SpeechPlayer` — see `docs/TTS_WIRING.md`.
+
+## YouTube / video capture (authoring)
+
+```bash
+npm run yt-capture -- --in ./talk.mp4 --emotion happy --start 12 --duration 6
+# or: --url 'https://www.youtube.com/watch?v=...'  (yt-dlp)
+npm run yt-capture-batch
+# http://127.0.0.1:5176/prototypes/yt-capture-batch.html
+```
+
+See `tools/yt-capture/README.md`. Respect ToS/copyright; bake curves only.
 
 ## Capture → bake (authoring)
 

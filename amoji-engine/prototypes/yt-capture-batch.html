@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amoji YT Capture Batch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0e141a;
+        --panel: #151d26;
+        --line: #2a3644;
+        --ink: #e8eef4;
+        --muted: #8b9aab;
+        --accent: #3d9a7a;
+        --warn: #c4a35a;
+        --bad: #c45c5c;
+        --ok: #5aaf7a;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.45 "IBM Plex Sans", sans-serif;
+      }
+      body {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        min-height: 100%;
+      }
+      @media (max-width: 900px) {
+        body { grid-template-columns: 1fr; }
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        min-height: 70vh;
+        background:
+          radial-gradient(ellipse at 20% 10%, #1a2834 0%, transparent 50%),
+          var(--bg);
+      }
+      .head {
+        padding: 16px 20px 8px;
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+      }
+      .brand { font-weight: 600; letter-spacing: 0.04em; }
+      .tag { color: var(--muted); font-size: 12px; }
+      .viewport {
+        position: relative;
+        flex: 1;
+        margin: 8px 20px 20px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+        background: #080c10;
+        min-height: 360px;
+      }
+      video, canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      canvas { pointer-events: none; }
+      aside {
+        background: var(--panel);
+        border-left: 1px solid var(--line);
+        padding: 16px;
+        overflow-y: auto;
+      }
+      .group { margin-bottom: 18px; }
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      button, .file-btn {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        padding: 9px 12px;
+        border-radius: 6px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button.primary {
+        background: var(--accent);
+        border-color: transparent;
+        color: #04140e;
+        font-weight: 600;
+      }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+      select, input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: #121a22;
+        color: var(--ink);
+        font: inherit;
+      }
+      .status {
+        margin-top: 8px;
+        font: 12px/1.4 "IBM Plex Mono", monospace;
+        color: var(--muted);
+        white-space: pre-wrap;
+      }
+      .status.ok { color: var(--ok); }
+      .status.warn { color: var(--warn); }
+      .status.bad { color: var(--bad); }
+      .note { font-size: 12px; color: var(--muted); line-height: 1.4; }
+      .file-btn input { display: none; }
+      pre {
+        margin: 8px 0 0;
+        padding: 10px;
+        background: #0b1016;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 11px/1.35 "IBM Plex Mono", monospace;
+        max-height: 160px;
+        overflow: auto;
+        color: #b7c4d2;
+      }
+      .meter {
+        height: 6px;
+        background: #0b1016;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .meter > span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+      }
+      .gate {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font: 11px "IBM Plex Mono", monospace;
+        margin-top: 8px;
+      }
+      .gate.pass { background: #1a3a28; color: var(--ok); }
+      .gate.fail { background: #3a1c1c; color: var(--bad); }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <div class="head">
+        <div class="brand">AMOJI · YT Capture Batch</div>
+        <div class="tag">video file → quality gate → ARKit NDJSON · authoring only</div>
+      </div>
+      <div class="viewport">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+    </main>
+    <aside>
+      <div class="group">
+        <div class="label">Clip</div>
+        <label class="file-btn">Load video<input type="file" id="fileVideo" accept="video/*" /></label>
+        <div class="row">
+          <button type="button" id="btnLatest">Try latest prep</button>
+        </div>
+        <div class="status" id="sourceStatus">load MediaPipe…</div>
+      </div>
+
+      <div class="group">
+        <div class="label">Emotion</div>
+        <select id="emotionSel">
+          <option value="happy">happy</option>
+          <option value="sad">sad</option>
+          <option value="angry">angry</option>
+          <option value="fear">fear</option>
+          <option value="disgust">disgust</option>
+          <option value="surprised">surprised</option>
+          <option value="thinking">thinking</option>
+          <option value="neutral">neutral</option>
+        </select>
+        <input id="customEmotion" type="text" placeholder="custom id…" style="margin-top:8px" />
+      </div>
+
+      <div class="group">
+        <div class="label">Quality gates</div>
+        <label class="note">Min face area
+          <input id="minArea" type="number" min="0.01" max="0.3" step="0.005" value="0.035" />
+        </label>
+        <label class="note" style="display:block;margin-top:8px">Min quality
+          <input id="minQuality" type="number" min="0.2" max="1" step="0.05" value="0.55" />
+        </label>
+        <div id="gateChip" class="gate fail">no face</div>
+        <div class="meter"><span id="qBar"></span></div>
+      </div>
+
+      <div class="group">
+        <div class="label">Batch track</div>
+        <div class="row">
+          <button type="button" id="btnRun" class="primary" disabled>Run clip</button>
+          <button type="button" id="btnStop" disabled>Stop</button>
+        </div>
+        <div class="status" id="runStatus">idle</div>
+        <pre id="liveDebug">—</pre>
+      </div>
+
+      <div class="group">
+        <div class="label">Export</div>
+        <div class="row">
+          <button type="button" id="btnNdjson" disabled>Download NDJSON</button>
+          <button type="button" id="btnTake" disabled>Download take</button>
+        </div>
+        <div class="row">
+          <button type="button" id="btnBake" disabled>Bake preview</button>
+        </div>
+        <div class="note" style="margin-top:8px">
+          Respect YouTube ToS &amp; copyright. Bake abstract curves only —
+          no celebrity likeness in product. Runtime stays pure generation.
+        </div>
+        <pre id="bakeDebug">—</pre>
+      </div>
+    </aside>
+
+    <script type="module">
+      import {
+        FaceLandmarker,
+        FilesetResolver,
+        DrawingUtils,
+      } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm';
+      import {
+        scoreFaceQuality,
+        resultsToFilteredTake,
+      } from '/engine/capture/videoIngest.js';
+      import { arkitHudLines } from '/engine/capture/mediapipeArkit.js';
+      import { bakeCaptureTake } from '/engine/capture/captureBake.js';
+
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('overlay');
+      const ctx = canvas.getContext('2d');
+      const sourceStatus = document.getElementById('sourceStatus');
+      const runStatus = document.getElementById('runStatus');
+      const liveDebug = document.getElementById('liveDebug');
+      const bakeDebug = document.getElementById('bakeDebug');
+      const gateChip = document.getElementById('gateChip');
+      const qBar = document.getElementById('qBar');
+      const btnRun = document.getElementById('btnRun');
+      const btnStop = document.getElementById('btnStop');
+      const btnNdjson = document.getElementById('btnNdjson');
+      const btnTake = document.getElementById('btnTake');
+      const btnBake = document.getElementById('btnBake');
+      const emotionSel = document.getElementById('emotionSel');
+      const customEmotion = document.getElementById('customEmotion');
+      const minAreaEl = document.getElementById('minArea');
+      const minQualityEl = document.getElementById('minQuality');
+
+      /** @type {FaceLandmarker|null} */
+      let landmarker = null;
+      let drawingUtils = null;
+      let running = false;
+      let lastVideoTime = -1;
+      /** @type {object[]} */
+      let rawResults = [];
+      /** @type {ReturnType<typeof resultsToFilteredTake>|null} */
+      let take = null;
+
+      function emotionId() {
+        return customEmotion.value.trim() || emotionSel.value;
+      }
+
+      function setSource(msg, tone = '') {
+        sourceStatus.className = `status ${tone}`;
+        sourceStatus.textContent = msg;
+      }
+      function setRun(msg, tone = '') {
+        runStatus.className = `status ${tone}`;
+        runStatus.textContent = msg;
+      }
+
+      function download(filename, text, type = 'application/json') {
+        const blob = new Blob([text], { type });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      function enableExport(on) {
+        btnNdjson.disabled = !on;
+        btnTake.disabled = !on;
+        btnBake.disabled = !on;
+      }
+
+      async function initMediaPipe() {
+        const vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm',
+        );
+        landmarker = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+            delegate: 'GPU',
+          },
+          runningMode: 'VIDEO',
+          numFaces: 1,
+          outputFaceBlendshapes: true,
+          outputFacialTransformationMatrixes: false,
+        });
+        drawingUtils = new DrawingUtils(ctx);
+        setSource('MediaPipe ready — load a prepared clip', 'ok');
+      }
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const w = Math.floor(rect.width);
+        const h = Math.floor(rect.height);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      }
+
+      async function loadFile(file) {
+        const url = URL.createObjectURL(file);
+        video.srcObject = null;
+        video.src = url;
+        video.loop = false;
+        await video.play();
+        video.pause();
+        video.currentTime = 0;
+        btnRun.disabled = false;
+        setSource(`loaded · ${file.name}`, 'ok');
+        const emoGuess = file.name.split('_')[0];
+        if ([...emotionSel.options].some((o) => o.value === emoGuess)) {
+          emotionSel.value = emoGuess;
+        }
+      }
+
+      document.getElementById('fileVideo').addEventListener('change', () => {
+        const f = document.getElementById('fileVideo').files?.[0];
+        if (f) loadFile(f).catch((e) => setSource(String(e.message || e), 'bad'));
+      });
+
+      document.getElementById('btnLatest').addEventListener('click', async () => {
+        try {
+          const res = await fetch('/tools/yt-capture/out/latest.json');
+          if (!res.ok) throw new Error('No latest prep — run npm run yt-capture first');
+          const latest = await res.json();
+          const vres = await fetch(latest.clip);
+          if (!vres.ok) throw new Error(`Missing clip ${latest.clip}`);
+          const blob = await vres.blob();
+          const file = new File([blob], latest.clip.split('/').pop(), { type: 'video/mp4' });
+          if (latest.emotion) emotionSel.value = latest.emotion;
+          await loadFile(file);
+        } catch (err) {
+          setSource(String(err.message || err), 'bad');
+        }
+      });
+
+      btnRun.addEventListener('click', async () => {
+        if (!landmarker || !video.src) return;
+        rawResults = [];
+        take = null;
+        enableExport(false);
+        running = true;
+        btnRun.disabled = true;
+        btnStop.disabled = false;
+        lastVideoTime = -1;
+        video.currentTime = 0;
+        await video.play();
+        setRun('tracking…', 'warn');
+        requestAnimationFrame(loop);
+      });
+
+      btnStop.addEventListener('click', () => {
+        running = false;
+        video.pause();
+        finishTake();
+      });
+
+      function finishTake() {
+        btnRun.disabled = false;
+        btnStop.disabled = true;
+        const filtered = resultsToFilteredTake(rawResults, {
+          emotion: emotionId(),
+          fps: 24,
+          subject: 'YtCapture',
+          filter: {
+            minArea: Number(minAreaEl.value) || 0.035,
+            minQuality: Number(minQualityEl.value) || 0.55,
+          },
+        });
+        take = filtered;
+        enableExport(filtered.frameCount > 0);
+        setRun(
+          `done · kept ${filtered.filter.keptCount}/${rawResults.length} (${(filtered.filter.keepRatio * 100).toFixed(0)}%) · ${filtered.durationSec.toFixed(2)}s`,
+          filtered.frameCount ? 'ok' : 'bad',
+        );
+      }
+
+      function loop() {
+        if (!running || !landmarker) return;
+        resizeCanvas();
+
+        if (video.ended) {
+          running = false;
+          finishTake();
+          return;
+        }
+
+        if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+          lastVideoTime = video.currentTime;
+          const result = landmarker.detectForVideo(video, performance.now());
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const landmarks = result.faceLandmarks?.[0];
+          const minArea = Number(minAreaEl.value) || 0.035;
+          const minQ = Number(minQualityEl.value) || 0.55;
+          const quality = landmarks
+            ? scoreFaceQuality(landmarks, { minArea })
+            : { score: 0, pass: false, reasons: ['no_face'] };
+
+          qBar.style.width = `${Math.min(100, quality.score * 100)}%`;
+          gateChip.textContent = quality.pass
+            ? `PASS ${quality.score.toFixed(2)}`
+            : `FAIL ${quality.reasons.join(',') || quality.score.toFixed(2)}`;
+          gateChip.className = `gate ${quality.pass && quality.score >= minQ ? 'pass' : 'fail'}`;
+
+          if (landmarks) {
+            drawingUtils.drawConnectors(
+              landmarks,
+              FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
+              { color: quality.pass ? '#3d9a7a' : '#c45c5c', lineWidth: 1.5 },
+            );
+          }
+
+          // Always store; filter at end (keeps timing continuity option)
+          rawResults.push({
+            t: video.currentTime,
+            faceBlendshapes: result.faceBlendshapes,
+            faceLandmarks: result.faceLandmarks,
+          });
+
+          const cats = result.faceBlendshapes?.[0]?.categories;
+          if (cats) {
+            const tmp = Object.fromEntries(
+              cats.map((c) => [c.categoryName, c.score]),
+            );
+            liveDebug.textContent = [
+              `t=${video.currentTime.toFixed(2)}s q=${quality.score.toFixed(2)}`,
+              ...arkitHudLines(tmp).slice(0, 8),
+            ].join('\n');
+          }
+        }
+        requestAnimationFrame(loop);
+      }
+
+      btnNdjson.addEventListener('click', () => {
+        if (!take) return;
+        const lines = take.frames
+          .map((f) =>
+            JSON.stringify({
+              protocol: f.protocol,
+              subject: f.subject,
+              frame: f.frame,
+              fps: f.fps,
+              t: f.t,
+              blendShapes: f.blendShapes,
+            }),
+          )
+          .join('\n');
+        download(`${emotionId()}-yt.ndjson`, lines, 'application/x-ndjson');
+      });
+
+      btnTake.addEventListener('click', () => {
+        if (!take) return;
+        download(`${emotionId()}-yt-take.json`, JSON.stringify(take, null, 2));
+      });
+
+      btnBake.addEventListener('click', () => {
+        if (!take || !take.frameCount) return;
+        try {
+          const bake = bakeCaptureTake(take, { emotion: emotionId(), fps: take.fps });
+          bakeDebug.textContent = [
+            `valid=${bake.envelope.valid}`,
+            `onset=${bake.envelope.onsetSec}s apex=${bake.envelope.apexSec}s offset=${bake.envelope.offsetSec}s`,
+            `stepOut≈${bake.envelope.suggestedStepOutSec}s`,
+            `peak morphs ${Object.keys(bake.recipeFragment[bake.emotion].peak).length}`,
+            `npm run capture-bake -- --emotion ${bake.emotion} --in ${bake.emotion}-yt.ndjson --apply-temporal`,
+          ].join('\n');
+        } catch (err) {
+          bakeDebug.textContent = String(err.message || err);
+        }
+      });
+
+      initMediaPipe().catch((err) => setSource(String(err.message || err), 'bad'));
+    </script>
+  </body>
+</html>

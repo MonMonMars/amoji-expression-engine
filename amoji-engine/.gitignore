@@ -9,3 +9,4 @@ coverage/
 *.blend1
 
 tools/capture-bake/out/
+tools/yt-capture/out/

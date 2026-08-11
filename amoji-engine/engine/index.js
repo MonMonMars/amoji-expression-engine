@@ -329,6 +329,15 @@ export {
   arkitHudLines,
 } from './capture/mediapipeArkit.js';
 export {
+  YT_CAPTURE_PROTOCOL,
+  LM,
+  landmarkBounds,
+  scoreFaceQuality,
+  filterCaptureFrames,
+  resultsToFilteredTake,
+  buildClipJob,
+} from './capture/videoIngest.js';
+export {
   envelopeToTimingRow,
   mergeTemporalEnvelopes,
 } from './capture/temporalMerge.js';

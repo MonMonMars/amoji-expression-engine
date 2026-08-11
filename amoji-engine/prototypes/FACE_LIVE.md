@@ -88,6 +88,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Chassis calib: `engine/export/chassisCalibrate.js` + `data/robots/chassis.json` (Face Live chassis + slew)
 - Capture→bake (authoring): `engine/capture/captureBake.js` + `tools/capture-bake/` — video ARKit → sculpts/timing; not runtime
 - Capture Studio: `prototypes/capture-studio.html` (`npm run capture-studio`) — MediaPipe webcam/video → NDJSON
+- YT/video batch: `tools/yt-capture/` + `prototypes/yt-capture-batch.html` — prep clip → quality gate → bake
 - Emotion timing: `data/temporal/emotion-timing.json` — Step-Out / attack / blink (updated via `capture-bake --apply-temporal`)
 - Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
 - Studio method reference: `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`

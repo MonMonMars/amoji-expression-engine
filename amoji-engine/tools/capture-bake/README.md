@@ -12,7 +12,8 @@ Expressions are continuous muscle motion. Timing (onset → apex → offset) is 
 
 | Source | Output | Notes |
 |---|---|---|
-| **Capture Studio** (webcam / video file) | NDJSON via MediaPipe | `npm run capture-studio` → http://127.0.0.1:5175/prototypes/capture-studio.html |
+| **Capture Studio** (webcam / video file) | NDJSON via MediaPipe | `npm run capture-studio` |
+| **YT / video batch** | Prep + quality gates | `npm run yt-capture` → `yt-capture-batch` |
 | iPhone **Live Link Face** | ARKit 52 stream / recorded JSON | Best mobile quality; matches our Live Link bridge |
 | Unreal Live Link recording | NDJSON / CSV of blendshapes | Reuse `amoji.livelink.arkit.v1` frames |
 | MediaPipe Face Landmarker | blendshapes → ARKit channels | `engine/capture/mediapipeArkit.js` |
