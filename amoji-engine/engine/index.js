@@ -198,6 +198,25 @@ export {
   retargetBody,
 } from './layers/bodyRetarget.js';
 export {
+  CONTINUITY_DECAY_HALF_LIFE_SEC,
+  IMPROV_COOLDOWN_SEC,
+  personalityProfile,
+  applyContinuity,
+  passiveMoodLeak,
+  canImprovise,
+  discretionaryImprovise,
+  DiscretionController,
+} from './layers/discretion.js';
+export {
+  EASTER_EGG_DISCLAIMER,
+  EASTER_EGGS,
+  personaAllowsEasterEggs,
+  getEasterEgg,
+  listEasterEggs,
+  resolveEasterEgg,
+  nlpGazeCue,
+} from './easterEggs/index.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "disclaimer": "Cultural performance conventions — NOT scientific evidence. Never use for real lie detection, credibility judgment, or clinical assessment. Default OFF. Locked off for corporate/care/education personas.",
+  "eggs": {
+    "nlpGazeConvention": {
+      "id": "nlpGazeConvention",
+      "label": "NLP gaze L/R myth",
+      "enabledDefault": false,
+      "debunkedBy": "Wiseman & Watt 2012 PLoS ONE — The Eyes Don't Have It",
+      "disclaimer": "Popular culture convention only. Eye direction does not indicate truthfulness.",
+      "behaviors": {
+        "constructing_or_evasive": { "lookX": 0.45, "lookY": 0.55, "useCase": "script marks character as performing 'untrustworthy'" },
+        "recalling_memory": { "lookX": -0.45, "lookY": 0.5, "useCase": "narrative memory flashback staging" }
+      }
+    },
+    "noseTouchTell": {
+      "id": "noseTouchTell",
+      "label": "Nose-touch 'tell' myth",
+      "enabledDefault": false,
+      "debunkedBy": "No reliable peer-reviewed support as a deception cue",
+      "disclaimer": "Stage business only — not a lie detector.",
+      "behaviors": {
+        "perform_tell": { "adaptor": "fingerTap", "useCase": "comedic / noir pastiche" }
+      }
+    },
+    "gazeAversionGuilt": {
+      "id": "gazeAversionGuilt",
+      "label": "Gaze aversion = guilt myth",
+      "enabledDefault": false,
+      "debunkedBy": "Cultural; aversion also marks thinking, politeness, autism-spectrum norms",
+      "disclaimer": "Do not infer guilt from aversion. Optional staging cue only.",
+      "behaviors": {
+        "stage_avert": { "gaze": "avoid", "useCase": "theatrical 'shifty' beat" }
+      }
+    },
+    "crossedArmsClosed": {
+      "id": "crossedArmsClosed",
+      "label": "Crossed arms = closed-off myth",
+      "enabledDefault": false,
+      "debunkedBy": "Context-dependent (cold, comfort, habit)",
+      "disclaimer": "Optional affect display — not personality diagnosis.",
+      "behaviors": {
+        "stage_cross": { "pose": "armsCrossChest", "useCase": "visual shorthand in stylized media" }
+      }
+    },
+    "microexpressionLieSpotter": {
+      "id": "microexpressionLieSpotter",
+      "label": "Trained microexpression lie-spotting myth",
+      "enabledDefault": false,
+      "debunkedBy": "GAO report — training does not beat chance for real-time deception detection",
+      "disclaimer": "Micro-leak as performance (Layer 3) remains valid; 'spotting lies via microexpressions' does not.",
+      "behaviors": {
+        "ui_only": { "note": "No runtime behavior — educational flag only" }
+      }
+    }
+  }
+}

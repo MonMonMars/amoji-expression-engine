@@ -21,7 +21,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 8 | Smile typology (reward/affiliative/dominance) + laugh head→torso PD | Done |
 | Phase 9 | Layer E eyes (VOR/pupil/gaze modes) + Layer 0 script pipeline | Done |
 | Phase 10 | MoodEngine (Layer -1) + full-body point retarget (B/W/G) | Done |
-| Phase 11+ | Actor discretion depth, easter eggs, production polish… | Specced |
+| Phase 11 | Layer D Actor Discretion + isolated easter-egg namespace | Done |
+| Phase 12+ | Production polish, robot driver packs… | Specced |
 
 ## Quick start
 

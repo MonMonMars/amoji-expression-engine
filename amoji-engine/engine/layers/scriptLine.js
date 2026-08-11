@@ -10,6 +10,7 @@ import { evaluateSmile, defaultSmileForPersona } from './smileLaugh.js';
 import { resolveGazeDirection } from './eyeAnchor.js';
 import { evaluateBody } from './neckShoulder.js';
 import { applyMoodBias, MoodController, getMoodDef, moodIdleBaseline } from './moodEngine.js';
+import { applyContinuity, DiscretionController } from './discretion.js';
 
 export const SCRIPT_GAZE = schema.gazeDirections;
 export const MOOD_SUPPRESSION = schema.moodSuppression;
@@ -144,12 +145,33 @@ export function matchCompound(primary, secondary) {
 /**
  * Perform a full script line → speech frames + gaze + body + smile metadata.
  * @param {object|string} rawLine
- * @param {import('../types.js').ComplianceContext & { fps?: number }} [context]
+ * @param {import('../types.js').ComplianceContext & {
+ *   fps?: number,
+ *   previousLine?: { emotion: string, intensity: number } | null,
+ *   discretion?: DiscretionController | null,
+ * }} [context]
  */
 export function performScript(rawLine, context = {}) {
   const line = normalizeScriptLine(rawLine);
   const moodBias = applyMoodBias(line.primary, line.intensity, line.mood);
-  const intensity = moodBias.intensity;
+  let intensity = moodBias.intensity;
+
+  const continuity = applyContinuity({
+    emotion: line.primary,
+    intensity,
+    previous: context.previousLine || null,
+    stepOutBefore: line.directions.step_out_before,
+    personaId: line.persona,
+  });
+  intensity = continuity.intensity;
+  if (context.discretion) {
+    context.discretion.ingestLine({
+      emotion: continuity.emotion,
+      intensity: continuity.intensity,
+      stepOutBefore: line.directions.step_out_before,
+    });
+  }
+
   const compoundId = matchCompound(line.primary, line.secondary);
 
   let emotionOut;
@@ -210,6 +232,7 @@ export function performScript(rawLine, context = {}) {
       },
       moodBias,
       moodBaseline,
+      continuity,
     },
     context,
   );

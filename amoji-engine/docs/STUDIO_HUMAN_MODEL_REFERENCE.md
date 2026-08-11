@@ -144,6 +144,8 @@ Amoji engine (ND “systemic emotion”)
 21. ~~**Layer 0 script** normalize + `performScript` pipeline~~ ✓
 22. ~~**Mood Engine** (bias / idle baseline / slow transition)~~ ✓
 23. ~~**Body retarget** 40+ markers ↔ Layer B/W/G~~ ✓
+24. ~~**Layer D Actor Discretion** (continuity / leak / gap improv)~~ ✓
+25. ~~**Easter eggs** isolated namespace (default OFF, persona-locked)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

@@ -47,6 +47,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Layer G gesture:** Emblem select / Wave / Speaking (Illustrator) / turn Regulators — Affect from emotion, Adaptor after ~3s gap; drives Sakura arm bones
 - **Layer B neck/shoulder:** emotion-driven head tilt + accessory-muscle breath; Threat freeze / Sigh; head-down×gaze lock → anger vs sad
 - **Layer -1 Mood:** slow-transition background mood (embarrassed/anxious/…) biases intensity + leaks signature morphs; retarget HUD for body points
+- **Layer D Discretion:** emotion continuity across picks; Gap improv (blocked while Script hold); passive mood leak
+- **Easter eggs:** NLP gaze myth toggle — default off, locked for corporate/care/education, disclaimer required
 - **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge for Unreal
@@ -62,6 +64,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Temporal: `engine/layers/temporalLayer.js`
 - Idle / personas: `engine/layers/idleMode.js` + `data/personas/catalog.json`
 - Mood: `engine/layers/moodEngine.js` + `data/moods/catalog.json`
+- Discretion: `engine/layers/discretion.js`
+- Easter eggs: `engine/easterEggs/index.js` + `data/easterEggs/catalog.json` (non-science)
 - Latency: `engine/layers/latencyBridge.js` + `data/fillers/filler-pools.json`
 - Compounds: `engine/layers/compoundEmotion.js` + `data/compounds/region-ownership.json`
 - Gait: `engine/layers/gait.js` + `data/gait/emotion-gait.json`

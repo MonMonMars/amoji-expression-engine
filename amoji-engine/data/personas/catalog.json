@@ -10,7 +10,11 @@
       "saccadeAmp": 0.14,
       "headDrift": 0.12,
       "variants": ["breath", "lookAround", "headBob", "softSmile"],
-      "playfulness": 0.7
+      "playfulness": 0.7,
+      "assertiveness": 0.65,
+      "emotionalStability": 0.55,
+      "defensiveness": 0.25,
+      "easterEggsAllowed": true
     },
     "corporate": {
       "label": "Corporate",
@@ -20,7 +24,11 @@
       "saccadeAmp": 0.05,
       "headDrift": 0.04,
       "variants": ["breath", "microShift", "breath", "still"],
-      "playfulness": 0.15
+      "playfulness": 0.15,
+      "assertiveness": 0.2,
+      "emotionalStability": 0.85,
+      "defensiveness": 0.35,
+      "easterEggsAllowed": false
     },
     "care": {
       "label": "Care / medical",
@@ -30,7 +38,11 @@
       "saccadeAmp": 0.07,
       "headDrift": 0.06,
       "variants": ["breath", "softAttend", "breath", "microShift"],
-      "playfulness": 0.25
+      "playfulness": 0.25,
+      "assertiveness": 0.25,
+      "emotionalStability": 0.9,
+      "defensiveness": 0.2,
+      "easterEggsAllowed": false
     },
     "education": {
       "label": "Education",
@@ -40,7 +52,11 @@
       "saccadeAmp": 0.1,
       "headDrift": 0.09,
       "variants": ["breath", "lookAround", "headBob", "breath"],
-      "playfulness": 0.55
+      "playfulness": 0.55,
+      "assertiveness": 0.45,
+      "emotionalStability": 0.75,
+      "defensiveness": 0.2,
+      "easterEggsAllowed": false
     },
     "home": {
       "label": "Home service",
@@ -50,7 +66,11 @@
       "saccadeAmp": 0.08,
       "headDrift": 0.07,
       "variants": ["breath", "softSmile", "microShift", "breath"],
-      "playfulness": 0.4
+      "playfulness": 0.4,
+      "assertiveness": 0.35,
+      "emotionalStability": 0.7,
+      "defensiveness": 0.3,
+      "easterEggsAllowed": true
     }
   },
   "arousalLadder": {
