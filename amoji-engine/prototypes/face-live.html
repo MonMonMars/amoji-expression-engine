@@ -704,6 +704,7 @@
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
+          <button type="button" id="btnPrefsAuditRenameView">Rename view</button>
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
@@ -1055,7 +1056,7 @@
         const actionsEl = document.getElementById('probeToastActions');
         if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
         if (detailEl) {
-          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss · tab cycle · hover pause`;
+          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · p pin · esc dismiss · tab · hover pause`;
         }
         if (actionsEl) {
           actionsEl.innerHTML = '';
@@ -1063,9 +1064,11 @@
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.action = a.id;
+            const label =
+              a.id === 'pin' && probeToastDismiss.pinned ? 'Unpin' : a.label;
             btn.textContent = a.shortcut
-              ? `${a.label} (${a.shortcut === 'Escape' ? 'esc' : a.shortcut})`
-              : a.label;
+              ? `${label} (${a.shortcut === 'Escape' ? 'esc' : a.shortcut})`
+              : label;
             actionsEl.appendChild(btn);
           }
         }
@@ -1101,7 +1104,8 @@
           reason !== 'persona_pick' &&
           reason !== 'mood_pick' &&
           reason !== 'smile_pick' &&
-          reason !== 'laugh_pick'
+          reason !== 'laugh_pick' &&
+          reason !== 'gaze_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1112,7 +1116,8 @@
           reason === 'persona_pick' ||
           reason === 'mood_pick' ||
           reason === 'smile_pick' ||
-          reason === 'laugh_pick'
+          reason === 'laugh_pick' ||
+          reason === 'gaze_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1754,6 +1759,7 @@
         syncLookSliders();
       });
       gazeModeSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('gaze_pick');
         gazeModeUi = gazeModeSel.value;
         if (gazeModeUi === 'manual') {
           trackCamera = true;
@@ -2209,6 +2215,7 @@
         async function runProbeToastAction(actionId) {
           const resolved = resolveProbeToastAction(actionId, {
             detail: lastProbeDetail,
+            pinned: probeToastDismiss.pinned,
           });
           if (!resolved.ok) return resolved;
           if (resolved.action === 'copy' && resolved.copy?.ok) {
@@ -2227,6 +2234,24 @@
             } catch (err) {
               setTtsStatus(String(err.message || err), 'bad');
             }
+          }
+          if (resolved.pin) {
+            probeToastDismiss.pin();
+            setTtsStatus('probe toast pinned', 'ok');
+            const pinBtn = document.querySelector(
+              '#probeToastActions button[data-action="pin"]',
+            );
+            if (pinBtn) pinBtn.textContent = 'Unpin (p)';
+            return resolved;
+          }
+          if (resolved.unpin) {
+            probeToastDismiss.unpin();
+            setTtsStatus('probe toast unpinned', 'ok');
+            const pinBtn = document.querySelector(
+              '#probeToastActions button[data-action="pin"]',
+            );
+            if (pinBtn) pinBtn.textContent = 'Pin (p)';
+            return resolved;
           }
           if (resolved.reprobe) {
             hideProbeToast();
@@ -2536,6 +2561,34 @@
           prefsStatus.textContent = removed.ok
             ? 'prefs · saved view deleted'
             : 'prefs · delete view failed';
+        });
+        document.getElementById('btnPrefsAuditRenameView')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          const nameEl = document.getElementById('prefsAuditViewName');
+          const name = nameEl?.value?.trim() || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a saved view to rename';
+            return;
+          }
+          if (!name) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · enter a new view name';
+            return;
+          }
+          const renamed = auditSavedViews.rename(id, name);
+          if (!renamed.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent =
+              renamed.reason === 'name_taken'
+                ? 'prefs · view name taken'
+                : 'prefs · rename view failed';
+            return;
+          }
+          refreshAuditSavedViewsUi(renamed.view?.id);
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = `prefs · renamed “${renamed.previousName}” → “${renamed.view?.name}”`;
         });
         document.getElementById('btnPrefsAuditExportViews')?.addEventListener('click', () => {
           const exported = auditSavedViews.exportJson();

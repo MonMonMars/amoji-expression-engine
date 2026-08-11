@@ -526,6 +526,7 @@ export {
   snapshotAuditView,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
+  renameAuditSavedView,
   createAuditSavedViews,
 } from './ui/auditSavedViews.js';
 export {

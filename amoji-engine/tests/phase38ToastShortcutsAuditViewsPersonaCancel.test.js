@@ -15,11 +15,12 @@ import { cancelCompoundEmblemLifecycle } from '../engine/export/compoundEmblemCr
 
 describe('Phase 38 probe toast shortcuts', () => {
   it('binds c / r / Escape on PROBE_TOAST_ACTIONS', () => {
-    expect(PROBE_TOAST_ACTIONS.map((a) => a.shortcut)).toEqual([
-      'c',
-      'r',
-      'Escape',
-    ]);
+    const shortcuts = Object.fromEntries(
+      PROBE_TOAST_ACTIONS.map((a) => [a.id, a.shortcut]),
+    );
+    expect(shortcuts.copy).toBe('c');
+    expect(shortcuts.reprobe).toBe('r');
+    expect(shortcuts.dismiss).toBe('Escape');
   });
 
   it('resolves keyboard shortcuts when toast is visible', () => {

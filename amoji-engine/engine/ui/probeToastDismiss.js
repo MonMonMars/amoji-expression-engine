@@ -95,6 +95,7 @@ export function createProbeToastDismissTimer(opts = {}) {
   let remainingMs = opts.dismissMs ?? PROBE_DETAIL_TOAST_DISMISS_MS;
   let startedAt = null;
   let paused = false;
+  let pinned = false;
   let active = false;
   /** @type {ReturnType<typeof setTimeout>|null} */
   let handle = null;
@@ -108,8 +109,14 @@ export function createProbeToastDismissTimer(opts = {}) {
 
   const schedule = () => {
     clearHandle();
-    if (!active || paused || remainingMs <= 0) {
-      if (active && !paused && remainingMs <= 0 && typeof opts.onExpire === 'function') {
+    if (!active || paused || pinned || remainingMs <= 0) {
+      if (
+        active &&
+        !paused &&
+        !pinned &&
+        remainingMs <= 0 &&
+        typeof opts.onExpire === 'function'
+      ) {
         active = false;
         opts.onExpire();
       }
@@ -121,6 +128,7 @@ export function createProbeToastDismissTimer(opts = {}) {
       remainingMs = 0;
       active = false;
       paused = false;
+      pinned = false;
       startedAt = null;
       if (typeof opts.onExpire === 'function') opts.onExpire();
     }, remainingMs);
@@ -133,11 +141,14 @@ export function createProbeToastDismissTimer(opts = {}) {
     get paused() {
       return paused;
     },
+    get pinned() {
+      return pinned;
+    },
     get remainingMs() {
       return computeProbeToastRemainingMs({
         remainingMs,
         startedAt,
-        paused,
+        paused: paused || pinned,
         now: nowFn(),
       });
     },
@@ -148,6 +159,7 @@ export function createProbeToastDismissTimer(opts = {}) {
           ? ms
           : opts.dismissMs ?? PROBE_DETAIL_TOAST_DISMISS_MS;
       paused = false;
+      pinned = false;
       active = true;
       startedAt = null;
       schedule();
@@ -158,20 +170,26 @@ export function createProbeToastDismissTimer(opts = {}) {
           ok: true,
           remainingMs,
           paused: false,
+          pinned: false,
         },
         {},
       );
     },
     pause() {
-      if (!active || paused) {
+      if (!active || paused || pinned) {
         return applyComplianceGate(
           {
             kind: 'tts_gateway_health_probe_toast_dismiss',
             action: 'pause',
             ok: active,
-            reason: !active ? 'inactive' : 'already_paused',
+            reason: !active
+              ? 'inactive'
+              : pinned
+                ? 'pinned'
+                : 'already_paused',
             remainingMs: this.remainingMs,
             paused,
+            pinned,
           },
           {},
         );
@@ -192,20 +210,26 @@ export function createProbeToastDismissTimer(opts = {}) {
           ok: true,
           remainingMs,
           paused: true,
+          pinned: false,
         },
         {},
       );
     },
     resume() {
-      if (!active || !paused) {
+      if (!active || pinned || !paused) {
         return applyComplianceGate(
           {
             kind: 'tts_gateway_health_probe_toast_dismiss',
             action: 'resume',
             ok: active,
-            reason: !active ? 'inactive' : 'not_paused',
+            reason: !active
+              ? 'inactive'
+              : pinned
+                ? 'pinned'
+                : 'not_paused',
             remainingMs: this.remainingMs,
             paused,
+            pinned,
           },
           {},
         );
@@ -219,6 +243,75 @@ export function createProbeToastDismissTimer(opts = {}) {
           ok: true,
           remainingMs,
           paused: false,
+          pinned: false,
+        },
+        {},
+      );
+    },
+    pin() {
+      if (!active) {
+        return applyComplianceGate(
+          {
+            kind: 'tts_gateway_health_probe_toast_dismiss',
+            action: 'pin',
+            ok: false,
+            reason: 'inactive',
+            pinned: false,
+          },
+          {},
+        );
+      }
+      if (!pinned) {
+        remainingMs = computeProbeToastRemainingMs({
+          remainingMs,
+          startedAt,
+          paused: paused || false,
+          now: nowFn(),
+        });
+      }
+      clearHandle();
+      startedAt = null;
+      paused = false;
+      pinned = true;
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_dismiss',
+          action: 'pin',
+          ok: true,
+          remainingMs,
+          paused: false,
+          pinned: true,
+          sticky: true,
+        },
+        {},
+      );
+    },
+    unpin() {
+      if (!active || !pinned) {
+        return applyComplianceGate(
+          {
+            kind: 'tts_gateway_health_probe_toast_dismiss',
+            action: 'unpin',
+            ok: active,
+            reason: !active ? 'inactive' : 'not_pinned',
+            remainingMs: this.remainingMs,
+            pinned,
+          },
+          {},
+        );
+      }
+      pinned = false;
+      paused = false;
+      schedule();
+      return applyComplianceGate(
+        {
+          kind: 'tts_gateway_health_probe_toast_dismiss',
+          action: 'unpin',
+          ok: true,
+          remainingMs,
+          paused: false,
+          pinned: false,
+          sticky: false,
         },
         {},
       );
@@ -227,6 +320,7 @@ export function createProbeToastDismissTimer(opts = {}) {
       clearHandle();
       active = false;
       paused = false;
+      pinned = false;
       startedAt = null;
       remainingMs = 0;
       return applyComplianceGate(
@@ -236,11 +330,25 @@ export function createProbeToastDismissTimer(opts = {}) {
           ok: true,
           remainingMs: 0,
           paused: false,
+          pinned: false,
         },
         {},
       );
     },
     handleHover(ev, hoverOpts = {}) {
+      if (pinned) {
+        return applyComplianceGate(
+          {
+            kind: 'tts_gateway_health_probe_toast_hover',
+            ok: false,
+            reason: 'pinned',
+            pause: false,
+            resume: false,
+            pinned: true,
+          },
+          {},
+        );
+      }
       const resolved = resolveProbeToastHoverPause(ev, {
         visible: active || hoverOpts.visible,
         paused,

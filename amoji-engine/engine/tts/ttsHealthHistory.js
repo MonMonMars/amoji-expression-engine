@@ -397,6 +397,7 @@ export const PROBE_DETAIL_TOAST_DISMISS_MS = 3800;
 export const PROBE_TOAST_ACTIONS = [
   { id: 'copy', label: 'Copy', shortcut: 'c' },
   { id: 'reprobe', label: 'Re-probe', shortcut: 'r' },
+  { id: 'pin', label: 'Pin', shortcut: 'p' },
   { id: 'dismiss', label: 'Dismiss', shortcut: 'Escape' },
 ];
 
@@ -435,6 +436,7 @@ export function resolveProbeToastShortcut(ev, opts = {}) {
   if (k === 'Escape' || code === 'Escape') action = 'dismiss';
   else if (k === 'c' || k === 'C') action = 'copy';
   else if (k === 'r' || k === 'R') action = 'reprobe';
+  else if (k === 'p' || k === 'P') action = 'pin';
   if (!action) {
     return applyComplianceGate(
       {
@@ -538,6 +540,25 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         copy: null,
         dismiss: true,
         reprobe: true,
+        pin: false,
+        unpin: false,
+      },
+      {},
+    );
+  }
+  if (id === 'pin') {
+    const pinned = !!ctx.pinned;
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_action',
+        ok: true,
+        action: 'pin',
+        copy: null,
+        dismiss: false,
+        reprobe: false,
+        pin: !pinned,
+        unpin: pinned,
+        sticky: !pinned,
       },
       {},
     );
@@ -551,6 +572,8 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
         copy: null,
         dismiss: true,
         reprobe: false,
+        pin: false,
+        unpin: false,
       },
       {},
     );
@@ -563,6 +586,8 @@ export function resolveProbeToastAction(actionId, ctx = {}) {
       error: 'unknown_action',
       dismiss: false,
       reprobe: false,
+      pin: false,
+      unpin: false,
     },
     {},
   );

@@ -127,6 +127,50 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
 }
 
 /**
+ * Rename a saved view payload (pure).
+ * @param {object} view
+ * @param {string} newName
+ * @param {{ now?: number }} [opts]
+ */
+export function renameAuditSavedView(view, newName, opts = {}) {
+  const name = String(newName || '').trim();
+  if (!view || !view.id) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_rename',
+        ok: false,
+        reason: 'missing_view',
+        view: null,
+      },
+      {},
+    );
+  }
+  if (!name) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_rename',
+        ok: false,
+        reason: 'empty_name',
+        view: normalizeAuditSavedView(view, { now: opts.now }),
+      },
+      {},
+    );
+  }
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_rename',
+      ok: true,
+      view: normalizeAuditSavedView(
+        { ...view, name, savedAt: opts.now ?? Date.now() },
+        { now: opts.now },
+      ),
+      previousName: view.name || null,
+    },
+    {},
+  );
+}
+
+/**
  * Create a persisted (or memory) saved-views store.
  * @param {{
  *   max?: number,
@@ -242,6 +286,71 @@ export function createAuditSavedViews(opts = {}) {
           kind: 'prefs_share_audit_views',
           action: 'remove',
           ok: views.length < before,
+          count: views.length,
+        },
+        {},
+      );
+    },
+    rename(idOrName, newName, renameOpts = {}) {
+      const key = String(idOrName || '');
+      const idx = views.findIndex(
+        (v) =>
+          v.id === key || v.name.toLowerCase() === key.toLowerCase(),
+      );
+      if (idx < 0) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'rename',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      const name = String(newName || '').trim();
+      if (!name) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'rename',
+            ok: false,
+            reason: 'empty_name',
+            view: views[idx],
+          },
+          {},
+        );
+      }
+      const clash = views.findIndex(
+        (v, i) =>
+          i !== idx && v.name.toLowerCase() === name.toLowerCase(),
+      );
+      if (clash >= 0) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'rename',
+            ok: false,
+            reason: 'name_taken',
+            view: views[idx],
+          },
+          {},
+        );
+      }
+      const renamed = renameAuditSavedView(views[idx], name, {
+        now: renameOpts.now,
+      });
+      if (!renamed.ok) return renamed;
+      views[idx] = renamed.view;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'rename',
+          ok: true,
+          view: views[idx],
+          previousName: renamed.previousName,
           count: views.length,
         },
         {},
