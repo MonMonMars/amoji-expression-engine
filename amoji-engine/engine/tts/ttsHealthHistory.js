@@ -180,6 +180,42 @@ export function describeProbeToastSlaBadge(sla, opts = {}) {
 }
 
 /**
+ * Tiny latency sparkline for probe toast HUD.
+ * @param {object[]} samples
+ * @param {{
+ *   width?: number,
+ *   height?: number,
+ *   maxPoints?: number,
+ *   strokeOk?: string,
+ *   strokeBad?: string,
+ *   fill?: string,
+ * }} [opts]
+ */
+export function buildProbeToastSparkMini(samples, opts = {}) {
+  const spark = buildHealthSparklineSvg(samples, {
+    width: opts.width ?? 72,
+    height: opts.height ?? 16,
+    maxPoints: opts.maxPoints ?? 12,
+    strokeOk: opts.strokeOk,
+    strokeBad: opts.strokeBad,
+    fill: opts.fill || 'rgba(94,224,168,0.1)',
+  });
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_spark_mini',
+      ok: !spark.empty,
+      show: !spark.empty,
+      svg: spark.svg,
+      empty: !!spark.empty,
+      count: spark.count || 0,
+      width: opts.width ?? 72,
+      height: opts.height ?? 16,
+    },
+    {},
+  );
+}
+
+/**
  * Build sparkline points (0..1 normalized latency; ok flag) from samples.
  * @param {object[]} samples
  * @param {{ maxPoints?: number }} [opts]

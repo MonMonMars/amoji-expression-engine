@@ -283,6 +283,42 @@
         padding: 6px 10px;
         border-radius: 8px;
       }
+      #probeDetailToast .toast-spark {
+        margin-top: 6px;
+        line-height: 0;
+        opacity: 0.95;
+      }
+      #probeDetailToast .toast-spark:empty { display: none; }
+      #probeDetailToast .toast-spark svg {
+        display: block;
+        width: 72px;
+        height: 16px;
+      }
+      #prefsAuditViewsDragList {
+        margin-top: 6px;
+        max-height: 96px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #0d141a;
+      }
+      #prefsAuditViewsDragList .drag-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 8px;
+        font-size: 0.78rem;
+        color: var(--ink);
+        border-bottom: 1px solid #1a2430;
+        cursor: grab;
+        user-select: none;
+      }
+      #prefsAuditViewsDragList .drag-item:last-child { border-bottom: 0; }
+      #prefsAuditViewsDragList .drag-item.dragging { opacity: 0.45; }
+      #prefsAuditViewsDragList .drag-item.active {
+        background: color-mix(in oklab, #163328 55%, #0d141a);
+        color: var(--accent);
+      }
       #glowOrb {
         width: min(42vmin, 280px);
         height: min(42vmin, 280px);
@@ -348,6 +384,7 @@
       <div id="probeDetailToast" role="status" aria-live="polite">
         <p class="toast-title" id="probeToastTitle">Probe detail</p>
         <p class="toast-detail" id="probeToastDetail">—</p>
+        <div class="toast-spark" id="probeToastSpark" aria-hidden="true"></div>
         <div class="toast-actions" id="probeToastActions"></div>
       </div>
       <div id="surfaceOverlay">
@@ -702,6 +739,11 @@
         <select id="prefsAuditSavedViews" class="ctl" style="margin-top:4px;">
           <option value="">Saved views…</option>
         </select>
+        <div id="prefsAuditViewsDragList" aria-label="Drag to reorder saved views"></div>
+        <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditMoveUp">Move up</button>
+          <button type="button" id="btnPrefsAuditMoveDown">Move down</button>
+        </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
@@ -815,6 +857,7 @@
         buildHealthProbeCopyPayload,
         describeHealthProbeToast,
         describeProbeToastSlaBadge,
+        buildProbeToastSparkMini,
         resolveProbeToastAction,
         resolveProbeToastShortcut,
       } from '/engine/tts/ttsHealthHistory.js';
@@ -1031,6 +1074,7 @@
       function refreshAuditSavedViewsUi(selectedId = '') {
         const sel = document.getElementById('prefsAuditSavedViews');
         const folderSel = document.getElementById('prefsAuditFolderFilter');
+        const dragList = document.getElementById('prefsAuditViewsDragList');
         const grouped = auditSavedViews.folders();
         if (folderSel) {
           const currentFolder = prefsAuditFolderFilter;
@@ -1056,9 +1100,12 @@
         placeholder.textContent = 'Saved views…';
         sel.appendChild(placeholder);
         const filterFolder = prefsAuditFolderFilter;
+        /** @type {object[]} */
+        const visible = [];
         for (const f of grouped.folders || []) {
           if (filterFolder && f.name !== filterFolder) continue;
           for (const v of f.views) {
+            visible.push({ ...v, _folderLabel: f.name });
             const opt = document.createElement('option');
             opt.value = v.id;
             opt.textContent =
@@ -1067,6 +1114,20 @@
                 : v.name;
             if (v.id === current) opt.selected = true;
             sel.appendChild(opt);
+          }
+        }
+        if (dragList) {
+          dragList.innerHTML = '';
+          for (const v of visible) {
+            const row = document.createElement('div');
+            row.className = 'drag-item' + (v.id === current ? ' active' : '');
+            row.draggable = true;
+            row.dataset.id = v.id;
+            row.textContent =
+              !filterFolder && v._folderLabel !== 'Inbox'
+                ? `${v._folderLabel} / ${v.name}`
+                : v.name;
+            dragList.appendChild(row);
           }
         }
       }
@@ -1107,6 +1168,7 @@
         lastProbeDetail = detail;
         const titleEl = document.getElementById('probeToastTitle');
         const detailEl = document.getElementById('probeToastDetail');
+        const sparkEl = document.getElementById('probeToastSpark');
         const actionsEl = document.getElementById('probeToastActions');
         const histLabel =
           probeToastHistory.size > 1
@@ -1129,6 +1191,14 @@
         }
         if (titleEl) titleEl.textContent = title;
         if (detailEl) detailEl.textContent = detailText;
+        if (sparkEl) {
+          const mini = buildProbeToastSparkMini(gatewayHealthHistory.samples, {
+            width: 72,
+            height: 16,
+            maxPoints: 12,
+          });
+          sparkEl.innerHTML = mini.show ? mini.svg : '';
+        }
         if (actionsEl) {
           actionsEl.innerHTML = '';
           for (const a of toast.actions || []) {
@@ -1190,7 +1260,8 @@
           reason !== 'look_pick' &&
           reason !== 'idle_pick' &&
           reason !== 'spin_pick' &&
-          reason !== 'cycle_pick'
+          reason !== 'cycle_pick' &&
+          reason !== 'blink_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1206,7 +1277,8 @@
           reason === 'look_pick' ||
           reason === 'idle_pick' ||
           reason === 'spin_pick' ||
-          reason === 'cycle_pick'
+          reason === 'cycle_pick' ||
+          reason === 'blink_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1954,6 +2026,7 @@
         e.currentTarget.classList.toggle('primary', cycleOn);
       });
       document.getElementById('btnBlink').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('blink_pick');
         temporal.forceBlink();
         forceBlink();
       });
@@ -2726,7 +2799,102 @@
           if (!id) return;
           const got = auditSavedViews.get(id);
           if (got.ok && got.view) applyAuditView(got.view);
+          refreshAuditSavedViewsUi(id);
         });
+        document.getElementById('btnPrefsAuditMoveUp')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a view to move';
+            return;
+          }
+          const moved = auditSavedViews.move(id, -1);
+          refreshAuditSavedViewsUi(id);
+          prefsStatus.className = moved.ok ? 'status ok' : 'status bad';
+          prefsStatus.textContent = moved.moved
+            ? 'prefs · view moved up'
+            : moved.ok
+              ? 'prefs · already at top'
+              : 'prefs · move failed';
+        });
+        document.getElementById('btnPrefsAuditMoveDown')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a view to move';
+            return;
+          }
+          const moved = auditSavedViews.move(id, 1);
+          refreshAuditSavedViewsUi(id);
+          prefsStatus.className = moved.ok ? 'status ok' : 'status bad';
+          prefsStatus.textContent = moved.moved
+            ? 'prefs · view moved down'
+            : moved.ok
+              ? 'prefs · already at bottom'
+              : 'prefs · move failed';
+        });
+        (() => {
+          const dragList = document.getElementById('prefsAuditViewsDragList');
+          if (!dragList) return;
+          let dragId = '';
+          dragList.addEventListener('dragstart', (ev) => {
+            const row = ev.target.closest?.('.drag-item');
+            if (!row) return;
+            dragId = row.dataset.id || '';
+            row.classList.add('dragging');
+            ev.dataTransfer?.setData('text/plain', dragId);
+            if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
+          });
+          dragList.addEventListener('dragend', (ev) => {
+            ev.target.closest?.('.drag-item')?.classList.remove('dragging');
+            dragId = '';
+          });
+          dragList.addEventListener('dragover', (ev) => {
+            ev.preventDefault();
+            if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+          });
+          dragList.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            const target = ev.target.closest?.('.drag-item');
+            const fromId = dragId || ev.dataTransfer?.getData('text/plain') || '';
+            const toId = target?.dataset?.id || '';
+            if (!fromId || !toId || fromId === toId) return;
+            const ids = [...dragList.querySelectorAll('.drag-item')].map(
+              (el) => el.dataset.id,
+            );
+            const from = ids.indexOf(fromId);
+            const to = ids.indexOf(toId);
+            if (from < 0 || to < 0) return;
+            ids.splice(from, 1);
+            ids.splice(to, 0, fromId);
+            // When folder filter is active, merge visible order back into full list.
+            if (prefsAuditFolderFilter) {
+              const full = auditSavedViews.views.map((v) => v.id);
+              const visibleSet = new Set(ids);
+              let vi = 0;
+              const merged = full.map((id) =>
+                visibleSet.has(id) ? ids[vi++] : id,
+              );
+              auditSavedViews.reorder(merged);
+            } else {
+              auditSavedViews.reorder(ids);
+            }
+            refreshAuditSavedViewsUi(fromId);
+            prefsStatus.className = 'status ok';
+            prefsStatus.textContent = 'prefs · views reordered';
+          });
+          dragList.addEventListener('click', (ev) => {
+            const row = ev.target.closest?.('.drag-item');
+            if (!row?.dataset?.id) return;
+            const got = auditSavedViews.get(row.dataset.id);
+            if (got.ok && got.view) {
+              applyAuditView(got.view);
+              refreshAuditSavedViewsUi(row.dataset.id);
+            }
+          });
+        })();
         document.getElementById('btnPrefsAuditDeleteView')?.addEventListener('click', () => {
           const sel = document.getElementById('prefsAuditSavedViews');
           const id = sel?.value || '';

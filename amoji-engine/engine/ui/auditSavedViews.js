@@ -46,6 +46,103 @@ export function snapshotAuditView(filters = {}, opts = {}) {
 }
 
 /**
+ * Reorder views by moving one id to a new index.
+ * @param {object[]} views
+ * @param {string} idOrName
+ * @param {number} toIndex
+ */
+export function reorderAuditSavedViews(views, idOrName, toIndex) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  const key = String(idOrName || '');
+  const from = list.findIndex(
+    (v) => v.id === key || v.name?.toLowerCase() === key.toLowerCase(),
+  );
+  if (from < 0) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_reorder',
+        ok: false,
+        reason: 'not_found',
+        views: list,
+        fromIndex: -1,
+        toIndex: null,
+      },
+      {},
+    );
+  }
+  const target = Math.max(0, Math.min(list.length - 1, Number(toIndex) || 0));
+  if (from === target) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_reorder',
+        ok: true,
+        views: list,
+        fromIndex: from,
+        toIndex: target,
+        moved: false,
+      },
+      {},
+    );
+  }
+  const [item] = list.splice(from, 1);
+  list.splice(target, 0, item);
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_reorder',
+      ok: true,
+      views: list,
+      fromIndex: from,
+      toIndex: target,
+      moved: true,
+      view: item,
+    },
+    {},
+  );
+}
+
+/**
+ * Apply an explicit id order (e.g. after drag-and-drop).
+ * @param {object[]} views
+ * @param {string[]} orderedIds
+ */
+export function applyAuditViewsOrder(views, orderedIds) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  const ids = Array.isArray(orderedIds) ? orderedIds.map(String) : [];
+  if (!ids.length) {
+    return applyComplianceGate(
+      {
+        kind: 'prefs_share_audit_views_reorder',
+        ok: false,
+        reason: 'empty_order',
+        views: list,
+      },
+      {},
+    );
+  }
+  const byId = new Map(list.map((v) => [v.id, v]));
+  const next = [];
+  for (const id of ids) {
+    if (byId.has(id)) {
+      next.push(byId.get(id));
+      byId.delete(id);
+    }
+  }
+  for (const v of list) {
+    if (byId.has(v.id)) next.push(v);
+  }
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_reorder',
+      ok: true,
+      views: next,
+      count: next.length,
+      moved: true,
+    },
+    {},
+  );
+}
+
+/**
  * Group saved views by folder (empty folder → "Inbox").
  * @param {object[]} views
  */
@@ -663,6 +760,59 @@ export function createAuditSavedViews(opts = {}) {
     },
     folders() {
       return groupAuditViewsByFolder(views);
+    },
+    move(idOrName, delta) {
+      const key = String(idOrName || '');
+      const from = views.findIndex(
+        (v) =>
+          v.id === key || v.name.toLowerCase() === key.toLowerCase(),
+      );
+      if (from < 0) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views',
+            action: 'move',
+            ok: false,
+            reason: 'not_found',
+            view: null,
+          },
+          {},
+        );
+      }
+      const to = from + (Number(delta) || 0);
+      const reordered = reorderAuditSavedViews(views, views[from].id, to);
+      if (!reordered.ok) return reordered;
+      views = reordered.views;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'move',
+          ok: true,
+          view: reordered.view || views[to],
+          fromIndex: reordered.fromIndex,
+          toIndex: reordered.toIndex,
+          moved: !!reordered.moved,
+          count: views.length,
+        },
+        {},
+      );
+    },
+    reorder(orderedIds) {
+      const applied = applyAuditViewsOrder(views, orderedIds);
+      if (!applied.ok) return applied;
+      views = applied.views;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'reorder',
+          ok: true,
+          views: views.slice(),
+          count: views.length,
+        },
+        {},
+      );
     },
     clear() {
       views = [];
