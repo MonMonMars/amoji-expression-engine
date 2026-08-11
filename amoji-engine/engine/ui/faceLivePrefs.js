@@ -60,15 +60,16 @@ export function disneyExtremeUiDefaults() {
  * - `x` / `X` → toggle master
  * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
  * - `h` / `H` / `?` → flash hotkey help on status
+ * - `Escape` → clear sticky status flash (only when a hold is active)
  * - `c` / `C` → copy Extreme prefs summary
  * - `r` / `R` → reset × defaults
  * - `[` / `]` → nudge shape × (when Extreme is on)
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed)
  * - `,` / `.` → nudge eyes × (when Extreme is on)
  * - `;` / `'` → nudge mouth × (when Extreme is on)
- * Ignores when typing in form fields or with modifier keys.
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
- * @param {{ typing?: boolean, targetTag?: string }} [opts]
+ * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, reason?: string }}
  */
 export const DISNEY_EXTREME_FACTOR_STEP = 0.05;
@@ -163,6 +164,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   if (!ev || ev.defaultPrevented) return { ok: false, reason: 'none' };
   if (ev.metaKey || ev.ctrlKey || ev.altKey) return { ok: false, reason: 'modifier' };
   const key = String(ev.key || '');
+  if (key === 'Escape') {
+    if (opts.holdingStatus) return { ok: true, action: 'clearStatusHold' };
+    return { ok: false, reason: 'no_hold' };
+  }
   const tag = String(opts.targetTag || ev.target?.tagName || '').toUpperCase();
   const typing =
     opts.typing === true ||

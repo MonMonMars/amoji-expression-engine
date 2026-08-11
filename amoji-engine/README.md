@@ -129,7 +129,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 116 | Extreme B body-apply toggle hotkey | Done |
 | Phase 117 | Extreme H/? show help hotkey | Done |
 | Phase 118 | Extreme status flash hold (copy/help/reset) | Done |
-| Phase 119+ | Further production polish… | Specced |
+| Phase 119 | Escape clears Extreme status flash hold | Done |
+| Phase 120+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -536,7 +536,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd></span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>Esc</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -1448,8 +1448,18 @@
       });
 
       document.addEventListener('keydown', (ev) => {
-        const resolved = resolveDisneyExtremeHotkey(ev);
+        const resolved = resolveDisneyExtremeHotkey(ev, {
+          holdingStatus: shouldHoldDisneyExtremeStatus(
+            disneyExtremeStatusHoldUntil,
+            performance.now(),
+          ),
+        });
         if (!resolved.ok || !disneyExtremeEl) return;
+        if (resolved.action === 'clearStatusHold') {
+          ev.preventDefault();
+          disneyExtremeStatusHoldUntil = 0;
+          return;
+        }
         if (resolved.action === 'toggle') {
           ev.preventDefault();
           disneyExtremeEl.checked = !disneyExtremeEl.checked;
