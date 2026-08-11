@@ -56,17 +56,46 @@ export function disneyExtremeUiDefaults() {
 }
 
 /**
- * Resolve Face Live Disney Extreme hotkey (plain `x` / `X` toggles master).
+ * Resolve Face Live Disney Extreme hotkey.
+ * - `x` / `X` → toggle master
+ * - `[` / `]` → nudge shape × (Face Live applies only when Extreme is on)
  * Ignores when typing in form fields or with modifier keys.
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string }} [opts]
- * @returns {{ ok: boolean, action?: 'toggle', reason?: string }}
+ * @returns {{ ok: boolean, action?: 'toggle'|'nudgeShapeDown'|'nudgeShapeUp', delta?: number, reason?: string }}
  */
+export const DISNEY_EXTREME_SHAPE_FACTOR_STEP = 0.05;
+export const DISNEY_EXTREME_SHAPE_FACTOR_MIN = 1;
+export const DISNEY_EXTREME_SHAPE_FACTOR_MAX = 1.8;
+
+/**
+ * Nudge / clamp Disney Extreme shape factor (slider range 1..1.8, step 0.05).
+ * @param {number} current
+ * @param {number} [delta]
+ * @returns {number}
+ */
+export function nudgeDisneyExtremeShapeFactor(current, delta = DISNEY_EXTREME_SHAPE_FACTOR_STEP) {
+  const step =
+    typeof delta === 'number' && Number.isFinite(delta)
+      ? delta
+      : DISNEY_EXTREME_SHAPE_FACTOR_STEP;
+  const raw =
+    typeof current === 'number' && Number.isFinite(current)
+      ? current
+      : defaultFaceLivePrefs().disneyExtremeFactor;
+  const next =
+    Math.round((raw + step) / DISNEY_EXTREME_SHAPE_FACTOR_STEP) *
+    DISNEY_EXTREME_SHAPE_FACTOR_STEP;
+  return Math.max(
+    DISNEY_EXTREME_SHAPE_FACTOR_MIN,
+    Math.min(DISNEY_EXTREME_SHAPE_FACTOR_MAX, Number(next.toFixed(2))),
+  );
+}
+
 export function resolveDisneyExtremeHotkey(ev, opts = {}) {
   if (!ev || ev.defaultPrevented) return { ok: false, reason: 'none' };
   if (ev.metaKey || ev.ctrlKey || ev.altKey) return { ok: false, reason: 'modifier' };
   const key = String(ev.key || '');
-  if (key !== 'x' && key !== 'X') return { ok: false, reason: 'key' };
   const tag = String(opts.targetTag || ev.target?.tagName || '').toUpperCase();
   const typing =
     opts.typing === true ||
@@ -75,7 +104,22 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     tag === 'SELECT' ||
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
-  return { ok: true, action: 'toggle' };
+  if (key === 'x' || key === 'X') return { ok: true, action: 'toggle' };
+  if (key === '[' || key === '{') {
+    return {
+      ok: true,
+      action: 'nudgeShapeDown',
+      delta: -DISNEY_EXTREME_SHAPE_FACTOR_STEP,
+    };
+  }
+  if (key === ']' || key === '}') {
+    return {
+      ok: true,
+      action: 'nudgeShapeUp',
+      delta: DISNEY_EXTREME_SHAPE_FACTOR_STEP,
+    };
+  }
+  return { ok: false, reason: 'key' };
 }
 
 /**

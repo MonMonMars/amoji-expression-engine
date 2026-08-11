@@ -15,7 +15,7 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
   it('formats off and on HUD copy', () => {
     expect(formatDisneyExtremeLiveHud({ enabled: false })).toEqual({
       pill: 'off',
-      status: 'extreme off · press X',
+      status: 'extreme off · X toggle · [ ] shape',
     });
     const on = formatDisneyExtremeLiveHud({
       enabled: true,
