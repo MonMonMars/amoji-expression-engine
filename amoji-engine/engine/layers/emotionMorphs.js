@@ -681,6 +681,13 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'showBaselineStacks', help: 'Alt+L stacks', kind: 'note' },
   { id: 'copyBaselineStacksSummary', help: '⇧Alt+L copy stacks', kind: 'note' },
+  {
+    id: 'showBaselineStacksCapacity',
+    keys: ['`', '~'],
+    help: '` stacks capacity',
+    kind: 'action',
+  },
+  { id: 'copyBaselineStacksCapacity', help: 'Shift+` copy capacity', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
   { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
   { id: 'pasteBaselineHistoryShareUrl', help: 'Alt+I paste hist share', kind: 'note' },
@@ -702,6 +709,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselineFavoriteTipSummary', help: 'Shift+0 jump fav tip summary', kind: 'note' },
   { id: 'showBaselineTips', help: 'Alt+0 tips readout', kind: 'note' },
   { id: 'copyBaselineTips', help: '⇧Alt+0 copy tips', kind: 'note' },
+  { id: 'tipsStrip', help: 'tips strip · live', kind: 'note' },
+  { id: 'capacityBadges', help: 'chip rows · capacity', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },
@@ -2975,6 +2984,71 @@ export function formatDisneyExtremeBaselineStacksSummaryLabel(stacks = {}) {
   const favN = Array.isArray(stacks?.favorites) ? stacks.favorites.length : 0;
   if (!histN && !redoN && !favN) return 'stacks · empty';
   return `stacks · hist ${histN} · redo ${redoN} · fav ${favN}`;
+}
+
+/**
+ * Stacks depths with capacity ceilings (hist/redo share history limit).
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} stacks
+ * @param {{ historyLimit?: number, favoritesLimit?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineStacksCapacityLabel(
+  stacks = {},
+  opts = {},
+) {
+  const histN = Array.isArray(stacks?.history) ? stacks.history.length : 0;
+  const redoN = Array.isArray(stacks?.redo) ? stacks.redo.length : 0;
+  const favN = Array.isArray(stacks?.favorites) ? stacks.favorites.length : 0;
+  const histLim = Math.max(
+    1,
+    Math.floor(
+      Number(opts.historyLimit) || DISNEY_EXTREME_BASELINE_HISTORY_LIMIT,
+    ),
+  );
+  const favLim = Math.max(
+    1,
+    Math.floor(
+      Number(opts.favoritesLimit) || DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT,
+    ),
+  );
+  return `stacks · hist ${histN}/${histLim} · redo ${redoN}/${histLim} · fav ${favN}/${favLim}`;
+}
+
+/**
+ * Compact hist/redo capacity badge for chip-row HUD.
+ * @param {number} count
+ * @param {{ kind?: 'hist'|'redo', limit?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineHistoryCapacityLabel(
+  count,
+  opts = {},
+) {
+  const n = Math.max(0, Math.floor(Number(count) || 0));
+  const limit = Math.max(
+    1,
+    Math.floor(Number(opts.limit) || DISNEY_EXTREME_BASELINE_HISTORY_LIMIT),
+  );
+  const kind = opts.kind === 'redo' ? 'redo' : 'hist';
+  return `${kind} · ${n}/${limit}`;
+}
+
+/**
+ * Compact favorites capacity badge for chip-row HUD.
+ * @param {number} count
+ * @param {{ limit?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineFavoritesCapacityLabel(
+  count,
+  opts = {},
+) {
+  const n = Math.max(0, Math.floor(Number(count) || 0));
+  const limit = Math.max(
+    1,
+    Math.floor(Number(opts.limit) || DISNEY_EXTREME_BASELINE_FAVORITES_LIMIT),
+  );
+  return `fav · ${n}/${limit}`;
 }
 
 /**

@@ -348,7 +348,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 335 | Extreme Alt+1–8 fav jump | Done |
 | Phase 336 | Extreme ⇧Alt+1–8 fav jump summary | Done |
 | Phase 337 | Extreme ⇧Alt+0 copy tips | Done |
-| Phase 338+ | Further production polish… | Specced |
+| Phase 338 | Extreme ` stacks capacity | Done |
+| Phase 339 | Extreme Shift+` copy capacity | Done |
+| Phase 340 | Extreme tips strip HUD | Done |
+| Phase 341 | Extreme chip-row capacity badges | Done |
+| Phase 342+ | Further production polish… | Specced |
 
 ## Quick start
 

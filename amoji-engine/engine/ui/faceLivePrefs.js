@@ -178,6 +178,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `Alt+L` → flash Extreme baseline stacks summary
  * - `Shift+Alt+L` → copy Extreme baseline stacks summary
+ * - `` ` `` → flash Extreme baseline stacks capacity (n/limit)
+ * - `~` / Shift+`` ` `` → copy Extreme baseline stacks capacity
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Shift+I` → merge Extreme baseline history JSON into current stack
  * - `Alt+I` → paste Extreme baseline history share URL (`#dxh=`)
@@ -592,6 +594,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBaselineHistory' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineHistoryJson' };
+    }
+    if (
+      entry.id === 'showBaselineStacksCapacity' &&
+      (ev.shiftKey || key === '~')
+    ) {
+      return { ok: true, action: 'copyBaselineStacksCapacity' };
     }
     if (entry.id === 'pasteBaselineHistoryJson' && ev.altKey && ev.shiftKey) {
       return { ok: true, action: 'mergeBaselineHistoryShareUrl' };
