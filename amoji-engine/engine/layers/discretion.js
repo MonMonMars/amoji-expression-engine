@@ -200,6 +200,59 @@ export function tuneContinuityResidualIntensity(continuity, opts = {}) {
 }
 
 /**
+ * Progress of continuity residual decay (1 = full residue, 0 = cleared).
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null } | null} continuity
+ * @param {{ peakIntensity?: number, minIntensity?: number }} [opts]
+ */
+export function continuityResidualDecayProgress(continuity, opts = {}) {
+  const residual = continuity?.residual;
+  if (!residual?.emotion) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_progress',
+        ok: false,
+        progress: 0,
+        intensity: 0,
+        peak: 0,
+        emotion: null,
+      },
+      {},
+    );
+  }
+  const intensity = residual.intensity ?? 0;
+  const minIntensity = opts.minIntensity ?? 0.02;
+  const peak = Math.max(intensity, opts.peakIntensity ?? intensity);
+  if (peak <= minIntensity) {
+    return applyComplianceGate(
+      {
+        kind: 'continuity_residual_progress',
+        ok: true,
+        progress: 0,
+        intensity,
+        peak,
+        emotion: residual.emotion,
+      },
+      {},
+    );
+  }
+  const progress = Math.max(
+    0,
+    Math.min(1, (intensity - minIntensity) / (peak - minIntensity)),
+  );
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_progress',
+      ok: true,
+      progress,
+      intensity,
+      peak,
+      emotion: residual.emotion,
+    },
+    {},
+  );
+}
+
+/**
  * Passive leakage: mood signature continuously under dialogue emotion.
  * @param {string} moodId
  * @param {number} baseline

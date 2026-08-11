@@ -578,6 +578,23 @@ export function summarizeAuditViewsImportPreview(raw, opts = {}) {
 }
 
 /**
+ * Whether a drag-drop should auto-import (Shift+drop).
+ * @param {{ shiftKey?: boolean }} [opts]
+ */
+export function shouldAutoImportAuditViewsOnDrop(opts = {}) {
+  const autoImport = !!opts.shiftKey;
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_import_drop',
+      ok: true,
+      autoImport,
+      shiftKey: autoImport,
+    },
+    {},
+  );
+}
+
+/**
  * Merge imported views into an existing list.
  * @param {object[]} existing
  * @param {object[]} incoming

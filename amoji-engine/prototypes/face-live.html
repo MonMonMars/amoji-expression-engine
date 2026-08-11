@@ -146,6 +146,9 @@
         width: 0%;
         background: linear-gradient(90deg, var(--accent), var(--accent2));
       }
+      #discResidualBar {
+        background: linear-gradient(90deg, #c9a227, #e0c060);
+      }
       pre {
         margin: 0;
         padding: 10px;
@@ -557,6 +560,7 @@
           <span style="font-size:0.8rem;color:var(--muted)">Auto improv on gap</span>
         </label>
         <div class="meter" title="gap toward improv"><i id="discGapBar"></i></div>
+        <div class="meter" title="residual decay"><i id="discResidualBar"></i></div>
         <div class="status" id="discStatus">discretion —</div>
         <div class="status" id="discContStatus">continuity —</div>
         <label class="row" style="grid-template-columns:auto 1fr;align-items:center;gap:8px;margin-top:6px;">
@@ -800,9 +804,9 @@
           id="prefsAuditImportViewsDropZone"
           class="status"
           style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
-          title="Drop JSON · double-click to import preview"
+          title="Drop JSON · Shift+drop import · double-click import"
         >
-          Drag & drop JSON to preview · double-click to import
+          Drag & drop JSON · Shift+drop import · double-click import
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
@@ -874,6 +878,7 @@
         DiscretionController,
         hasContinuityResidual,
         tuneContinuityResidualIntensity,
+        continuityResidualDecayProgress,
       } from '/engine/layers/discretion.js';
       import {
         personaAllowsEasterEggs,
@@ -948,6 +953,7 @@
         filterAuditSavedViews,
         formatAuditViewsImportInheritHint,
         summarizeAuditViewsImportPreview,
+        shouldAutoImportAuditViewsOnDrop,
       } from '/engine/ui/auditSavedViews.js';
       import {
         listRemapProfiles,
@@ -1093,6 +1099,7 @@
       const moodCtl = new MoodController({ state: 'neutral' });
       const discCtl = new DiscretionController({ personaId: 'companion' });
       let discContinuityResidualCompoundHandled = false;
+      let discResidualPeak = 0;
       let gazeModeUi = 'manual';
       const eggEnabled = {
         nlpGazeConvention: false,
@@ -1411,6 +1418,7 @@
           reason !== 'tts_endpoint_input_pick' &&
           reason !== 'tts_endpoint_paste_pick' &&
           reason !== 'tts_endpoint_enter_pick' &&
+          reason !== 'tts_endpoint_escape_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -1509,6 +1517,7 @@
       const discStatus = document.getElementById('discStatus');
       const discContStatus = document.getElementById('discContStatus');
       const discGapBar = document.getElementById('discGapBar');
+      const discResidualBar = document.getElementById('discResidualBar');
       const discStimulus = document.getElementById('discStimulus');
       const discAuto = document.getElementById('discAuto');
       const ttsAudioSync = document.getElementById('ttsAudioSync');
@@ -1996,6 +2005,7 @@
             intensity,
             stepOutBefore: stepOutNext,
           });
+          discResidualPeak = cont.residual?.intensity ?? 0;
           temporal.setEmotion(emotion, cont.intensity, { stepOutBefore: stepOutNext });
           intensity = cont.intensity;
           intensityEl.value = String(intensity);
@@ -2154,6 +2164,7 @@
         if (cont.residual) {
           cancelActiveCompoundLifecycle('deliver_residue_pick');
         }
+        discResidualPeak = cont.residual?.intensity ?? 0;
         discContStatus.textContent = cont.residual
           ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
           : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2164,6 +2175,7 @@
         cancelActiveCompoundLifecycle('clear_pick');
         discCtl.clearContinuity();
         discContinuityResidualCompoundHandled = false;
+        discResidualPeak = 0;
         discContStatus.textContent = 'continuity cleared';
       });
       discAuto.addEventListener('change', () => {
@@ -2855,6 +2867,10 @@
             cancelActiveCompoundLifecycle('tts_endpoint_enter_pick');
             persistPrefs();
             syncGatewayHealthPoll();
+          } else if (ev.key === 'Escape') {
+            ev.stopPropagation();
+            cancelActiveCompoundLifecycle('tts_endpoint_escape_pick');
+            ttsEndpointEl.blur();
           }
         });
         ttsPresetSel.addEventListener('change', () => {
@@ -3544,7 +3560,7 @@
           if (!prefsAuditImportPreviewText) {
             dropZone.classList.remove('has-preview');
             dropZone.textContent =
-              'Drag & drop JSON to preview · double-click to import';
+              'Drag & drop JSON · Shift+drop import · double-click import';
             return;
           }
           dropZone.classList.add('has-preview');
@@ -3702,6 +3718,10 @@
               prefsAuditImportPreviewLabel = preview.ok ? preview.label : file.name;
               refreshAuditImportDropZone();
               refreshAuditImportInheritHint();
+              if (shouldAutoImportAuditViewsOnDrop({ shiftKey: ev.shiftKey }).autoImport) {
+                await importAuditViewsText(text);
+                return;
+              }
               prefsStatus.className = 'status ok';
               prefsStatus.textContent = preview.ok
                 ? `prefs · drop preview · ${preview.label}`
@@ -3959,8 +3979,23 @@
         } else {
           discContinuityResidualCompoundHandled = false;
         }
+        if (hasContinuityResidual(discState.continuity)) {
+          const ri = discState.continuity?.residual?.intensity ?? 0;
+          if (ri > discResidualPeak) discResidualPeak = ri;
+        } else {
+          discResidualPeak = 0;
+        }
+        const residualProgress = continuityResidualDecayProgress(discState.continuity, {
+          peakIntensity: discResidualPeak,
+        });
         if (discGapBar) {
           discGapBar.style.width = `${Math.min(100, (discState.gapProgress || 0) * 100)}%`;
+        }
+        if (discResidualBar) {
+          discResidualBar.style.width = `${Math.min(
+            100,
+            (residualProgress.progress || 0) * 100,
+          )}%`;
         }
         if (discState.autoReaction && !discState.autoReaction.blocked) {
           cancelActiveCompoundLifecycle('auto_improv_pick');
