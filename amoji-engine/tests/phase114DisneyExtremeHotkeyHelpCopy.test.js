@@ -19,6 +19,7 @@ describe('Phase 114 Extreme hotkey help + Copy summary', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('- = body×');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('C copy');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('R reset');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('H help');
     expect(formatDisneyExtremeHotkeyHelp()).toBe(
       `extreme off · ${DISNEY_EXTREME_HOTKEY_HELP}`,
     );
