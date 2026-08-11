@@ -1,0 +1,81 @@
+/**
+ * Linked sound + haptic mute for Face Live probe toast feedback.
+ */
+import { applyComplianceGate } from '../compliance/complianceGate.js';
+
+/**
+ * Pair sound/haptic players with optional linked mute.
+ * @param {{
+ *   muted?: boolean,
+ *   setMuted?: (on: boolean) => unknown,
+ *   toggleMute?: () => unknown,
+ * }} sound
+ * @param {{
+ *   muted?: boolean,
+ *   setMuted?: (on: boolean) => unknown,
+ *   toggleMute?: () => unknown,
+ * }} haptic
+ * @param {{ linked?: boolean }} [opts]
+ */
+export function createLinkedProbeToastMute(sound, haptic, opts = {}) {
+  let linked = opts.linked !== false;
+
+  const gate = (action, extra = {}) =>
+    applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_feedback',
+        action,
+        ok: true,
+        linked,
+        soundMuted: !!sound?.muted,
+        hapticMuted: !!haptic?.muted,
+        ...extra,
+      },
+      {},
+    );
+
+  return {
+    get linked() {
+      return linked;
+    },
+    get muted() {
+      return !!(sound?.muted || haptic?.muted);
+    },
+    get soundMuted() {
+      return !!sound?.muted;
+    },
+    get hapticMuted() {
+      return !!haptic?.muted;
+    },
+    setLinked(on) {
+      linked = !!on;
+      if (linked && sound && haptic) {
+        haptic.setMuted?.(!!sound.muted);
+      }
+      return gate('set_linked', { linked });
+    },
+    setMuted(on) {
+      const muted = !!on;
+      sound?.setMuted?.(muted);
+      if (linked) haptic?.setMuted?.(muted);
+      return gate('set_muted', { muted });
+    },
+    toggleMute() {
+      const next = !sound?.muted;
+      sound?.setMuted?.(next);
+      if (linked) haptic?.setMuted?.(next);
+      else haptic?.toggleMute?.();
+      return gate('toggle_mute', { muted: !!sound?.muted });
+    },
+    toggleSoundMute() {
+      sound?.toggleMute?.();
+      if (linked) haptic?.setMuted?.(!!sound?.muted);
+      return gate('toggle_sound_mute', { muted: !!sound?.muted });
+    },
+    toggleHapticMute() {
+      haptic?.toggleMute?.();
+      if (linked) sound?.setMuted?.(!!haptic?.muted);
+      return gate('toggle_haptic_mute', { muted: !!haptic?.muted });
+    },
+  };
+}

@@ -668,6 +668,10 @@
           <input id="prefsProbeToastVolume" type="range" min="0" max="100" value="100" style="flex:1;" />
           <span id="prefsProbeToastVolumeVal" style="font-size:0.8rem;color:var(--muted);min-width:2.5rem;">100%</span>
         </label>
+        <label class="row" style="align-items:center;gap:8px;margin-top:4px;">
+          <input id="prefsProbeToastLinkMute" type="checkbox" checked />
+          <span style="font-size:0.8rem;color:var(--muted)">Link sound + haptic mute</span>
+        </label>
         <pre id="ttsProbeDetail" style="max-height:72px;margin-top:6px;">probe · click sparkline</pre>
       </div>
 
@@ -767,6 +771,7 @@
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
           <button type="button" id="btnPrefsAuditExportStarred">Export starred</button>
+          <button type="button" id="btnPrefsAuditExportFolder">Export folder</button>
           <label class="row" style="flex:1;margin:0;align-items:stretch;">
             <input id="prefsAuditImportViewsFile" type="file" accept="application/json,.json" hidden />
             <button type="button" id="btnPrefsAuditImportViews" style="flex:1;">Import views</button>
@@ -897,6 +902,7 @@
       import { compareProbeToastDetails } from '/engine/ui/probeToastCompare.js';
       import { createProbeToastSound } from '/engine/ui/probeToastSound.js';
       import { createProbeToastHaptic } from '/engine/ui/probeToastHaptic.js';
+      import { createLinkedProbeToastMute } from '/engine/ui/probeToastFeedback.js';
       import {
         createAuditSavedViews,
         buildAuditViewShareSnapshot,
@@ -1084,6 +1090,11 @@
       const probeToastHistory = createProbeToastHistory();
       const probeToastSound = createProbeToastSound({ enabled: true });
       const probeToastHaptic = createProbeToastHaptic({ enabled: true });
+      const probeToastFeedback = createLinkedProbeToastMute(
+        probeToastSound,
+        probeToastHaptic,
+        { linked: true },
+      );
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
@@ -1312,7 +1323,9 @@
           reason !== 'arousal_pick' &&
           reason !== 'robotwalk_pick' &&
           reason !== 'robotslew_pick' &&
-          reason !== 'latency_pick'
+          reason !== 'latency_pick' &&
+          reason !== 'threat_pick' &&
+          reason !== 'sigh_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1337,7 +1350,9 @@
           reason === 'arousal_pick' ||
           reason === 'robotwalk_pick' ||
           reason === 'robotslew_pick' ||
-          reason === 'latency_pick'
+          reason === 'latency_pick' ||
+          reason === 'threat_pick' ||
+          reason === 'sigh_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2460,10 +2475,13 @@
         }
         syncProbeToastMuteUi();
         document.getElementById('btnProbeToastMute')?.addEventListener('click', () => {
-          probeToastSound.toggleMute();
+          probeToastFeedback.toggleSoundMute();
           syncProbeToastMuteUi();
+          syncProbeToastHapticMuteUi();
           setTtsStatus(
-            probeToastSound.muted ? 'probe toast muted' : 'probe toast sound on',
+            probeToastFeedback.soundMuted
+              ? 'probe toast sound muted'
+              : 'probe toast sound on',
             'ok',
           );
         });
@@ -2479,12 +2497,24 @@
         }
         syncProbeToastHapticMuteUi();
         document.getElementById('btnProbeToastHapticMute')?.addEventListener('click', () => {
-          probeToastHaptic.toggleMute();
+          probeToastFeedback.toggleHapticMute();
+          syncProbeToastMuteUi();
           syncProbeToastHapticMuteUi();
           setTtsStatus(
-            probeToastHaptic.muted
+            probeToastFeedback.hapticMuted
               ? 'probe toast haptic muted'
               : 'probe toast haptic on',
+            'ok',
+          );
+        });
+        document.getElementById('prefsProbeToastLinkMute')?.addEventListener('change', (ev) => {
+          probeToastFeedback.setLinked(!!ev.target.checked);
+          syncProbeToastMuteUi();
+          syncProbeToastHapticMuteUi();
+          setTtsStatus(
+            probeToastFeedback.linked
+              ? 'probe toast mute linked'
+              : 'probe toast mute independent',
             'ok',
           );
         });
@@ -3248,6 +3278,35 @@
             ? `prefs · starred exported · ${exported.count}`
             : 'prefs · no starred views to export';
         });
+        document.getElementById('btnPrefsAuditExportFolder')?.addEventListener('click', () => {
+          const folderEl = document.getElementById('prefsAuditViewFolder');
+          const folder =
+            prefsAuditFolderFilter ||
+            folderEl?.value?.trim() ||
+            '';
+          if (!folder) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a folder to export';
+            return;
+          }
+          const exported = auditSavedViews.exportFolder(folder);
+          if (!exported.ok) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · export folder failed';
+            return;
+          }
+          const blob = new Blob([exported.json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `amoji-prefs-audit-views-${folder.replace(/\s+/g, '-').toLowerCase()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          prefsStatus.className = exported.count ? 'status ok' : 'status warn';
+          prefsStatus.textContent = exported.count
+            ? `prefs · exported ${exported.count} in ${folder}`
+            : `prefs · no views in ${folder}`;
+        });
         document.getElementById('btnPrefsAuditImportViews')?.addEventListener('click', () => {
           document.getElementById('prefsAuditImportViewsFile')?.click();
         });
@@ -3409,10 +3468,12 @@
       applySurfaceLevel(6, { applyHints: false });
 
       document.getElementById('btnThreat').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('threat_pick');
         bodyCtl.triggerThreat();
         bodyStatus.textContent = 'threat freeze ON';
       });
       document.getElementById('btnSigh').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('sigh_pick');
         bodyCtl.triggerSigh();
         bodyStatus.textContent = 'sigh (exhale emphasis)';
       });

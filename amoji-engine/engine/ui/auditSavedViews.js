@@ -327,20 +327,31 @@ export function groupAuditViewsByFolder(views) {
 /**
  * Export saved views as a portable JSON document.
  * @param {object[]} views
- * @param {{ now?: number, starredOnly?: boolean }} [opts]
+ * @param {{ now?: number, starredOnly?: boolean, folder?: string|null }} [opts]
  */
 export function exportAuditSavedViewsJson(views, opts = {}) {
   let list = (Array.isArray(views) ? views : []).map((v) =>
     normalizeAuditSavedView(v),
   );
   const starredOnly = !!opts.starredOnly;
+  const folderFilter =
+    opts.folder != null && String(opts.folder).trim() !== ''
+      ? String(opts.folder).trim()
+      : null;
   if (starredOnly) list = list.filter((v) => v.starred);
+  if (folderFilter) {
+    list = list.filter((v) => {
+      const vFolder = String(v.folder || '').trim() || 'Inbox';
+      return vFolder === folderFilter;
+    });
+  }
   const payload = {
     kind: 'amoji.faceLive.prefsShareAudit.views',
     version: 1,
     exportedAt: new Date(opts.now ?? Date.now()).toISOString(),
     count: list.length,
     starredOnly,
+    folder: folderFilter,
     views: list,
   };
   return applyComplianceGate(
@@ -350,6 +361,7 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
       json: JSON.stringify(payload, null, 2),
       count: list.length,
       starredOnly,
+      folder: folderFilter,
       total: Array.isArray(views) ? views.length : 0,
       payload,
     },
@@ -1214,6 +1226,25 @@ export function createAuditSavedViews(opts = {}) {
       return exportAuditSavedViewsJson(views, {
         ...exportOpts,
         starredOnly: true,
+      });
+    },
+    exportFolder(folderName, exportOpts = {}) {
+      const folder = String(folderName || '').trim();
+      if (!folder) {
+        return applyComplianceGate(
+          {
+            kind: 'prefs_share_audit_views_export',
+            ok: false,
+            reason: 'missing_folder',
+            count: 0,
+            folder: null,
+          },
+          {},
+        );
+      }
+      return exportAuditSavedViewsJson(views, {
+        ...exportOpts,
+        folder,
       });
     },
     importJson(raw, importOpts = {}) {
