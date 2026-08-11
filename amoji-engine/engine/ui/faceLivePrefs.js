@@ -226,6 +226,16 @@ export function disneyExtremeUiDefaults() {
  * - `Tab` → focus / scroll Extreme panel into view (Shift+Tab left to browser)
  * - `F2` → flash Extreme factors strip
  * - `Shift+F2` → copy Extreme factors strip
+ * - `F3` → flash Extreme ease strip
+ * - `Shift+F3` → copy Extreme ease strip
+ * - `F4` → flash Extreme mix strip
+ * - `Shift+F4` → copy Extreme mix strip
+ * - `F5` → flash Extreme neck strip
+ * - `Shift+F5` → copy Extreme neck strip
+ * - `F6` → flash Extreme tips strip
+ * - `Shift+F6` → copy Extreme tips strip
+ * - `F7` → flash Extreme capacity strip
+ * - `Shift+F7` → copy Extreme capacity strip
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -851,6 +861,27 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBaselineFactorsStrip' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineFactorsStrip' };
+    }
+    if (entry.id === 'showBaselineEaseStrip' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineEaseStrip' };
+    }
+    if (entry.id === 'showBaselineMixStrip' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineMixStrip' };
+    }
+    if (entry.id === 'showBaselineNeckStrip' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineNeckStrip' };
+    }
+    if (entry.id === 'showBaselineTipsFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineTips' };
+    }
+    if (entry.id === 'showBaselineTipsFKey') {
+      return { ok: true, action: 'showBaselineTips' };
+    }
+    if (entry.id === 'showBaselineCapacityFKey' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineStacksCapacity' };
+    }
+    if (entry.id === 'showBaselineCapacityFKey') {
+      return { ok: true, action: 'showBaselineStacksCapacity' };
     }
     return { ok: true, action: entry.id };
   }

@@ -9,6 +9,7 @@ import {
   disneyExtremeBodyMix,
   DISNEY_EXTREME_NECK_SCALE_BLEND,
   formatDisneyExtremeNeckLabel,
+  formatDisneyExtremeBodyMixLabel,
 } from './neckShoulder.js';
 
 export const EMOTIONS = [
@@ -294,6 +295,58 @@ export function formatDisneyExtremeFactorBarsLabel(opts = {}) {
 export function formatDisneyExtremeBaselineFactorsStripLabel(opts = {}) {
   const core = formatDisneyExtremeFactorBarsLabel(opts);
   return core.startsWith('factors ·') ? core : `factors · ${core}`;
+}
+
+/**
+ * Live ease strip label (always `ease · …` prefixed).
+ * @param {{ markerT?: number, enabled?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineEaseStripLabel(opts = {}) {
+  const core = formatDisneyExtremeEaseCurveLabel(opts);
+  if (core.startsWith('ease ·')) return core;
+  if (core.startsWith('ease curve ·')) {
+    return `ease · ${core.slice('ease curve · '.length)}`;
+  }
+  if (core.startsWith('ease ')) return `ease · ${core.slice('ease '.length)}`;
+  return `ease · ${core}`;
+}
+
+/**
+ * Live body-mix strip label (always `mix · …` prefixed).
+ * @param {{
+ *   enabled?: boolean,
+ *   bodyOn?: boolean,
+ *   markerT?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineMixStripLabel(opts = {}) {
+  const core = formatDisneyExtremeBodyMixLabel(opts);
+  if (core.startsWith('mix ·')) return core;
+  if (core.startsWith('body mix ·')) {
+    return `mix · ${core.slice('body mix · '.length)}`;
+  }
+  if (core.startsWith('mix ')) return `mix · ${core.slice('mix '.length)}`;
+  return `mix · ${core}`;
+}
+
+/**
+ * Live neck strip label (always `neck · …` prefixed).
+ * @param {{
+ *   enabled?: boolean,
+ *   bodyOn?: boolean,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ *   bodyInt?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineNeckStripLabel(opts = {}) {
+  const core = formatDisneyExtremeNeckLabel(opts);
+  if (core.startsWith('neck ·')) return core;
+  if (core.startsWith('neck ')) return `neck · ${core.slice('neck '.length)}`;
+  return `neck · ${core}`;
 }
 
 /**
@@ -837,6 +890,44 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   },
   { id: 'copyBaselineFactorsStrip', help: 'Shift+F2 copy factors', kind: 'note' },
   { id: 'factorsStrip', help: 'factors strip · live', kind: 'note' },
+  {
+    id: 'showBaselineEaseStrip',
+    keys: ['F3'],
+    help: 'F3 ease strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineEaseStrip', help: 'Shift+F3 copy ease', kind: 'note' },
+  { id: 'easeStrip', help: 'ease strip · live', kind: 'note' },
+  {
+    id: 'showBaselineMixStrip',
+    keys: ['F4'],
+    help: 'F4 mix strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineMixStrip', help: 'Shift+F4 copy mix', kind: 'note' },
+  { id: 'mixStrip', help: 'mix strip · live', kind: 'note' },
+  {
+    id: 'showBaselineNeckStrip',
+    keys: ['F5'],
+    help: 'F5 neck strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineNeckStrip', help: 'Shift+F5 copy neck', kind: 'note' },
+  { id: 'neckStrip', help: 'neck strip · live', kind: 'note' },
+  {
+    id: 'showBaselineTipsFKey',
+    keys: ['F6'],
+    help: 'F6 tips strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineTipsFKey', help: 'Shift+F6 copy tips', kind: 'note' },
+  {
+    id: 'showBaselineCapacityFKey',
+    keys: ['F7'],
+    help: 'F7 capacity strip',
+    kind: 'action',
+  },
+  { id: 'copyBaselineCapacityFKey', help: 'Shift+F7 copy capacity', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
   { id: 'diffBaselineChip', help: 'Alt+click chip diff', kind: 'note' },
   { id: 'compareBaselineChips', help: 'Shift+Alt+click chip compare', kind: 'note' },

@@ -396,7 +396,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 383 | Extreme factors strip live label | Done |
 | Phase 384 | Extreme F2 factors strip flash | Done |
 | Phase 385 | Extreme Shift+F2 copy factors strip | Done |
-| Phase 386+ | Further production polish… | Specced |
+| Phase 386 | Extreme ease strip + F3 | Done |
+| Phase 387 | Extreme mix strip + F4 | Done |
+| Phase 388 | Extreme neck strip + F5 | Done |
+| Phase 389 | Extreme tips/capacity F6–F7 | Done |
+| Phase 390+ | Further production polish… | Specced |
 
 ## Quick start
 
