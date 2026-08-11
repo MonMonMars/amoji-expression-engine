@@ -193,6 +193,19 @@
         border-radius: 4px;
       }
       .sla-spark svg { display: block; width: 100%; max-width: 160px; height: 28px; pointer-events: none; }
+      .extreme-ease-spark {
+        display: inline-flex;
+        align-items: center;
+        flex: 0 0 auto;
+        opacity: 0.95;
+      }
+      .extreme-ease-spark svg {
+        display: block;
+        width: 140px;
+        height: 28px;
+        border-radius: 4px;
+        background: color-mix(in oklab, #0a1016 70%, transparent);
+      }
       #surfaceOverlay {
         position: absolute;
         inset: 0;
@@ -536,7 +549,7 @@
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>Esc</kbd></span>
+            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -600,6 +613,14 @@
         <div class="row" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeCopy">Copy summary <kbd>C</kbd></button>
+        </div>
+        <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
+          <div
+            id="disneyExtremeEaseSpark"
+            class="extreme-ease-spark"
+            title="Ease overdrive curve (marker = shapeInt)"
+          ></div>
+          <div class="status" id="disneyExtremeEaseLabel" style="margin:0;">ease curve</div>
         </div>
         <div class="status" id="disneyExtremeStatus">extreme off</div>
       </div>
@@ -955,6 +976,8 @@
         amplifyDisneyExtremeMorphs,
         formatDisneyExtremeLiveHud,
         formatDisneyExtremeHotkeyHelp,
+        formatDisneyExtremeEaseCurveLabel,
+        buildDisneyExtremeEaseSparkSvg,
         DISNEY_EXTREME_STATUS_HOLD_MS,
         shouldHoldDisneyExtremeStatus,
         computeDisneyExtremeIntensities,
@@ -1185,6 +1208,12 @@
         'disneyExtremeMouthFactorVal',
       );
       const disneyExtremeStatus = document.getElementById('disneyExtremeStatus');
+      const disneyExtremeEaseSpark = document.getElementById(
+        'disneyExtremeEaseSpark',
+      );
+      const disneyExtremeEaseLabel = document.getElementById(
+        'disneyExtremeEaseLabel',
+      );
       const hudExtreme = document.getElementById('hudExtreme');
       const lookXEl = document.getElementById('lookX');
       const lookYEl = document.getElementById('lookY');
@@ -4787,6 +4816,20 @@
           disneyExtremeStatus.textContent = extremeHud.status;
         }
         if (hudExtreme) hudExtreme.textContent = extremeHud.pill;
+        if (disneyExtremeEaseSpark) {
+          const spark = buildDisneyExtremeEaseSparkSvg({
+            markerT: disneyExtremeOn ? shapeInt : undefined,
+            width: 140,
+            height: 28,
+          });
+          disneyExtremeEaseSpark.innerHTML = spark.svg;
+        }
+        if (disneyExtremeEaseLabel) {
+          disneyExtremeEaseLabel.textContent = formatDisneyExtremeEaseCurveLabel({
+            enabled: disneyExtremeOn,
+            markerT: disneyExtremeOn ? shapeInt : undefined,
+          });
+        }
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, shapeInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);

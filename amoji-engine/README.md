@@ -140,7 +140,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 127 | Extreme Alt coarser nudge (0.20) | Done |
 | Phase 128 | Extreme hotkey catalog extract | Done |
 | Phase 129 | Extreme nudge flash coarse Δ | Done |
-| Phase 130+ | Further production polish… | Specced |
+| Phase 130 | Extreme ease curve spark UI | Done |
+| Phase 131+ | Further production polish… | Specced |
 
 ## Quick start
 

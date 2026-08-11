@@ -58,6 +58,108 @@ export function easeEmotionIntensity(t) {
 }
 
 /**
+ * Sample `easeEmotionIntensity` across 0..maxT for Extreme curve UI.
+ * @param {{
+ *   steps?: number,
+ *   maxT?: number,
+ *   markerT?: number,
+ * }} [opts]
+ * @returns {{
+ *   points: { t: number, y: number }[],
+ *   marker: { t: number, y: number }|null,
+ *   gain: number,
+ *   maxY: number,
+ *   maxT: number,
+ * }}
+ */
+export function sampleDisneyExtremeEaseCurve(opts = {}) {
+  const steps = Math.max(2, Math.floor(opts.steps ?? 33));
+  const maxT =
+    typeof opts.maxT === 'number' && opts.maxT > 0 ? opts.maxT : 2;
+  /** @type {{ t: number, y: number }[]} */
+  const points = [];
+  for (let i = 0; i < steps; i++) {
+    const t = (i / (steps - 1)) * maxT;
+    points.push({ t, y: easeEmotionIntensity(t) });
+  }
+  /** @type {{ t: number, y: number }|null} */
+  let marker = null;
+  if (typeof opts.markerT === 'number' && Number.isFinite(opts.markerT)) {
+    const t = Math.max(0, Math.min(maxT, opts.markerT));
+    marker = { t, y: easeEmotionIntensity(t) };
+  }
+  let maxY = 0;
+  for (const p of points) if (p.y > maxY) maxY = p.y;
+  if (marker && marker.y > maxY) maxY = marker.y;
+  return {
+    points,
+    marker,
+    gain: DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
+    maxY,
+    maxT,
+  };
+}
+
+/**
+ * Compact label for the Extreme ease curve readout.
+ * @param {{ markerT?: number, enabled?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeEaseCurveLabel(opts = {}) {
+  const gain = DISNEY_EXTREME_EASE_OVERDRIVE_GAIN;
+  if (!opts.enabled) return `ease curve · od ×${gain.toFixed(2)} (off)`;
+  if (typeof opts.markerT === 'number' && Number.isFinite(opts.markerT)) {
+    const t = Math.max(0, Math.min(2, opts.markerT));
+    return `ease ${easeEmotionIntensity(t).toFixed(2)} @ ${t.toFixed(2)} · od ×${gain.toFixed(2)}`;
+  }
+  return `ease curve · od ×${gain.toFixed(2)}`;
+}
+
+/**
+ * Inline SVG sparkline for the Extreme ease overdrive curve.
+ * @param {{
+ *   width?: number,
+ *   height?: number,
+ *   steps?: number,
+ *   maxT?: number,
+ *   markerT?: number,
+ *   stroke?: string,
+ *   markerStroke?: string,
+ *   fill?: string,
+ *   peakGuide?: string,
+ * }} [opts]
+ * @returns {{ svg: string, empty: boolean, sample: ReturnType<typeof sampleDisneyExtremeEaseCurve> }}
+ */
+export function buildDisneyExtremeEaseSparkSvg(opts = {}) {
+  const width = opts.width ?? 140;
+  const height = opts.height ?? 28;
+  const sample = sampleDisneyExtremeEaseCurve(opts);
+  const pad = 2;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const stroke = opts.stroke || '#7ec8ff';
+  const markerStroke = opts.markerStroke || '#ffb454';
+  const fill = opts.fill || 'rgba(126,200,255,0.14)';
+  const peakGuide = opts.peakGuide || 'rgba(255,255,255,0.18)';
+  const maxY = Math.max(sample.maxY, 1e-6);
+  const coords = sample.points.map((p) => ({
+    x: pad + (p.t / sample.maxT) * w,
+    y: pad + (1 - p.y / maxY) * h,
+  }));
+  const poly = coords.map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+  const area = `${pad},${pad + h} ${poly} ${pad + w},${pad + h}`;
+  const peakX = pad + (1 / sample.maxT) * w;
+  let markerSvg = '';
+  if (sample.marker) {
+    const mx = pad + (sample.marker.t / sample.maxT) * w;
+    const my = pad + (1 - sample.marker.y / maxY) * h;
+    markerSvg = `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="2.4" fill="${markerStroke}" stroke="#0b1218" stroke-width="0.8"/>`;
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Disney Extreme ease curve"><rect width="100%" height="100%" fill="transparent"/><line x1="${peakX.toFixed(1)}" y1="${pad}" x2="${peakX.toFixed(1)}" y2="${pad + h}" stroke="${peakGuide}" stroke-width="1" stroke-dasharray="2 2"/><polygon points="${area}" fill="${fill}" stroke="none"/><polyline points="${poly}" fill="none" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>${markerSvg}</svg>`;
+  return { svg, empty: false, sample };
+}
+
+/**
  * Pick / blend hand-tuned tier recipes for a continuous intensity.
  * @param {string} emotion
  * @param {number} intensity 0..2
