@@ -256,6 +256,8 @@ export {
   amplifyDisneyExtremeMorphs,
   classifyDisneyExtremeMorphKey,
   formatDisneyExtremeLiveHud,
+  formatDisneyExtremeHotkeyHelp,
+  DISNEY_EXTREME_HOTKEY_HELP,
   computeDisneyExtremeIntensities,
   DISNEY_EXTREME_DEFAULTS,
   normalizeMorphName,

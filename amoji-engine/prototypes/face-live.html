@@ -597,10 +597,11 @@
             />
           </label>
         </div>
-        <div class="row" style="margin-top:6px;">
+        <div class="row" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults</button>
+          <button type="button" id="btnDisneyExtremeCopy">Copy summary</button>
         </div>
-        <div class="status" id="disneyExtremeStatus">extreme off · X · [ ] shape · - = body · , . eye · ; ' mouth</div>
+        <div class="status" id="disneyExtremeStatus">extreme off</div>
       </div>
 
       <div class="group">
@@ -953,6 +954,7 @@
         mergeMorphOverlays,
         amplifyDisneyExtremeMorphs,
         formatDisneyExtremeLiveHud,
+        formatDisneyExtremeHotkeyHelp,
         computeDisneyExtremeIntensities,
       } from '/engine/layers/emotionMorphs.js';
       import {
@@ -1284,6 +1286,11 @@
       }
       syncDisneyExtremeFactorLabels();
       syncDisneyExtremePrefsSummary(savedPrefs);
+      if (disneyExtremeStatus) {
+        disneyExtremeStatus.textContent = formatDisneyExtremeHotkeyHelp({
+          enabled: !!disneyExtremeEl?.checked,
+        });
+      }
 
       if (disneyExtremeEl && disneyExtremeFactorEl) {
         disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
@@ -1387,6 +1394,37 @@
         syncDisneyExtremePrefsSummary();
         updateTierHintForDisneyExtreme();
         persistPrefs();
+      });
+
+      document.getElementById('btnDisneyExtremeCopy')?.addEventListener('click', async () => {
+        const text = summarizeDisneyExtremePrefs({
+          disneyExtreme: !!disneyExtremeEl?.checked,
+          disneyExtremeFactor: Number(disneyExtremeFactorEl?.value || 1.6),
+          disneyExtremeBody: !!disneyExtremeBodyEl?.checked,
+          disneyExtremeBodyFactor: Number(
+            disneyExtremeBodyFactorEl?.value || 1.6,
+          ),
+          disneyExtremeEyeFactor: Number(
+            disneyExtremeEyeFactorEl?.value || 1.4,
+          ),
+          disneyExtremeMouthFactor: Number(
+            disneyExtremeMouthFactorEl?.value || 1.5,
+          ),
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        if (disneyExtremeStatus) {
+          disneyExtremeStatus.textContent = ok
+            ? `copied · ${text}`
+            : `copy failed · ${text}`;
+        }
       });
 
       document.addEventListener('keydown', (ev) => {

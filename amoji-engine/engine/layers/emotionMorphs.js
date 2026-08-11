@@ -234,6 +234,19 @@ export const DISNEY_EXTREME_DEFAULTS = {
   intensityCap: 2.0,
 };
 
+/** Shared Face Live Extreme hotkey legend (status / docs). */
+export const DISNEY_EXTREME_HOTKEY_HELP =
+  "X · [ ] shape · - = body · , . eye · ; ' mouth";
+
+/**
+ * Status prefix + hotkey legend for Extreme off/on idle copy.
+ * @param {{ enabled?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeHotkeyHelp(opts = {}) {
+  return `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_HELP}`;
+}
+
 /**
  * Classify a morph key as eye-ish or mouth-ish for Disney Extreme amplify.
  * @param {string} key
@@ -302,7 +315,7 @@ export function amplifyDisneyExtremeMorphs(targets, opts = {}) {
  */
 export function formatDisneyExtremeLiveHud(opts = {}) {
   if (!opts.enabled) {
-    return { pill: 'off', status: 'extreme off · X · [ ] shape · - = body · , . eye · ; \' mouth' };
+    return { pill: 'off', status: formatDisneyExtremeHotkeyHelp({ enabled: false }) };
   }
   const shapeInt = Number(opts.shapeInt);
   const bodyInt = Number(opts.bodyInt);

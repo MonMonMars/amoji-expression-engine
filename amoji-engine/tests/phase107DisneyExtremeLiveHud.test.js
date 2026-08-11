@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   formatDisneyExtremeLiveHud,
+  formatDisneyExtremeHotkeyHelp,
   DISNEY_EXTREME_DEFAULTS,
 } from '../engine/layers/emotionMorphs.js';
 import * as engine from '../engine/index.js';
@@ -15,7 +16,7 @@ describe('Phase 107 formatDisneyExtremeLiveHud + Face Live wiring', () => {
   it('formats off and on HUD copy', () => {
     expect(formatDisneyExtremeLiveHud({ enabled: false })).toEqual({
       pill: 'off',
-      status: 'extreme off · X · [ ] shape · - = body · , . eye · ; \' mouth',
+      status: formatDisneyExtremeHotkeyHelp({ enabled: false }),
     });
     const on = formatDisneyExtremeLiveHud({
       enabled: true,
