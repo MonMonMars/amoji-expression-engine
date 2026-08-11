@@ -865,7 +865,10 @@
           <summary title="Alt+T toggle · remembered">More Extreme IO · SVG · JSON · share · fav</summary>
           <div class="row" style="gap:8px;">
             <button type="button" id="btnDisneyExtremeCopyEase">Copy ease SVG <kbd>⇧E</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyEaseLabel">Copy ease label <kbd>Alt+E</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyMix">Copy mix SVG <kbd>⇧M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyMixLabel">Copy mix label <kbd>Alt+M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyNeckLabel">Copy neck label <kbd>Alt+N</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyJson">Copy JSON <kbd>J</kbd></button>
@@ -915,6 +918,7 @@
             <button type="button" id="btnDisneyExtremeMergeStacksShare">Merge stacks share <kbd>⇧Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeSharePin">Share pin <kbd>Alt+C</kbd></button>
             <button type="button" id="btnDisneyExtremePinSummary">Pin summary <kbd>Alt+D</kbd></button>
+            <button type="button" id="btnDisneyExtremePinBundle">Pin bundle <kbd>Alt+A</kbd></button>
             <button type="button" id="btnDisneyExtremeFocusPanel">Focus Extreme panel <kbd>Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
@@ -2071,6 +2075,17 @@
         return true;
       }
 
+      function flashDisneyExtremeBaselinePinBundle() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        flashDisneyExtremeStatus(
+          `pin · ${formatDisneyExtremeBundleLabel(lastExtremeBaselineSnap)}`,
+        );
+        return true;
+      }
+
       function focusDisneyExtremePanel() {
         const panel = document.getElementById('disneyExtremePanel');
         if (!panel) {
@@ -3133,8 +3148,20 @@
         copyDisneyExtremeEaseSvg();
       });
 
+      document.getElementById('btnDisneyExtremeCopyEaseLabel')?.addEventListener('click', () => {
+        copyDisneyExtremeEaseCurveLabel();
+      });
+
       document.getElementById('btnDisneyExtremeCopyMix')?.addEventListener('click', () => {
         copyDisneyExtremeBodyMixSvg();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyMixLabel')?.addEventListener('click', () => {
+        copyDisneyExtremeBodyMixLabel();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyNeckLabel')?.addEventListener('click', () => {
+        copyDisneyExtremeNeckLabel();
       });
 
       document.getElementById('btnDisneyExtremeCopyFactors')?.addEventListener('click', () => {
@@ -3359,6 +3386,10 @@
 
       document.getElementById('btnDisneyExtremePinSummary')?.addEventListener('click', () => {
         flashDisneyExtremeBaselinePinSummary();
+      });
+
+      document.getElementById('btnDisneyExtremePinBundle')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselinePinBundle();
       });
 
       document.getElementById('btnDisneyExtremeFocusPanel')?.addEventListener('click', () => {
@@ -4163,6 +4194,27 @@
         return ok;
       }
 
+      async function copyDisneyExtremeEaseCurveLabel() {
+        const snap = disneyExtremeSnapshot();
+        const text = formatDisneyExtremeEaseCurveLabel({
+          enabled: snap.enabled,
+          markerT: snap.enabled ? snap.shapeInt : undefined,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
       async function copyDisneyExtremeBodyMixSvg() {
         const snap = disneyExtremeSnapshot();
         const spark = buildDisneyExtremeBodyMixSparkSvg({
@@ -4181,6 +4233,52 @@
         }
         flashDisneyExtremeStatus(
           ok ? 'copied · mix SVG' : 'copy failed · mix SVG',
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBodyMixLabel() {
+        const snap = disneyExtremeSnapshot();
+        const text = formatDisneyExtremeBodyMixLabel({
+          enabled: snap.enabled,
+          bodyOn: snap.bodyOn,
+          markerT: snap.bodyOn ? snap.bodyInt : undefined,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeNeckLabel() {
+        const snap = disneyExtremeSnapshot();
+        const text = formatDisneyExtremeNeckLabel({
+          enabled: snap.enabled,
+          bodyOn: snap.bodyOn,
+          neckBlend: snap.neckBlend,
+          bodyMix: snap.bodyMix,
+          bodyInt: snap.bodyInt,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
         );
         return ok;
       }
@@ -4383,6 +4481,11 @@
           copyDisneyExtremeEaseSvg();
           return;
         }
+        if (resolved.action === 'copyEaseCurveLabel') {
+          ev.preventDefault();
+          copyDisneyExtremeEaseCurveLabel();
+          return;
+        }
         if (resolved.action === 'showBodyMix') {
           ev.preventDefault();
           flashDisneyExtremeBodyMix();
@@ -4391,6 +4494,11 @@
         if (resolved.action === 'copyBodyMixCurve') {
           ev.preventDefault();
           copyDisneyExtremeBodyMixSvg();
+          return;
+        }
+        if (resolved.action === 'copyBodyMixLabel') {
+          ev.preventDefault();
+          copyDisneyExtremeBodyMixLabel();
           return;
         }
         if (resolved.action === 'showFactorBars') {
@@ -4408,6 +4516,11 @@
           flashDisneyExtremeNeck();
           return;
         }
+        if (resolved.action === 'copyNeckLabel') {
+          ev.preventDefault();
+          copyDisneyExtremeNeckLabel();
+          return;
+        }
         if (resolved.action === 'showBundle') {
           ev.preventDefault();
           flashDisneyExtremeBundle();
@@ -4416,6 +4529,11 @@
         if (resolved.action === 'copyBundle') {
           ev.preventDefault();
           copyDisneyExtremeBundle();
+          return;
+        }
+        if (resolved.action === 'showBaselinePinBundle') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselinePinBundle();
           return;
         }
         if (resolved.action === 'copySnapshotJson') {

@@ -30,11 +30,14 @@ describe('Phase 127 Extreme Alt coarser nudge steps', () => {
       }).delta,
     ).toBe(0.2);
     expect(
-      resolveDisneyExtremeHotkey({ key: 'a', altKey: true }).ok,
+      resolveDisneyExtremeHotkey({ key: '5', altKey: true }).ok,
     ).toBe(false);
     expect(
-      resolveDisneyExtremeHotkey({ key: 'a', altKey: true }).reason,
+      resolveDisneyExtremeHotkey({ key: '5', altKey: true }).reason,
     ).toBe('modifier');
+    expect(
+      resolveDisneyExtremeHotkey({ key: 'a', altKey: true }).action,
+    ).toBe('showBaselinePinBundle');
     expect(
       resolveDisneyExtremeHotkey({ key: 'x', altKey: true }).action,
     ).toBe('focusExtremePanel');

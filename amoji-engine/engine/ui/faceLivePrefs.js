@@ -76,15 +76,19 @@ export function disneyExtremeUiDefaults() {
  * - `Alt+H` → copy Extreme hotkey help legend
  * - `e` / `E` → flash ease curve label on status
  * - `Shift+E` → copy ease curve SVG to clipboard
+ * - `Alt+E` → copy ease curve label text to clipboard
  * - `m` / `M` → flash body mix label on status
  * - `Shift+M` → copy body mix SVG to clipboard
+ * - `Alt+M` → copy body mix label text to clipboard
  * - `f` / `F` → flash factor bars label on status
  * - `Shift+F` → copy factor bars SVG to clipboard
  * - `Alt+F` → paste Extreme baseline favorites share URL (`#dxf=`)
  * - `Shift+Alt+F` → merge Extreme baseline favorites share URL into favorites
  * - `n` / `N` → flash neck blend / body mix label on status
+ * - `Alt+N` → copy neck blend label text to clipboard
  * - `a` / `A` → flash combined Extreme bundle readout
  * - `Shift+A` → copy Extreme bundle text to clipboard
+ * - `Alt+A` → flash Extreme pin bundle readout
  * - `j` / `J` → copy Extreme snapshot JSON to clipboard
  * - `Shift+J` → paste / apply Extreme snapshot JSON from clipboard
  * - `Alt+J` → paste Extreme snapshot share URL (`#dxs=`)
@@ -166,7 +170,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / Alt+C share pin / Alt+D pin summary / Alt+X focus panel / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / Alt+C share pin / Alt+D pin summary / Alt+X focus panel / Alt+A pin bundle / Alt+E/M/N copy labels / Alt+1–4 fav jump exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -381,7 +385,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J/C/D/X and Alt+1–4 fav jump.
+  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B/F/I/J/C/D/X/A/E/M/N and Alt+1–4 fav jump.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-4]$/.test(lower);
@@ -408,6 +412,10 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       lower !== 'c' &&
       lower !== 'd' &&
       lower !== 'x' &&
+      lower !== 'a' &&
+      lower !== 'e' &&
+      lower !== 'm' &&
+      lower !== 'n' &&
       !favJumpDigit
     ) {
       return { ok: false, reason: 'modifier' };
@@ -423,8 +431,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showHelp' && ev.altKey) {
       return { ok: true, action: 'copyHotkeyHelp' };
     }
+    if (entry.id === 'showEaseCurve' && ev.altKey) {
+      return { ok: true, action: 'copyEaseCurveLabel' };
+    }
     if (entry.id === 'showEaseCurve' && ev.shiftKey) {
       return { ok: true, action: 'copyEaseCurve' };
+    }
+    if (entry.id === 'showBodyMix' && ev.altKey) {
+      return { ok: true, action: 'copyBodyMixLabel' };
     }
     if (entry.id === 'showBodyMix' && ev.shiftKey) {
       return { ok: true, action: 'copyBodyMixCurve' };
@@ -437,6 +451,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showFactorBars' && ev.shiftKey) {
       return { ok: true, action: 'copyFactorBars' };
+    }
+    if (entry.id === 'showNeckBlend' && ev.altKey) {
+      return { ok: true, action: 'copyNeckLabel' };
+    }
+    if (entry.id === 'showBundle' && ev.altKey) {
+      return { ok: true, action: 'showBaselinePinBundle' };
     }
     if (entry.id === 'showBundle' && ev.shiftKey) {
       return { ok: true, action: 'copyBundle' };
