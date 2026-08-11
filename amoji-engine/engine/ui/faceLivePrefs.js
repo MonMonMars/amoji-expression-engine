@@ -98,6 +98,7 @@ export function disneyExtremeUiDefaults() {
  * - `n` / `N` → flash neck blend / body mix label on status
  * - `Alt+N` → copy neck blend label text to clipboard
  * - `Shift+N` → copy factor bars label text to clipboard
+ * - `Shift+Alt+N` → copy neck + factors labels bundle to clipboard
  * - `a` / `A` → flash combined Extreme bundle readout
  * - `Shift+A` → copy Extreme bundle text to clipboard
  * - `Alt+A` → flash Extreme pin bundle readout
@@ -128,6 +129,7 @@ export function disneyExtremeUiDefaults() {
  * - `k` / `K` → clear Extreme baseline (and hist/redo)
  * - `Shift+K` → clear Extreme baseline history (+ wipe redo)
  * - `Alt+K` → clear Extreme baseline pin only (keep stacks)
+ * - `Shift+Alt+K` → clear Extreme baseline history only (keep redo)
  * - `w` / `W` → wipe Extreme baseline redo stack
  * - `Shift+W` → wipe Extreme baseline favorites
  * - `Alt+W` → wipe Extreme baseline stacks (hist + redo + fav)
@@ -155,6 +157,7 @@ export function disneyExtremeUiDefaults() {
  * - `g` / `G` → copy Extreme baseline favorites JSON
  * - `Shift+G` → paste Extreme baseline favorites JSON from clipboard
  * - `Alt+G` → merge Extreme baseline favorites JSON into current favorites
+ * - `Shift+Alt+G` → copy Extreme favorites list + JSON bundle to clipboard
  * - `t` / `T` → copy Extreme baseline favorites share link (`#dxf=`)
  * - `Alt+T` → toggle Extreme More IO panel
  * - `Shift+T` → toggle Extreme More IO panel
@@ -162,6 +165,7 @@ export function disneyExtremeUiDefaults() {
  * - `z` / `Z` → copy Extreme baseline stacks JSON (hist + redo + fav)
  * - `Shift+Z` → paste Extreme baseline stacks JSON from clipboard
  * - `Alt+Z` → merge Extreme baseline stacks JSON into current stacks
+ * - `Shift+Alt+Z` → copy Extreme stacks summary + JSON bundle to clipboard
  * - `v` / `V` → copy Extreme baseline stacks share link (`#dxb=`)
  * - `Shift+V` → copy Extreme kit share link (`#dxs=` + `#dxb=`)
  * - `Alt+V` → paste Extreme kit share URL from clipboard
@@ -194,7 +198,7 @@ export function disneyExtremeUiDefaults() {
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / ⇧Alt+S copy fav list / Alt+W wipe stacks / ⇧Alt+W wipe all / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T/Shift+T more IO / ⇧Alt+T open more IO / Alt+H copy help / Shift+H copy hist list / ⇧Alt+H copy redo list / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Shift+R reset+all / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / ⇧Alt+X enable+focus / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / ⇧Alt+E/M copy label+svg / Shift+N factors label / Shift+P replace pin / Shift+X enable / Shift+B enable body / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / ⇧Alt+G copy fav+json / Alt+Z merge stacks / ⇧Alt+Z copy stacks+json / Alt+S unstar fav / ⇧Alt+S copy fav list / Alt+W wipe stacks / ⇧Alt+W wipe all / Alt+P copy fp / ⇧Alt+P pin fp / Alt+K clear pin / ⇧Alt+K clear hist keep redo / Alt+L stacks / Alt+V paste kit / Alt+T/Shift+T more IO / ⇧Alt+T open more IO / Alt+H copy help / Shift+H copy hist list / ⇧Alt+H copy redo list / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / ⇧Alt+R jump pin summary / Shift+R reset+all / Alt+B paste stacks / Alt+F paste fav / Alt+I paste hist share / Alt+J paste snap / ⇧Alt+J paste snap live / Alt+C share pin / ⇧Alt+C paste pin / Alt+D pin summary / ⇧Alt+D copy pin / Alt+X focus panel / ⇧Alt+X enable+focus / Alt+A pin bundle / ⇧Alt+A copy pin bundle / Alt+E/M/N copy labels / ⇧Alt+E/M copy label+svg / ⇧Alt+N copy neck+factors / Shift+N factors label / Shift+P replace pin / Shift+X enable / Shift+B enable body / Alt+1–4 fav jump exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -488,6 +492,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showFactorBars' && ev.shiftKey) {
       return { ok: true, action: 'copyFactorBars' };
     }
+    if (entry.id === 'showNeckBlend' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyNeckFactorsBundle' };
+    }
     if (entry.id === 'showNeckBlend' && ev.altKey) {
       return { ok: true, action: 'copyNeckLabel' };
     }
@@ -584,6 +591,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'pasteBaselineHistoryJson' && ev.shiftKey) {
       return { ok: true, action: 'mergeBaselineHistoryJson' };
     }
+    if (entry.id === 'clearBaseline' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'clearBaselineHistoryKeepRedo' };
+    }
     if (entry.id === 'clearBaseline' && ev.altKey) {
       return { ok: true, action: 'clearBaselinePin' };
     }
@@ -635,6 +645,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'starBaselineFavorite' && ev.shiftKey) {
       return { ok: true, action: 'showBaselineFavorites' };
     }
+    if (entry.id === 'copyBaselineFavoritesJson' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineFavoritesBundle' };
+    }
     if (entry.id === 'copyBaselineFavoritesJson' && ev.altKey) {
       return { ok: true, action: 'mergeBaselineFavoritesJson' };
     }
@@ -649,6 +662,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'copyBaselineFavoritesShareUrl' && ev.shiftKey) {
       return { ok: true, action: 'toggleMoreIo' };
+    }
+    if (entry.id === 'copyBaselineStacksJson' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineStacksBundle' };
     }
     if (entry.id === 'copyBaselineStacksJson' && ev.altKey) {
       return { ok: true, action: 'mergeBaselineStacksJson' };

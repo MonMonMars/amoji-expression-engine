@@ -8,6 +8,7 @@ import { applyYouthfulSmileBias } from './smileLaugh.js';
 import {
   disneyExtremeBodyMix,
   DISNEY_EXTREME_NECK_SCALE_BLEND,
+  formatDisneyExtremeNeckLabel,
 } from './neckShoulder.js';
 
 export const EMOTIONS = [
@@ -276,6 +277,33 @@ export function formatDisneyExtremeFactorBarsLabel(opts = {}) {
     ? `body×${f.body.toFixed(2)}`
     : 'body off';
   return `shape×${f.shape.toFixed(2)} · ${bodyBit} · eye×${f.eye.toFixed(2)} · mouth×${f.mouth.toFixed(2)}`;
+}
+
+/**
+ * Clipboard bundle: neck label + factors label (multiline).
+ * @param {{
+ *   enabled?: boolean,
+ *   bodyOn?: boolean,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ *   bodyInt?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeNeckFactorsBundle(opts = {}) {
+  const neck = formatDisneyExtremeNeckLabel({
+    enabled: opts.enabled,
+    bodyOn: opts.bodyOn,
+    neckBlend: opts.neckBlend,
+    bodyMix: opts.bodyMix,
+    bodyInt: opts.bodyInt,
+  });
+  const factors = formatDisneyExtremeFactorBarsLabel(opts);
+  return `${neck}\n${factors}`;
 }
 
 /**
@@ -599,6 +627,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'mergeBaselineFavoritesShareUrl', help: '⇧Alt+F merge fav', kind: 'note' },
   { id: 'showNeckBlend', keys: ['n', 'N'], help: 'N neck', kind: 'action' },
   { id: 'copyNeckLabel', help: 'Alt+N copy neck', kind: 'note' },
+  { id: 'copyNeckFactorsBundle', help: '⇧Alt+N copy neck+factors', kind: 'note' },
   { id: 'showBundle', keys: ['a', 'A'], help: 'A all', kind: 'action' },
   { id: 'copyBundle', help: 'Shift+A copy all', kind: 'note' },
   { id: 'showBaselinePinBundle', help: 'Alt+A pin bundle', kind: 'note' },
@@ -614,6 +643,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'clearBaseline', keys: ['k', 'K'], help: 'K clear base', kind: 'action' },
   { id: 'clearBaselineHistory', help: 'Shift+K clear hist', kind: 'note' },
   { id: 'clearBaselinePin', help: 'Alt+K clear pin', kind: 'note' },
+  { id: 'clearBaselineHistoryKeepRedo', help: '⇧Alt+K clear hist keep redo', kind: 'note' },
   { id: 'clearBaselineRedo', keys: ['w', 'W'], help: 'W wipe redo', kind: 'action' },
   { id: 'clearBaselineFavorites', help: 'Shift+W wipe favs', kind: 'note' },
   { id: 'clearBaselineStacks', help: 'Alt+W wipe stacks', kind: 'note' },
@@ -641,6 +671,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineFavoritesJson', keys: ['g', 'G'], help: 'G copy fav JSON', kind: 'action' },
   { id: 'pasteBaselineFavoritesJson', help: 'Shift+G paste fav', kind: 'note' },
   { id: 'mergeBaselineFavoritesJson', help: 'Alt+G merge fav', kind: 'note' },
+  { id: 'copyBaselineFavoritesBundle', help: '⇧Alt+G copy fav+json', kind: 'note' },
   { id: 'copyBaselineFavoritesShareUrl', keys: ['t', 'T'], help: 'T share fav', kind: 'action' },
   { id: 'toggleMoreIo', help: 'Alt+T more IO', kind: 'note' },
   { id: 'toggleMoreIoShift', help: 'Shift+T more IO', kind: 'note' },
@@ -672,6 +703,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineStacksJson', keys: ['z', 'Z'], help: 'Z copy stacks', kind: 'action' },
   { id: 'pasteBaselineStacksJson', help: 'Shift+Z paste stacks', kind: 'note' },
   { id: 'mergeBaselineStacksJson', help: 'Alt+Z merge stacks', kind: 'note' },
+  { id: 'copyBaselineStacksBundle', help: '⇧Alt+Z copy stacks+json', kind: 'note' },
   { id: 'copyBaselineStacksShareUrl', keys: ['v', 'V'], help: 'V share stacks', kind: 'action' },
   { id: 'copyBaselineKitShareUrl', help: 'Shift+V share kit', kind: 'note' },
   { id: 'pasteBaselineKitShareUrl', help: 'Alt+V paste kit', kind: 'note' },
@@ -2619,6 +2651,20 @@ export function formatDisneyExtremeBaselineFavoritesList(favorites) {
 }
 
 /**
+ * Clipboard bundle: favorites list text + JSON (multiline).
+ * @param {object[]|null|undefined} favorites
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineFavoritesBundle(favorites, opts = {}) {
+  const list = formatDisneyExtremeBaselineFavoritesList(favorites);
+  const json = serializeDisneyExtremeBaselineFavorites(favorites, {
+    pretty: opts.pretty !== false,
+  });
+  return `${list}\n${json}`;
+}
+
+/**
  * Serialize Extreme baseline favorites to versioned JSON.
  * @param {object[]|null|undefined} favorites
  * @param {{ pretty?: boolean }} [opts]
@@ -2871,6 +2917,20 @@ export function formatDisneyExtremeBaselineStacksSummaryLabel(stacks = {}) {
   const favN = Array.isArray(stacks?.favorites) ? stacks.favorites.length : 0;
   if (!histN && !redoN && !favN) return 'stacks · empty';
   return `stacks · hist ${histN} · redo ${redoN} · fav ${favN}`;
+}
+
+/**
+ * Clipboard bundle: stacks summary + JSON (multiline).
+ * @param {{ history?: object[], redo?: object[], favorites?: object[] }|null|undefined} stacks
+ * @param {{ pretty?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineStacksBundle(stacks = {}, opts = {}) {
+  const summary = formatDisneyExtremeBaselineStacksSummaryLabel(stacks);
+  const json = serializeDisneyExtremeBaselineStacks(stacks, {
+    pretty: opts.pretty !== false,
+  });
+  return `${summary}\n${json}`;
 }
 
 /**

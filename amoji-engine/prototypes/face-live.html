@@ -856,6 +856,7 @@
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearHistKeepRedo">Clear hist keep redo <kbd>⇧Alt+K</kbd></button>
           <button type="button" id="btnDisneyExtremeWipeRedo">Wipe redo <kbd>W</kbd></button>
           <button type="button" id="btnDisneyExtremePinBase">Pin baseline <kbd>P</kbd></button>
           <button type="button" id="btnDisneyExtremeStarFav">Star favorite <kbd>S</kbd></button>
@@ -875,6 +876,7 @@
             <button type="button" id="btnDisneyExtremeCopyMixLabel">Copy mix label <kbd>Alt+M</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyMixBundle">Copy mix+svg <kbd>⇧Alt+M</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyNeckLabel">Copy neck label <kbd>Alt+N</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyNeckFactors">Copy neck+factors <kbd>⇧Alt+N</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFactors">Copy factors SVG <kbd>⇧F</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFactorsLabel">Copy factors label <kbd>⇧N</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyBundle">Copy all <kbd>⇧A</kbd></button>
@@ -902,6 +904,7 @@
             <button type="button" id="btnDisneyExtremeFavList">Favorites list <kbd>⇧S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFavList">Copy fav list <kbd>⇧Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyFav">Copy fav JSON <kbd>G</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFavBundle">Copy fav+json <kbd>⇧Alt+G</kbd></button>
             <button type="button" id="btnDisneyExtremePasteFav">Paste fav JSON <kbd>⇧G</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeFav">Merge fav JSON <kbd>Alt+G</kbd></button>
             <button type="button" id="btnDisneyExtremeWipeFav">Wipe favorites <kbd>⇧W</kbd></button>
@@ -913,6 +916,7 @@
             <button type="button" id="btnDisneyExtremePasteKit">Paste kit share <kbd>Alt+V</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeKit">Merge kit share <kbd>⇧Alt+V</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyStacks">Copy stacks JSON <kbd>Z</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyStacksBundle">Copy stacks+json <kbd>⇧Alt+Z</kbd></button>
             <button type="button" id="btnDisneyExtremePasteStacks">Paste stacks JSON <kbd>⇧Z</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacks">Merge stacks JSON <kbd>Alt+Z</kbd></button>
             <button type="button" id="btnDisneyExtremeShareStacks">Copy stacks share <kbd>V</kbd></button>
@@ -947,7 +951,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1343,6 +1347,7 @@
         formatDisneyExtremeEaseCurveBundle,
         buildDisneyExtremeEaseSparkSvg,
         formatDisneyExtremeFactorBarsLabel,
+        formatDisneyExtremeNeckFactorsBundle,
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
         formatDisneyExtremeBundleLabel,
@@ -1371,6 +1376,7 @@
         decodeDisneyExtremeBaselineKitHash,
         formatDisneyExtremeBaselineKitPreviewLabel,
         formatDisneyExtremeBaselineStacksSummaryLabel,
+        formatDisneyExtremeBaselineStacksBundle,
         cycleDisneyExtremeBaselineFavoriteIndex,
         cycleDisneyExtremeBaselineHistoryIndex,
         cycleDisneyExtremeBaselineRedoIndex,
@@ -1410,6 +1416,7 @@
         formatDisneyExtremeSnapshotPreviewLabel,
         pushDisneyExtremeBaselineFavorite,
         formatDisneyExtremeBaselineFavoritesList,
+        formatDisneyExtremeBaselineFavoritesBundle,
         formatDisneyExtremeBaselineFavoritesPreviewLabel,
         serializeDisneyExtremeBaselineFavorites,
         parseDisneyExtremeBaselineFavorites,
@@ -2716,6 +2723,28 @@
         return ok;
       }
 
+      async function copyDisneyExtremeBaselineFavoritesBundle() {
+        const text = formatDisneyExtremeBaselineFavoritesBundle(
+          extremeBaselineFavorites,
+        );
+        const count = extremeBaselineFavorites.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · fav+json · ${count}`
+            : `copy failed · fav+json · ${count}`,
+        );
+        return ok;
+      }
+
       async function pasteDisneyExtremeBaselineFavoritesJson(opts = {}) {
         let text = '';
         try {
@@ -2877,6 +2906,33 @@
           ok
             ? `copied · stacks · hist ${histN} · redo ${redoN} · fav ${favN}`
             : `copy failed · stacks · hist ${histN} · redo ${redoN} · fav ${favN}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBaselineStacksBundle() {
+        const stacks = {
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        };
+        const text = formatDisneyExtremeBaselineStacksBundle(stacks);
+        const histN = extremeBaselineHistory.length;
+        const redoN = extremeBaselineRedo.length;
+        const favN = extremeBaselineFavorites.length;
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok
+            ? `copied · stacks+json · hist ${histN} · redo ${redoN} · fav ${favN}`
+            : `copy failed · stacks+json · hist ${histN} · redo ${redoN} · fav ${favN}`,
         );
         return ok;
       }
@@ -3462,6 +3518,10 @@
         copyDisneyExtremeNeckLabel();
       });
 
+      document.getElementById('btnDisneyExtremeCopyNeckFactors')?.addEventListener('click', () => {
+        copyDisneyExtremeNeckFactorsBundle();
+      });
+
       document.getElementById('btnDisneyExtremeCopyFactors')?.addEventListener('click', () => {
         copyDisneyExtremeFactorBarsSvg();
       });
@@ -3512,6 +3572,10 @@
 
       document.getElementById('btnDisneyExtremeClearHist')?.addEventListener('click', () => {
         clearDisneyExtremeBaselineHistoryOnly();
+      });
+
+      document.getElementById('btnDisneyExtremeClearHistKeepRedo')?.addEventListener('click', () => {
+        clearDisneyExtremeBaselineHistoryKeepRedo();
       });
 
       document.getElementById('btnDisneyExtremeWipeRedo')?.addEventListener('click', () => {
@@ -3602,6 +3666,10 @@
         copyDisneyExtremeBaselineFavoritesJson();
       });
 
+      document.getElementById('btnDisneyExtremeCopyFavBundle')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineFavoritesBundle();
+      });
+
       document.getElementById('btnDisneyExtremePasteFav')?.addEventListener('click', () => {
         pasteDisneyExtremeBaselineFavoritesJson();
       });
@@ -3644,6 +3712,10 @@
 
       document.getElementById('btnDisneyExtremeCopyStacks')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineStacksJson();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyStacksBundle')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineStacksBundle();
       });
 
       document.getElementById('btnDisneyExtremePasteStacks')?.addEventListener('click', () => {
@@ -4460,6 +4532,25 @@
         return true;
       }
 
+      function clearDisneyExtremeBaselineHistoryKeepRedo() {
+        if (!extremeBaselineHistory.length) {
+          flashDisneyExtremeStatus('clear hist · empty');
+          return false;
+        }
+        extremeBaselineHistory = [];
+        extremeHistoryJumpIndexActive = null;
+        persistDisneyExtremeBaselineHistory();
+        syncDisneyExtremePrefsSummary();
+        syncDisneyExtremeHistoryUi();
+        const redoN = extremeBaselineRedo.length;
+        flashDisneyExtremeStatus(
+          redoN > 0
+            ? `cleared · hist · keep redo ${redoN}`
+            : 'cleared · hist · keep redo',
+        );
+        return true;
+      }
+
       function clearDisneyExtremeBaselineRedoOnly() {
         if (
           !hasDisneyExtremeBaselineRedo({
@@ -4676,6 +4767,29 @@
         }
         flashDisneyExtremeStatus(
           ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeNeckFactorsBundle() {
+        const snap = disneyExtremeSnapshot();
+        const text = formatDisneyExtremeNeckFactorsBundle({
+          ...disneyExtremeFactorOpts(),
+          neckBlend: snap.neckBlend,
+          bodyMix: snap.bodyMix,
+          bodyInt: snap.bodyInt,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? 'copied · neck+factors' : 'copy failed · neck+factors',
         );
         return ok;
       }
@@ -4970,6 +5084,11 @@
           copyDisneyExtremeNeckLabel();
           return;
         }
+        if (resolved.action === 'copyNeckFactorsBundle') {
+          ev.preventDefault();
+          copyDisneyExtremeNeckFactorsBundle();
+          return;
+        }
         if (resolved.action === 'showBundle') {
           ev.preventDefault();
           flashDisneyExtremeBundle();
@@ -5028,6 +5147,11 @@
         if (resolved.action === 'clearBaselineHistory') {
           ev.preventDefault();
           clearDisneyExtremeBaselineHistoryOnly();
+          return;
+        }
+        if (resolved.action === 'clearBaselineHistoryKeepRedo') {
+          ev.preventDefault();
+          clearDisneyExtremeBaselineHistoryKeepRedo();
           return;
         }
         if (resolved.action === 'clearBaselinePin') {
@@ -5090,6 +5214,11 @@
           copyDisneyExtremeBaselineFavoritesJson();
           return;
         }
+        if (resolved.action === 'copyBaselineFavoritesBundle') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineFavoritesBundle();
+          return;
+        }
         if (resolved.action === 'pasteBaselineFavoritesJson') {
           ev.preventDefault();
           pasteDisneyExtremeBaselineFavoritesJson();
@@ -5108,6 +5237,11 @@
         if (resolved.action === 'copyBaselineStacksJson') {
           ev.preventDefault();
           copyDisneyExtremeBaselineStacksJson();
+          return;
+        }
+        if (resolved.action === 'copyBaselineStacksBundle') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineStacksBundle();
           return;
         }
         if (resolved.action === 'pasteBaselineStacksJson') {
