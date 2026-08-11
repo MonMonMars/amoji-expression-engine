@@ -69,6 +69,7 @@ export function disneyExtremeUiDefaults() {
  * Resolve Face Live Disney Extreme hotkey.
  * - `x` / `X` → toggle master
  * - `b` / `B` → toggle Apply to body/head (enables Extreme if needed)
+ * - `Alt+B` → paste Extreme baseline stacks share URL (`#dxb=`)
  * - `h` / `H` / `?` → flash hotkey help on status
  * - `Alt+H` → copy Extreme hotkey help legend
  * - `e` / `E` → flash ease curve label on status
@@ -94,6 +95,8 @@ export function disneyExtremeUiDefaults() {
  * - `Alt+O` → merge Extreme baseline redo JSON into current redo stack
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
+ * - `Alt+U` → cycle next Extreme redo entry
+ * - `Shift+Alt+U` → cycle previous Extreme redo entry
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `Shift+Y` → copy Extreme baseline history share link (`#dxh=`)
  * - `Alt+Y` → copy Extreme baseline redo share link (`#dxr=`)
@@ -110,6 +113,8 @@ export function disneyExtremeUiDefaults() {
  * - `Alt+O` → merge Extreme baseline redo JSON into current redo stack
  * - `u` / `U` → undo Extreme baseline to previous history entry
  * - `Shift+U` → redo Extreme baseline from redo stack
+ * - `Alt+U` → cycle next Extreme redo entry
+ * - `Shift+Alt+U` → cycle previous Extreme redo entry
  * - `y` / `Y` → copy Extreme snapshot share link (`#dxs=`)
  * - `Shift+Y` → copy Extreme baseline history share link (`#dxh=`)
  * - `Alt+Y` → copy Extreme baseline redo share link (`#dxr=`)
@@ -134,6 +139,7 @@ export function disneyExtremeUiDefaults() {
  * - `l` / `L` → flash Extreme baseline history list
  * - `Shift+L` → copy Extreme baseline history JSON
  * - `Alt+L` → flash Extreme baseline stacks summary
+ * - `Shift+Alt+L` → copy Extreme baseline stacks summary
  * - `i` / `I` → paste Extreme baseline history JSON from clipboard
  * - `Shift+I` → merge Extreme baseline history JSON into current stack
  * - `1`–`8` → jump to Extreme baseline history entry by index
@@ -143,11 +149,12 @@ export function disneyExtremeUiDefaults() {
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
  * - `r` / `R` → reset × defaults
+ * - `Alt+R` → jump / restore Extreme pinned baseline
  * - `[` / `]` → nudge shape × (when Extreme is on; Shift = coarse 0.10; Alt = coarser 0.20)
  * - `-` / `=` → nudge body × (when Extreme is on; enables body apply if needed; Shift/Alt step)
  * - `,` / `.` → nudge eyes × (when Extreme is on; Shift/`</>` = coarse; Alt = coarser)
  * - `;` / `'` → nudge mouth × (when Extreme is on; Shift/Alt step)
- * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+1–4 fav jump exempt).
+ * Ignores when typing in form fields or with modifier keys (Escape exempt when holding or chip compare / active chips is set; Shift/Alt allowed for nudge steps; Alt+O merge redo / Alt+Y share redo / Alt+G merge fav / Alt+Z merge stacks / Alt+S unstar fav / Alt+W wipe stacks / Alt+P copy fp / Alt+K clear pin / Alt+L stacks / Alt+V paste kit / Alt+T more IO / Alt+H copy help / Alt+Q hist cycle / Alt+U redo cycle / Alt+R jump pin / Alt+B paste stacks / Alt+1–4 fav jump exempt).
  * @param {KeyboardEvent|{ key?: string, metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, target?: any, defaultPrevented?: boolean }} ev
  * @param {{ typing?: boolean, targetTag?: string, holdingStatus?: boolean, holdingChipCompare?: boolean, holdingActiveChips?: boolean }} [opts]
  * @returns {{ ok: boolean, action?: string, delta?: number, index?: number, reason?: string }}
@@ -362,7 +369,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     !!ev.target?.isContentEditable;
   if (typing) return { ok: false, reason: 'typing' };
   // Alt is reserved for coarser factor nudges — reject on letter/action hotkeys
-  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q and Alt+1–4 fav jump.
+  // except Alt+O/Y/G/Z/S/W/P/K/L/V/T/H/Q/U/R/B and Alt+1–4 fav jump.
   if (ev.altKey && !isDisneyExtremeNudgeHotkeyKey(key)) {
     const lower = key.toLowerCase();
     const favJumpDigit = /^[1-4]$/.test(lower);
@@ -380,6 +387,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       lower !== 't' &&
       lower !== 'h' &&
       lower !== 'q' &&
+      lower !== 'u' &&
+      lower !== 'r' &&
+      lower !== 'b' &&
       !favJumpDigit
     ) {
       return { ok: false, reason: 'modifier' };
@@ -416,8 +426,23 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'copySummary' && ev.shiftKey) {
       return { ok: true, action: 'copySnapshotDiff' };
     }
+    if (entry.id === 'undoBaseline' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'cycleBaselineRedoPrev' };
+    }
+    if (entry.id === 'undoBaseline' && ev.altKey) {
+      return { ok: true, action: 'cycleBaselineRedoNext' };
+    }
     if (entry.id === 'undoBaseline' && ev.shiftKey) {
       return { ok: true, action: 'redoBaseline' };
+    }
+    if (entry.id === 'resetDefaults' && ev.altKey) {
+      return { ok: true, action: 'jumpBaselinePin' };
+    }
+    if (entry.id === 'toggleBodyApply' && ev.altKey) {
+      return { ok: true, action: 'pasteBaselineStacksShareUrl' };
+    }
+    if (entry.id === 'showBaselineHistory' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineStacksSummary' };
     }
     if (entry.id === 'showBaselineHistory' && ev.altKey) {
       return { ok: true, action: 'showBaselineStacks' };

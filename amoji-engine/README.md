@@ -292,7 +292,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 279 | Extreme Alt+H copy hotkey help | Done |
 | Phase 280 | Extreme Alt+Q / ⇧Alt+Q cycle history | Done |
 | Phase 281 | Extreme More IO open persist | Done |
-| Phase 282+ | Further production polish… | Specced |
+| Phase 282 | Extreme Alt+U / ⇧Alt+U cycle redo | Done |
+| Phase 283 | Extreme Alt+R jump pin | Done |
+| Phase 284 | Extreme ⇧Alt+L copy stacks summary | Done |
+| Phase 285 | Extreme Alt+B paste stacks share | Done |
+| Phase 286+ | Further production polish… | Specced |
 
 ## Quick start
 

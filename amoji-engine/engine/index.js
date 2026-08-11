@@ -319,6 +319,7 @@ export {
   DISNEY_EXTREME_STACKS_HASH_PARAM,
   cycleDisneyExtremeBaselineFavoriteIndex,
   cycleDisneyExtremeBaselineHistoryIndex,
+  cycleDisneyExtremeBaselineRedoIndex,
   formatDisneyExtremeMultiHashLoadLabel,
   buildDisneyExtremeBaselineKitShareUrl,
   decodeDisneyExtremeBaselineKitHash,

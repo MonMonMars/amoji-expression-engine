@@ -899,6 +899,11 @@
             <button type="button" id="btnDisneyExtremePrevFav">Prev favorite <kbd>⇧Q</kbd></button>
             <button type="button" id="btnDisneyExtremeNextHist">Next history <kbd>Alt+Q</kbd></button>
             <button type="button" id="btnDisneyExtremePrevHist">Prev history <kbd>⇧Alt+Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeNextRedo">Next redo <kbd>Alt+U</kbd></button>
+            <button type="button" id="btnDisneyExtremePrevRedo">Prev redo <kbd>⇧Alt+U</kbd></button>
+            <button type="button" id="btnDisneyExtremeJumpPin">Jump pin <kbd>Alt+R</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyStacksSummary">Copy stacks summary <kbd>⇧Alt+L</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteStacksShare">Paste stacks share <kbd>Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd></button>
@@ -907,7 +912,7 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · G/⇧G/Alt+G fav JSON · T fav share · Alt+T more IO · Alt+H copy help · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V stacks/kit · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo · Esc clear active"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–4 fav · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G fav JSON · T fav share · Alt+T more IO · Alt+H copy help · Z/⇧Z/Alt+Z stacks · V/⇧V/Alt+V stacks/kit · Alt+B paste stacks · O/⇧O/Alt+O redo JSON · ⇧Y/Alt+Y share · U undo · ⇧U redo · Esc clear active"
         >
           <span class="extreme-hist-empty">hist · empty</span>
         </div>
@@ -1332,9 +1337,11 @@
         formatDisneyExtremeBaselineStacksSummaryLabel,
         cycleDisneyExtremeBaselineFavoriteIndex,
         cycleDisneyExtremeBaselineHistoryIndex,
+        cycleDisneyExtremeBaselineRedoIndex,
         saveDisneyExtremeMoreIoOpen,
         loadDisneyExtremeMoreIoOpen,
         DISNEY_EXTREME_HOTKEY_HELP,
+        decodeDisneyExtremeBaselineStacksHash,
         removeDisneyExtremeBaselineFavorite,
         formatDisneyExtremeMultiHashLoadLabel,
         diffDisneyExtremeSnapshots,
@@ -2006,6 +2013,73 @@
           return false;
         }
         return jumpDisneyExtremeBaselineHistory(next);
+      }
+
+      function cycleDisneyExtremeBaselineRedo(opts = {}) {
+        const next = cycleDisneyExtremeBaselineRedoIndex(
+          extremeRedoJumpIndexActive,
+          extremeBaselineRedo.length,
+          { prev: !!opts.prev },
+        );
+        if (next == null) {
+          flashDisneyExtremeStatus('redo · empty');
+          return false;
+        }
+        return jumpDisneyExtremeBaselineRedo(next);
+      }
+
+      function jumpDisneyExtremeBaselinePin() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        applyDisneyExtremeSnapshot(lastExtremeBaselineSnap);
+        lastExtremeDirty = false;
+        syncDisneyExtremePrefsSummary();
+        const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
+        flashDisneyExtremeStatus(`pin · jump · fp ${fp}`);
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineStacksSummary() {
+        const text = formatDisneyExtremeBaselineStacksSummaryLabel({
+          history: extremeBaselineHistory,
+          redo: extremeBaselineRedo,
+          favorites: extremeBaselineFavorites,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      async function pasteDisneyExtremeBaselineStacksShareUrl(opts = {}) {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · stacks clipboard');
+          return false;
+        }
+        const stacks = decodeDisneyExtremeBaselineStacksHash(text);
+        if (!stacks.ok) {
+          flashDisneyExtremeStatus(`paste failed · stacks · ${stacks.error}`);
+          return false;
+        }
+        return applyDisneyExtremeBaselineStacks(stacks, {
+          merge: !!opts.merge,
+        });
       }
 
       function toggleDisneyExtremeMoreIo(opts = {}) {
@@ -3100,6 +3174,26 @@
 
       document.getElementById('btnDisneyExtremePrevHist')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineHistory({ prev: true });
+      });
+
+      document.getElementById('btnDisneyExtremeNextRedo')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineRedo();
+      });
+
+      document.getElementById('btnDisneyExtremePrevRedo')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineRedo({ prev: true });
+      });
+
+      document.getElementById('btnDisneyExtremeJumpPin')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselinePin();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyStacksSummary')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineStacksSummary();
+      });
+
+      document.getElementById('btnDisneyExtremePasteStacksShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselineStacksShareUrl();
       });
 
       document.getElementById('btnDisneyExtremeUnstarFav')?.addEventListener('click', () => {
@@ -4266,6 +4360,31 @@
         if (resolved.action === 'cycleBaselineHistoryPrev') {
           ev.preventDefault();
           cycleDisneyExtremeBaselineHistory({ prev: true });
+          return;
+        }
+        if (resolved.action === 'cycleBaselineRedoNext') {
+          ev.preventDefault();
+          cycleDisneyExtremeBaselineRedo();
+          return;
+        }
+        if (resolved.action === 'cycleBaselineRedoPrev') {
+          ev.preventDefault();
+          cycleDisneyExtremeBaselineRedo({ prev: true });
+          return;
+        }
+        if (resolved.action === 'jumpBaselinePin') {
+          ev.preventDefault();
+          jumpDisneyExtremeBaselinePin();
+          return;
+        }
+        if (resolved.action === 'copyBaselineStacksSummary') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineStacksSummary();
+          return;
+        }
+        if (resolved.action === 'pasteBaselineStacksShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselineStacksShareUrl();
           return;
         }
         if (resolved.action === 'copyBaselineRedoJson') {

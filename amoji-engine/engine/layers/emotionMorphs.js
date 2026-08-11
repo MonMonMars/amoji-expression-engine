@@ -518,6 +518,7 @@ export const DISNEY_EXTREME_DEFAULTS = {
 export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'toggle', keys: ['x', 'X'], help: 'X', kind: 'action' },
   { id: 'toggleBodyApply', keys: ['b', 'B'], help: 'B body', kind: 'action' },
+  { id: 'pasteBaselineStacksShareUrl', help: 'Alt+B paste stacks', kind: 'note' },
   {
     id: 'nudgeShape',
     keys: { down: ['[', '{'], up: [']', '}'] },
@@ -549,6 +550,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
   { id: 'copySnapshotDiff', help: 'Shift+C copy diff', kind: 'note' },
   { id: 'resetDefaults', keys: ['r', 'R'], help: 'R reset', kind: 'action' },
+  { id: 'jumpBaselinePin', help: 'Alt+R jump pin', kind: 'note' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'copyHotkeyHelp', help: 'Alt+H copy help', kind: 'note' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
@@ -577,6 +579,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'mergeBaselineRedoJson', help: 'Alt+O merge redo', kind: 'note' },
   { id: 'undoBaseline', keys: ['u', 'U'], help: 'U undo base', kind: 'action' },
   { id: 'redoBaseline', help: 'Shift+U redo base', kind: 'note' },
+  { id: 'cycleBaselineRedoNext', help: 'Alt+U next redo', kind: 'note' },
+  { id: 'cycleBaselineRedoPrev', help: '⇧Alt+U prev redo', kind: 'note' },
   { id: 'copySnapshotShareUrl', keys: ['y', 'Y'], help: 'Y share link', kind: 'action' },
   { id: 'copyBaselineHistoryShareUrl', help: 'Shift+Y share hist', kind: 'note' },
   { id: 'copyBaselineRedoShareUrl', help: 'Alt+Y share redo', kind: 'note' },
@@ -592,6 +596,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showBaselineHistory', keys: ['l', 'L'], help: 'L hist list', kind: 'action' },
   { id: 'copyBaselineHistoryJson', help: 'Shift+L copy hist JSON', kind: 'note' },
   { id: 'showBaselineStacks', help: 'Alt+L stacks', kind: 'note' },
+  { id: 'copyBaselineStacksSummary', help: '⇧Alt+L copy stacks', kind: 'note' },
   { id: 'pasteBaselineHistoryJson', keys: ['i', 'I'], help: 'I paste hist', kind: 'action' },
   { id: 'mergeBaselineHistoryJson', help: 'Shift+I merge hist', kind: 'note' },
   {
@@ -2798,7 +2803,10 @@ export function decodeDisneyExtremeBaselineStacksHash(hashOrQuery) {
   if (!hashOrQuery || typeof hashOrQuery !== 'string') {
     return { ok: false, error: 'empty' };
   }
-  let raw = hashOrQuery.replace(/^#/, '');
+  let raw = hashOrQuery.trim();
+  const hashIdx = raw.indexOf('#');
+  if (hashIdx >= 0) raw = raw.slice(hashIdx + 1);
+  else raw = raw.replace(/^#/, '');
   const m = raw.match(
     new RegExp(`(?:^|&)?${DISNEY_EXTREME_STACKS_HASH_PARAM}=([^&]+)`),
   );
@@ -2902,6 +2910,21 @@ export function cycleDisneyExtremeBaselineFavoriteIndex(
  * @returns {number|null}
  */
 export function cycleDisneyExtremeBaselineHistoryIndex(
+  currentIndex,
+  length,
+  opts = {},
+) {
+  return cycleDisneyExtremeBaselineFavoriteIndex(currentIndex, length, opts);
+}
+
+/**
+ * Next/prev redo index for Alt+U / ⇧Alt+U cycling (same wrap rules as favorites).
+ * @param {number|null|undefined} currentIndex
+ * @param {number} length
+ * @param {{ prev?: boolean }} [opts]
+ * @returns {number|null}
+ */
+export function cycleDisneyExtremeBaselineRedoIndex(
   currentIndex,
   length,
   opts = {},
