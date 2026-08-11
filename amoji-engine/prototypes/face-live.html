@@ -199,6 +199,14 @@
       </div>
 
       <div class="group">
+        <div class="label">Compound emotion</div>
+        <select id="compoundSel" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;">
+          <option value="">— none (use single) —</option>
+        </select>
+        <div class="status" id="gaitStatus">gait —</div>
+      </div>
+
+      <div class="group">
         <div class="label">Intensity <span id="intensityVal">0.70</span></div>
         <input id="intensity" type="range" min="0" max="1.25" step="0.01" value="0.70" />
         <div class="meter"><i id="intensityMeter"></i></div>
@@ -244,7 +252,12 @@
           <button type="button" id="btnMoodFear">Mood: fear</button>
           <button type="button" id="btnLiveLink">Live Link pub</button>
         </div>
+        <div class="row">
+          <button type="button" id="btnLatency">Sim AI latency</button>
+          <button type="button" id="btnImprov">Improv noise</button>
+        </div>
         <div class="status" id="temporalStatus">step-out off · livelink off</div>
+        <div class="status" id="latencyStatus">latency idle</div>
       </div>
 
       <div class="group">
@@ -311,6 +324,18 @@
         PERSONAS,
       } from '/engine/layers/idleMode.js';
       import {
+        LatencyBridge,
+        improviseReaction,
+      } from '/engine/layers/latencyBridge.js';
+      import {
+        COMPOUNDS,
+        compoundToMorphWeights,
+      } from '/engine/layers/compoundEmotion.js';
+      import {
+        evaluateGait,
+        sampleWalkPose,
+      } from '/engine/layers/gait.js';
+      import {
         morphsToLiveLinkFrame,
       } from '/engine/export/liveLinkFace.js';
 
@@ -351,8 +376,23 @@
       const temporal = new TemporalLayer({ recipes: HI_RECIPES });
       temporal.setEmotion(emotion, intensity);
       const idle = new IdleController({ personaId: 'companion', arousal: 'calm' });
+      const latency = new LatencyBridge({ personaId: 'companion', lang: 'zh' });
+      let compoundId = '';
+      let walkPhase = 0;
       const temporalStatus = document.getElementById('temporalStatus');
       const idleStatus = document.getElementById('idleStatus');
+      const latencyStatus = document.getElementById('latencyStatus');
+      const gaitStatus = document.getElementById('gaitStatus');
+      const compoundSel = document.getElementById('compoundSel');
+      for (const [id, def] of Object.entries(COMPOUNDS)) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = `${def.label} (${def.secondary}+${def.primary})`;
+        compoundSel.appendChild(opt);
+      }
+      compoundSel.addEventListener('change', () => {
+        compoundId = compoundSel.value;
+      });
 
       function refreshTemporalStatus() {
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
@@ -682,6 +722,7 @@
 
       document.getElementById('personaSel').addEventListener('change', (e) => {
         idle.setPersona(e.target.value);
+        latency.personaId = e.target.value;
       });
       document.getElementById('arousalSeg').addEventListener('click', (ev) => {
         const btn = ev.target.closest('button[data-arousal]');
@@ -690,8 +731,34 @@
         document.querySelectorAll('#arousalSeg button').forEach((b) => {
           b.classList.toggle('active', b.dataset.arousal === idle.arousal);
         });
-        // map arousal to temporal tense flag
         temporal.tense = idle.arousal === 'tense' || idle.arousal === 'alert';
+      });
+
+      document.getElementById('btnLatency').addEventListener('click', (e) => {
+        if (latency.active) {
+          latency.resolve();
+          e.currentTarget.classList.remove('primary');
+        } else {
+          latency.start({ contextHint: emotion });
+          e.currentTarget.classList.add('primary');
+        }
+      });
+      document.getElementById('btnImprov').addEventListener('click', () => {
+        const r = improviseReaction({
+          stimulus: 'noise',
+          mood: temporal.moodEmotion || undefined,
+          personaId: idle.personaId,
+        });
+        temporal.setEmotion(r.emotion, r.intensity, { stepOutBefore: false });
+        emotion = r.emotion;
+        intensity = r.intensity;
+        intensityEl.value = String(intensity);
+        intensityEl.dispatchEvent(new Event('input'));
+        document.querySelectorAll('#emoGrid button').forEach((x) => {
+          x.classList.toggle('active', x.dataset.emo === emotion);
+        });
+        document.getElementById('hudEmo').textContent = emotion;
+        latencyStatus.textContent = `improv: ${r.note} (${r.adaptor})`;
       });
 
       function tick() {
@@ -739,13 +806,29 @@
         idleStatus.textContent = `${PERSONAS[idle.personaId]?.label || idle.personaId} · ${idleState.arousal} · ${idleState.variant} · ${idleState.breath.bpm.toFixed(0)} bpm · next ${idleState.nextVariantIn.toFixed(0)}s`;
 
         const temporalState = temporal.tick(dt);
+        const latencyState = latency.tick(dt);
+        if (latencyState.phase === 'waiting' && latencyState.emotionHint) {
+          // soft overlay: thinking during wait without wiping user emotion permanently
+        }
+        if (!latency.active && !latency.recovering) {
+          document.getElementById('btnLatency').classList.remove('primary');
+        }
+        latencyStatus.textContent = latencyState.phase === 'waiting'
+          ? `${latencyState.tier} · ${latencyState.elapsed?.toFixed?.(1) || 0}s · ${latencyState.filler?.text || '…'} · ${latencyState.adaptor || ''}`
+          : latencyState.phase === 'recovery'
+            ? 'recovery → focused idle'
+            : 'latency idle';
+
         const morphs = availableMorphs();
-        const targets = emotionToMorphWeights(
-          lod,
-          temporalState.displayEmotion,
-          temporalState.displayIntensity,
-          morphs,
-        );
+        let displayEmo = temporalState.displayEmotion;
+        let displayInt = temporalState.displayIntensity;
+        if (latencyState.phase === 'waiting' && latencyState.emotionHint) {
+          displayEmo = latencyState.emotionHint;
+          displayInt = Math.max(displayInt * 0.35, latencyState.intensityHint || 0.3);
+        }
+        let targets = compoundId
+          ? compoundToMorphWeights(compoundId, displayInt, morphs)
+          : emotionToMorphWeights(lod, displayEmo, displayInt, morphs);
         if (idleState.channels.softSmile > 0.01 && lod === 'hi') {
           if (morphs.includes('Expressions_mouthSmile_max')) {
             targets.Expressions_mouthSmile_max = Math.max(
@@ -765,11 +848,25 @@
         }
         mergeMorphOverlays(targets, temporalState.leakWeights);
 
+        // Gait HUD + subtle vertical bounce from walk cycle when spin/idle
+        const gaitOut = evaluateGait(compoundId ? COMPOUNDS[compoundId].primary : emotion, intensity);
+        walkPhase = (walkPhase + dt * gaitOut.gait.cadence * 1.2) % 1;
+        const walk = sampleWalkPose(gaitOut.gait, walkPhase);
+        gaitStatus.textContent = `${gaitOut.emotion} · spd ${gaitOut.gait.walkSpeed.toFixed(2)} · stride ${gaitOut.gait.strideLength.toFixed(2)} · arm ${gaitOut.gait.armSwingOrigin} · ${gaitOut.gait.footstepWeight}`;
+        if (idleOn && model && !mixer) {
+          model.position.y += walk.vertical * 0.5;
+        }
+
         // Eye look-at (HI Expression_*). Track camera ≈ head-relative aim.
         if (lod === 'hi') {
           let lx = lookX;
           let ly = lookY;
-          if (trackCamera && model) {
+          if (latencyState.phase === 'waiting') {
+            lx = latencyState.lookX;
+            ly = latencyState.lookY;
+            lookXVal.textContent = lx.toFixed(2);
+            lookYVal.textContent = ly.toFixed(2);
+          } else if (trackCamera && model) {
             const head = new THREE.Vector3(0, 1.55, 0);
             model.localToWorld(head);
             const toCam = camera.position.clone().sub(head).normalize();

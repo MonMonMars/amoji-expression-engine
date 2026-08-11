@@ -51,6 +51,29 @@ export {
   IdleController,
 } from './layers/idleMode.js';
 export {
+  LATENCY_THRESHOLDS,
+  FILLER_POOLS,
+  latencyTier,
+  pickFiller,
+  improviseReaction,
+  LatencyBridge,
+} from './layers/latencyBridge.js';
+export {
+  COMPOUNDS,
+  DEFAULT_OWNERSHIP,
+  classifyFaceRegion,
+  getCompound,
+  mergeByRegion,
+  evaluateCompound,
+  compoundToMorphWeights,
+} from './layers/compoundEmotion.js';
+export {
+  GAIT_NEUTRAL,
+  GAIT_BY_EMOTION,
+  evaluateGait,
+  sampleWalkPose,
+} from './layers/gait.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

@@ -41,6 +41,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Emotion buttons + intensity slider (hand-tuned subtle/medium/peak sculpts)
 - **Phase 3:** Step-Out next · Force leak · Mood fear · emotion-modulated blink
 - **Persona / Layer I:** companion·corporate·care·education·home + calm/alert/tense breath ladder (90s variant rotate)
+- **Compound emotions:** 6 region-locked blends (e.g. 開心的驚訝)
+- **Layer T:** Sim AI latency (gaze → pensive filler → secondary) + Improv noise
+- **Layer W gait HUD:** speed / stride / arm origin / footfall weight
 - **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
 - Idle sway / turntable / cycle emotions / blink

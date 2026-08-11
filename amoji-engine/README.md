@@ -15,7 +15,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 2 | Muscle M1–M21 perimeter + Preston Blair visemes + LOCKED/CLAMPED/OPEN mouth resolve | Done (MVP discrete) |
 | Phase 3 | Blink / micro-leak / Step-Out temporal layer + Live Link bridge | Done |
 | Phase 4 | Cohen–Massaro coarticulation + Layer I personas / breath / 90s idle | Done |
-| Phase 5+ | Layer T latency bridge, compound emotion engine, full Layer W gait… | Specced in `docs/source/` |
+| Phase 5 | Layer T latency bridge + compound emotions + Layer W gait | Done |
+| Phase 6+ | Full Layer G gesture stack, Surface Renderer levels, production TTS phoneme timing… | Specced |
 
 ## Quick start
 
@@ -50,7 +51,7 @@ Do **not** special-case the renderer for the new emotion.
 
 Mouth override is LOCKED / CLAMPED / OPEN (not additive). MBP always forces `jaw = 0`.
 
-**TODO:** Cohen–Massaro coarticulation (continuous blend) — MVP uses discrete per-character visemes. See `docs/source` coarticulation spec.
+Continuous speech: `performSpeech(text, emotion, t, { mode: 'coarticulated' })` uses Cohen–Massaro dominance functions (`engine/layers/coarticulation.js`).
 
 ## Docs
 

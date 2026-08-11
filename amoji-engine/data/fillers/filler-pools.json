@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "tiers": ["none", "gaze", "pensive", "secondary"],
+  "thresholdsSec": { "none": 0.3, "gaze": 1.0, "pensive": 3.0 },
+  "pools": {
+    "default": {
+      "pensive": [
+        { "zh": "等我諗吓⋯", "en": "Let me think about that..." },
+        { "zh": "唔~係喎,等一等⋯", "en": "Hmm, let's see..." },
+        { "zh": "好問題,等我諗清楚啲⋯", "en": "Good question — let me think it through..." }
+      ],
+      "secondary": [
+        { "zh": "唔好意思,俾我多少少時間", "en": "Sorry, just need a moment." },
+        { "zh": "網路好似有啲慢,等等", "en": "Bit slow today — hang on." }
+      ],
+      "ack": [
+        { "zh": "明白", "en": "Got it" },
+        { "zh": "係喎", "en": "Right..." }
+      ]
+    },
+    "corporate": {
+      "pensive": [
+        { "zh": "請稍等,我核對一下⋯", "en": "One moment while I check..." },
+        { "zh": "正在處理您的請求⋯", "en": "Processing your request..." }
+      ],
+      "secondary": [
+        { "zh": "仍在處理,請再等一下", "en": "Still working on that — thank you for waiting." }
+      ],
+      "ack": [
+        { "zh": "收到", "en": "Understood." }
+      ]
+    },
+    "companion": {
+      "pensive": [
+        { "zh": "等我諗吓先⋯", "en": "Hmm, give me a sec..." },
+        { "zh": "好問題喎⋯", "en": "Ooh, good one..." }
+      ],
+      "secondary": [
+        { "zh": "唔好意思呀,再等我一陣", "en": "Sorry — almost there." }
+      ],
+      "ack": [
+        { "zh": "嗯嗯", "en": "Mhm" }
+      ]
+    },
+    "care": {
+      "pensive": [
+        { "zh": "等我睇清楚啲⋯", "en": "Let me look carefully..." },
+        { "zh": "我慢慢同你核對⋯", "en": "I'll check that carefully with you..." }
+      ],
+      "secondary": [
+        { "zh": "唔好意思,想俾你準確答案", "en": "Sorry — I want to get this right for you." }
+      ],
+      "ack": [
+        { "zh": "我聽到喇", "en": "I hear you." }
+      ]
+    }
+  },
+  "adaptors": ["chinTouch", "headTurn", "napeTouch"],
+  "recoveryMs": 280
+}

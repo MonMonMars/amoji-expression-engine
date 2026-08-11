@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "note": "Compound emotions = region ownership, not 50/50 average (Martinez / Ekman).",
+  "defaultOwnership": {
+    "brow": "secondary",
+    "eye": "secondary",
+    "cheek": "primary",
+    "mouth": "primary",
+    "nose": "primary",
+    "jaw": "primary"
+  },
+  "compounds": {
+    "happy_surprised": {
+      "label": "開心的驚訝",
+      "primary": "happy",
+      "secondary": "surprised",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "primary", "jaw": "primary" }
+    },
+    "sad_angry": {
+      "label": "傷心的憤怒",
+      "primary": "sad",
+      "secondary": "angry",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "secondary", "jaw": "primary" }
+    },
+    "fear_disgust": {
+      "label": "恐懼的厭惡",
+      "primary": "disgust",
+      "secondary": "fear",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "primary", "jaw": "primary" }
+    },
+    "fear_surprised": {
+      "label": "恐懼的驚訝",
+      "primary": "fear",
+      "secondary": "surprised",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "primary", "jaw": "primary" }
+    },
+    "angry_disgust": {
+      "label": "憤怒的厭惡",
+      "primary": "disgust",
+      "secondary": "angry",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "primary", "jaw": "primary" }
+    },
+    "sad_fear": {
+      "label": "傷心的恐懼",
+      "primary": "sad",
+      "secondary": "fear",
+      "ownership": { "brow": "secondary", "eye": "secondary", "cheek": "primary", "mouth": "primary", "nose": "primary", "jaw": "primary" }
+    }
+  }
+}

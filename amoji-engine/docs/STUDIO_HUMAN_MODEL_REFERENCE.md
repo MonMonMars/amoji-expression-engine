@@ -131,9 +131,11 @@ Amoji engine (ND “systemic emotion”)
 8. ~~**Phase 3 timeline** (blink / leak / Step-Out)~~ ✓
 9. ~~**Cohen–Massaro coarticulation** (continuous visemes)~~ ✓
 10. ~~**Persona idle variants / Layer I breath ladder**~~ ✓
-11. Layer T latency bridge / improvised reaction
-12. Compound emotion engine (region-locked blends)
-13. Full Layer W gait styles
+11. ~~**Layer T latency bridge / improvised reaction**~~ ✓
+12. ~~**Compound emotion engine** (region-locked blends)~~ ✓
+13. ~~**Layer W gait styles**~~ ✓
+14. Full Layer G gesture stack (Emblem → Adaptor)
+15. Surface Renderer level switcher
 ---
 
 ## 7. What *not* to copy blindly
