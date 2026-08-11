@@ -253,6 +253,25 @@ export function continuityResidualDecayProgress(continuity, opts = {}) {
 }
 
 /**
+ * Reset residual peak tracking after deliver / line ingest.
+ * @param {{ residual?: { emotion?: string, intensity?: number } | null } | null} continuity
+ */
+export function resetContinuityResidualPeak(continuity) {
+  const hasResidual = hasContinuityResidual(continuity);
+  const peak = hasResidual ? continuity?.residual?.intensity ?? 0 : 0;
+  return applyComplianceGate(
+    {
+      kind: 'continuity_residual_peak_reset',
+      ok: true,
+      peak,
+      hasResidual,
+      emotion: continuity?.residual?.emotion ?? null,
+    },
+    {},
+  );
+}
+
+/**
  * Passive leakage: mood signature continuously under dialogue emotion.
  * @param {string} moodId
  * @param {number} baseline

@@ -291,6 +291,9 @@ Amoji engine (ND “systemic emotion”)
 168. ~~**Shift-drop auto-import** (`shouldAutoImportAuditViewsOnDrop` · Shift+drop)~~ ✓
 169. ~~**Residual decay HUD bar** (`continuityResidualDecayProgress` · `#discResidualBar`)~~ ✓
 170. ~~**Cancel on TTS endpoint Escape** (`tts_endpoint_escape_pick`)~~ ✓
+171. ~~**Alt-drop replace import** (`shouldAutoImportAuditViewsOnDrop` · Alt+drop · merge:false)~~ ✓
+172. ~~**Residual peak reset on deliver** (`resetContinuityResidualPeak` · deliver/ingest)~~ ✓
+173. ~~**Cancel on TTS endpoint Tab blur** (`tts_endpoint_tab_blur_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -322,4 +325,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further production polish (Alt-drop import replace, residual peak reset on deliver, endpoint Tab blur cancel).
+Next code increment: further production polish (Ctrl-drop import append-only, residual bar color by emotion, endpoint focus cancel).

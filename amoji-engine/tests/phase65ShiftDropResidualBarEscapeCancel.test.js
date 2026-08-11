@@ -47,6 +47,7 @@ describe('Phase 65 continuity residual decay progress', () => {
 describe('Phase 65 shift-drop auto-import', () => {
   it('auto-imports when shiftKey is held on drop', () => {
     expect(shouldAutoImportAuditViewsOnDrop({ shiftKey: true }).autoImport).toBe(true);
+    expect(shouldAutoImportAuditViewsOnDrop({ shiftKey: true }).merge).toBe(true);
     expect(shouldAutoImportAuditViewsOnDrop({ shiftKey: false }).autoImport).toBe(false);
   });
 });

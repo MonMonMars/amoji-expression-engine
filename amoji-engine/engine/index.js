@@ -210,6 +210,7 @@ export {
   decayContinuityResidual,
   tuneContinuityResidualIntensity,
   continuityResidualDecayProgress,
+  resetContinuityResidualPeak,
   passiveMoodLeak,
   canImprovise,
   discretionaryImprovise,

@@ -804,9 +804,9 @@
           id="prefsAuditImportViewsDropZone"
           class="status"
           style="margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center;"
-          title="Drop JSON · Shift+drop import · double-click import"
+          title="Drop JSON · Alt+drop replace · Shift+drop merge · double-click import"
         >
-          Drag & drop JSON · Shift+drop import · double-click import
+          Drag & drop JSON · Alt+drop replace · Shift+drop merge · double-click import
         </div>
         <label class="row" style="align-items:center;gap:8px;margin-top:6px;">
           <input id="prefsAuditImportStarredOnly" type="checkbox" />
@@ -879,6 +879,7 @@
         hasContinuityResidual,
         tuneContinuityResidualIntensity,
         continuityResidualDecayProgress,
+        resetContinuityResidualPeak,
       } from '/engine/layers/discretion.js';
       import {
         personaAllowsEasterEggs,
@@ -1419,6 +1420,7 @@
           reason !== 'tts_endpoint_paste_pick' &&
           reason !== 'tts_endpoint_enter_pick' &&
           reason !== 'tts_endpoint_escape_pick' &&
+          reason !== 'tts_endpoint_tab_blur_pick' &&
           reason !== 'deliver_residue_pick' &&
           reason !== 'continuity_residual_pick'
         ) {
@@ -2005,7 +2007,8 @@
             intensity,
             stepOutBefore: stepOutNext,
           });
-          discResidualPeak = cont.residual?.intensity ?? 0;
+          discContinuityResidualCompoundHandled = false;
+          discResidualPeak = resetContinuityResidualPeak(cont).peak;
           temporal.setEmotion(emotion, cont.intensity, { stepOutBefore: stepOutNext });
           intensity = cont.intensity;
           intensityEl.value = String(intensity);
@@ -2156,6 +2159,8 @@
       });
       document.getElementById('btnDiscDeliver').addEventListener('click', () => {
         cancelActiveCompoundLifecycle('deliver_pick');
+        discContinuityResidualCompoundHandled = false;
+        discResidualPeak = 0;
         const cont = discCtl.ingestLine({
           emotion,
           intensity,
@@ -2164,7 +2169,7 @@
         if (cont.residual) {
           cancelActiveCompoundLifecycle('deliver_residue_pick');
         }
-        discResidualPeak = cont.residual?.intensity ?? 0;
+        discResidualPeak = resetContinuityResidualPeak(cont).peak;
         discContStatus.textContent = cont.residual
           ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
           : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2841,13 +2846,18 @@
           refreshGatewayHealth();
         });
         const ttsEndpointEl = document.getElementById('ttsEndpoint');
+        let ttsEndpointTabbing = false;
         ttsEndpointEl?.addEventListener('change', () => {
           cancelActiveCompoundLifecycle('tts_endpoint_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
         ttsEndpointEl?.addEventListener('blur', () => {
-          cancelActiveCompoundLifecycle('tts_endpoint_blur_pick');
+          const reason = ttsEndpointTabbing
+            ? 'tts_endpoint_tab_blur_pick'
+            : 'tts_endpoint_blur_pick';
+          ttsEndpointTabbing = false;
+          cancelActiveCompoundLifecycle(reason);
           persistPrefs();
           syncGatewayHealthPoll();
         });
@@ -2863,6 +2873,7 @@
           syncGatewayHealthPoll();
         });
         ttsEndpointEl?.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Tab') ttsEndpointTabbing = true;
           if (ev.key === 'Enter') {
             cancelActiveCompoundLifecycle('tts_endpoint_enter_pick');
             persistPrefs();
@@ -3560,7 +3571,7 @@
           if (!prefsAuditImportPreviewText) {
             dropZone.classList.remove('has-preview');
             dropZone.textContent =
-              'Drag & drop JSON · Shift+drop import · double-click import';
+              'Drag & drop JSON · Alt+drop replace · Shift+drop merge · double-click import';
             return;
           }
           dropZone.classList.add('has-preview');
@@ -3604,7 +3615,7 @@
           );
           hintEl.textContent = hinted.ok && hinted.hint ? hinted.hint : '—';
         }
-        async function importAuditViewsText(text) {
+        async function importAuditViewsText(text, importOpts = {}) {
           const mergeStarredOnly = !!document.getElementById(
             'prefsAuditImportStarredOnly',
           )?.checked;
@@ -3624,8 +3635,9 @@
               'prefs · pick a folder for import folder filter';
             return { ok: false };
           }
+          const replace = !!importOpts.replace;
           const imported = auditSavedViews.importJson(text, {
-            merge: true,
+            merge: !replace,
             mergeStarredOnly,
             mergeStarredOnlyExplicit: mergeStarredOnly,
             toastInHashOnly: toastHashOnly,
@@ -3646,9 +3658,13 @@
           if (imported.toastInHashOnly) bits.push('toast hash');
           if (imported.folder) bits.push(`folder ${imported.folder}`);
           if (imported.fromExportMeta && bits.length) bits.push('from export');
-          prefsStatus.textContent = bits.length
-            ? `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`
-            : `prefs · views imported · ${imported.count}`;
+          if (replace) {
+            prefsStatus.textContent = `prefs · replaced · ${imported.count} views`;
+          } else if (bits.length) {
+            prefsStatus.textContent = `prefs · merge ${bits.join(' · ')} · +${imported.added || 0} · ~${imported.updated || 0} · skip ${imported.skipped || 0}`;
+          } else {
+            prefsStatus.textContent = `prefs · views imported · ${imported.count}`;
+          }
           prefsAuditImportPreviewText = '';
           prefsAuditImportPreviewLabel = '';
           refreshAuditImportDropZone();
@@ -3718,8 +3734,12 @@
               prefsAuditImportPreviewLabel = preview.ok ? preview.label : file.name;
               refreshAuditImportDropZone();
               refreshAuditImportInheritHint();
-              if (shouldAutoImportAuditViewsOnDrop({ shiftKey: ev.shiftKey }).autoImport) {
-                await importAuditViewsText(text);
+              const dropAction = shouldAutoImportAuditViewsOnDrop({
+                shiftKey: ev.shiftKey,
+                altKey: ev.altKey,
+              });
+              if (dropAction.autoImport) {
+                await importAuditViewsText(text, { replace: dropAction.replace });
                 return;
               }
               prefsStatus.className = 'status ok';

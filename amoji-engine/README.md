@@ -76,7 +76,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 63 | Toast hash import drag preview · TTS endpoint paste cancel · continuity residual morph overlay | Done |
 | Phase 64 | Import drag-drop UX · residual decay/tune · TTS endpoint Enter cancel | Done |
 | Phase 65 | Shift-drop auto-import · residual decay HUD bar · TTS Escape cancel | Done |
-| Phase 66+ | Further production polish… | Specced |
+| Phase 66 | Alt-drop replace import · residual peak reset on deliver · TTS Tab blur cancel | Done |
+| Phase 67+ | Further production polish… | Specced |
 
 ## Quick start
 
