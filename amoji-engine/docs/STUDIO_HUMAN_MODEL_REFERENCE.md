@@ -275,6 +275,9 @@ Amoji engine (ND “systemic emotion”)
 152. ~~**Toast hash view export filter** (`exportToastHash` · Export toast hash views)~~ ✓
 153. ~~**Cancel on disc stimulus change** (`stimulus_pick`)~~ ✓
 154. ~~**Cancel on script hold release** (`script_hold_release_pick`)~~ ✓
+155. ~~**Toast hash view import filter** (`toastInHashOnly` · import merge + inherit export meta)~~ ✓
+156. ~~**Cancel on TTS endpoint change** (`tts_endpoint_pick`)~~ ✓
+157. ~~**Cancel on disc deliver residue** (`deliver_residue_pick`)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -306,4 +309,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast hash view export filter, cancel on disc stimulus change, compound on script hold release).
+Next code increment: further polish (toast hash import UI inherit hints, TTS endpoint blur/input cancel, continuity residual in tick loop).

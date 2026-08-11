@@ -385,6 +385,8 @@ export function exportAuditSavedViewsJson(views, opts = {}) {
  *   mergeStarredOnlyExplicit?: boolean,
  *   folder?: string|null,
  *   folderExplicit?: boolean,
+ *   toastInHashOnly?: boolean,
+ *   toastInHashOnlyExplicit?: boolean,
  *   inheritExportMeta?: boolean,
  * }} [opts]
  */
@@ -411,10 +413,11 @@ export function resolveAuditViewsImportFilters(raw, opts = {}) {
     parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   const fromExportMeta =
     payload.kind === 'amoji.faceLive.prefsShareAudit.views' &&
-    (!!payload.starredOnly || !!payload.folder);
+    (!!payload.starredOnly || !!payload.folder || !!payload.toastInHashOnly);
   const inherit = opts.inheritExportMeta !== false;
 
   let mergeStarredOnly = !!opts.mergeStarredOnly;
+  let toastInHashOnly = !!opts.toastInHashOnly;
   let folder =
     opts.folder != null && String(opts.folder).trim() !== ''
       ? String(opts.folder).trim()
@@ -423,6 +426,9 @@ export function resolveAuditViewsImportFilters(raw, opts = {}) {
   if (inherit && fromExportMeta) {
     if (payload.starredOnly && !opts.mergeStarredOnlyExplicit && !opts.folderExplicit) {
       mergeStarredOnly = true;
+    }
+    if (payload.toastInHashOnly && !opts.toastInHashOnlyExplicit && !opts.folderExplicit) {
+      toastInHashOnly = true;
     }
     if (payload.folder && !opts.folderExplicit && !folder) {
       folder = String(payload.folder).trim();
@@ -434,9 +440,11 @@ export function resolveAuditViewsImportFilters(raw, opts = {}) {
       kind: 'prefs_share_audit_views_import_filters',
       ok: true,
       mergeStarredOnly,
+      toastInHashOnly,
       folder,
       fromExportMeta,
       exportStarredOnly: !!payload.starredOnly,
+      exportToastInHashOnly: !!payload.toastInHashOnly,
       exportFolder: payload.folder || null,
     },
     {},
@@ -449,6 +457,7 @@ export function resolveAuditViewsImportFilters(raw, opts = {}) {
  * @param {object[]} incoming
  * @param {{
  *   mergeStarredOnly?: boolean,
+ *   toastInHashOnly?: boolean,
  *   folder?: string|null,
  *   max?: number,
  *   now?: number,
@@ -460,6 +469,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
     normalizeAuditSavedView(v, { now: opts.now }),
   );
   const mergeStarredOnly = !!opts.mergeStarredOnly;
+  const toastInHashOnly = !!opts.toastInHashOnly;
   const folderFilter =
     opts.folder != null && String(opts.folder).trim() !== ''
       ? String(opts.folder).trim()
@@ -469,6 +479,10 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
   let skipped = 0;
   for (const v of incomingList) {
     if (mergeStarredOnly && !v.starred) {
+      skipped += 1;
+      continue;
+    }
+    if (toastInHashOnly && !v.toastInHashOnly) {
       skipped += 1;
       continue;
     }
@@ -502,6 +516,7 @@ export function mergeAuditSavedViewsImport(existing, incoming, opts = {}) {
       updated,
       skipped,
       mergeStarredOnly,
+      toastInHashOnly,
       folder: folderFilter,
       count: views.length,
     },
@@ -557,7 +572,7 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
     parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   const fromExportMeta =
     payload.kind === 'amoji.faceLive.prefsShareAudit.views' &&
-    (!!payload.starredOnly || !!payload.folder);
+    (!!payload.starredOnly || !!payload.folder || !!payload.toastInHashOnly);
   return applyComplianceGate(
     {
       kind: 'prefs_share_audit_views_import',
@@ -566,6 +581,7 @@ export function importAuditSavedViewsJson(raw, opts = {}) {
       count: views.length,
       merge: !!opts.merge,
       mergeStarredOnly: !!opts.mergeStarredOnly,
+      toastInHashOnly: !!payload.toastInHashOnly,
       folder: payload.folder || null,
       starredOnly: !!payload.starredOnly,
       fromExportMeta,
@@ -1362,6 +1378,8 @@ export function createAuditSavedViews(opts = {}) {
       const filters = resolveAuditViewsImportFilters(raw, {
         mergeStarredOnly: importOpts.mergeStarredOnly,
         mergeStarredOnlyExplicit: importOpts.mergeStarredOnlyExplicit,
+        toastInHashOnly: importOpts.toastInHashOnly,
+        toastInHashOnlyExplicit: importOpts.toastInHashOnlyExplicit,
         folder: importOpts.folder,
         folderExplicit: importOpts.folderExplicit,
         inheritExportMeta: importOpts.inheritExportMeta,
@@ -1369,6 +1387,7 @@ export function createAuditSavedViews(opts = {}) {
       if (!filters.ok) return filters;
 
       const mergeStarredOnly = filters.mergeStarredOnly;
+      const toastInHashOnly = filters.toastInHashOnly;
       const folder = filters.folder;
 
       const imported = importAuditSavedViewsJson(raw, {
@@ -1381,6 +1400,7 @@ export function createAuditSavedViews(opts = {}) {
       if (importOpts.merge) {
         const merged = mergeAuditSavedViewsImport(views, imported.views, {
           mergeStarredOnly,
+          toastInHashOnly,
           folder,
           max,
           now: importOpts.now,
@@ -1395,6 +1415,7 @@ export function createAuditSavedViews(opts = {}) {
             count: views.length,
             merge: true,
             mergeStarredOnly,
+            toastInHashOnly,
             folder,
             fromExportMeta: filters.fromExportMeta,
             added: merged.added,
@@ -1415,6 +1436,7 @@ export function createAuditSavedViews(opts = {}) {
           count: views.length,
           merge: !!importOpts.merge,
           mergeStarredOnly,
+          toastInHashOnly,
           folder,
           fromExportMeta: filters.fromExportMeta,
         },

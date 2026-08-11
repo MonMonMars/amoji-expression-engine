@@ -791,6 +791,10 @@
           <input id="prefsAuditImportFolderOnly" type="checkbox" />
           <span style="font-size:0.8rem;color:var(--muted)">Import merge folder filter</span>
         </label>
+        <label class="row" style="align-items:center;gap:8px;margin-top:4px;">
+          <input id="prefsAuditImportToastHashOnly" type="checkbox" />
+          <span style="font-size:0.8rem;color:var(--muted)">Import merge toast hash only</span>
+        </label>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
           <button type="button" id="btnPrefsAuditRenameView">Rename view</button>
@@ -1374,7 +1378,9 @@
           reason !== 'tts_preset_pick' &&
           reason !== 'auto_improv_pick' &&
           reason !== 'stimulus_pick' &&
-          reason !== 'script_hold_release_pick'
+          reason !== 'script_hold_release_pick' &&
+          reason !== 'tts_endpoint_pick' &&
+          reason !== 'deliver_residue_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2113,6 +2119,9 @@
           intensity,
           stepOutBefore: stepOutNext,
         });
+        if (cont.residual) {
+          cancelActiveCompoundLifecycle('deliver_residue_pick');
+        }
         discContStatus.textContent = cont.residual
           ? `continuity blend ${cont.blend.toFixed(2)} · residue ${cont.residual.emotion} ${cont.residual.intensity.toFixed(2)}`
           : `continuity clean · ${cont.emotion} @ ${cont.intensity.toFixed(2)}`;
@@ -2787,6 +2796,7 @@
           refreshGatewayHealth();
         });
         document.getElementById('ttsEndpoint')?.addEventListener('change', () => {
+          cancelActiveCompoundLifecycle('tts_endpoint_pick');
           persistPrefs();
           syncGatewayHealthPoll();
         });
@@ -3476,6 +3486,9 @@
             const folderOnly = !!document.getElementById(
               'prefsAuditImportFolderOnly',
             )?.checked;
+            const toastHashOnly = !!document.getElementById(
+              'prefsAuditImportToastHashOnly',
+            )?.checked;
             const folderEl = document.getElementById('prefsAuditViewFolder');
             const folder = folderOnly
               ? prefsAuditFolderFilter ||
@@ -3492,6 +3505,8 @@
               merge: true,
               mergeStarredOnly,
               mergeStarredOnlyExplicit: mergeStarredOnly,
+              toastInHashOnly: toastHashOnly,
+              toastInHashOnlyExplicit: toastHashOnly,
               folder: folder || null,
               folderExplicit: folderOnly,
               inheritExportMeta: true,
@@ -3505,6 +3520,7 @@
             prefsStatus.className = 'status ok';
             const bits = [];
             if (imported.mergeStarredOnly) bits.push('starred');
+            if (imported.toastInHashOnly) bits.push('toast hash');
             if (imported.folder) bits.push(`folder ${imported.folder}`);
             if (imported.fromExportMeta && bits.length) bits.push('from export');
             prefsStatus.textContent = bits.length
