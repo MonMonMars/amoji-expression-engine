@@ -533,6 +533,7 @@ export {
   sortAuditViewsByStar,
   filterAuditSavedViews,
   clearStarsInFolder,
+  pruneUnstarredViews,
   exportAuditSavedViewsJson,
   importAuditSavedViewsJson,
   renameAuditSavedView,
@@ -564,8 +565,10 @@ export {
   PROBE_TOAST_SOUND_FREQ,
   PROBE_TOAST_SOUND_BASE_GAIN,
   PROBE_TOAST_SOUND_DUCK_FACTOR,
+  PROBE_TOAST_SOUND_MIN_INTERVAL_MS,
   clampProbeToastVolume,
   effectiveProbeToastVolume,
+  resolveProbeToastSoundRateLimit,
   resolveProbeToastSound,
   createProbeToastSound,
 } from './ui/probeToastSound.js';

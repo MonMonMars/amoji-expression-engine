@@ -17,6 +17,9 @@ export const PROBE_TOAST_SOUND_BASE_GAIN = 0.035;
 /** Volume multiplier applied while the toast is pinned (ducked). */
 export const PROBE_TOAST_SOUND_DUCK_FACTOR = 0.35;
 
+/** Minimum ms between toast sound cues (rate-limit). */
+export const PROBE_TOAST_SOUND_MIN_INTERVAL_MS = 1200;
+
 /**
  * Clamp toast cue volume to [0, 1].
  * @param {unknown} value
@@ -26,6 +29,51 @@ export function clampProbeToastVolume(value, fallback = 1) {
   const n = Number(value);
   if (!Number.isFinite(n)) return Math.min(1, Math.max(0, fallback));
   return Math.min(1, Math.max(0, n));
+}
+
+/**
+ * Whether a toast cue is allowed under rate-limit.
+ * @param {{ lastPlayedAt?: number|null, now?: number, minIntervalMs?: number }} [opts]
+ */
+export function resolveProbeToastSoundRateLimit(opts = {}) {
+  const now = opts.now ?? Date.now();
+  const minIntervalMs = Math.max(
+    0,
+    Number(opts.minIntervalMs ?? PROBE_TOAST_SOUND_MIN_INTERVAL_MS) || 0,
+  );
+  const lastPlayedAt =
+    typeof opts.lastPlayedAt === 'number' ? opts.lastPlayedAt : null;
+  if (lastPlayedAt == null || minIntervalMs <= 0) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_sound',
+        ok: true,
+        play: true,
+        rateLimited: false,
+        lastPlayedAt,
+        minIntervalMs,
+        now,
+      },
+      {},
+    );
+  }
+  const elapsed = Math.max(0, now - lastPlayedAt);
+  const rateLimited = elapsed < minIntervalMs;
+  return applyComplianceGate(
+    {
+      kind: 'tts_gateway_health_probe_toast_sound',
+      ok: !rateLimited,
+      play: !rateLimited,
+      rateLimited,
+      reason: rateLimited ? 'rate_limit' : null,
+      lastPlayedAt,
+      minIntervalMs,
+      elapsedMs: elapsed,
+      retryAfterMs: rateLimited ? minIntervalMs - elapsed : 0,
+      now,
+    },
+    {},
+  );
 }
 
 /**
@@ -52,6 +100,9 @@ export function effectiveProbeToastVolume(opts = {}) {
  *   ducked?: boolean,
  *   duckFactor?: number,
  *   event?: string,
+ *   lastPlayedAt?: number|null,
+ *   now?: number,
+ *   minIntervalMs?: number,
  * }} [opts]
  */
 export function resolveProbeToastSound(opts = {}) {
@@ -62,6 +113,30 @@ export function resolveProbeToastSound(opts = {}) {
     ducked,
     duckFactor: opts.duckFactor,
   });
+  const rate = resolveProbeToastSoundRateLimit({
+    lastPlayedAt: opts.lastPlayedAt,
+    now: opts.now,
+    minIntervalMs: opts.minIntervalMs,
+  });
+  if (rate.rateLimited) {
+    return applyComplianceGate(
+      {
+        kind: 'tts_gateway_health_probe_toast_sound',
+        ok: false,
+        play: false,
+        reason: 'rate_limit',
+        frequencyHz: null,
+        durationMs: 0,
+        volume,
+        baseVolume,
+        ducked,
+        rateLimited: true,
+        elapsedMs: rate.elapsedMs,
+        retryAfterMs: rate.retryAfterMs,
+      },
+      {},
+    );
+  }
   if (opts.enabled === false || opts.muted) {
     return applyComplianceGate(
       {
@@ -145,6 +220,7 @@ export function resolveProbeToastSound(opts = {}) {
  *   enabled?: boolean,
  *   volume?: number,
  *   duckFactor?: number,
+ *   minIntervalMs?: number,
  *   AudioContext?: typeof AudioContext,
  *   now?: () => number,
  * }} [opts]
@@ -154,10 +230,16 @@ export function createProbeToastSound(opts = {}) {
   let muted = false;
   let volume = clampProbeToastVolume(opts.volume, 1);
   let ducked = false;
+  let lastPlayedAt = null;
   const duckFactor = clampProbeToastVolume(
     opts.duckFactor ?? PROBE_TOAST_SOUND_DUCK_FACTOR,
     PROBE_TOAST_SOUND_DUCK_FACTOR,
   );
+  const minIntervalMs = Math.max(
+    0,
+    Number(opts.minIntervalMs ?? PROBE_TOAST_SOUND_MIN_INTERVAL_MS) || 0,
+  );
+  const nowFn = opts.now || (() => Date.now());
   /** @type {AudioContext|null} */
   let ctx = null;
   const AC =
@@ -187,6 +269,12 @@ export function createProbeToastSound(opts = {}) {
     },
     get duckFactor() {
       return duckFactor;
+    },
+    get minIntervalMs() {
+      return minIntervalMs;
+    },
+    get lastPlayedAt() {
+      return lastPlayedAt;
     },
     setEnabled(on) {
       enabled = !!on;
@@ -266,6 +354,7 @@ export function createProbeToastSound(opts = {}) {
      * @param {{ tone?: string, event?: string, volume?: number, ducked?: boolean }} [playOpts]
      */
     play(playOpts = {}) {
+      const now = playOpts.now ?? nowFn();
       const resolved = resolveProbeToastSound({
         enabled,
         muted,
@@ -277,8 +366,12 @@ export function createProbeToastSound(opts = {}) {
         duckFactor,
         tone: playOpts.tone,
         event: playOpts.event || 'show',
+        lastPlayedAt,
+        now,
+        minIntervalMs,
       });
       if (!resolved.play) return resolved;
+      lastPlayedAt = now;
       try {
         const audio = ensureCtx();
         if (!audio) {

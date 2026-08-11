@@ -761,6 +761,7 @@
           <button type="button" id="btnPrefsAuditStarAll">Star all</button>
           <button type="button" id="btnPrefsAuditUnstarAll">Unstar all</button>
           <button type="button" id="btnPrefsAuditClearFolderStars">Clear folder stars</button>
+          <button type="button" id="btnPrefsAuditPruneUnstarred">Prune unstarred</button>
         </div>
         <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExportViews">Export views</button>
@@ -1296,7 +1297,8 @@
           reason !== 'stepout_pick' &&
           reason !== 'leak_pick' &&
           reason !== 'improv_pick' &&
-          reason !== 'arousal_pick'
+          reason !== 'arousal_pick' &&
+          reason !== 'robotwalk_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1318,7 +1320,8 @@
           reason === 'stepout_pick' ||
           reason === 'leak_pick' ||
           reason === 'improv_pick' ||
-          reason === 'arousal_pick'
+          reason === 'arousal_pick' ||
+          reason === 'robotwalk_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -1607,6 +1610,7 @@
         persistPrefs();
       });
       document.getElementById('btnRobotWalk').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('robotwalk_pick');
         robotWalkOn = !robotWalkOn;
         document.getElementById('btnRobotWalk').classList.toggle('primary', robotWalkOn);
         refreshRobotStatus();
@@ -3001,6 +3005,19 @@
           refreshAuditSavedViewsUi();
           prefsStatus.className = 'status ok';
           prefsStatus.textContent = `prefs · cleared ${out.changed} stars in ${folder}`;
+        });
+        document.getElementById('btnPrefsAuditPruneUnstarred')?.addEventListener('click', () => {
+          const folder = prefsAuditFolderFilter || null;
+          const out = auditSavedViews.pruneUnstarred(folder ? { folder } : {});
+          refreshAuditSavedViewsUi();
+          prefsStatus.className = out.removed ? 'status ok' : 'status warn';
+          prefsStatus.textContent = folder
+            ? out.removed
+              ? `prefs · pruned ${out.removed} unstarred in ${folder}`
+              : `prefs · no unstarred views in ${folder}`
+            : out.removed
+              ? `prefs · pruned ${out.removed} unstarred views`
+              : 'prefs · no unstarred views to prune';
         });
         (() => {
           const dragList = document.getElementById('prefsAuditViewsDragList');

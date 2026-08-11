@@ -121,6 +121,47 @@ export function clearStarsInFolder(views, folder, opts = {}) {
 }
 
 /**
+ * Remove unstarred views (optional folder scope).
+ * @param {object[]} views
+ * @param {{ folder?: string|null }} [opts]
+ */
+export function pruneUnstarredViews(views, opts = {}) {
+  const list = Array.isArray(views) ? views.slice() : [];
+  const folderFilter =
+    opts.folder != null && String(opts.folder).trim() !== ''
+      ? String(opts.folder).trim()
+      : null;
+  const kept = [];
+  let removed = 0;
+  for (const v of list) {
+    if (v?.starred) {
+      kept.push(v);
+      continue;
+    }
+    if (folderFilter) {
+      const vFolder = String(v?.folder || '').trim() || 'Inbox';
+      if (vFolder !== folderFilter) {
+        kept.push(v);
+        continue;
+      }
+    }
+    removed += 1;
+  }
+  return applyComplianceGate(
+    {
+      kind: 'prefs_share_audit_views_prune_unstarred',
+      ok: true,
+      views: kept,
+      removed,
+      folder: folderFilter,
+      count: kept.length,
+      starredCount: kept.filter((v) => v.starred).length,
+    },
+    {},
+  );
+}
+
+/**
  * Filter views by starred-only and/or folder.
  * @param {object[]} views
  * @param {{ starredOnly?: boolean, folder?: string|null }} [opts]
@@ -999,6 +1040,30 @@ export function createAuditSavedViews(opts = {}) {
           ok: true,
           folder: cleared.folder,
           changed: cleared.changed,
+          count: views.length,
+          starredCount: views.filter((v) => v.starred).length,
+          views: views.slice(),
+        },
+        {},
+      );
+    },
+    /**
+     * Delete unstarred views (optional folder scope).
+     * @param {{ folder?: string|null }} [pruneOpts]
+     */
+    pruneUnstarred(pruneOpts = {}) {
+      const pruned = pruneUnstarredViews(views, pruneOpts);
+      if (!pruned.ok) return pruned;
+      const removed = pruned.removed;
+      views = pruned.views;
+      save();
+      return applyComplianceGate(
+        {
+          kind: 'prefs_share_audit_views',
+          action: 'prune_unstarred',
+          ok: true,
+          removed,
+          folder: pruned.folder,
           count: views.length,
           starredCount: views.filter((v) => v.starred).length,
           views: views.slice(),
