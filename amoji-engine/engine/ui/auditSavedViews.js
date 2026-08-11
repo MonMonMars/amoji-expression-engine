@@ -23,6 +23,7 @@ export function normalizeAuditSavedView(raw, opts = {}) {
     query: raw?.query != null ? String(raw.query) : '',
     regex: !!raw?.regex,
     rangePreset: raw?.rangePreset || 'all',
+    toastInHashOnly: !!raw?.toastInHashOnly,
     savedAt: typeof raw?.savedAt === 'number' ? raw.savedAt : now,
   };
 }
@@ -42,6 +43,7 @@ export function snapshotAuditView(filters = {}, opts = {}) {
       query: filters.query,
       regex: filters.regex,
       rangePreset: filters.rangePreset,
+      toastInHashOnly: filters.toastInHashOnly,
     },
     { now: opts.now },
   );
@@ -642,6 +644,7 @@ export function compactAuditViewForShare(view) {
   if (v.query) out.q = v.query;
   if (v.regex) out.r = 1;
   if (v.rangePreset && v.rangePreset !== 'all') out.p = v.rangePreset;
+  if (v.toastInHashOnly) out.t = 1;
   return out;
 }
 
@@ -660,6 +663,7 @@ export function expandAuditViewFromShare(compact, opts = {}) {
       query: compact?.q ?? compact?.query,
       regex: compact?.r ?? compact?.regex,
       rangePreset: compact?.p || compact?.rangePreset,
+      toastInHashOnly: compact?.t ?? compact?.toastInHashOnly,
     },
     { now: opts.now },
   );

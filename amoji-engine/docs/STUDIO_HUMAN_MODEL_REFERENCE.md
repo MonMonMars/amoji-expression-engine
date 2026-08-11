@@ -300,4 +300,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (cancel on TTS synth/http, compound on script hold/clear, audit toast hash export filter).
+Next code increment: further polish (toast hash saved views, cancel on TTS preset change, compound on disc auto-improv).

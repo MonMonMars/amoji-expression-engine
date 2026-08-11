@@ -1216,15 +1216,18 @@
         prefsAuditQuery = view.query || '';
         prefsAuditRegex = !!view.regex;
         prefsAuditRange = view.rangePreset || 'all';
+        prefsAuditToastHashOnly = !!view.toastInHashOnly;
         const filterEl = document.getElementById('prefsAuditFilter');
         const searchEl = document.getElementById('prefsAuditSearch');
         const regexEl = document.getElementById('prefsAuditRegex');
         const rangeEl = document.getElementById('prefsAuditRange');
+        const toastHashEl = document.getElementById('prefsAuditToastHashOnly');
         const folderEl = document.getElementById('prefsAuditViewFolder');
         if (filterEl) filterEl.value = prefsAuditFilter;
         if (searchEl) searchEl.value = prefsAuditQuery;
         if (regexEl) regexEl.checked = prefsAuditRegex;
         if (rangeEl) rangeEl.value = prefsAuditRange;
+        if (toastHashEl) toastHashEl.checked = prefsAuditToastHashOnly;
         if (folderEl) folderEl.value = view.folder || '';
         refreshPrefsAuditUi();
       }
@@ -1365,7 +1368,9 @@
           reason !== 'tts_synth_pick' &&
           reason !== 'tts_http_pick' &&
           reason !== 'script_hold_pick' &&
-          reason !== 'clear_pick'
+          reason !== 'clear_pick' &&
+          reason !== 'tts_preset_pick' &&
+          reason !== 'auto_improv_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -2116,6 +2121,7 @@
         discContStatus.textContent = 'continuity cleared';
       });
       discAuto.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('auto_improv_pick');
         discCtl.setAutoImprovise(discAuto.checked, discStimulus.value || 'noise');
         discStatus.textContent = discAuto.checked
           ? `auto improv ON (${discStimulus.value})`
@@ -2420,6 +2426,7 @@
         }
         if (ttsAudioSync) ttsAudioSync.checked = savedPrefs.audioSync !== false;
         ttsPresetSel.addEventListener('change', () => {
+          cancelActiveCompoundLifecycle('tts_preset_pick');
           const applied = applyTtsPreset(ttsPresetSel.value, { persistBrowser: true });
           const el = document.getElementById('ttsEndpoint');
           if (applied.needsGateway) {
@@ -3025,6 +3032,7 @@
               query: prefsAuditQuery,
               regex: prefsAuditRegex,
               rangePreset: prefsAuditRange,
+              toastInHashOnly: prefsAuditToastHashOnly,
               folder,
             },
             { name, folder },
@@ -3727,6 +3735,7 @@
           discGapBar.style.width = `${Math.min(100, (discState.gapProgress || 0) * 100)}%`;
         }
         if (discState.autoReaction && !discState.autoReaction.blocked) {
+          cancelActiveCompoundLifecycle('auto_improv_pick');
           const r = discState.autoReaction;
           temporal.setEmotion(r.emotion, r.intensity, { stepOutBefore: false });
           emotion = r.emotion;
