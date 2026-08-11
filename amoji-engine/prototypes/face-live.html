@@ -917,8 +917,12 @@
             <button type="button" id="btnDisneyExtremePasteStacksShare">Paste stacks share <kbd>Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeMergeStacksShare">Merge stacks share <kbd>⇧Alt+B</kbd></button>
             <button type="button" id="btnDisneyExtremeSharePin">Share pin <kbd>Alt+C</kbd></button>
+            <button type="button" id="btnDisneyExtremePastePinShare">Paste pin share <kbd>⇧Alt+C</kbd></button>
             <button type="button" id="btnDisneyExtremePinSummary">Pin summary <kbd>Alt+D</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinSummary">Copy pin summary <kbd>⇧Alt+D</kbd></button>
             <button type="button" id="btnDisneyExtremePinBundle">Pin bundle <kbd>Alt+A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinBundle">Copy pin bundle <kbd>⇧Alt+A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinFp">Copy pin fp <kbd>⇧Alt+P</kbd></button>
             <button type="button" id="btnDisneyExtremeFocusPanel">Focus Extreme panel <kbd>Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
@@ -2083,6 +2087,95 @@
         flashDisneyExtremeStatus(
           `pin · ${formatDisneyExtremeBundleLabel(lastExtremeBaselineSnap)}`,
         );
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselinePinBundle() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        const text = formatDisneyExtremeBundleLabel(lastExtremeBaselineSnap);
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · pin · ${text}` : `copy failed · pin · ${text}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBaselinePinSummary() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        const text = formatDisneyExtremeBaselineHistoryEntry(
+          lastExtremeBaselineSnap,
+          { index: 1, kind: 'hist' },
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · pin · ${text}` : `copy failed · pin · ${text}`,
+        );
+        return ok;
+      }
+
+      async function copyDisneyExtremeBaselinePinFingerprint() {
+        if (!lastExtremeBaselineSnap) {
+          flashDisneyExtremeStatus('pin · none');
+          return false;
+        }
+        const fp = disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap);
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(fp);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · pin fp ${fp}` : `copy failed · pin fp ${fp}`,
+        );
+        return ok;
+      }
+
+      async function pasteDisneyExtremeBaselinePinShareUrl() {
+        let text = '';
+        try {
+          if (navigator.clipboard?.readText) {
+            text = await navigator.clipboard.readText();
+          }
+        } catch {
+          flashDisneyExtremeStatus('paste failed · pin share clipboard');
+          return false;
+        }
+        const decoded = decodeDisneyExtremeSnapshotHash(text);
+        if (!decoded.ok) {
+          flashDisneyExtremeStatus(
+            `paste failed · pin share · ${decoded.error}`,
+          );
+          return false;
+        }
+        setDisneyExtremeBaseline(decoded.snap);
+        const fp = disneyExtremeSnapshotFingerprintShort(decoded.snap);
+        flashDisneyExtremeStatus(`pasted · pin · fp ${fp}`);
         return true;
       }
 
@@ -3384,12 +3477,28 @@
         copyDisneyExtremeBaselinePinShareUrl();
       });
 
+      document.getElementById('btnDisneyExtremePastePinShare')?.addEventListener('click', () => {
+        pasteDisneyExtremeBaselinePinShareUrl();
+      });
+
       document.getElementById('btnDisneyExtremePinSummary')?.addEventListener('click', () => {
         flashDisneyExtremeBaselinePinSummary();
       });
 
+      document.getElementById('btnDisneyExtremeCopyPinSummary')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselinePinSummary();
+      });
+
       document.getElementById('btnDisneyExtremePinBundle')?.addEventListener('click', () => {
         flashDisneyExtremeBaselinePinBundle();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyPinBundle')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselinePinBundle();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyPinFp')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselinePinFingerprint();
       });
 
       document.getElementById('btnDisneyExtremeFocusPanel')?.addEventListener('click', () => {
@@ -4536,6 +4645,11 @@
           flashDisneyExtremeBaselinePinBundle();
           return;
         }
+        if (resolved.action === 'copyBaselinePinBundle') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselinePinBundle();
+          return;
+        }
         if (resolved.action === 'copySnapshotJson') {
           ev.preventDefault();
           copyDisneyExtremeSnapshotJson();
@@ -4709,6 +4823,21 @@
         if (resolved.action === 'showBaselinePin') {
           ev.preventDefault();
           flashDisneyExtremeBaselinePinSummary();
+          return;
+        }
+        if (resolved.action === 'copyBaselinePin') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselinePinSummary();
+          return;
+        }
+        if (resolved.action === 'copyBaselinePinFingerprint') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselinePinFingerprint();
+          return;
+        }
+        if (resolved.action === 'pasteBaselinePinShareUrl') {
+          ev.preventDefault();
+          pasteDisneyExtremeBaselinePinShareUrl();
           return;
         }
         if (resolved.action === 'focusExtremePanel') {
