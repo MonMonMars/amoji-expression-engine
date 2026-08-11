@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "types": {
+    "reward": {
+      "id": "reward",
+      "label": "Reward (Duchenne)",
+      "facs": ["AU6", "AU12", "AU25", "AU26"],
+      "symmetric": true,
+      "social": "genuine pleasure — rewards both parties",
+      "duchenne": true
+    },
+    "affiliative": {
+      "id": "affiliative",
+      "label": "Affiliative",
+      "facs": ["AU12", "AU14", "AU24"],
+      "symmetric": true,
+      "social": "polite bond-building — non-threatening",
+      "duchenne": false
+    },
+    "dominance": {
+      "id": "dominance",
+      "label": "Dominance",
+      "facs": ["AU5", "AU6", "AU9", "AU10", "AU12"],
+      "symmetric": false,
+      "social": "status / superiority display",
+      "duchenne": false
+    },
+    "laughter": {
+      "id": "laughter",
+      "label": "Laughter",
+      "facs": ["AU6", "AU12", "AU25", "AU26", "AU27"],
+      "symmetric": true,
+      "social": "highly social — contagious; independent of happy peak",
+      "duchenne": true,
+      "independentState": true
+    }
+  },
+  "personaDefaultSmile": {
+    "home": "reward",
+    "corporate": "affiliative",
+    "companion": "reward",
+    "education": "reward",
+    "care": "affiliative"
+  },
+  "personaLaughAllowed": {
+    "home": true,
+    "corporate": false,
+    "companion": true,
+    "education": true,
+    "care": false
+  },
+  "laughterIntensityGate": 0.8,
+  "contagionHalfLifeSec": 4.5,
+  "morphRecipes": {
+    "reward": {
+      "Expressions_mouthSmile_max": 0.85,
+      "Expressions_mouthSmileL_max": 0.55,
+      "Expressions_mouthSmileR_max": 0.55,
+      "Expressions_eyeSquintL_max": 0.55,
+      "Expressions_eyeSquintR_max": 0.55,
+      "Expressions_mouthSmileOpen_max": 0.25,
+      "Expressions_browsMidVert_min": 0.12
+    },
+    "affiliative": {
+      "Expressions_mouthSmile_max": 0.45,
+      "Expressions_mouthSmileL_max": 0.28,
+      "Expressions_mouthSmileR_max": 0.28,
+      "Expressions_mouthClosed_max": 0.35,
+      "Expressions_mouthBite_max": 0.12
+    },
+    "dominance": {
+      "Expressions_mouthSmile_max": 0.55,
+      "Expressions_mouthSmileL_max": 0.25,
+      "Expressions_mouthSmileR_max": 0.7,
+      "Expressions_eyeSquintL_max": 0.2,
+      "Expressions_eyeSquintR_max": 0.35,
+      "Expressions_browsMidVert_max": 0.35,
+      "Expressions_browOutVertL_max": 0.25,
+      "Expressions_browOutVertR_max": 0.4,
+      "Expressions_cheekSneerL_max": 0.2,
+      "Expressions_cheekSneerR_max": 0.35,
+      "Expressions_mouthOpenHalf_max": 0.15
+    },
+    "laughter": {
+      "Expressions_mouthSmileOpen_max": 0.9,
+      "Expressions_mouthSmileOpen2_max": 0.7,
+      "Expressions_mouthSmile_max": 0.95,
+      "Expressions_mouthSmileL_max": 0.7,
+      "Expressions_mouthSmileR_max": 0.7,
+      "Expressions_eyeSquintL_max": 0.75,
+      "Expressions_eyeSquintR_max": 0.75,
+      "Expressions_mouthOpenLarge_max": 0.55,
+      "Expressions_browsMidVert_min": 0.2
+    }
+  },
+  "laughBody": {
+    "headBobAmp": 0.22,
+    "headBobHz": 4.2,
+    "pdKp": 18,
+    "pdKd": 6.5,
+    "torsoGain": 0.55,
+    "shoulderGain": 0.7,
+    "pulseBreathAmp": 0.35
+  }
+}

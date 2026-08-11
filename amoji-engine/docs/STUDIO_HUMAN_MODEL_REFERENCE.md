@@ -138,6 +138,8 @@ Amoji engine (ND “systemic emotion”)
 15. ~~**Surface Renderer level switcher**~~ ✓
 16. ~~**Layer B neck/shoulder/breath** (`accessoryMuscleActivation`)~~ ✓
 17. ~~**TTS phoneme timing** → coarticulated visemes~~ ✓
+18. ~~**Smile typology** (reward / affiliative / dominance)~~ ✓
+19. ~~**Laughter** head-dominant → torso/shoulder PD + contagion freshness~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

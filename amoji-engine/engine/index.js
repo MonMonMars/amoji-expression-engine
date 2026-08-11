@@ -127,6 +127,25 @@ export {
   paralinguisticToHook,
 } from './layers/phonemeTiming.js';
 export {
+  SMILE_TYPES,
+  SMILE_MORPH_RECIPES,
+  PERSONA_DEFAULT_SMILE,
+  PERSONA_LAUGH_ALLOWED,
+  LAUGHTER_INTENSITY_GATE,
+  defaultSmileForPersona,
+  personaAllowsLaugh,
+  contagionFreshness,
+  scaleSmileRecipe,
+  evaluateSmile,
+  resolveHappyFamily,
+  pdStep,
+  sampleLaughBody,
+  evaluateLaugh,
+  happyFamilyMorphWeights,
+  applyLaughBones,
+  SmileLaughController,
+} from './layers/smileLaugh.js';
+export {
   EMOTIONS,
   HI_RECIPES,
   SCULPT_RECIPES,

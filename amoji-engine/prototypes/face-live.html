@@ -312,6 +312,20 @@
       </div>
 
       <div class="group">
+        <div class="label">Smile / Laugh</div>
+        <select id="smileSel" class="ctl">
+          <option value="reward">Reward (Duchenne)</option>
+          <option value="affiliative">Affiliative</option>
+          <option value="dominance">Dominance</option>
+        </select>
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnLaugh" class="primary">Laugh</button>
+          <button type="button" id="btnStopLaugh">Stop</button>
+        </div>
+        <div class="status" id="smileStatus">smile —</div>
+      </div>
+
+      <div class="group">
         <div class="label">Surface Renderer</div>
         <select id="surfaceSel" class="ctl"></select>
         <div class="status" id="surfaceStatus">surface —</div>
@@ -456,6 +470,11 @@
         applyBodyBones,
       } from '/engine/layers/neckShoulder.js';
       import {
+        SmileLaughController,
+        applyLaughBones,
+        defaultSmileForPersona,
+      } from '/engine/layers/smileLaugh.js';
+      import {
         SURFACE_LEVEL_IDS,
         getSurfaceLevel,
         renderSurface,
@@ -506,6 +525,7 @@
       const latency = new LatencyBridge({ personaId: 'companion', lang: 'zh' });
       const gestures = new GestureController({ anxiety: 0.35 });
       const bodyCtl = new BodyController();
+      const smileCtl = new SmileLaughController({ personaId: 'companion' });
       let compoundId = '';
       let walkPhase = 0;
       let surfaceLevel = 6;
@@ -521,9 +541,11 @@
       const gaitStatus = document.getElementById('gaitStatus');
       const gestureStatus = document.getElementById('gestureStatus');
       const bodyStatus = document.getElementById('bodyStatus');
+      const smileStatus = document.getElementById('smileStatus');
       const surfaceStatus = document.getElementById('surfaceStatus');
       const compoundSel = document.getElementById('compoundSel');
       const emblemSel = document.getElementById('emblemSel');
+      const smileSel = document.getElementById('smileSel');
       const surfaceSel = document.getElementById('surfaceSel');
       const surfaceOverlay = document.getElementById('surfaceOverlay');
       const glowOrb = document.getElementById('glowOrb');
@@ -892,6 +914,9 @@
       document.getElementById('personaSel').addEventListener('change', (e) => {
         idle.setPersona(e.target.value);
         latency.personaId = e.target.value;
+        smileCtl.setPersona(e.target.value);
+        smileSel.value = defaultSmileForPersona(e.target.value);
+        smileCtl.setSmileType(smileSel.value);
       });
       document.getElementById('arousalSeg').addEventListener('click', (ev) => {
         const btn = ev.target.closest('button[data-arousal]');
@@ -986,6 +1011,18 @@
         bodyStatus.textContent = 'sigh (exhale emphasis)';
       });
 
+      smileSel.addEventListener('change', () => {
+        smileCtl.setSmileType(smileSel.value);
+      });
+      document.getElementById('btnLaugh').addEventListener('click', () => {
+        smileCtl.startLaugh(Math.max(intensity, 0.85));
+        document.getElementById('btnLaugh').classList.add('primary');
+      });
+      document.getElementById('btnStopLaugh').addEventListener('click', () => {
+        smileCtl.stopLaugh();
+        document.getElementById('btnLaugh').classList.remove('primary');
+      });
+
       function tick() {
         const dt = clock.getDelta();
         frames += 1;
@@ -1054,6 +1091,28 @@
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, displayInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, displayInt, morphs);
+
+        // Smile typology / laughter (happy family subtypes)
+        const smileState = smileCtl.tick(dt, {
+          emotion: displayEmo,
+          intensity: displayInt,
+          availableMorphs: morphs,
+        });
+        if (smileState.active && smileState.morphs) {
+          if (smileState.kind === 'laughter' || displayEmo === 'happy' || displayEmo === 'smile_open') {
+            mergeMorphOverlays(targets, smileState.morphs);
+          }
+        }
+        if (smileState.kind === 'laughter') {
+          smileStatus.textContent = `LAUGH · fresh ${smileState.freshness?.toFixed?.(2) ?? '—'} · n=${smileCtl.consecutive}`;
+          document.getElementById('btnLaugh').classList.add('primary');
+        } else if (smileState.active) {
+          smileStatus.textContent = `${smileState.duchenne ? 'Duchenne' : 'non-Duchenne'} · ${smileState.label}`;
+          document.getElementById('btnLaugh').classList.remove('primary');
+        } else {
+          smileStatus.textContent = 'smile idle (non-happy emotion)';
+        }
+
         if (idleState.channels.softSmile > 0.01 && lod === 'hi') {
           if (morphs.includes('Expressions_mouthSmile_max')) {
             targets.Expressions_mouthSmile_max = Math.max(
@@ -1112,7 +1171,11 @@
           gazeLock,
         });
         if (model && boneMap.head) {
-          applyBodyBones(boneMap, boneRest, bodyState.pose, 1);
+          if (smileState.kind === 'laughter' && smileState.body) {
+            applyLaughBones(boneMap, boneRest, smileState.body, 1);
+          } else {
+            applyBodyBones(boneMap, boneRest, bodyState.pose, 1);
+          }
         }
         const b = bodyState.body;
         bodyStatus.textContent = `${bodyState.emotion} · ama ${b.accessoryMuscleActivation.toFixed(2)} · ${b.breathingMode} · ${bodyState.gazeCombo}${bodyState.threatFreezeT > 0 ? ' · FREEZE' : ''}${bodyState.sighT > 0 ? ' · sigh' : ''}`;

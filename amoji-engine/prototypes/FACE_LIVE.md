@@ -46,6 +46,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Layer W gait HUD:** speed / stride / arm origin / footfall weight
 - **Layer G gesture:** Emblem select / Wave / Speaking (Illustrator) / turn Regulators — Affect from emotion, Adaptor after ~3s gap; drives Sakura arm bones
 - **Layer B neck/shoulder:** emotion-driven head tilt + accessory-muscle breath; Threat freeze / Sigh; head-down×gaze lock → anger vs sad
+- **Smile / Laugh:** reward · affiliative · dominance (persona defaults); Laugh → head bob with PD-derived torso/shoulders + contagion freshness
 - **Surface Renderer L1–10:** same emotion → glow / pixel / emoji / mesh fidelity hints (uncanny risk chip); L1–3 abstract overlay
 - **Live Link pub** → `npm run livelink` bridge for Unreal
 - **Eye look-at** — track camera or manual X/Y; idle adds saccade noise on HI
@@ -64,6 +65,7 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Gait: `engine/layers/gait.js` + `data/gait/emotion-gait.json`
 - Gesture: `engine/layers/gesture.js` + `data/gestures/catalog.json`
 - Body: `engine/layers/neckShoulder.js` + `data/body/emotion-neck-shoulder.json`
+- Smile / laugh: `engine/layers/smileLaugh.js` + `data/emotions/smile-types.json`
 - Phoneme timing: `engine/layers/phonemeTiming.js` + `data/visemes/phoneme-to-viseme.json`
 - Surface: `engine/layers/surfaceRenderer.js` + `data/surface/levels.json`
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
