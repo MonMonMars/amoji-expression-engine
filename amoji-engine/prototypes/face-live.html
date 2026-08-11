@@ -1166,6 +1166,14 @@
             1.6,
         );
       }
+
+      function updateTierHintForDisneyExtreme() {
+        const disneyExtremeOn = disneyExtremeEl?.checked || false;
+        const disneyExtremeFactor = Number(disneyExtremeFactorEl?.value || 1.6);
+        const shapeFactor = disneyExtremeOn ? disneyExtremeFactor : 1;
+        const shapeInt = Math.min(2.0, intensity * shapeFactor);
+        if (tierHint) tierHint.textContent = tierLabel(shapeInt);
+      }
       if (disneyExtremeEyeFactorEl) {
         disneyExtremeEyeFactorEl.value = String(
           savedPrefs.disneyExtremeEyeFactor ?? disneyExtremeEyeFactorEl.value ?? 1.4,
@@ -1187,6 +1195,7 @@
         disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
         disneyExtremeEl.addEventListener('change', () => {
           disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+          updateTierHintForDisneyExtreme();
         });
       }
 
@@ -1198,7 +1207,10 @@
         };
         syncBodyUi();
         disneyExtremeBodyEl.addEventListener('change', syncBodyUi);
-        disneyExtremeEl?.addEventListener('change', syncBodyUi);
+        disneyExtremeEl?.addEventListener('change', () => {
+          syncBodyUi();
+          updateTierHintForDisneyExtreme();
+        });
       }
 
       const syncEyeMouthUi = () => {
@@ -1211,7 +1223,10 @@
         }
       };
       syncEyeMouthUi();
-      disneyExtremeEl?.addEventListener('change', syncEyeMouthUi);
+      disneyExtremeEl?.addEventListener('change', () => {
+        syncEyeMouthUi();
+        updateTierHintForDisneyExtreme();
+      });
 
       let lod = 'hi';
       let texLod = 'mid';
@@ -2248,7 +2263,7 @@
         intensity = Number(intensityEl.value);
         intensityVal.textContent = intensity.toFixed(2);
         intensityMeter.style.width = `${Math.min(100, (intensity / 2) * 100)}%`;
-        tierHint.textContent = tierLabel(intensity);
+        updateTierHintForDisneyExtreme();
         temporal.intensity = intensity;
       });
       intensityEl.addEventListener('change', () => persistPrefs());
