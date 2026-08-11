@@ -324,7 +324,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 311 | Extreme Shift+X enable Extreme | Done |
 | Phase 312 | Extreme Shift+B enable body | Done |
 | Phase 313 | Extreme ⇧Alt+X enable + focus | Done |
-| Phase 314+ | Further production polish… | Specced |
+| Phase 314 | Extreme ⇧Alt+T open More IO | Done |
+| Phase 315 | Extreme Shift+T toggle More IO | Done |
+| Phase 316 | Extreme Shift+H copy hist list | Done |
+| Phase 317 | Extreme Shift+R reset + all | Done |
+| Phase 318+ | Further production polish… | Specced |
 
 ## Quick start
 
