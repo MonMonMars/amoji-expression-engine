@@ -212,6 +212,9 @@ Amoji engine (ND “systemic emotion”)
 89. ~~**Probe toast focus trap** (`resolveProbeToastFocusTrap` · Tab cycle)~~ ✓
 90. ~~**Audit views export/import** (`exportAuditSavedViewsJson` / `importAuditSavedViewsJson`)~~ ✓
 91. ~~**Cancel compound on mood change** (mood picker clears lifecycle)~~ ✓
+92. ~~**Probe toast pause-on-hover** (`createProbeToastDismissTimer` · hover pauses dismiss)~~ ✓
+93. ~~**Audit views delete UI** (Delete view for selected saved view)~~ ✓
+94. ~~**Cancel compound on smile/laugh** (smile type / Laugh clears lifecycle)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -243,4 +246,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (toast pause-on-hover, views delete UI, cancel on smile/laugh mode).
+Next code increment: further polish (toast sticky pin, views rename, cancel on gaze mode).

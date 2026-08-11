@@ -534,6 +534,11 @@ export {
   createProbeToastFocusTrap,
 } from './ui/probeToastFocusTrap.js';
 export {
+  resolveProbeToastHoverPause,
+  computeProbeToastRemainingMs,
+  createProbeToastDismissTimer,
+} from './ui/probeToastDismiss.js';
+export {
   COMPOUND_TO_EMBLEM,
   COMPOUND_EMBLEM_HOLD_SEC,
   COMPOUND_EMBLEM_RELEASE_SEC,

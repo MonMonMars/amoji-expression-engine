@@ -703,6 +703,9 @@
           </label>
         </div>
         <div class="row" style="margin-top:4px;">
+          <button type="button" id="btnPrefsAuditDeleteView">Delete view</button>
+        </div>
+        <div class="row" style="margin-top:4px;">
           <button type="button" id="btnPrefsAuditExport">Export audit</button>
           <button type="button" id="btnPrefsAuditClear">Clear audit</button>
         </div>
@@ -805,6 +808,7 @@
       import { createPrefsShareAudit } from '/engine/ui/prefsShareAudit.js';
       import { createAuditSavedViews } from '/engine/ui/auditSavedViews.js';
       import { createProbeToastFocusTrap } from '/engine/ui/probeToastFocusTrap.js';
+      import { createProbeToastDismissTimer } from '/engine/ui/probeToastDismiss.js';
       import {
         listRemapProfiles,
         remapLiveLinkFrame,
@@ -975,12 +979,19 @@
       const prefsShareAudit = createPrefsShareAudit({ memory: false });
       const auditSavedViews = createAuditSavedViews({ memory: false });
       const probeToastFocusTrap = createProbeToastFocusTrap();
+      const probeToastDismiss = createProbeToastDismissTimer({
+        onExpire: () => {
+          const el = document.getElementById('probeDetailToast');
+          el?.classList.remove('show');
+          probeToastVisible = false;
+          probeToastFocusTrap.deactivate();
+        },
+      });
       let prefsAuditFilter = 'all';
       let prefsAuditQuery = '';
       let prefsAuditRegex = false;
       let prefsAuditRange = 'all';
       let lastProbeDetail = null;
-      let probeToastTimer = null;
       let probeToastVisible = false;
       function refreshPrefsAuditUi() {
         const fmt = prefsShareAudit.format({
@@ -1033,10 +1044,7 @@
         el?.classList.remove('show');
         probeToastVisible = false;
         probeToastFocusTrap.deactivate();
-        if (probeToastTimer) {
-          clearTimeout(probeToastTimer);
-          probeToastTimer = null;
-        }
+        probeToastDismiss.cancel();
       }
       function showProbeToast(detail) {
         const toast = describeHealthProbeToast(detail);
@@ -1047,7 +1055,7 @@
         const actionsEl = document.getElementById('probeToastActions');
         if (titleEl) titleEl.textContent = toast.title || 'Probe detail';
         if (detailEl) {
-          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss · tab cycle`;
+          detailEl.textContent = `${toast.detail || ''} · c copy · r re-probe · esc dismiss · tab cycle · hover pause`;
         }
         if (actionsEl) {
           actionsEl.innerHTML = '';
@@ -1066,12 +1074,7 @@
         el.classList.add('show');
         probeToastVisible = true;
         probeToastFocusTrap.activate(el);
-        if (probeToastTimer) clearTimeout(probeToastTimer);
-        probeToastTimer = setTimeout(() => {
-          el.classList.remove('show');
-          probeToastVisible = false;
-          probeToastFocusTrap.deactivate();
-        }, toast.dismissMs || 3800);
+        probeToastDismiss.start(toast.dismissMs || 3800);
       }
       function cancelActiveCompoundLifecycle(reason = 'emotion_pick') {
         if (!compoundCrossfade) return null;
@@ -1096,7 +1099,9 @@
           reason !== 'remap_pick' &&
           reason !== 'surface_pick' &&
           reason !== 'persona_pick' &&
-          reason !== 'mood_pick'
+          reason !== 'mood_pick' &&
+          reason !== 'smile_pick' &&
+          reason !== 'laugh_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled`;
         } else if (
@@ -1105,7 +1110,9 @@
           reason === 'remap_pick' ||
           reason === 'surface_pick' ||
           reason === 'persona_pick' ||
-          reason === 'mood_pick'
+          reason === 'mood_pick' ||
+          reason === 'smile_pick' ||
+          reason === 'laugh_pick'
         ) {
           fingerStatus.textContent = `fingers · lifecycle cancelled · ${reason.replace('_pick', '')}`;
         }
@@ -2234,6 +2241,15 @@
           if (!btn) return;
           runProbeToastAction(btn.dataset.action);
         });
+        const probeToastEl = document.getElementById('probeDetailToast');
+        probeToastEl?.addEventListener('pointerenter', () => {
+          if (!probeToastVisible) return;
+          probeToastDismiss.handleHover('pointerenter', { visible: true });
+        });
+        probeToastEl?.addEventListener('pointerleave', () => {
+          if (!probeToastVisible) return;
+          probeToastDismiss.handleHover('pointerleave', { visible: true });
+        });
         document.addEventListener('keydown', (ev) => {
           if (!probeToastVisible) return;
           if (ev.key === 'Tab') {
@@ -2506,6 +2522,21 @@
           const got = auditSavedViews.get(id);
           if (got.ok && got.view) applyAuditView(got.view);
         });
+        document.getElementById('btnPrefsAuditDeleteView')?.addEventListener('click', () => {
+          const sel = document.getElementById('prefsAuditSavedViews');
+          const id = sel?.value || '';
+          if (!id) {
+            prefsStatus.className = 'status bad';
+            prefsStatus.textContent = 'prefs · pick a saved view to delete';
+            return;
+          }
+          const removed = auditSavedViews.remove(id);
+          refreshAuditSavedViewsUi('');
+          prefsStatus.className = removed.ok ? 'status ok' : 'status bad';
+          prefsStatus.textContent = removed.ok
+            ? 'prefs · saved view deleted'
+            : 'prefs · delete view failed';
+        });
         document.getElementById('btnPrefsAuditExportViews')?.addEventListener('click', () => {
           const exported = auditSavedViews.exportJson();
           const blob = new Blob([exported.json], { type: 'application/json' });
@@ -2661,9 +2692,11 @@
       });
 
       smileSel.addEventListener('change', () => {
+        cancelActiveCompoundLifecycle('smile_pick');
         smileCtl.setSmileType(smileSel.value);
       });
       document.getElementById('btnLaugh').addEventListener('click', () => {
+        cancelActiveCompoundLifecycle('laugh_pick');
         smileCtl.startLaugh(Math.max(intensity, 0.85));
         document.getElementById('btnLaugh').classList.add('primary');
       });
