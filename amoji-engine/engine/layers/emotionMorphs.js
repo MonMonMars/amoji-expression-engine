@@ -887,7 +887,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'rootsStrip', help: 'roots strip · live', kind: 'note' },
   { id: 'activeStrip', help: 'active strip · live · dbl-click copy', kind: 'note' },
   { id: 'pinStrip', help: 'pin strip · live', kind: 'note' },
-  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin/dirty/curves', kind: 'note' },
+  { id: 'hudBundle', help: 'hud bundle · tips/roots/cap/active/pin/dirty/factors/curves', kind: 'note' },
   {
     id: 'showBaselineDirtyStrip',
     keys: ['Home'],
@@ -900,6 +900,9 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     help: 'End copy dirty',
     kind: 'action',
   },
+  { id: 'showBaselineAllStrips', help: 'Alt+Home all strips', kind: 'note' },
+  { id: 'copyBaselineAllStrips', help: 'Alt+End copy all strips', kind: 'note' },
+  { id: 'allStrips', help: 'all strips · bundle', kind: 'note' },
   { id: 'dirtyStrip', help: 'dirty strip · live', kind: 'note' },
   {
     id: 'toggleBaselineStrips',
@@ -2531,6 +2534,10 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
  *   bodyMarkerT?: number,
  *   neckBlend?: number,
  *   bodyMix?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2555,6 +2562,14 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
     fp: opts.fp,
     changeCount: opts.changeCount,
   });
+  const factors = formatDisneyExtremeBaselineFactorsStripLabel({
+    enabled: opts.enabled,
+    shapeFactor: opts.shapeFactor,
+    bodyOn: opts.bodyOn,
+    bodyFactor: opts.bodyFactor,
+    eyeFactor: opts.eyeFactor,
+    mouthFactor: opts.mouthFactor,
+  });
   const curves = formatDisneyExtremeBaselineCurveStripsLabel({
     enabled: opts.enabled,
     markerT: opts.markerT ?? opts.shapeInt,
@@ -2564,12 +2579,12 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
     bodyMix: opts.bodyMix,
     bodyInt: opts.bodyInt,
   });
-  return `hud · ${capacity} · ${active} · ${pin} · ${dirty} · ${curves}`;
+  return `hud · ${capacity} · ${active} · ${pin} · ${dirty} · ${factors} · ${curves}`;
 }
 
 /**
  * Multiline Extreme HUD bundle for clipboard
- * (tips/roots/capacity/active/pin/dirty/curves).
+ * (tips/roots/capacity/active/pin/dirty/factors/curves).
  * @param {{
  *   history?: object[]|null,
  *   redo?: object[]|null,
@@ -2592,6 +2607,10 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
  *   bodyMarkerT?: number,
  *   neckBlend?: number,
  *   bodyMix?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
  * }} [opts]
  * @returns {string}
  */
@@ -2616,11 +2635,154 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
       fp: opts.fp,
       changeCount: opts.changeCount,
     }),
+    formatDisneyExtremeBaselineFactorsStripLabel({
+      enabled: opts.enabled,
+      shapeFactor: opts.shapeFactor,
+      bodyOn: opts.bodyOn,
+      bodyFactor: opts.bodyFactor,
+      eyeFactor: opts.eyeFactor,
+      mouthFactor: opts.mouthFactor,
+    }),
     formatDisneyExtremeBaselineCurveStripsLabel({
       enabled: opts.enabled,
       markerT: opts.markerT ?? opts.shapeInt,
       bodyOn: opts.bodyOn,
       bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+      neckBlend: opts.neckBlend,
+      bodyMix: opts.bodyMix,
+      bodyInt: opts.bodyInt,
+    }),
+  ].join('\n');
+}
+
+/**
+ * One-line Extreme all-strips readout (status flash).
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @param {{
+ *   historyIndex?: number|null,
+ *   redoIndex?: number|null,
+ *   favoriteIndex?: number|null,
+ *   pin?: object|null,
+ *   hasBaseline?: boolean,
+ *   dirty?: boolean,
+ *   fp?: string,
+ *   changeCount?: number,
+ *   enabled?: boolean,
+ *   shapeInt?: number,
+ *   markerT?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineAllStripsLabel(stacks = {}, opts = {}) {
+  const summary = formatDisneyExtremeBaselineStripsSummaryLabel(
+    stacks,
+    opts,
+  ).replace(/^strips · /, '');
+  const factors = formatDisneyExtremeBaselineFactorsStripLabel({
+    enabled: opts.enabled,
+    shapeFactor: opts.shapeFactor,
+    bodyOn: opts.bodyOn,
+    bodyFactor: opts.bodyFactor,
+    eyeFactor: opts.eyeFactor,
+    mouthFactor: opts.mouthFactor,
+  });
+  const curves = formatDisneyExtremeBaselineCurveStripsLabel({
+    enabled: opts.enabled,
+    markerT: opts.markerT ?? opts.shapeInt,
+    bodyOn: opts.bodyOn,
+    bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+    neckBlend: opts.neckBlend,
+    bodyMix: opts.bodyMix,
+    bodyInt: opts.bodyInt,
+  });
+  return `all · ${summary} · ${factors} · ${curves}`;
+}
+
+/**
+ * Multiline Extreme all-strips clipboard bundle.
+ * @param {{
+ *   history?: object[]|null,
+ *   redo?: object[]|null,
+ *   favorites?: object[]|null,
+ * }} [stacks]
+ * @param {{
+ *   historyIndex?: number|null,
+ *   redoIndex?: number|null,
+ *   favoriteIndex?: number|null,
+ *   pin?: object|null,
+ *   hasBaseline?: boolean,
+ *   dirty?: boolean,
+ *   fp?: string,
+ *   changeCount?: number,
+ *   enabled?: boolean,
+ *   shapeInt?: number,
+ *   markerT?: number,
+ *   bodyOn?: boolean,
+ *   bodyInt?: number,
+ *   bodyMarkerT?: number,
+ *   neckBlend?: number,
+ *   bodyMix?: number,
+ *   shapeFactor?: number,
+ *   bodyFactor?: number,
+ *   eyeFactor?: number,
+ *   mouthFactor?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineAllStripsBundle(
+  stacks = {},
+  opts = {},
+) {
+  return [
+    formatDisneyExtremeBaselineTipsLabel(stacks),
+    formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
+    formatDisneyExtremeBaselineRootsLabel(stacks),
+    formatDisneyExtremeBaselineActiveLabel({
+      historyIndex: opts.historyIndex,
+      redoIndex: opts.redoIndex,
+      favoriteIndex: opts.favoriteIndex,
+    }),
+    formatDisneyExtremeBaselinePinStripLabel(opts.pin),
+    formatDisneyExtremeBaselineDirtyStripLabel({
+      hasBaseline:
+        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+      dirty: opts.dirty,
+      fp: opts.fp,
+      changeCount: opts.changeCount,
+    }),
+    formatDisneyExtremeBaselineFactorsStripLabel({
+      enabled: opts.enabled,
+      shapeFactor: opts.shapeFactor,
+      bodyOn: opts.bodyOn,
+      bodyFactor: opts.bodyFactor,
+      eyeFactor: opts.eyeFactor,
+      mouthFactor: opts.mouthFactor,
+    }),
+    formatDisneyExtremeBaselineEaseStripLabel({
+      enabled: opts.enabled,
+      markerT: opts.markerT ?? opts.shapeInt,
+    }),
+    formatDisneyExtremeBaselineMixStripLabel({
+      enabled: opts.enabled,
+      bodyOn: opts.bodyOn,
+      markerT: opts.bodyMarkerT ?? opts.bodyInt,
+    }),
+    formatDisneyExtremeBaselineNeckStripLabel({
+      enabled: opts.enabled,
+      bodyOn: opts.bodyOn,
       neckBlend: opts.neckBlend,
       bodyMix: opts.bodyMix,
       bodyInt: opts.bodyInt,

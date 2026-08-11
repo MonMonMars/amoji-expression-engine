@@ -412,7 +412,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 399 | Extreme HUD bundle summary + curves | Done |
 | Phase 400 | Extreme HUD bundle clipboard + curves | Done |
 | Phase 401 | Extreme ⇧Alt+PageUp open curves | Done |
-| Phase 402+ | Further production polish… | Specced |
+| Phase 402 | Extreme HUD bundle summary + factors | Done |
+| Phase 403 | Extreme HUD bundle clipboard + factors | Done |
+| Phase 404 | Extreme all-strips formatters | Done |
+| Phase 405 | Extreme Alt+Home/End all strips | Done |
+| Phase 406+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -964,6 +964,8 @@
           <button type="button" id="btnDisneyExtremeCopyHudBundle">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStrip">Dirty strip <kbd>Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
+          <button type="button" id="btnDisneyExtremeAllStrips">All strips <kbd>Alt+Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStrips">Copy all strips <kbd>Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeCloseStrips">Close strips <kbd>Alt+PageUp</kbd></button>
@@ -1571,6 +1573,8 @@
         formatDisneyExtremeBaselineNeckStripLabel,
         formatDisneyExtremeBaselineCurveStripsLabel,
         formatDisneyExtremeBaselineCurveStripsBundle,
+        formatDisneyExtremeBaselineAllStripsLabel,
+        formatDisneyExtremeBaselineAllStripsBundle,
         formatDisneyExtremeNeckFactorsBundle,
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
@@ -2707,6 +2711,7 @@
       function disneyExtremeHudBundleActiveOpts() {
         const dirty = disneyExtremeDirtyStripOpts();
         const curves = disneyExtremeCurveStripOpts();
+        const factors = disneyExtremeFactorOpts();
         return {
           historyIndex: extremeHistoryJumpIndexActive,
           redoIndex: extremeRedoJumpIndexActive,
@@ -2716,13 +2721,57 @@
           dirty: dirty.dirty,
           fp: dirty.fp,
           changeCount: dirty.changeCount,
-          enabled: curves.enabled,
+          enabled: curves.enabled ?? factors.enabled,
           shapeInt: curves.shapeInt,
-          bodyOn: curves.bodyOn,
+          bodyOn: curves.bodyOn ?? factors.bodyOn,
           bodyInt: curves.bodyInt,
           neckBlend: curves.neckBlend,
           bodyMix: curves.bodyMix,
+          shapeFactor: factors.shapeFactor,
+          bodyFactor: factors.bodyFactor,
+          eyeFactor: factors.eyeFactor,
+          mouthFactor: factors.mouthFactor,
         };
+      }
+
+      function disneyExtremeAllStripsOpts() {
+        return {
+          ...disneyExtremeHudBundleActiveOpts(),
+        };
+      }
+
+      function flashDisneyExtremeBaselineAllStrips() {
+        openDisneyExtremeStrips();
+        const text = formatDisneyExtremeBaselineAllStripsLabel(
+          disneyExtremeHudBundleOpts(),
+          disneyExtremeAllStripsOpts(),
+        );
+        flashDisneyExtremeStatus(text);
+        return true;
+      }
+
+      async function copyDisneyExtremeBaselineAllStrips() {
+        const text = formatDisneyExtremeBaselineAllStripsBundle(
+          disneyExtremeHudBundleOpts(),
+          disneyExtremeAllStripsOpts(),
+        );
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        const summary = formatDisneyExtremeBaselineAllStripsLabel(
+          disneyExtremeHudBundleOpts(),
+          disneyExtremeAllStripsOpts(),
+        );
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${summary}` : `copy failed · ${summary}`,
+        );
+        return ok;
       }
 
       function flashDisneyExtremeBaselineHudBundle() {
@@ -4805,6 +4854,14 @@
 
       document.getElementById('btnDisneyExtremeCopyDirtyStrip')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineDirtyStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeAllStrips')?.addEventListener('click', () => {
+        flashDisneyExtremeBaselineAllStrips();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyAllStrips')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineAllStrips();
       });
 
       document.getElementById('btnDisneyExtremeToggleStrips')?.addEventListener('click', () => {
@@ -7004,6 +7061,16 @@
         if (resolved.action === 'copyBaselineDirtyStrip') {
           ev.preventDefault();
           copyDisneyExtremeBaselineDirtyStrip();
+          return;
+        }
+        if (resolved.action === 'showBaselineAllStrips') {
+          ev.preventDefault();
+          flashDisneyExtremeBaselineAllStrips();
+          return;
+        }
+        if (resolved.action === 'copyBaselineAllStrips') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineAllStrips();
           return;
         }
         if (resolved.action === 'toggleBaselineStrips') {

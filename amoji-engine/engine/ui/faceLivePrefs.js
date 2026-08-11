@@ -211,6 +211,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Alt+Enter` → copy Extreme HUD bundle (tips/roots/capacity/active/pin)
  * - `Home` → flash Extreme dirty/clean pin-drift strip
  * - `End` → copy Extreme dirty/clean pin-drift strip
+ * - `Alt+Home` → flash Extreme all-strips summary
+ * - `Alt+End` → copy Extreme all-strips bundle
  * - `PageUp` → toggle Extreme strips panel
  * - `Shift+PageUp` → open Extreme strips panel
  * - `Alt+PageUp` → close Extreme strips panel
@@ -489,6 +491,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     const insertKey = key === 'Insert';
     const pageDownKey = key === 'PageDown';
     const pageUpKey = key === 'PageUp';
+    const homeKey = key === 'Home';
+    const endKey = key === 'End';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -523,7 +527,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !enterKey &&
       !insertKey &&
       !pageDownKey &&
-      !pageUpKey
+      !pageUpKey &&
+      !homeKey &&
+      !endKey
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -888,6 +894,12 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       // Preserve Shift+Tab browser focus traversal.
       if (ev.shiftKey) return { ok: false, reason: 'modifier' };
       return { ok: true, action: 'focusExtremePanel' };
+    }
+    if (entry.id === 'showBaselineDirtyStrip' && ev.altKey) {
+      return { ok: true, action: 'showBaselineAllStrips' };
+    }
+    if (entry.id === 'copyBaselineDirtyStrip' && ev.altKey) {
+      return { ok: true, action: 'copyBaselineAllStrips' };
     }
     if (entry.id === 'showBaselineFactorsStrip' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineFactorsStrip' };

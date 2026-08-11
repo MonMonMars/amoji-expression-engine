@@ -30,6 +30,7 @@ describe('Phase 375 Extreme HUD bundle includes dirty', () => {
     );
     expect(summary).toContain('dirty · dirty×2 · fp cafe');
     expect(summary).toContain('curves ·');
+    expect(summary).toContain('factors ·');
     const bundle = formatDisneyExtremeBaselineHudBundleLabel(
       { history: [snap], redo: [], favorites: [] },
       {
@@ -39,11 +40,12 @@ describe('Phase 375 Extreme HUD bundle includes dirty', () => {
         fp: 'cafe',
       },
     );
-    expect(bundle.split('\n')).toHaveLength(7);
+    expect(bundle.split('\n')).toHaveLength(8);
     expect(bundle.split('\n')[5]).toBe('dirty · clean · fp cafe');
-    expect(bundle.split('\n')[6]).toMatch(/^curves · /);
+    expect(bundle.split('\n')[6]).toMatch(/^factors · /);
+    expect(bundle.split('\n')[7]).toMatch(/^curves · /);
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain(
-      'hud bundle · tips/roots/cap/active/pin/dirty/curves',
+      'hud bundle · tips/roots/cap/active/pin/dirty/factors/curves',
     );
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('disneyExtremeDirtyStripOpts()');

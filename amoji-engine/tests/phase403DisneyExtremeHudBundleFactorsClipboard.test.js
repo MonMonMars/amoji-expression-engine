@@ -9,12 +9,12 @@ import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-describe('Phase 400 Extreme HUD bundle clipboard includes curves', () => {
-  it('appends curves line to HUD clipboard bundle and Face Live passes curve opts', () => {
+describe('Phase 403 Extreme HUD bundle clipboard includes factors', () => {
+  it('inserts factors line before curves in HUD clipboard bundle', () => {
     const snap = buildDisneyExtremeLiveSnapshot({
       enabled: true,
       intensity: 0.4,
-      shapeFactor: 1.1,
+      shapeFactor: 1.2,
     });
     const bundle = formatDisneyExtremeBaselineHudBundleLabel(
       { history: [snap], redo: [], favorites: [] },
@@ -23,10 +23,14 @@ describe('Phase 400 Extreme HUD bundle clipboard includes curves', () => {
         hasBaseline: true,
         dirty: true,
         changeCount: 1,
-        fp: 'beef',
+        fp: 'fac2',
         enabled: snap.enabled,
-        shapeInt: snap.shapeInt,
+        shapeFactor: snap.shapeFactor,
         bodyOn: snap.bodyOn,
+        bodyFactor: snap.bodyFactor,
+        eyeFactor: snap.eyeFactor,
+        mouthFactor: snap.mouthFactor,
+        shapeInt: snap.shapeInt,
         bodyInt: snap.bodyInt,
         neckBlend: snap.neckBlend,
         bodyMix: snap.bodyMix,
@@ -37,9 +41,7 @@ describe('Phase 400 Extreme HUD bundle clipboard includes curves', () => {
     expect(lines[6]).toMatch(/^factors · /);
     expect(lines[7]).toMatch(/^curves · /);
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain('disneyExtremeCurveStripOpts()');
-    expect(src).toContain('neckBlend: curves.neckBlend');
-    expect(src).toContain('disneyExtremeFactorOpts()');
     expect(src).toContain('shapeFactor: factors.shapeFactor');
+    expect(src).toContain('eyeFactor: factors.eyeFactor');
   });
 });

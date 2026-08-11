@@ -364,6 +364,8 @@ export {
   formatDisneyExtremeBaselinePinStripLabel,
   formatDisneyExtremeBaselineHudBundleSummary,
   formatDisneyExtremeBaselineHudBundleLabel,
+  formatDisneyExtremeBaselineAllStripsLabel,
+  formatDisneyExtremeBaselineAllStripsBundle,
   formatDisneyExtremeBaselineDirtyStripLabel,
   formatDisneyExtremeBaselineStripsSummaryLabel,
   formatDisneyExtremeBaselineChipPreviewLabel,
