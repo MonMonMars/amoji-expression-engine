@@ -103,7 +103,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 90 | TTS dragover/dragenter consistency test | Done |
 | Phase 91 | TTS drop reset/persist reliability test | Done |
 | Phase 92 | TTS dragstart no persist/sync test | Done |
-| Phase 93+ | Further production polish… | Specced |
+| Phase 93 | Prefs dropzone drag/meta wiring consistency test | Done |
+| Phase 94+ | Further production polish… | Specced |
 
 ## Quick start
 
