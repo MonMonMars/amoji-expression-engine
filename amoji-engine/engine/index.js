@@ -266,3 +266,18 @@ export {
   encodeLiveLinkLine,
   LiveLinkPublisher,
 } from './export/liveLinkFace.js';
+export {
+  ROBOT_CATALOG,
+  ROBOT_PACKS,
+  DEFAULT_ROBOT_PACK,
+  ROBOT_PROTOCOL,
+  listRobotPacks,
+  getRobotPack,
+  emotionToFaceHints,
+  mapFrameToJoints,
+  clampJoints,
+  robotJointsNonZero,
+  driveRobot,
+  encodeRobotLine,
+  RobotDriverPublisher,
+} from './export/robotDriver.js';

@@ -146,6 +146,7 @@ Amoji engine (ND “systemic emotion”)
 23. ~~**Body retarget** 40+ markers ↔ Layer B/W/G~~ ✓
 24. ~~**Layer D Actor Discretion** (continuity / leak / gap improv)~~ ✓
 25. ~~**Easter eggs** isolated namespace (default OFF, persona-locked)~~ ✓
+26. ~~**Robot driver packs** (face-servo-12 → upper-body → humanoid stub)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -177,4 +178,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment should prioritize **eyes + idle⊗emotion overlay**, not more skin pores.
+Next code increment: chassis-specific robot tuning + production polish (TTS wiring, Actor discretion UX depth).

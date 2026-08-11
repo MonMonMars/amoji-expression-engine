@@ -451,6 +451,16 @@
         <div class="label">ARKit 52 export (nonzero)</div>
         <pre id="arkitDebug">—</pre>
       </div>
+
+      <div class="group">
+        <div class="label">Robot driver (L10)</div>
+        <select id="robotPackSel" class="ctl"></select>
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="btnRobotWalk">Walk hips</button>
+        </div>
+        <div class="status" id="robotStatus">robot off</div>
+        <pre id="robotDebug">—</pre>
+      </div>
     </aside>
 
     <script type="importmap">
@@ -500,6 +510,11 @@
         morphWeightsToArkit,
         arkitNonZero,
       } from '/engine/export/arkitExporter.js';
+      import {
+        listRobotPacks,
+        driveRobot,
+        DEFAULT_ROBOT_PACK,
+      } from '/engine/export/robotDriver.js';
       import {
         texturePackUrls,
         applyTexturePack,
@@ -559,6 +574,9 @@
       const loadStatus = document.getElementById('loadStatus');
       const morphDebug = document.getElementById('morphDebug');
       const arkitDebug = document.getElementById('arkitDebug');
+      const robotDebug = document.getElementById('robotDebug');
+      const robotStatus = document.getElementById('robotStatus');
+      const robotPackSel = document.getElementById('robotPackSel');
       const intensityEl = document.getElementById('intensity');
       const intensityVal = document.getElementById('intensityVal');
       const intensityMeter = document.getElementById('intensityMeter');
@@ -598,6 +616,8 @@
       let walkPhase = 0;
       let surfaceLevel = 6;
       let applySurfaceHints = true;
+      let robotPackId = DEFAULT_ROBOT_PACK;
+      let robotWalkOn = false;
       /** @type {Record<string, THREE.Object3D>} */
       let boneMap = {};
       /** @type {Record<string, { x: number, y: number, z: number }>} */
@@ -649,6 +669,25 @@
         if (id === surfaceLevel) opt.selected = true;
         surfaceSel.appendChild(opt);
       }
+      for (const pack of listRobotPacks()) {
+        const opt = document.createElement('option');
+        opt.value = pack.id;
+        opt.textContent = `${pack.label} (${pack.dof} DOF)`;
+        if (pack.id === robotPackId) opt.selected = true;
+        robotPackSel.appendChild(opt);
+      }
+      robotPackSel.addEventListener('change', () => {
+        robotPackId = robotPackSel.value || DEFAULT_ROBOT_PACK;
+        robotStatus.textContent = `pack ${robotPackId}`;
+      });
+      document.getElementById('btnRobotWalk').addEventListener('click', () => {
+        robotWalkOn = !robotWalkOn;
+        document.getElementById('btnRobotWalk').classList.toggle('primary', robotWalkOn);
+        robotStatus.textContent = robotWalkOn
+          ? `pack ${robotPackId} · walk ON`
+          : `pack ${robotPackId}`;
+      });
+      robotStatus.textContent = `pack ${robotPackId}`;
 
       function refreshTemporalStatus() {
         temporalStatus.textContent = `step-out ${stepOutNext ? 'ON' : 'off'} · livelink ${liveLinkOn ? 'ON' : 'off'} · mood ${temporal.moodEmotion || '—'}`;
@@ -1511,6 +1550,29 @@
           .slice(0, 12)
           .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
         arkitDebug.textContent = arkitLines.length ? arkitLines.join('\n') : '(all zero)';
+
+        if (frames % 3 === 0) {
+          const blinkW =
+            blinkT > 0 ? Math.sin((1 - blinkT / 0.18) * Math.PI) : temporalState?.blink || 0;
+          const robotFrame = driveRobot(robotPackId, {
+            emotion,
+            intensity,
+            lookX,
+            lookY,
+            blinkL: blinkW,
+            blinkR: blinkW,
+            timeSec: performance.now() / 1000,
+            walking: robotWalkOn,
+            gaitPhase: walkPhase,
+          });
+          const nz = robotFrame.nonzero || {};
+          const robotLines = Object.entries(nz)
+            .slice(0, 14)
+            .map(([k, v]) => `${k}: ${Number(v).toFixed(2)}`);
+          robotDebug.textContent = robotLines.length
+            ? `${robotFrame.packId} · ${robotFrame.dof}DOF\n${robotLines.join('\n')}`
+            : `(${robotPackId} rest)`;
+        }
 
         if (liveLinkOn && frames % 2 === 0) {
           const frame = morphsToLiveLinkFrame(targets);

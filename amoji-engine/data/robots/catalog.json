@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "note": "Hardware driver packs — map Amoji semantic frame → clamped servo/joint commands. Pure generation only; compliance-gated at export.",
+  "defaultPack": "face-servo-12",
+  "packs": {
+    "face-servo-12": {
+      "id": "face-servo-12",
+      "label": "Face servo (12 DOF)",
+      "productLine": "toy-robot",
+      "surfaceLevel": 10,
+      "rateHz": 30,
+      "protocol": "json-joints-v1",
+      "description": "Minimal expressive face for desktop / toy robots. Mouth owns jaw during speech.",
+      "joints": {
+        "brow_L": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "brow" },
+        "brow_R": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "brow" },
+        "lid_L": { "unit": "norm", "min": 0, "max": 1, "rest": 0, "region": "lid" },
+        "lid_R": { "unit": "norm", "min": 0, "max": 1, "rest": 0, "region": "lid" },
+        "eye_pan_L": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "eye" },
+        "eye_tilt_L": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "eye" },
+        "eye_pan_R": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "eye" },
+        "eye_tilt_R": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "eye" },
+        "jaw": { "unit": "norm", "min": 0, "max": 1, "rest": 0, "region": "mouth", "speechLocked": true },
+        "mouth_width": { "unit": "norm", "min": 0, "max": 1, "rest": 0.35, "region": "mouth", "speechLocked": true },
+        "mouth_corner_L": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "mouth" },
+        "mouth_corner_R": { "unit": "norm", "min": -1, "max": 1, "rest": 0, "region": "mouth" }
+      }
+    },
+    "upper-body-companion": {
+      "id": "upper-body-companion",
+      "label": "Upper-body companion",
+      "productLine": "companion-robot",
+      "surfaceLevel": 10,
+      "rateHz": 24,
+      "protocol": "json-joints-v1",
+      "description": "Head + neck + shoulders + arms. Face servos plus Layer B/G body channels.",
+      "extends": "face-servo-12",
+      "joints": {
+        "neck_pitch": { "unit": "rad", "min": -0.55, "max": 0.45, "rest": 0, "region": "neck" },
+        "neck_yaw": { "unit": "rad", "min": -0.7, "max": 0.7, "rest": 0, "region": "neck" },
+        "neck_roll": { "unit": "rad", "min": -0.35, "max": 0.35, "rest": 0, "region": "neck" },
+        "shoulder_L_lift": { "unit": "rad", "min": -0.2, "max": 0.85, "rest": 0.05, "region": "shoulder" },
+        "shoulder_R_lift": { "unit": "rad", "min": -0.2, "max": 0.85, "rest": 0.05, "region": "shoulder" },
+        "shoulder_L_protract": { "unit": "rad", "min": -0.25, "max": 0.35, "rest": 0, "region": "shoulder" },
+        "shoulder_R_protract": { "unit": "rad", "min": -0.25, "max": 0.35, "rest": 0, "region": "shoulder" },
+        "elbow_L": { "unit": "rad", "min": 0, "max": 2.2, "rest": 0.35, "region": "arm" },
+        "elbow_R": { "unit": "rad", "min": 0, "max": 2.2, "rest": 0.35, "region": "arm" },
+        "wrist_L": { "unit": "rad", "min": -0.8, "max": 0.8, "rest": 0, "region": "arm" },
+        "wrist_R": { "unit": "rad", "min": -0.8, "max": 0.8, "rest": 0, "region": "arm" }
+      }
+    },
+    "humanoid-stub": {
+      "id": "humanoid-stub",
+      "label": "Humanoid stub (legs)",
+      "productLine": "humanoid",
+      "surfaceLevel": 10,
+      "rateHz": 20,
+      "protocol": "json-joints-v1",
+      "description": "Extends companion with pelvis + legs for Layer W gait drive. Stub mapping — tune per chassis.",
+      "extends": "upper-body-companion",
+      "joints": {
+        "spine_bend": { "unit": "rad", "min": -0.4, "max": 0.35, "rest": 0, "region": "spine" },
+        "pelvis_yaw": { "unit": "rad", "min": -0.35, "max": 0.35, "rest": 0, "region": "pelvis" },
+        "hip_L": { "unit": "rad", "min": -0.6, "max": 0.9, "rest": 0, "region": "leg" },
+        "hip_R": { "unit": "rad", "min": -0.6, "max": 0.9, "rest": 0, "region": "leg" },
+        "knee_L": { "unit": "rad", "min": 0, "max": 1.8, "rest": 0.05, "region": "leg" },
+        "knee_R": { "unit": "rad", "min": 0, "max": 1.8, "rest": 0.05, "region": "leg" },
+        "ankle_L": { "unit": "rad", "min": -0.45, "max": 0.45, "rest": 0, "region": "leg" },
+        "ankle_R": { "unit": "rad", "min": -0.45, "max": 0.45, "rest": 0, "region": "leg" }
+      }
+    }
+  },
+  "emotionFaceHints": {
+    "happy": { "brow": 0.15, "lid": 0.08, "corner": 0.75 },
+    "smile_open": { "brow": 0.2, "lid": 0.12, "corner": 0.95, "jaw": 0.35 },
+    "sad": { "brow": -0.55, "lid": 0.25, "corner": -0.55 },
+    "angry": { "brow": -0.85, "lid": 0.15, "corner": -0.25 },
+    "fear": { "brow": 0.65, "lid": -0.15, "corner": -0.1, "jaw": 0.2 },
+    "disgust": { "brow": -0.35, "lid": 0.2, "corner": -0.4 },
+    "surprised": { "brow": 0.9, "lid": -0.35, "corner": 0.1, "jaw": 0.55 },
+    "thinking": { "brow": 0.25, "lid": 0.1, "corner": -0.05 },
+    "neutral": { "brow": 0, "lid": 0, "corner": 0 }
+  }
+}

@@ -55,7 +55,8 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - **Eye look-at / Layer E:** camera track or manual; gaze modes lock/avoid/scan/presentation/camera; Turn-start/end; VOR vs head; pupil scale
 - Idle sway / turntable / cycle emotions / blink
 - HUD: mesh LOD, tex LOD, surface, gesture, body, eyes, tris, emotion, FPS
-- Debug: active morphs + **ARKit 52** nonzero export preview
+- Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
+- **Robot driver packs** (Surface L10): face-servo-12 / upper-body-companion / humanoid-stub — clamped joint JSON
 
 ## Code
 
@@ -80,5 +81,6 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Coarticulation: `engine/layers/coarticulation.js` (Emotion Lab checkbox)
 - Textures: `engine/layers/textureLod.js`
 - ARKit / Live Link: `engine/export/arkitExporter.js`, `liveLinkFace.js`, `prototypes/livelink-bridge.mjs`
+- Robot drivers: `engine/export/robotDriver.js` + `data/robots/catalog.json`
 - Unreal: `assets/characters/jp-female-v0/UNREAL_LIVELINK.md`
 - Studio method reference: `docs/STUDIO_HUMAN_MODEL_REFERENCE.md`
