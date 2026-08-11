@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "transitionHalfLifeSec": 8,
+  "moods": {
+    "neutral": {
+      "label": "Neutral",
+      "baseline": 0,
+      "suppression": {},
+      "facilitation": {},
+      "signatureMorphs": {},
+      "gazeBias": "lock",
+      "anxiety": 0.2
+    },
+    "embarrassed": {
+      "label": "Embarrassed",
+      "baseline": 0.3,
+      "suppression": { "happy": 0.35, "smile_open": 0.4, "surprised": 0.15 },
+      "facilitation": { "fear": 0.1, "sad": 0.08 },
+      "signatureMorphs": {
+        "Expressions_eyeSquintL_max": 0.12,
+        "Expressions_eyeSquintR_max": 0.08,
+        "Expressions_mouthSmile_max": 0.08,
+        "Expressions_browsMidVert_min": 0.06
+      },
+      "gazeBias": "avoid",
+      "anxiety": 0.55
+    },
+    "anxious": {
+      "label": "Anxious",
+      "baseline": 0.35,
+      "suppression": { "happy": 0.25, "surprised": 0.15 },
+      "facilitation": { "fear": 0.2, "thinking": 0.1 },
+      "signatureMorphs": {
+        "Expressions_browsMidVert_max": 0.1,
+        "Expressions_eyeSquintL_max": 0.1,
+        "Expressions_eyeSquintR_max": 0.1,
+        "Expressions_mouthClosed_max": 0.08
+      },
+      "gazeBias": "idle_scan",
+      "anxiety": 0.7
+    },
+    "suspicious": {
+      "label": "Suspicious",
+      "baseline": 0.3,
+      "suppression": { "happy": 0.2, "smile_open": 0.25 },
+      "facilitation": { "thinking": 0.15, "angry": 0.08 },
+      "signatureMorphs": {
+        "Expressions_browSqueezeL_max": 0.14,
+        "Expressions_eyeSquintR_max": 0.18,
+        "Expressions_browsMidVert_min": 0.08
+      },
+      "gazeBias": "avoid",
+      "anxiety": 0.45
+    },
+    "tired": {
+      "label": "Tired",
+      "baseline": 0.25,
+      "suppression": { "happy": 0.3, "angry": 0.2, "surprised": 0.2 },
+      "facilitation": { "sad": 0.12 },
+      "signatureMorphs": {
+        "Expressions_eyeSquintL_max": 0.15,
+        "Expressions_eyeSquintR_max": 0.15,
+        "Expressions_browsMidVert_min": 0.1,
+        "Expressions_mouthClosed_max": 0.1
+      },
+      "gazeBias": "idle_scan",
+      "anxiety": 0.25
+    },
+    "content": {
+      "label": "Content",
+      "baseline": 0.2,
+      "suppression": { "angry": 0.2, "fear": 0.15 },
+      "facilitation": { "happy": 0.12, "smile_open": 0.1 },
+      "signatureMorphs": {
+        "Expressions_mouthSmile_max": 0.12,
+        "Expressions_eyeSquintL_max": 0.06,
+        "Expressions_eyeSquintR_max": 0.06
+      },
+      "gazeBias": "lock",
+      "anxiety": 0.15
+    },
+    "irritable": {
+      "label": "Irritable",
+      "baseline": 0.3,
+      "suppression": { "happy": 0.3, "smile_open": 0.35 },
+      "facilitation": { "angry": 0.18, "disgust": 0.1 },
+      "signatureMorphs": {
+        "Expressions_browsMidVert_min": 0.12,
+        "Expressions_browSqueezeL_max": 0.1,
+        "Expressions_browSqueezeR_max": 0.1,
+        "Expressions_mouthClosed_max": 0.12
+      },
+      "gazeBias": "lock",
+      "anxiety": 0.5
+    },
+    "melancholy": {
+      "label": "Melancholy",
+      "baseline": 0.35,
+      "suppression": { "happy": 0.4, "surprised": 0.2 },
+      "facilitation": { "sad": 0.2 },
+      "signatureMorphs": {
+        "Expressions_browsMidVert_max": 0.08,
+        "Expressions_mouthSmile_min": 0.1,
+        "Expressions_eyeSquintL_max": 0.05
+      },
+      "gazeBias": "avoid",
+      "anxiety": 0.35
+    }
+  }
+}

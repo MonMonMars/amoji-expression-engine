@@ -9,6 +9,7 @@ import { performSpeech } from './performSpeech.js';
 import { evaluateSmile, defaultSmileForPersona } from './smileLaugh.js';
 import { resolveGazeDirection } from './eyeAnchor.js';
 import { evaluateBody } from './neckShoulder.js';
+import { applyMoodBias, MoodController, getMoodDef, moodIdleBaseline } from './moodEngine.js';
 
 export const SCRIPT_GAZE = schema.gazeDirections;
 export const MOOD_SUPPRESSION = schema.moodSuppression;
@@ -114,20 +115,12 @@ export function normalizeScriptLine(raw) {
  * @param {number} intensity
  * @param {{ state?: string, baseline_intensity?: number } | null} mood
  */
-export function applyMoodBias(emotion, intensity, mood) {
-  if (!mood?.state) {
-    return { intensity, leakEmotion: null, leakIntensity: 0 };
-  }
-  const table = MOOD_SUPPRESSION[mood.state] || {};
-  const factor = table[emotion] ?? 0.1;
-  const base = mood.baseline_intensity ?? 0.25;
-  const suppressed = intensity * (1 - base * factor);
-  return {
-    intensity: Math.max(0, suppressed),
-    leakEmotion: mood.state === 'embarrassed' ? 'fear' : mood.state === 'suspicious' ? 'thinking' : null,
-    leakIntensity: base * 0.35,
-  };
+export function applyMoodBiasToLine(emotion, intensity, mood) {
+  return applyMoodBias(emotion, intensity, mood);
 }
+
+// Re-export canonical bias for callers that imported from scriptLine
+export { applyMoodBias, MoodController, getMoodDef, moodIdleBaseline };
 
 /**
  * Find compound id for primary+secondary pair if catalogued.
@@ -166,6 +159,11 @@ export function performScript(rawLine, context = {}) {
     emotionOut = evaluateEmotion(line.primary, intensity);
   }
   emotionOut = applyComplianceGate(emotionOut, context);
+
+  const moodBaseline =
+    line.mood?.state
+      ? moodIdleBaseline(line.mood.state, line.mood.baseline_intensity ?? getMoodDef(line.mood.state).baseline)
+      : null;
 
   const smileType =
     line.directions.smile || defaultSmileForPersona(line.persona);
@@ -211,6 +209,7 @@ export function performScript(rawLine, context = {}) {
         step_out_before: line.directions.step_out_before,
       },
       moodBias,
+      moodBaseline,
     },
     context,
   );

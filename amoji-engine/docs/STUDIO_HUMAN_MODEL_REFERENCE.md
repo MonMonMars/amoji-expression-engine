@@ -142,6 +142,8 @@ Amoji engine (ND “systemic emotion”)
 19. ~~**Laughter** head-dominant → torso/shoulder PD + contagion freshness~~ ✓
 20. ~~**Layer E** head–eye / VOR / pupil / Dyadic·Presentation gaze~~ ✓
 21. ~~**Layer 0 script** normalize + `performScript` pipeline~~ ✓
+22. ~~**Mood Engine** (bias / idle baseline / slow transition)~~ ✓
+23. ~~**Body retarget** 40+ markers ↔ Layer B/W/G~~ ✓
 ---
 
 ## 7. What *not* to copy blindly

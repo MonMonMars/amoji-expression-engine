@@ -366,6 +366,22 @@
       </div>
 
       <div class="group">
+        <div class="label">Layer -1 · Mood</div>
+        <select id="moodSel" class="ctl">
+          <option value="neutral">Neutral</option>
+          <option value="embarrassed">Embarrassed</option>
+          <option value="anxious">Anxious</option>
+          <option value="suspicious">Suspicious</option>
+          <option value="tired">Tired</option>
+          <option value="content">Content</option>
+          <option value="irritable">Irritable</option>
+          <option value="melancholy">Melancholy</option>
+        </select>
+        <div class="status" id="moodStatus">mood —</div>
+        <div class="status" id="retargetStatus">retarget —</div>
+      </div>
+
+      <div class="group">
         <div class="label">Persona / Layer I idle</div>
         <select id="personaSel" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:#121a22;color:var(--ink);font:inherit;">
           <option value="companion">Companion</option>
@@ -451,6 +467,13 @@
       import {
         EyeController,
       } from '/engine/layers/eyeAnchor.js';
+      import {
+        MoodController,
+      } from '/engine/layers/moodEngine.js';
+      import {
+        retargetBody,
+        BODY_POINT_COUNT,
+      } from '/engine/layers/bodyRetarget.js';
       import {
         morphWeightsToArkit,
         arkitNonZero,
@@ -545,6 +568,7 @@
       const bodyCtl = new BodyController();
       const smileCtl = new SmileLaughController({ personaId: 'companion' });
       const eyeCtl = new EyeController({ gaze: 'lock', pupilProfile: 'robot' });
+      const moodCtl = new MoodController({ state: 'neutral' });
       let gazeModeUi = 'manual';
       let compoundId = '';
       let walkPhase = 0;
@@ -563,10 +587,13 @@
       const bodyStatus = document.getElementById('bodyStatus');
       const smileStatus = document.getElementById('smileStatus');
       const eyeStatus = document.getElementById('eyeStatus');
+      const moodStatus = document.getElementById('moodStatus');
+      const retargetStatus = document.getElementById('retargetStatus');
       const surfaceStatus = document.getElementById('surfaceStatus');
       const compoundSel = document.getElementById('compoundSel');
       const emblemSel = document.getElementById('emblemSel');
       const smileSel = document.getElementById('smileSel');
+      const moodSel = document.getElementById('moodSel');
       const gazeModeSel = document.getElementById('gazeModeSel');
       const surfaceSel = document.getElementById('surfaceSel');
       const surfaceOverlay = document.getElementById('surfaceOverlay');
@@ -912,6 +939,9 @@
         gazeModeUi = 'lock';
         gazeModeSel.value = 'lock';
       });
+      moodSel.addEventListener('change', () => {
+        moodCtl.setMood(moodSel.value);
+      });
 
       document.getElementById('btnIdle').addEventListener('click', (e) => {
         idleOn = !idleOn;
@@ -1125,8 +1155,16 @@
             : 'latency idle';
 
         const morphs = availableMorphs();
+        const moodState = moodCtl.tick(dt);
+        moodStatus.textContent = moodState.transitioning
+          ? `${moodState.state}→${moodState.targetState} · base ${moodState.baseline.toFixed(2)}`
+          : `${moodState.state} · base ${moodState.baseline.toFixed(2)} · anx ${moodState.anxiety.toFixed(2)}`;
+        gestures.anxiety = moodState.anxiety;
+
         let displayEmo = temporalState.displayEmotion;
         let displayInt = temporalState.displayIntensity;
+        const biased = moodState.bias(displayEmo, displayInt);
+        displayInt = biased.intensity;
         if (latencyState.phase === 'waiting' && latencyState.emotionHint) {
           displayEmo = latencyState.emotionHint;
           displayInt = Math.max(displayInt * 0.35, latencyState.intensityHint || 0.3);
@@ -1134,6 +1172,9 @@
         let targets = compoundId
           ? compoundToMorphWeights(compoundId, displayInt, morphs)
           : emotionToMorphWeights(lod, displayEmo, displayInt, morphs);
+        if (moodState.morphs && Object.keys(moodState.morphs).length) {
+          mergeMorphOverlays(targets, moodState.morphs);
+        }
 
         // Smile typology / laughter (happy family subtypes)
         const smileState = smileCtl.tick(dt, {
@@ -1186,7 +1227,10 @@
 
         // Layer G — Emblem > Illustrator/Regulator > Affect > Adaptor
         const anxiety =
-          idle.arousal === 'tense' ? 0.7 : idle.arousal === 'alert' ? 0.45 : 0.25;
+          Math.max(
+            moodState.anxiety,
+            idle.arousal === 'tense' ? 0.7 : idle.arousal === 'alert' ? 0.45 : 0.25,
+          );
         const gestureState = gestures.tick(dt, {
           emotion: displayEmo,
           intensity: displayInt,
@@ -1223,6 +1267,19 @@
         const b = bodyState.body;
         bodyStatus.textContent = `${bodyState.emotion} · ama ${b.accessoryMuscleActivation.toFixed(2)} · ${b.breathingMode} · ${bodyState.gazeCombo}${bodyState.threatFreezeT > 0 ? ' · FREEZE' : ''}${bodyState.sighT > 0 ? ' · sigh' : ''}`;
         document.getElementById('hudBody').textContent = b.breathingMode;
+
+        const retarget = retargetBody({
+          body: b,
+          bodyPose: bodyState.pose,
+          gait: gaitOut.gait,
+          walk,
+          walkPhase,
+          gesture: gestureState,
+        });
+        retargetStatus.textContent = `${BODY_POINT_COUNT} pts · top ${retarget.top
+          .slice(0, 3)
+          .map((t) => t.id)
+          .join(' · ') || '—'}`;
 
         // Surface Renderer — same Layer 1 → level-specific params
         const surf = renderSurface(

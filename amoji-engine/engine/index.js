@@ -166,10 +166,37 @@ export {
   SCRIPT_EXAMPLE,
   validateScriptLine,
   normalizeScriptLine,
-  applyMoodBias,
+  applyMoodBiasToLine,
   matchCompound,
   performScript,
 } from './layers/scriptLine.js';
+export {
+  MOODS,
+  MOOD_TRANSITION_HALF_LIFE_SEC,
+  getMoodDef,
+  moodBlendAlpha,
+  applyMoodBias,
+  moodIdleBaseline,
+  moodSignatureLeak,
+  MoodController,
+} from './layers/moodEngine.js';
+export {
+  BODY_FRONT,
+  BODY_BACK,
+  BODY_POINTS,
+  BODY_POINT_COUNT,
+  FACE_POINT_COUNT,
+  FULL_BODY_POINT_BUDGET,
+  BONE_MAP,
+  getBodyPoint,
+  bodyPointToBone,
+  emptyBodyDeltas,
+  retargetLayerB,
+  retargetLayerW,
+  retargetLayerG,
+  mergeBodyDeltas,
+  retargetBody,
+} from './layers/bodyRetarget.js';
 export {
   EMOTIONS,
   HI_RECIPES,
