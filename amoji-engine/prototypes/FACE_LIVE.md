@@ -58,9 +58,9 @@ python3 assets/characters/jp-female-v0/build_texture_lods.py
 - Debug: active morphs + **ARKit 52** + **robot DOF** nonzero export preview
 - **Robot packs**: face-servo-12 / upper-body-companion / upper-body-hands / upper-body-fingers / humanoid-stub
 - **Finger presets**: rest · fist · open-palm · point · ok · wave · pinch · thumbs-up · chin-rest · self-hug · fists (emblem / affect / adaptor sync)
-- **Prefs**: Face Live restores from `localStorage`; **Export prefs** / **Import prefs** JSON; **Copy share link** (`#flp=` hash, loads on open)
-- **TTS speak**: Mock / HTTP / gateway presets + **Probe gateway** health chip (auto-poll ~8s when endpoint set)
-- **Compound emotions**: region-locked blends also stage primary-weighted finger/look cues
+- **Prefs**: Face Live restores from `localStorage`; **Export prefs** / **Import prefs** JSON; **Copy share link** (`#flp=` short link); **Show QR** (scannable image + offline fingerprint fallback)
+- **TTS speak**: Mock / HTTP / gateway presets + **Probe gateway** health chip (auto-poll ~8s with exponential backoff on failures)
+- **Compound emotions**: region-locked blends stage fingers and **crossfade → emblem** (eased gesture blend)
 - **Layer D**: Deliver line / Clear residue / stimulus / auto improv / gap meter / continuity HUD
 - **Chassis calib**: desktop-buddy (+ expressive/quiet) / lobby-companion (+ quiet/hands/fingers) / lab-humanoid (+ demo) — gains, invert, deadzone, slew
 

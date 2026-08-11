@@ -537,9 +537,14 @@
           <button type="button" id="btnPrefsExport">Export prefs</button>
           <button type="button" id="btnPrefsImport">Import prefs</button>
           <button type="button" id="btnPrefsShare">Copy share link</button>
+          <button type="button" id="btnPrefsQr">Show QR</button>
         </div>
         <input type="file" id="prefsImportFile" accept="application/json,.json" style="display:none" />
         <div class="status" id="prefsStatus">prefs · localStorage</div>
+        <div id="prefsQrWrap" style="display:none;margin-top:8px;">
+          <img id="prefsQrImg" alt="prefs share QR" width="160" height="160" style="border-radius:8px;background:#fff;display:block;" />
+          <div class="status" id="prefsQrHint">scan · or copy short link</div>
+        </div>
         <pre id="robotDebug">—</pre>
       </div>
     </aside>
@@ -609,14 +614,15 @@
         stageAffect,
         stageCompoundAffect,
       } from '/engine/export/affectStaging.js';
+      import { crossfadeCompoundToEmblem } from '/engine/export/compoundEmblemCrossfade.js';
       import {
         loadFaceLivePrefs,
         saveFaceLivePrefs,
         exportFaceLivePrefsJson,
         importFaceLivePrefsJson,
         loadFaceLivePrefsFromHash,
-        buildPrefsShareUrl,
       } from '/engine/ui/faceLivePrefs.js';
+      import { buildPrefsShareBundle } from '/engine/ui/prefsShareLink.js';
       import {
         probeTtsGateway,
         startGatewayHealthPoll,
@@ -786,6 +792,8 @@
       let eggAdaptorHint = null;
       let eggPoseHint = null;
       let compoundId = '';
+      let compoundCrossfade = null;
+      let compoundCrossfadeT0 = 0;
       let walkPhase = 0;
       let surfaceLevel = Number(savedPrefs.surfaceLevel) || 6;
       let applySurfaceHints = true;
@@ -950,18 +958,33 @@
       compoundSel.addEventListener('change', () => {
         compoundId = compoundSel.value;
         if (!compoundId || !affectFingerSyncOn) return;
-        const staged = stageCompoundAffect(compoundId, intensity);
-        if (staged.ok && staged.synced && staged.fingerPresetId) {
-          applyFingerPreset(staged.fingerPresetId, { fromEmblem: true });
-          fingerStatus.textContent = `fingers · ${staged.fingerPresetId} · compound ${staged.band}`;
-          if (staged.lookBias) {
-            lookX = staged.lookBias.lookX || lookX;
-            lookY = staged.lookBias.lookY || lookY;
-            lookXEl.value = String(lookX);
-            lookYEl.value = String(lookY);
-            lookXVal.textContent = lookX.toFixed(2);
-            lookYVal.textContent = lookY.toFixed(2);
-          }
+        const kick = crossfadeCompoundToEmblem(compoundId, intensity, 0);
+        if (!kick.ok) return;
+        compoundCrossfade = {
+          compoundId,
+          intensity,
+          durationSec: kick.durationSec || 0.9,
+          emblemId: kick.emblemId,
+        };
+        compoundCrossfadeT0 = performance.now() / 1000;
+        if (kick.fingerPresetId) {
+          applyFingerPreset(kick.fingerPresetId, { fromEmblem: true });
+        }
+        if (kick.gesture) fingerGesture = { ...kick.gesture };
+        fingerStatus.textContent = kick.emblemId
+          ? `fingers · compound→${kick.emblemId}`
+          : `fingers · ${kick.fingerPresetId || '—'} · compound`;
+        if (kick.lookBias) {
+          lookX = kick.lookBias.lookX || lookX;
+          lookY = kick.lookBias.lookY || lookY;
+          lookXEl.value = String(lookX);
+          lookYEl.value = String(lookY);
+          lookXVal.textContent = lookX.toFixed(2);
+          lookYVal.textContent = lookY.toFixed(2);
+        }
+        if (kick.emblemId) {
+          if (emblemSel) emblemSel.value = kick.emblemId;
+          gestures.setEmblem(kick.emblemId);
         }
       });
       for (const [id, def] of Object.entries(GESTURE_EMBLEMS)) {
@@ -1847,23 +1870,23 @@
         });
         document.getElementById('btnPrefsShare').addEventListener('click', async () => {
           persistPrefs();
-          const share = buildPrefsShareUrl(loadFaceLivePrefs().prefs);
+          const bundle = buildPrefsShareBundle(loadFaceLivePrefs().prefs);
           try {
             if (navigator.clipboard?.writeText) {
-              await navigator.clipboard.writeText(share.url);
+              await navigator.clipboard.writeText(bundle.copyText || bundle.shortUrl);
             } else {
               const ta = document.createElement('textarea');
-              ta.value = share.url;
+              ta.value = bundle.copyText || bundle.shortUrl;
               document.body.appendChild(ta);
               ta.select();
               document.execCommand('copy');
               ta.remove();
             }
             prefsStatus.className = 'status ok';
-            prefsStatus.textContent = 'prefs · share link copied';
-            if (share.hash) {
+            prefsStatus.textContent = 'prefs · short link copied';
+            if (bundle.hash) {
               try {
-                history.replaceState(null, '', `#${share.hash}`);
+                history.replaceState(null, '', `#${bundle.hash}`);
               } catch {
                 /* ignore */
               }
@@ -1871,6 +1894,39 @@
           } catch (err) {
             prefsStatus.className = 'status bad';
             prefsStatus.textContent = String(err.message || err);
+          }
+        });
+        document.getElementById('btnPrefsQr').addEventListener('click', () => {
+          persistPrefs();
+          const wrap = document.getElementById('prefsQrWrap');
+          const img = document.getElementById('prefsQrImg');
+          const hint = document.getElementById('prefsQrHint');
+          const bundle = buildPrefsShareBundle(loadFaceLivePrefs().prefs);
+          const visible = wrap.style.display !== 'none';
+          if (visible) {
+            wrap.style.display = 'none';
+            prefsStatus.textContent = 'prefs · QR hidden';
+            return;
+          }
+          img.onerror = () => {
+            // Offline fallback: fingerprint SVG as data URL
+            const svg = bundle.qrFingerprintSvg || '';
+            img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+            hint.textContent = 'offline fingerprint · copy short link to share';
+          };
+          img.onload = () => {
+            hint.textContent = 'scan · or copy short link';
+          };
+          img.src = bundle.qrImageUrl;
+          wrap.style.display = 'block';
+          prefsStatus.className = 'status ok';
+          prefsStatus.textContent = 'prefs · QR shown';
+          if (bundle.hash) {
+            try {
+              history.replaceState(null, '', `#${bundle.hash}`);
+            } catch {
+              /* ignore */
+            }
           }
         });
         if (hashPrefs.ok) {
@@ -2048,6 +2104,28 @@
         }
         if (mixer) mixer.update(dt);
         idleStatus.textContent = `${PERSONAS[idle.personaId]?.label || idle.personaId} · ${idleState.arousal} · ${idleState.variant} · ${idleState.breath.bpm.toFixed(0)} bpm · next ${idleState.nextVariantIn.toFixed(0)}s`;
+
+        if (compoundCrossfade) {
+          const elapsed =
+            performance.now() / 1000 - compoundCrossfadeT0;
+          const dur = Math.max(0.2, compoundCrossfade.durationSec || 0.9);
+          const t = Math.min(1, elapsed / dur);
+          const xf = crossfadeCompoundToEmblem(
+            compoundCrossfade.compoundId,
+            compoundCrossfade.intensity,
+            t,
+          );
+          if (xf.ok && xf.gesture) fingerGesture = { ...xf.gesture };
+          if (xf.ok && t >= 0.5 && xf.fingerPresetId && fingerPresetId !== xf.fingerPresetId) {
+            applyFingerPreset(xf.fingerPresetId, { fromEmblem: true });
+          }
+          if (t >= 1) {
+            fingerStatus.textContent = xf.emblemId
+              ? `fingers · ${xf.fingerPresetId || '—'} · emblem ${xf.emblemId}`
+              : `fingers · ${xf.fingerPresetId || '—'} · compound done`;
+            compoundCrossfade = null;
+          }
+        }
 
         const temporalState = temporal.tick(dt);
         const latencyState = latency.tick(dt);

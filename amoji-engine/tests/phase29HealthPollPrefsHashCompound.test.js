@@ -87,6 +87,7 @@ describe('Phase 29 gateway health poll', () => {
   });
 
   it('reports idle when endpoint empty via getEndpoint', async () => {
+    vi.useFakeTimers();
     const onResult = vi.fn();
     startGatewayHealthPoll({
       getEndpoint: () => '',
@@ -94,7 +95,7 @@ describe('Phase 29 gateway health poll', () => {
       onResult,
       immediate: true,
     });
-    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(0);
     expect(onResult.mock.calls[0][0].status).toBe('no_endpoint');
     stopGatewayHealthPoll();
   });

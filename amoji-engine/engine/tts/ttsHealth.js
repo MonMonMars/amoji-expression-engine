@@ -143,17 +143,31 @@ export async function probeTtsGateway(opts = {}) {
   }
 }
 
-/** @type {ReturnType<typeof setInterval>|null} */
+/** @type {ReturnType<typeof setTimeout>|null} */
 let activePollTimer = null;
 /** @type {number} */
 let activePollGen = 0;
+
+/**
+ * Exponential backoff for gateway health poll intervals.
+ * @param {number} consecutiveFailures
+ * @param {{ baseMs?: number, maxMs?: number, factor?: number }} [opts]
+ */
+export function computeHealthPollInterval(consecutiveFailures = 0, opts = {}) {
+  const base = Math.max(2000, opts.baseMs ?? 8000);
+  const max = Math.max(base, opts.maxMs ?? 60000);
+  const factor = opts.factor ?? 2;
+  const n = Math.max(0, Math.floor(Number(consecutiveFailures) || 0));
+  const ms = Math.min(max, base * factor ** n);
+  return Math.round(ms);
+}
 
 /**
  * Stop any active gateway health poll started by {@link startGatewayHealthPoll}.
  */
 export function stopGatewayHealthPoll() {
   if (activePollTimer != null) {
-    clearInterval(activePollTimer);
+    clearTimeout(activePollTimer);
     activePollTimer = null;
   }
   activePollGen += 1;
@@ -164,13 +178,15 @@ export function stopGatewayHealthPoll() {
 }
 
 /**
- * Poll TTS gateway health on an interval. Replaces any previous poll.
- * When endpoint is empty, stops and optionally notifies idle.
+ * Poll TTS gateway health with exponential backoff on consecutive failures.
+ * Replaces any previous poll. Empty endpoint → idle callback, no reschedule storm.
  *
  * @param {{
  *   getEndpoint?: () => string,
  *   endpoint?: string,
  *   intervalMs?: number,
+ *   maxIntervalMs?: number,
+ *   backoffFactor?: number,
  *   token?: string,
  *   fetchImpl?: typeof fetch,
  *   timeoutMs?: number,
@@ -180,8 +196,12 @@ export function stopGatewayHealthPoll() {
  */
 export function startGatewayHealthPoll(opts = {}) {
   stopGatewayHealthPoll();
-  const intervalMs = Math.max(2000, opts.intervalMs ?? 8000);
+  const baseMs = Math.max(2000, opts.intervalMs ?? 8000);
+  const maxMs = opts.maxIntervalMs ?? 60000;
+  const factor = opts.backoffFactor ?? 2;
   const gen = activePollGen;
+  let failures = 0;
+
   const resolveEndpoint = () => {
     if (typeof opts.getEndpoint === 'function') {
       return String(opts.getEndpoint() || '').trim();
@@ -189,10 +209,18 @@ export function startGatewayHealthPoll(opts = {}) {
     return String(opts.endpoint || '').trim();
   };
 
+  const schedule = (delayMs) => {
+    if (gen !== activePollGen) return;
+    activePollTimer = setTimeout(() => {
+      void tick();
+    }, delayMs);
+  };
+
   const tick = async () => {
     if (gen !== activePollGen) return;
     const endpoint = resolveEndpoint();
     if (!endpoint) {
+      failures = 0;
       opts.onResult?.(
         applyComplianceGate(
           {
@@ -205,6 +233,8 @@ export function startGatewayHealthPoll(opts = {}) {
           {},
         ),
       );
+      // Keep a slow poll so endpoint paste can resume without restart
+      schedule(baseMs);
       return;
     }
     const result = await probeTtsGateway({
@@ -214,22 +244,40 @@ export function startGatewayHealthPoll(opts = {}) {
       timeoutMs: opts.timeoutMs,
     });
     if (gen !== activePollGen) return;
-    opts.onResult?.(result);
+    if (result.ok) failures = 0;
+    else failures += 1;
+    const nextMs = computeHealthPollInterval(failures, {
+      baseMs,
+      maxMs,
+      factor,
+    });
+    const enriched = {
+      ...result,
+      consecutiveFailures: failures,
+      nextPollMs: nextMs,
+      message:
+        result.ok || failures === 0
+          ? result.message
+          : `${result.message} · retry ${Math.round(nextMs / 1000)}s`,
+    };
+    opts.onResult?.(enriched);
+    schedule(nextMs);
   };
 
   if (opts.immediate !== false) {
     void tick();
+  } else {
+    schedule(baseMs);
   }
-  activePollTimer = setInterval(() => {
-    void tick();
-  }, intervalMs);
 
   return applyComplianceGate(
     {
       kind: 'tts_gateway_health_poll',
       action: 'start',
       ok: true,
-      intervalMs,
+      intervalMs: baseMs,
+      maxIntervalMs: maxMs,
+      backoffFactor: factor,
       stop: stopGatewayHealthPoll,
     },
     {},

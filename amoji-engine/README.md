@@ -40,7 +40,8 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 27 | Face Live prefs · affect/adaptor finger maps · gateway smoke docs | Done |
 | Phase 28 | Prefs JSON import/export · affect staging · gateway health chip | Done |
 | Phase 29 | Auto health poll · prefs URL hash · compound affect staging | Done |
-| Phase 30+ | Further production polish… | Specced |
+| Phase 30 | Poll backoff · prefs QR/short-link · compound→emblem crossfade | Done |
+| Phase 31+ | Further production polish… | Specced |
 
 ## Quick start
 

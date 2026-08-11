@@ -182,6 +182,9 @@ Amoji engine (ND “systemic emotion”)
 59. ~~**Auto gateway health poll** (`startGatewayHealthPoll` · 8s interval)~~ ✓
 60. ~~**Prefs share URL hash** (`#flp=` encode/decode · Copy share link)~~ ✓
 61. ~~**Compound affect staging** (`stageCompoundAffect` · primary-weighted fingers)~~ ✓
+62. ~~**Health poll backoff** (`computeHealthPollInterval` · exponential on failures)~~ ✓
+63. ~~**Prefs QR / short-link** (`buildPrefsShareBundle` · Show QR + copy short link)~~ ✓
+64. ~~**Compound→emblem crossfade** (`crossfadeCompoundToEmblem` · eased gesture blend)~~ ✓
 ---
 
 ## 7. What *not* to copy blindly
@@ -213,4 +216,4 @@ Amoji engine (ND “systemic emotion”)
 | SE FACS-ish library | HI `Expressions_*` morph targets |
 | Realtime test harness | `prototypes/face-live.html` → `npm run face-live` |
 
-Next code increment: further polish (poll backoff on consecutive failures, prefs QR/short-link helper, compound→emblem crossfade).
+Next code increment: further polish (health poll jitter, prefs deep-link landing toast, emblem hold/release after compound crossfade).

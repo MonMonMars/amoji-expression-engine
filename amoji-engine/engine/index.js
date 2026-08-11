@@ -460,6 +460,7 @@ export {
 export {
   healthUrlForEndpoint,
   probeTtsGateway,
+  computeHealthPollInterval,
   startGatewayHealthPoll,
   stopGatewayHealthPoll,
 } from './tts/ttsHealth.js';
@@ -471,3 +472,17 @@ export {
   stageAffect,
   stageCompoundAffect,
 } from './export/affectStaging.js';
+export {
+  PREFS_SHARE_DEFAULT_PATH,
+  buildPrefsShortLink,
+  buildPrefsQrImageUrl,
+  buildPrefsQrFingerprintSvg,
+  buildPrefsShareBundle,
+} from './ui/prefsShareLink.js';
+export {
+  COMPOUND_TO_EMBLEM,
+  emblemForCompound,
+  crossfadeEase,
+  lerpGesture,
+  crossfadeCompoundToEmblem,
+} from './export/compoundEmblemCrossfade.js';
