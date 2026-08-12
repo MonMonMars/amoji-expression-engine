@@ -21,6 +21,6 @@ describe('Phase 450 Extreme drop hint + status click flash', () => {
     expect(src).toContain('disneyExtremeStatus?.addEventListener(\'dblclick\'');
     expect(src).toContain('flashDisneyExtremeHotkeyDigestStatus();');
     expect(src).toContain('copyDisneyExtremeSummary();');
-    expect(src).toContain('click flash · dbl-click paste');
+    expect(src).toContain('click/Enter/Space flash · dbl-click paste');
   });
 });

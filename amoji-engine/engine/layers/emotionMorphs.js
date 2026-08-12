@@ -997,6 +997,9 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'arrowHistButtons', help: '↓/↑ cycle hist · button', kind: 'note' },
   { id: 'arrowRedoButtons', help: '⇧↓/⇧↑ cycle redo · button', kind: 'note' },
   { id: 'sparkDblClickCopy', help: 'sparks · dbl-click copy', kind: 'note' },
+  { id: 'sparkShiftEnterCopy', help: 'sparks · ⇧Enter copy', kind: 'note' },
+  { id: 'statusKeyboardA11y', help: 'status row · Enter/Space digest', kind: 'note' },
+  { id: 'dropHintKeyboardA11y', help: 'drop hint · Enter/Space flash', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',

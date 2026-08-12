@@ -468,7 +468,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 455 | Extreme Tab focus panel button | Done |
 | Phase 456 | Extreme arrow cycle mirror buttons | Done |
 | Phase 457 | Extreme catalog/test/docs sync polish | Done |
-| Phase 458+ | Further production polish… | Specced |
+| Phase 458 | Extreme status/drop keyboard accessibility | Done |
+| Phase 459 | Extreme spark Shift+Enter copy | Done |
+| Phase 460 | Extreme interactive title refresh | Done |
+| Phase 461 | Extreme keyboard interaction docs sync | Done |
+| Phase 462+ | Further production polish… | Specced |
 
 ## Quick start
 

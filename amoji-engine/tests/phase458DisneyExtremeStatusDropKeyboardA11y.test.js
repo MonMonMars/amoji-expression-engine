@@ -1,0 +1,21 @@
+import { describe, expect, it } from 'vitest';
+import { DISNEY_EXTREME_HOTKEY_HELP } from '../engine/layers/emotionMorphs.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+describe('Phase 458 Extreme status/drop keyboard accessibility', () => {
+  it('adds Enter/Space support to status and drop hint rows', () => {
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('status row · Enter/Space digest');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('drop hint · Enter/Space flash');
+    const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
+    expect(src).toContain("id=\"disneyExtremeStatus\" title=\"Prefs summary tooltip · click/Enter/Space digest · dbl-click copy · C\"");
+    expect(src).toContain("id=\"disneyExtremeDropHint\" title=\"Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · click/Enter/Space flash · dbl-click paste\"");
+    expect(src).toContain("getElementById('disneyExtremeDropHint')?.setAttribute('role', 'button')");
+    expect(src).toContain("disneyExtremeStatus?.setAttribute('tabindex', '0')");
+    expect(src).toContain("disneyExtremeStatus?.addEventListener('keydown'");
+    expect(src).toContain('flashDisneyExtremeHotkeyDigestStatus();');
+  });
+});

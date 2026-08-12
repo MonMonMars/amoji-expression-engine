@@ -1250,7 +1250,7 @@
           <div
             id="disneyExtremeFactorBars"
             class="extreme-factor-bars is-off"
-            title="Factor bars (shape/body/eye/mouth) · click flash · dbl-click copy · F · ⇧F"
+            title="Factor bars (shape/body/eye/mouth) · click/Enter/Space flash · dbl-click/⇧Enter copy · F · ⇧F"
           ></div>
           <div class="status" id="disneyExtremeFactorBarsLabel" style="margin:0;" title="Live factors label · F flash · ⇧F copy">factors</div>
         </div>
@@ -1258,7 +1258,7 @@
           <div
             id="disneyExtremeEaseSpark"
             class="extreme-ease-spark"
-            title="Ease overdrive curve (marker = shapeInt) · click flash · dbl-click copy · E · ⇧E"
+            title="Ease overdrive curve (marker = shapeInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · E · ⇧E"
           ></div>
           <div class="status" id="disneyExtremeEaseLabel" style="margin:0;" title="Live ease label · E flash · ⇧E copy">ease curve</div>
         </div>
@@ -1266,12 +1266,12 @@
           <div
             id="disneyExtremeBodySpark"
             class="extreme-body-spark is-off"
-            title="Body mix curve (marker = bodyInt) · click flash · dbl-click copy · M · ⇧M"
+            title="Body mix curve (marker = bodyInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · M · ⇧M"
           ></div>
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;" title="Live mix label · M flash · ⇧M copy">body mix</div>
         </div>
-        <div class="status" id="disneyExtremeStatus" title="Prefs summary tooltip · click digest · dbl-click copy · C" style="cursor:pointer;">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · click flash · dbl-click paste" style="cursor:pointer;">
+        <div class="status" id="disneyExtremeStatus" title="Prefs summary tooltip · click/Enter/Space digest · dbl-click copy · C" style="cursor:pointer;">extreme off</div>
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · click/Enter/Space flash · dbl-click paste" style="cursor:pointer;">
           Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · dbl-click paste
         </div>
       </div>
@@ -6533,6 +6533,14 @@
       document.getElementById('disneyExtremeDropHint')?.addEventListener('click', () => {
         flashDisneyExtremeDropHint();
       });
+      document.getElementById('disneyExtremeDropHint')?.setAttribute('role', 'button');
+      document.getElementById('disneyExtremeDropHint')?.setAttribute('tabindex', '0');
+      document.getElementById('disneyExtremeDropHint')?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeDropHint();
+        }
+      });
 
       document.getElementById('disneyExtremeDropHint')?.addEventListener(
         'dblclick',
@@ -6543,6 +6551,14 @@
 
       disneyExtremeStatus?.addEventListener('click', () => {
         flashDisneyExtremeHotkeyDigestStatus();
+      });
+      disneyExtremeStatus?.setAttribute('role', 'button');
+      disneyExtremeStatus?.setAttribute('tabindex', '0');
+      disneyExtremeStatus?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          flashDisneyExtremeHotkeyDigestStatus();
+        }
       });
 
       disneyExtremeStatus?.addEventListener('dblclick', (ev) => {
@@ -7075,6 +7091,10 @@
       disneyExtremeEaseSpark?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeEaseSvg();
+            return;
+          }
           flashDisneyExtremeEaseCurve();
         }
       });
@@ -7090,6 +7110,10 @@
       disneyExtremeBodySpark?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeBodyMixSvg();
+            return;
+          }
           flashDisneyExtremeBodyMix();
         }
       });
@@ -7105,6 +7129,10 @@
       disneyExtremeFactorBars?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeFactorBarsSvg();
+            return;
+          }
           flashDisneyExtremeFactorBars();
         }
       });
@@ -7120,6 +7148,10 @@
       hudExtremeSpark?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeEaseSvg();
+            return;
+          }
           flashDisneyExtremeEaseCurve();
         }
       });
@@ -7155,6 +7187,10 @@
       hudExtremeFactors?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeFactorBarsSvg();
+            return;
+          }
           flashDisneyExtremeFactorBars();
         }
       });
@@ -7170,6 +7206,10 @@
       hudBodySpark?.addEventListener('keydown', (ev) => {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            copyDisneyExtremeBodyMixSvg();
+            return;
+          }
           flashDisneyExtremeBodyMix();
         }
       });
