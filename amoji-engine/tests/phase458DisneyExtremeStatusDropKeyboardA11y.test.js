@@ -13,7 +13,7 @@ describe('Phase 458 Extreme status/drop keyboard accessibility', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('id=\"disneyExtremeStatus\"');
     expect(src).toContain('id=\"disneyExtremeDropHint\"');
-    expect(src).toContain('click/Enter/Space digest · dbl-click copy · C');
+    expect(src).toContain('click/Enter/Space digest · dbl-click/⇧Enter copy · C');
     expect(src).toContain('click/Enter/Space flash · dbl-click paste');
     expect(src).toContain("getElementById('disneyExtremeDropHint')?.setAttribute('role', 'button')");
     expect(src).toContain("disneyExtremeStatus?.setAttribute('tabindex', '0')");

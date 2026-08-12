@@ -11,16 +11,20 @@ describe('Phase 452 Extreme spark label title tooltips', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('spark/readout labels · title tooltips');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain(
-      'id="disneyExtremeFactorBarsLabel" style="margin:0;" title="Live factors label · F flash · ⇧F copy"',
+      'id="disneyExtremeFactorBarsLabel"',
     );
+    expect(src).toContain('Live factors label · F flash · ⇧F copy');
     expect(src).toContain(
-      'id="disneyExtremeEaseLabel" style="margin:0;" title="Live ease label · E flash · ⇧E copy"',
+      'id="disneyExtremeEaseLabel"',
     );
+    expect(src).toContain('Live ease label · E flash · ⇧E copy');
     expect(src).toContain(
-      'id="disneyExtremeBodyMixLabel" style="margin:0;" title="Live mix label · M flash · ⇧M copy"',
+      'id="disneyExtremeBodyMixLabel"',
     );
+    expect(src).toContain('Live mix label · M flash · ⇧M copy');
     expect(src).toContain(
-      'id="disneyExtremeStripsEmpty" hidden title="No strips match · ⇧Alt+F12 clear filter"',
+      'id="disneyExtremeStripsEmpty"',
     );
+    expect(src).toContain('No strips match · click/Enter/Space clear');
   });
 });

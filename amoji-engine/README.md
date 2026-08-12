@@ -492,7 +492,19 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 479 | Extreme interactive aria-keyshortcuts | Done |
 | Phase 480 | Extreme HUD/panel aria-keyshortcuts | Done |
 | Phase 481 | Extreme aria metadata docs sync | Done |
-| Phase 482+ | Further production polish… | Specced |
+| Phase 482 | Extreme factor bars label keyboard | Done |
+| Phase 483 | Extreme ease label keyboard | Done |
+| Phase 484 | Extreme body mix label keyboard | Done |
+| Phase 485 | Extreme strips empty keyboard | Done |
+| Phase 486 | Extreme details aria-expanded sync | Done |
+| Phase 487 | Extreme more IO summary keyboard | Done |
+| Phase 488 | Extreme filter input aria metadata | Done |
+| Phase 489 | Extreme status Shift+Enter copy | Done |
+| Phase 490 | Extreme drop hint Shift+Enter paste | Done |
+| Phase 491 | Extreme spark label aria-describedby | Done |
+| Phase 492 | Extreme interactive bind helper | Done |
+| Phase 493 | Extreme label a11y docs sync | Done |
+| Phase 494+ | Further production polish… | Specced |
 
 ## Quick start
 

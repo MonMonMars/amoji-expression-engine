@@ -14,7 +14,7 @@ describe('Phase 478 Extreme interactive aria-label coverage', () => {
     expect(src).toContain('id="disneyExtremeStripsSummary" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme strips summary"');
     expect(src).toContain('id="disneyExtremeHistory" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme history row"');
     expect(src).toContain('id="disneyExtremeFavorites" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme favorites row"');
-    expect(src).toContain('id="disneyExtremeStatus" aria-keyshortcuts="Enter Space" aria-label="Extreme status summary"');
+    expect(src).toContain('id="disneyExtremeStatus" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme status summary"');
     expect(src).toContain('id="disneyExtremeDropHint" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme drop hint"');
   });
 });
