@@ -946,7 +946,9 @@
           <button type="button" id="btnDisneyExtremeReset" title="Reset × defaults · R">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeResetBundle" title="Reset + all · ⇧R">Reset + all <kbd>⇧R</kbd></button>
           <button type="button" id="btnDisneyExtremeCopy" title="Copy prefs summary · filter-aware when filter active">Copy summary <kbd>C</kbd></button>
+          <button type="button" id="btnDisneyExtremeToggle" title="Toggle Extreme · X">Toggle Extreme <kbd>X</kbd></button>
           <button type="button" id="btnDisneyExtremeEnable" title="Enable Extreme tier · ⇧X">Enable Extreme <kbd>⇧X</kbd></button>
+          <button type="button" id="btnDisneyExtremeToggleBody" title="Toggle body apply · B">Toggle body <kbd>B</kbd></button>
           <button type="button" id="btnDisneyExtremeEnableBody" title="Enable body deform · ⇧B">Enable body <kbd>⇧B</kbd></button>
           <button type="button" id="btnDisneyExtremeBundle" title="All readout bundle · A">All readout <kbd>A</kbd></button>
           <button type="button" id="btnDisneyExtremeEaseReadout" title="Flash ease curve readout · E">Ease readout <kbd>E</kbd></button>
@@ -1158,7 +1160,7 @@
             <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12">Clear filter</button>
             <span class="status" id="disneyExtremeStripsFilterSummary" title="Filter match count · click flash · ⇧F12 copy · dbl-click copy">filter · all · 11</span>
           </div>
-          <div class="status" id="disneyExtremeStripsEmpty" hidden>No strips match</div>
+          <div class="status" id="disneyExtremeStripsEmpty" hidden title="No strips match · ⇧Alt+F12 clear filter">No strips match</div>
           <div
             class="status"
             id="disneyExtremeTips"
@@ -1243,7 +1245,7 @@
             class="extreme-factor-bars is-off"
             title="Factor bars (shape/body/eye/mouth) · click to flash · F · Shift+F copy"
           ></div>
-          <div class="status" id="disneyExtremeFactorBarsLabel" style="margin:0;">factors</div>
+          <div class="status" id="disneyExtremeFactorBarsLabel" style="margin:0;" title="Live factors label · F flash · ⇧F copy">factors</div>
         </div>
         <div class="row" style="margin-top:6px;gap:10px;align-items:center;">
           <div
@@ -1251,7 +1253,7 @@
             class="extreme-ease-spark"
             title="Ease overdrive curve (marker = shapeInt) · click to flash"
           ></div>
-          <div class="status" id="disneyExtremeEaseLabel" style="margin:0;">ease curve</div>
+          <div class="status" id="disneyExtremeEaseLabel" style="margin:0;" title="Live ease label · E flash · ⇧E copy">ease curve</div>
         </div>
         <div class="row" style="margin-top:4px;gap:10px;align-items:center;">
           <div
@@ -1259,10 +1261,10 @@
             class="extreme-body-spark is-off"
             title="Body mix curve (marker = bodyInt) · click to flash · M"
           ></div>
-          <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;">body mix</div>
+          <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;" title="Live mix label · M flash · ⇧M copy">body mix</div>
         </div>
-        <div class="status" id="disneyExtremeStatus">extreme off</div>
-        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · double-click paste snapshot" style="cursor:pointer;">
+        <div class="status" id="disneyExtremeStatus" title="Prefs summary tooltip · click digest · dbl-click copy · C" style="cursor:pointer;">extreme off</div>
+        <div class="status" id="disneyExtremeDropHint" title="Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · click flash · dbl-click paste" style="cursor:pointer;">
           Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · dbl-click paste
         </div>
       </div>
@@ -3765,6 +3767,35 @@
         return true;
       }
 
+      function toggleDisneyExtreme() {
+        if (!disneyExtremeEl) {
+          flashDisneyExtremeStatus('extreme · missing');
+          return false;
+        }
+        disneyExtremeEl.checked = !disneyExtremeEl.checked;
+        disneyExtremeEl.dispatchEvent(new Event('change'));
+        return true;
+      }
+
+      function toggleDisneyExtremeBodyApply() {
+        if (!disneyExtremeEl) {
+          flashDisneyExtremeStatus('extreme · missing');
+          return false;
+        }
+        if (!disneyExtremeEl.checked) {
+          disneyExtremeEl.checked = true;
+          disneyExtremeEl.dispatchEvent(new Event('change'));
+          if (disneyExtremeBodyEl && !disneyExtremeBodyEl.checked) {
+            disneyExtremeBodyEl.checked = true;
+            disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+          }
+        } else if (disneyExtremeBodyEl) {
+          disneyExtremeBodyEl.checked = !disneyExtremeBodyEl.checked;
+          disneyExtremeBodyEl.dispatchEvent(new Event('change'));
+        }
+        return true;
+      }
+
       function enableFocusDisneyExtremePanel() {
         enableDisneyExtreme();
         return focusDisneyExtremePanel();
@@ -4890,6 +4921,23 @@
         syncDisneyExtremeDirtyUi();
       }
 
+      function flashDisneyExtremeHotkeyDigestStatus() {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeHotkeyDigest({
+            enabled: !!disneyExtremeEl?.checked,
+            stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
+          }),
+        );
+        return true;
+      }
+
+      function flashDisneyExtremeDropHint() {
+        flashDisneyExtremeStatus(
+          'drop · snapshot/hist/redo/fav/stacks · Meta preview · Shift merge · dbl-click paste',
+        );
+        return true;
+      }
+
       function flashDisneyExtremeStatus(text, holdMs = DISNEY_EXTREME_STATUS_HOLD_MS) {
         if (disneyExtremeStatus) disneyExtremeStatus.textContent = text;
         const ms =
@@ -5105,8 +5153,16 @@
         copyDisneyExtremeSummary();
       });
 
+      document.getElementById('btnDisneyExtremeToggle')?.addEventListener('click', () => {
+        toggleDisneyExtreme();
+      });
+
       document.getElementById('btnDisneyExtremeEnable')?.addEventListener('click', () => {
         enableDisneyExtreme();
+      });
+
+      document.getElementById('btnDisneyExtremeToggleBody')?.addEventListener('click', () => {
+        toggleDisneyExtremeBodyApply();
       });
 
       document.getElementById('btnDisneyExtremeEnableBody')?.addEventListener('click', () => {
@@ -5828,12 +5884,7 @@
       });
 
       document.getElementById('btnDisneyExtremeShowHelp')?.addEventListener('click', () => {
-        flashDisneyExtremeStatus(
-          formatDisneyExtremeHotkeyDigest({
-            enabled: !!disneyExtremeEl?.checked,
-            stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
-          }),
-        );
+        flashDisneyExtremeHotkeyDigestStatus();
       });
 
       document.getElementById('btnDisneyExtremeClearActive')?.addEventListener('click', () => {
@@ -6444,12 +6495,25 @@
         await handleDisneyExtremeSnapshotDrop(ev);
       });
 
+      document.getElementById('disneyExtremeDropHint')?.addEventListener('click', () => {
+        flashDisneyExtremeDropHint();
+      });
+
       document.getElementById('disneyExtremeDropHint')?.addEventListener(
         'dblclick',
         () => {
           pasteDisneyExtremeSnapshotJson();
         },
       );
+
+      disneyExtremeStatus?.addEventListener('click', () => {
+        flashDisneyExtremeHotkeyDigestStatus();
+      });
+
+      disneyExtremeStatus?.addEventListener('dblclick', (ev) => {
+        ev.preventDefault();
+        copyDisneyExtremeSummary();
+      });
 
       function flashDisneyExtremeSnapshotDiff() {
         const current = disneyExtremeSnapshot();
@@ -7089,8 +7153,7 @@
         }
         if (resolved.action === 'toggle') {
           ev.preventDefault();
-          disneyExtremeEl.checked = !disneyExtremeEl.checked;
-          disneyExtremeEl.dispatchEvent(new Event('change'));
+          toggleDisneyExtreme();
           return;
         }
         if (resolved.action === 'enableExtreme') {
@@ -7105,17 +7168,7 @@
         }
         if (resolved.action === 'toggleBodyApply') {
           ev.preventDefault();
-          if (!disneyExtremeEl.checked) {
-            disneyExtremeEl.checked = true;
-            disneyExtremeEl.dispatchEvent(new Event('change'));
-            if (disneyExtremeBodyEl && !disneyExtremeBodyEl.checked) {
-              disneyExtremeBodyEl.checked = true;
-              disneyExtremeBodyEl.dispatchEvent(new Event('change'));
-            }
-          } else if (disneyExtremeBodyEl) {
-            disneyExtremeBodyEl.checked = !disneyExtremeBodyEl.checked;
-            disneyExtremeBodyEl.dispatchEvent(new Event('change'));
-          }
+          toggleDisneyExtremeBodyApply();
           return;
         }
         if (resolved.action === 'enableBodyApply') {
