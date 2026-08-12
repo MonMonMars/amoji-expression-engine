@@ -42,6 +42,8 @@ describe('Phase 114 Extreme hotkey help + Copy summary', () => {
     expect(src).toContain('formatDisneyExtremeHotkeyHelp');
     expect(src).toContain("getElementById('btnDisneyExtremeCopy')");
     expect(src).toContain('navigator.clipboard');
-    expect(src).toContain('copied · ${text}');
+    expect(src).toMatch(
+      /copyDisneyExtremeSummary[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel/,
+    );
   });
 });

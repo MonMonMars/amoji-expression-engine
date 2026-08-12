@@ -448,7 +448,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 435 | Extreme strip copy filter guards | Done |
 | Phase 436 | Extreme IO/SVG copy-flash rollout | Done |
 | Phase 437 | Extreme help/clear hotkey buttons | Done |
-| Phase 438+ | Further production polish… | Specced |
+| Phase 438 | Extreme JSON copy-flash rollout | Done |
+| Phase 439 | Extreme share URL copy-flash rollout | Done |
+| Phase 440 | Extreme fp/diff copy-flash rollout | Done |
+| Phase 441 | Extreme JSON/share empty copy guards | Done |
+| Phase 442+ | Further production polish… | Specced |
 
 ## Quick start
 

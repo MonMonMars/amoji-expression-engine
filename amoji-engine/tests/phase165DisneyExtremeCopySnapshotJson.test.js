@@ -28,7 +28,9 @@ describe('Phase 165 Extreme J copy snapshot JSON', () => {
     expect(src).toContain('async function copyDisneyExtremeSnapshotJson()');
     expect(src).toContain("resolved.action === 'copySnapshotJson'");
     expect(src).toContain('serializeDisneyExtremeSnapshot');
-    expect(src).toContain('copied · snapshot JSON');
+    expect(src).toMatch(
+      /copyDisneyExtremeSnapshotJson[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: `snapshot JSON · fp \$\{fp\}`/,
+    );
     expect(src).toContain('<kbd>J</kbd>');
   });
 });

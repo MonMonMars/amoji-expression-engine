@@ -16,7 +16,9 @@ describe('Phase 169 Extreme Face Live paste JSON wiring', () => {
     expect(src).toContain('parseDisneyExtremeSnapshot');
     expect(src).toContain('disneyExtremeSnapshotFingerprintShort');
     expect(src).toContain('pasted · snapshot JSON · fp');
-    expect(src).toContain('copied · snapshot JSON · fp');
+    expect(src).toMatch(
+      /copyDisneyExtremeSnapshotJson[\s\S]*?summary: `snapshot JSON · fp \$\{fp\}`/,
+    );
     expect(src).toContain('<kbd>⇧J</kbd>');
   });
 });

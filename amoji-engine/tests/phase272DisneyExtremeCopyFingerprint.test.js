@@ -20,6 +20,8 @@ describe('Phase 272 Extreme Alt+P copy fingerprint', () => {
     expect(src).toContain('btnDisneyExtremeCopyFp');
     expect(src).toContain('function copyDisneyExtremeSnapshotFingerprint');
     expect(src).toContain("resolved.action === 'copySnapshotFingerprint'");
-    expect(src).toContain('copied · fp');
+    expect(src).toMatch(
+      /copyDisneyExtremeSnapshotFingerprint[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: `fp \$\{fp\}`/,
+    );
   });
 });

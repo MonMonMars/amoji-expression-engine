@@ -24,6 +24,8 @@ describe('Phase 304 Extreme ⇧Alt+P copy pin fingerprint', () => {
     expect(src).toContain('btnDisneyExtremeCopyPinFp');
     expect(src).toContain('function copyDisneyExtremeBaselinePinFingerprint');
     expect(src).toContain("resolved.action === 'copyBaselinePinFingerprint'");
-    expect(src).toContain('copied · pin fp');
+    expect(src).toMatch(
+      /copyDisneyExtremeBaselinePinFingerprint[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: `pin fp \$\{fp\}`/,
+    );
   });
 });

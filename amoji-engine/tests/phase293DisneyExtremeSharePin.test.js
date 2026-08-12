@@ -47,7 +47,9 @@ describe('Phase 293 Extreme Alt+C share pin', () => {
     expect(src).toContain('btnDisneyExtremeSharePin');
     expect(src).toContain('function copyDisneyExtremeBaselinePinShareUrl');
     expect(src).toContain("resolved.action === 'copyBaselinePinShareUrl'");
-    expect(src).toContain('copied · pin share');
+    expect(src).toMatch(
+      /copyDisneyExtremeBaselinePinShareUrl[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: `pin share · fp \$\{fp\}`/,
+    );
     expect(src).toContain('share pin · none');
   });
 });
