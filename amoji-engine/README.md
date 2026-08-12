@@ -816,6 +816,390 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 803 | Extreme live region policy | Done |
 | Phase 804 | Extreme a11y substring harness batch | Done |
 | Phase 805 | Extreme batch 614+ | Done |
+| Phase 806 | Extreme prefers-reduced-motion CSS | Done |
+| Phase 807 | Extreme respect reduced motion | Done |
+| Phase 808 | Extreme respect reduced motion | Done |
+| Phase 809 | Extreme reduced motion | Done |
+| Phase 810 | Extreme reduced motion | Done |
+| Phase 811 | Extreme prefers-contrast boost | Done |
+| Phase 812 | Extreme prefers-contrast token | Done |
+| Phase 813 | Extreme focus fallback | Done |
+| Phase 814 | Extreme status visible | Done |
+| Phase 815 | Extreme hit target pad | Done |
+| Phase 816 | Extreme chip min size | Done |
+| Phase 817 | Extreme toolbar pad | Done |
+| Phase 818 | Extreme pan-y panel | Done |
+| Phase 819 | Extreme none on chips | Done |
+| Phase 820 | Extreme text on status | Done |
+| Phase 821 | Extreme pointer interactive audit | Done |
+| Phase 822 | Extreme grab on panel drop | Done |
+| Phase 823 | Extreme shared token assert | Done |
+| Phase 824 | Extreme width token assert | Done |
+| Phase 825 | Extreme light assert | Done |
+| Phase 826 | Extreme role=region | Done |
+| Phase 827 | Extreme aria-label region | Done |
+| Phase 828 | Extreme role=group | Done |
+| Phase 829 | Extreme aria-label Extreme actions | Done |
+| Phase 830 | Extreme role=group | Done |
+| Phase 831 | Extreme aria-label overflow | Done |
+| Phase 832 | Extreme role=region | Done |
+| Phase 833 | Extreme aria-label region | Done |
+| Phase 834 | Extreme role=group keep | Done |
+| Phase 835 | Extreme role=group keep | Done |
+| Phase 836 | Extreme role=status assert | Done |
+| Phase 837 | Extreme role=button keep | Done |
+| Phase 838 | Extreme role=group | Done |
+| Phase 839 | Extreme role=group | Done |
+| Phase 840 | Extreme role=group | Done |
+| Phase 841 | Extreme role=group keep | Done |
+| Phase 842 | Extreme role=group | Done |
+| Phase 843 | Extreme role=button assert | Done |
+| Phase 844 | Extreme polite policy | Done |
+| Phase 845 | Extreme atomic policy | Done |
+| Phase 846 | Extreme role=separator | Done |
+| Phase 847 | Extreme role=switch keep | Done |
+| Phase 848 | Extreme role=combobox keep | Done |
+| Phase 849 | Extreme native button role | Done |
+| Phase 850 | Extreme Extreme panel | Done |
+| Phase 851 | Extreme strips | Done |
+| Phase 852 | Extreme more IO | Done |
+| Phase 853 | Extreme visually-hidden | Done |
+| Phase 854 | Extreme panel before strips | Done |
+| Phase 855 | Extreme filter before strips | Done |
+| Phase 856 | Extreme chips after row | Done |
+| Phase 857 | Extreme tabindex 0 keep | Done |
+| Phase 858 | Extreme tabindex 0 keep | Done |
+| Phase 859 | Extreme native tabindex | Done |
+| Phase 860 | Extreme roving tabindex doc | Done |
+| Phase 861 | Extreme restore after clear filter | Done |
+| Phase 862 | Extreme restore after paste | Done |
+| Phase 863 | Extreme no trap in panel | Done |
+| Phase 864 | Extreme avoid on Extreme | Done |
+| Phase 865 | Extreme visible-only outline policy | Done |
+| Phase 866 | Extreme aria-busy status pulse | Done |
+| Phase 867 | Extreme aria-busy status pulse | Done |
+| Phase 868 | Extreme status announce | Done |
+| Phase 869 | Extreme status announce | Done |
+| Phase 870 | Extreme status announce | Done |
+| Phase 871 | Extreme status announce | Done |
+| Phase 872 | Extreme status announce | Done |
+| Phase 873 | Extreme guard announce | Done |
+| Phase 874 | Extreme guard announce | Done |
+| Phase 875 | Extreme announce | Done |
+| Phase 876 | Extreme copy announce | Done |
+| Phase 877 | Extreme copy announce | Done |
+| Phase 878 | Extreme copy announce | Done |
+| Phase 879 | Extreme copy announce | Done |
+| Phase 880 | Extreme copy announce | Done |
+| Phase 881 | Extreme copy announce | Done |
+| Phase 882 | Extreme copy announce | Done |
+| Phase 883 | Extreme copy announce | Done |
+| Phase 884 | Extreme announce | Done |
+| Phase 885 | Extreme announce | Done |
+| Phase 886 | Extreme announce | Done |
+| Phase 887 | Extreme announce | Done |
+| Phase 888 | Extreme clear timeout | Done |
+| Phase 889 | Extreme pulseDisneyExtremeAriaBusy assert | Done |
+| Phase 890 | Extreme live aria-label | Done |
+| Phase 891 | Extreme keyshortcuts keep | Done |
+| Phase 892 | Extreme live aria-label | Done |
+| Phase 893 | Extreme keyshortcuts keep | Done |
+| Phase 894 | Extreme live aria-label | Done |
+| Phase 895 | Extreme keyshortcuts keep | Done |
+| Phase 896 | Extreme live aria-label | Done |
+| Phase 897 | Extreme keyshortcuts keep | Done |
+| Phase 898 | Extreme live aria-label | Done |
+| Phase 899 | Extreme keyshortcuts keep | Done |
+| Phase 900 | Extreme live aria-label | Done |
+| Phase 901 | Extreme keyshortcuts keep | Done |
+| Phase 902 | Extreme live aria-label | Done |
+| Phase 903 | Extreme keyshortcuts keep | Done |
+| Phase 904 | Extreme live aria-label | Done |
+| Phase 905 | Extreme keyshortcuts keep | Done |
+| Phase 906 | Extreme live aria-label | Done |
+| Phase 907 | Extreme keyshortcuts keep | Done |
+| Phase 908 | Extreme live aria-label | Done |
+| Phase 909 | Extreme keyshortcuts keep | Done |
+| Phase 910 | Extreme live aria-label | Done |
+| Phase 911 | Extreme keyshortcuts keep | Done |
+| Phase 912 | Extreme role=img | Done |
+| Phase 913 | Extreme role=img | Done |
+| Phase 914 | Extreme role=img | Done |
+| Phase 915 | Extreme role=img | Done |
+| Phase 916 | Extreme role=img | Done |
+| Phase 917 | Extreme role=img | Done |
+| Phase 918 | Extreme aria-label | Done |
+| Phase 919 | Extreme aria-label | Done |
+| Phase 920 | Extreme aria-label | Done |
+| Phase 921 | Extreme aria-hidden decorative | Done |
+| Phase 922 | Extreme title tooltip keep | Done |
+| Phase 923 | Extreme aria-labelledby keep | Done |
+| Phase 924 | Extreme describedby keep | Done |
+| Phase 925 | Extreme is-dirty class aria | Done |
+| Phase 926 | Extreme live aria-label | Done |
+| Phase 927 | Extreme keyshortcuts | Done |
+| Phase 928 | Extreme flash parity | Done |
+| Phase 929 | Extreme copy parity | Done |
+| Phase 930 | Extreme Enter/Space parity | Done |
+| Phase 931 | Extreme focus-visible keep | Done |
+| Phase 932 | Extreme use details wire helper | Done |
+| Phase 933 | Extreme use details wire helper | Done |
+| Phase 934 | Extreme persist open keep | Done |
+| Phase 935 | Extreme persist open keep | Done |
+| Phase 936 | Extreme aria-expanded live keep | Done |
+| Phase 937 | Extreme aria-controls keep | Done |
+| Phase 938 | Extreme skipRole native keep | Done |
+| Phase 939 | Extreme skipTabindex keep | Done |
+| Phase 940 | Extreme marker hidden keep | Done |
+| Phase 941 | Extreme open announce keep | Done |
+| Phase 942 | Extreme close announce keep | Done |
+| Phase 943 | Extreme idempotent | Done |
+| Phase 944 | Extreme length assert | Done |
+| Phase 945 | Extreme push once | Done |
+| Phase 946 | Extreme surface count 32 | Done |
+| Phase 947 | Extreme spaceCopy opt keep | Done |
+| Phase 948 | Extreme escapeClear opt keep | Done |
+| Phase 949 | Extreme onDelete alias keep | Done |
+| Phase 950 | Extreme Alt+Enter paste keep | Done |
+| Phase 951 | Extreme ariaFromTitle keep | Done |
+| Phase 952 | Extreme describedBy opt keep | Done |
+| Phase 953 | Extreme labelledBy opt keep | Done |
+| Phase 954 | Extreme keyshortcuts opt keep | Done |
+| Phase 955 | Extreme skipRole keep | Done |
+| Phase 956 | Extreme skipTabindex keep | Done |
+| Phase 957 | Extreme backgroundOnly keep | Done |
+| Phase 958 | Extreme ignoreChildTargets keep | Done |
+| Phase 959 | Extreme pasteOnDblClick keep | Done |
+| Phase 960 | Extreme ⇧Enter paste keep | Done |
+| Phase 961 | Extreme ⇧Enter copy keep | Done |
+| Phase 962 | Extreme Delete clear keep | Done |
+| Phase 963 | Extreme Backspace clear keep | Done |
+| Phase 964 | Extreme click flash keep | Done |
+| Phase 965 | Extreme dblclick copy keep | Done |
+| Phase 966 | Extreme keydown Enter keep | Done |
+| Phase 967 | Extreme keydown Space keep | Done |
+| Phase 968 | Extreme shouldIgnoreTarget helper | Done |
+| Phase 969 | Extreme null el guard | Done |
+| Phase 970 | Extreme normalize shortcuts call | Done |
+| Phase 971 | Extreme contract doc comments | Done |
+| Phase 972 | Extreme Enter jump keep | Done |
+| Phase 973 | Extreme ⇧Enter pin keep | Done |
+| Phase 974 | Extreme Meta+Enter preview keep | Done |
+| Phase 975 | Extreme Ctrl+Enter remove keep | Done |
+| Phase 976 | Extreme Alt+Enter diff keep | Done |
+| Phase 977 | Extreme ⇧Alt+Enter compare keep | Done |
+| Phase 978 | Extreme Space jump keep | Done |
+| Phase 979 | Extreme ⇧Space star keep | Done |
+| Phase 980 | Extreme Ctrl+Space unstar keep | Done |
+| Phase 981 | Extreme Meta+Space preview keep | Done |
+| Phase 982 | Extreme click jump keep | Done |
+| Phase 983 | Extreme Shift+click star keep | Done |
+| Phase 984 | Extreme Ctrl+click remove keep | Done |
+| Phase 985 | Extreme Meta+click preview keep | Done |
+| Phase 986 | Extreme Alt+click diff keep | Done |
+| Phase 987 | Extreme ⇧Alt+click compare keep | Done |
+| Phase 988 | Extreme dbl-click pin keep | Done |
+| Phase 989 | Extreme aria-current keep | Done |
+| Phase 990 | Extreme aria-pressed keep | Done |
+| Phase 991 | Extreme describedby hints keep | Done |
+| Phase 992 | Extreme full keyshortcuts keep | Done |
+| Phase 993 | Extreme native button keep | Done |
+| Phase 994 | Extreme focus-visible keep | Done |
+| Phase 995 | Extreme expanded text keep | Done |
+| Phase 996 | Extreme combobox keep | Done |
+| Phase 997 | Extreme haspopup keep | Done |
+| Phase 998 | Extreme owns keep | Done |
+| Phase 999 | Extreme expanded sync keep | Done |
+| Phase 1000 | Extreme activedescendant keep | Done |
+| Phase 1001 | Extreme autocomplete keep | Done |
+| Phase 1002 | Extreme Enter flash keep | Done |
+| Phase 1003 | Extreme ⇧Enter copy keep | Done |
+| Phase 1004 | Extreme ArrowDown keep | Done |
+| Phase 1005 | Extreme ArrowUp keep | Done |
+| Phase 1006 | Extreme Escape clear keep | Done |
+| Phase 1007 | Extreme Alt+F12 keep | Done |
+| Phase 1008 | Extreme aria-label keep | Done |
+| Phase 1009 | Extreme aria keep | Done |
+| Phase 1010 | Extreme group keep | Done |
+| Phase 1011 | Extreme live keep | Done |
+| Phase 1012 | Extreme switch keep | Done |
+| Phase 1013 | Extreme switch keep | Done |
+| Phase 1014 | Extreme aria-checked sync keep | Done |
+| Phase 1015 | Extreme describedby keep | Done |
+| Phase 1016 | Extreme keyshortcuts keep | Done |
+| Phase 1017 | Extreme orientation keep | Done |
+| Phase 1018 | Extreme valuetext step keep | Done |
+| Phase 1019 | Extreme disabled sync keep | Done |
+| Phase 1020 | Extreme describedby val keep | Done |
+| Phase 1021 | Extreme keyshortcuts keep | Done |
+| Phase 1022 | Extreme keyshortcuts keep | Done |
+| Phase 1023 | Extreme keyshortcuts keep | Done |
+| Phase 1024 | Extreme keyshortcuts keep | Done |
+| Phase 1025 | Extreme live keep | Done |
+| Phase 1026 | Extreme labelledby keep | Done |
+| Phase 1027 | Extreme call keep | Done |
+| Phase 1028 | Extreme call keep | Done |
+| Phase 1029 | Extreme call keep | Done |
+| Phase 1030 | Extreme keep | Done |
+| Phase 1031 | Extreme announce keep | Done |
+| Phase 1032 | Extreme static aria-label | Done |
+| Phase 1033 | Extreme ascii keyshortcuts | Done |
+| Phase 1034 | Extreme static aria-label | Done |
+| Phase 1035 | Extreme ascii keyshortcuts | Done |
+| Phase 1036 | Extreme static aria-label | Done |
+| Phase 1037 | Extreme ascii keyshortcuts | Done |
+| Phase 1038 | Extreme static aria-label | Done |
+| Phase 1039 | Extreme ascii keyshortcuts | Done |
+| Phase 1040 | Extreme static aria-label | Done |
+| Phase 1041 | Extreme ascii keyshortcuts | Done |
+| Phase 1042 | Extreme static aria-label | Done |
+| Phase 1043 | Extreme ascii keyshortcuts | Done |
+| Phase 1044 | Extreme static aria-label | Done |
+| Phase 1045 | Extreme ascii keyshortcuts | Done |
+| Phase 1046 | Extreme static aria-label | Done |
+| Phase 1047 | Extreme ascii keyshortcuts | Done |
+| Phase 1048 | Extreme static aria-label | Done |
+| Phase 1049 | Extreme ascii keyshortcuts | Done |
+| Phase 1050 | Extreme static aria-label | Done |
+| Phase 1051 | Extreme ascii keyshortcuts | Done |
+| Phase 1052 | Extreme static aria-label | Done |
+| Phase 1053 | Extreme ascii keyshortcuts | Done |
+| Phase 1054 | Extreme static aria-label | Done |
+| Phase 1055 | Extreme ascii keyshortcuts | Done |
+| Phase 1056 | Extreme static aria-label | Done |
+| Phase 1057 | Extreme ascii keyshortcuts | Done |
+| Phase 1058 | Extreme static aria-label | Done |
+| Phase 1059 | Extreme ascii keyshortcuts | Done |
+| Phase 1060 | Extreme static aria-label | Done |
+| Phase 1061 | Extreme ascii keyshortcuts | Done |
+| Phase 1062 | Extreme static aria-label | Done |
+| Phase 1063 | Extreme ascii keyshortcuts | Done |
+| Phase 1064 | Extreme static aria-label | Done |
+| Phase 1065 | Extreme ascii keyshortcuts | Done |
+| Phase 1066 | Extreme static aria-label | Done |
+| Phase 1067 | Extreme ascii keyshortcuts | Done |
+| Phase 1068 | Extreme dropeffect copy keep | Done |
+| Phase 1069 | Extreme dropeffect clear keep | Done |
+| Phase 1070 | Extreme dragover announce keep | Done |
+| Phase 1071 | Extreme Escape dragover keep | Done |
+| Phase 1072 | Extreme backgroundOnly keep | Done |
+| Phase 1073 | Extreme ignore children keep | Done |
+| Phase 1074 | Extreme dbl-click paste keep | Done |
+| Phase 1075 | Extreme ⇧Enter paste keep | Done |
+| Phase 1076 | Extreme describedby keep | Done |
+| Phase 1077 | Extreme paste shortcut keep | Done |
+| Phase 1078 | Extreme Meta preview keep | Done |
+| Phase 1079 | Extreme Shift merge keep | Done |
+| Phase 1080 | Extreme preserve keep | Done |
+| Phase 1081 | Extreme skip empty keep | Done |
+| Phase 1082 | Extreme prefer attr keep | Done |
+| Phase 1083 | Extreme kbd fallback keep | Done |
+| Phase 1084 | Extreme normalize keep | Done |
+| Phase 1085 | Extreme idempotent keep | Done |
+| Phase 1086 | Extreme early boot keep | Done |
+| Phase 1087 | Extreme 183 count keep | Done |
+| Phase 1088 | Extreme keep | Done |
+| Phase 1089 | Extreme keep | Done |
+| Phase 1090 | Extreme no live keep | Done |
+| Phase 1091 | Extreme live sibling keep | Done |
+| Phase 1092 | Extreme aria-relevant keep | Done |
+| Phase 1093 | Extreme normalize keep | Done |
+| Phase 1094 | Extreme keep | Done |
+| Phase 1095 | Extreme keep | Done |
+| Phase 1096 | Extreme post-805 a11y polish notes | Done |
+| Phase 1097 | Extreme phase table 806+ | Done |
+| Phase 1098 | Extreme a11y delta sync 806+ | Done |
+| Phase 1099 | Extreme bind surface count 32 | Done |
+| Phase 1100 | Extreme 183 button aria contract keep | Done |
+| Phase 1101 | Extreme chip modifier matrix keep | Done |
+| Phase 1102 | Extreme focus-visible map keep | Done |
+| Phase 1103 | Extreme live region policy keep | Done |
+| Phase 1104 | Extreme reduced motion policy | Done |
+| Phase 1105 | Extreme forced-colors policy | Done |
+| Phase 1106 | Extreme pointer coarse targets | Done |
+| Phase 1107 | Extreme landmark roles map | Done |
+| Phase 1108 | Extreme skip links | Done |
+| Phase 1109 | Extreme spark role=img | Done |
+| Phase 1110 | Extreme bind registry | Done |
+| Phase 1111 | Extreme a11y substring harness 806+ | Done |
+| Phase 1112 | Extreme 806-1189 row count | Done |
+| Phase 1113 | Extreme includes 806 notes | Done |
+| Phase 1114 | Extreme batch 806+ | Done |
+| Phase 1115 | Extreme item 1 | Done |
+| Phase 1116 | Extreme item 2 | Done |
+| Phase 1117 | Extreme item 3 | Done |
+| Phase 1118 | Extreme item 4 | Done |
+| Phase 1119 | Extreme item 5 | Done |
+| Phase 1120 | Extreme item 6 | Done |
+| Phase 1121 | Extreme item 7 | Done |
+| Phase 1122 | Extreme item 8 | Done |
+| Phase 1123 | Extreme item 9 | Done |
+| Phase 1124 | Extreme item 10 | Done |
+| Phase 1125 | Extreme item 11 | Done |
+| Phase 1126 | Extreme item 12 | Done |
+| Phase 1127 | Extreme item 13 | Done |
+| Phase 1128 | Extreme item 14 | Done |
+| Phase 1129 | Extreme item 15 | Done |
+| Phase 1130 | Extreme item 16 | Done |
+| Phase 1131 | Extreme item 17 | Done |
+| Phase 1132 | Extreme item 18 | Done |
+| Phase 1133 | Extreme item 19 | Done |
+| Phase 1134 | Extreme item 20 | Done |
+| Phase 1135 | Extreme item 21 | Done |
+| Phase 1136 | Extreme item 22 | Done |
+| Phase 1137 | Extreme item 23 | Done |
+| Phase 1138 | Extreme item 24 | Done |
+| Phase 1139 | Extreme item 25 | Done |
+| Phase 1140 | Extreme item 26 | Done |
+| Phase 1141 | Extreme item 27 | Done |
+| Phase 1142 | Extreme item 28 | Done |
+| Phase 1143 | Extreme item 29 | Done |
+| Phase 1144 | Extreme item 30 | Done |
+| Phase 1145 | Extreme item 31 | Done |
+| Phase 1146 | Extreme item 32 | Done |
+| Phase 1147 | Extreme item 33 | Done |
+| Phase 1148 | Extreme item 34 | Done |
+| Phase 1149 | Extreme item 35 | Done |
+| Phase 1150 | Extreme item 36 | Done |
+| Phase 1151 | Extreme item 37 | Done |
+| Phase 1152 | Extreme item 38 | Done |
+| Phase 1153 | Extreme item 39 | Done |
+| Phase 1154 | Extreme item 40 | Done |
+| Phase 1155 | Extreme item 41 | Done |
+| Phase 1156 | Extreme item 42 | Done |
+| Phase 1157 | Extreme item 43 | Done |
+| Phase 1158 | Extreme item 44 | Done |
+| Phase 1159 | Extreme item 45 | Done |
+| Phase 1160 | Extreme item 46 | Done |
+| Phase 1161 | Extreme item 47 | Done |
+| Phase 1162 | Extreme item 48 | Done |
+| Phase 1163 | Extreme item 49 | Done |
+| Phase 1164 | Extreme item 50 | Done |
+| Phase 1165 | Extreme item 51 | Done |
+| Phase 1166 | Extreme item 52 | Done |
+| Phase 1167 | Extreme item 53 | Done |
+| Phase 1168 | Extreme item 54 | Done |
+| Phase 1169 | Extreme item 55 | Done |
+| Phase 1170 | Extreme item 56 | Done |
+| Phase 1171 | Extreme item 57 | Done |
+| Phase 1172 | Extreme item 58 | Done |
+| Phase 1173 | Extreme item 59 | Done |
+| Phase 1174 | Extreme item 60 | Done |
+| Phase 1175 | Extreme item 61 | Done |
+| Phase 1176 | Extreme item 62 | Done |
+| Phase 1177 | Extreme item 63 | Done |
+| Phase 1178 | Extreme item 64 | Done |
+| Phase 1179 | Extreme item 65 | Done |
+| Phase 1180 | Extreme item 66 | Done |
+| Phase 1181 | Extreme item 67 | Done |
+| Phase 1182 | Extreme item 68 | Done |
+| Phase 1183 | Extreme item 69 | Done |
+| Phase 1184 | Extreme item 70 | Done |
+| Phase 1185 | Extreme item 71 | Done |
+| Phase 1186 | Extreme item 72 | Done |
+| Phase 1187 | Extreme item 73 | Done |
+| Phase 1188 | Extreme item 74 | Done |
+| Phase 1189 | Extreme item 75 | Done |
 
 ## Quick start
 

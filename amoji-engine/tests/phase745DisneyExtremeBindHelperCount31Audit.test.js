@@ -7,6 +7,6 @@ describe('Phase 745 Extreme bindHelperCount31Audit', () => {
   it('covers bindHelperCount31Audit metadata', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('bind helper · surface count audit');
     const src = readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('DISNEY_EXTREME_BIND_SURFACE_COUNT = 31');
+    expect(src).toContain('DISNEY_EXTREME_BIND_SURFACE_COUNT = 32');
   });
 });

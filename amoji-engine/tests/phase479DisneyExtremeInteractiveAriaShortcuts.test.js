@@ -15,7 +15,8 @@ describe('Phase 479 Extreme interactive aria-keyshortcuts', () => {
     expect(src).toContain('aria-keyshortcuts="Enter Space Shift+Enter"');
     expect(src).toContain('id="disneyExtremePin" aria-keyshortcuts="Enter Space Shift+Enter"');
     expect(src).toContain('id="disneyExtremeCurveStrip"');
-    expect(src).toContain('id="disneyExtremePanel" title="Drop Extreme snapshot');
+    expect(src).toContain('id="disneyExtremePanel"');
+    expect(src).toContain('title="Drop Extreme snapshot');
     expect(src).toContain('aria-keyshortcuts="Enter Space Shift+Enter"');
   });
 });

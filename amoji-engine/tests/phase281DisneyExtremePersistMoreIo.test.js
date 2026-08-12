@@ -42,6 +42,6 @@ describe('Phase 281 Extreme More IO open persist', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('loadDisneyExtremeMoreIoOpen');
     expect(src).toContain('saveDisneyExtremeMoreIoOpen');
-    expect(src).toContain("moreIo.addEventListener('toggle'");
+    expect(src).toContain('wireDisneyExtremeDetailsToggle(moreIo');
   });
 });

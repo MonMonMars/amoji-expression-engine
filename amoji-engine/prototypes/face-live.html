@@ -693,7 +693,63 @@
         outline: 2px solid #8ac6ff;
         outline-offset: 2px;
       }
-      :root { --extreme-focus-ring: 2px solid #8ac6ff; --extreme-focus-offset: 2px; }
+      :root {
+        --extreme-focus-ring: 2px solid #8ac6ff;
+        --extreme-focus-offset: 2px;
+        --extreme-focus-ring-width: 2px;
+        color-scheme: light;
+      }
+      /* disneyExtremeA11yPolish806 */
+      @media (prefers-reduced-motion: reduce) {
+        #disneyExtremePanel,
+        #disneyExtremeDirty,
+        #disneyExtremeEaseSpark,
+        #disneyExtremeBodySpark,
+        #disneyExtremeFactorBars,
+        #hudExtremeSpark,
+        #hudBodySpark,
+        #hudExtremeFactors,
+        #pillExtreme {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+      @media (prefers-contrast: more) {
+        :root {
+          --extreme-focus-ring: 3px solid #004d99;
+          --extreme-focus-ring-width: 3px;
+        }
+      }
+      @media (forced-colors: active) {
+        #disneyExtremeStatus,
+        #disneyExtremeDropHint,
+        [id^="btnDisneyExtreme"]:focus-visible {
+          outline: 2px solid CanvasText;
+          outline-offset: 2px;
+        }
+      }
+      @media (pointer: coarse) {
+        #disneyExtremePanel [id^="btnDisneyExtreme"],
+        #disneyExtremeMore [id^="btnDisneyExtreme"],
+        #disneyExtremeHistory button.extreme-hist-chip,
+        #disneyExtremeHistory button.extreme-redo-chip,
+        #disneyExtremeFavorites button.extreme-fav-chip {
+          min-height: 44px;
+          min-width: 44px;
+          padding: 8px 12px;
+        }
+      }
+      #disneyExtremePanel {
+        touch-action: pan-y;
+      }
+      #disneyExtremeHistory button.extreme-hist-chip,
+      #disneyExtremeHistory button.extreme-redo-chip,
+      #disneyExtremeFavorites button.extreme-fav-chip {
+        user-select: none;
+      }
+      #disneyExtremeStatus {
+        user-select: text;
+      }
       #disneyExtremePanel [id^="btnDisneyExtreme"]:focus-visible,
       #disneyExtremeMore [id^="btnDisneyExtreme"]:focus-visible,
       #disneyExtremeStripsFilter:focus-visible,
@@ -931,8 +987,11 @@
         <div class="status" id="tierHint">sculpt: medium band</div>
       </div>
 
-      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste" aria-label="Disney Extreme panel drop and quick actions" aria-keyshortcuts="Enter Space Shift+Enter" aria-describedby="disneyExtremeStatus disneyExtremeDropHint">
-        <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
+      <a href="#disneyExtremePanel" id="disneyExtremeSkipPanel" class="visually-hidden">Skip to Extreme panel</a>
+      <a href="#disneyExtremeStrips" id="disneyExtremeSkipStrips" class="visually-hidden">Skip to Extreme strips</a>
+      <a href="#disneyExtremeMore" id="disneyExtremeSkipMore" class="visually-hidden">Skip to Extreme more IO</a>
+      <div class="group" id="disneyExtremePanel" role="region" aria-label="Disney Extreme panel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste" aria-keyshortcuts="Enter Space Shift+Enter" aria-describedby="disneyExtremeStatus disneyExtremeDropHint">
+        <div class="row" id="disneyExtremeToggleRow" role="group" aria-label="Extreme master toggle" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input
               id="disneyExtreme" type="checkbox" role="switch" aria-labelledby="disneyExtremeLabel" aria-describedby="disneyExtremeStatus" aria-keyshortcuts="X Shift+X Alt+X Shift+Alt+X"
@@ -953,7 +1012,7 @@
             />
           </div>
         </div>
-        <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
+        <div class="row" id="disneyExtremeBodyToggleRow" role="group" aria-label="Extreme body toggle" style="gap:12px;align-items:center;margin-top:6px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input
               id="disneyExtremeBody" type="checkbox" role="switch" checked aria-labelledby="disneyExtremeBodyLabel" aria-describedby="disneyExtremeStatus" aria-keyshortcuts="B Shift+B"
@@ -1013,7 +1072,7 @@
             />
           </label>
         </div>
-        <div class="row" style="margin-top:6px;gap:8px;">
+        <div class="row" id="disneyExtremeToolbar" role="group" aria-label="Extreme actions" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset" title="Reset × defaults · R" aria-keyshortcuts="R" aria-label="Reset × defaults · R">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeResetBundle" title="Reset + all · ⇧R" aria-keyshortcuts="Shift+R" aria-label="Reset + all · ⇧R">Reset + all <kbd>⇧R</kbd></button>
           <button type="button" id="btnDisneyExtremeCopy" title="Copy prefs summary · filter-aware when filter active" aria-keyshortcuts="C" aria-label="Copy prefs summary · filter-aware when filter active">Copy summary <kbd>C</kbd></button>
@@ -1109,7 +1168,7 @@
           <button type="button" id="btnDisneyExtremeCopyCurveStrip" title="Copy curves · ⇧Alt+PageDown" aria-keyshortcuts="Shift+Alt+PageDown" aria-label="Copy curves · ⇧Alt+PageDown">Copy curves <kbd>⇧Alt+PageDown</kbd></button>
           <button type="button" id="btnDisneyExtremeJumpFavSummary" title="Jump fav summary · ⇧Alt+1–8" aria-keyshortcuts="Shift+Alt+1–8" aria-label="Jump fav summary · ⇧Alt+1–8">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
-        <details id="disneyExtremeMore">
+        <details id="disneyExtremeMore" role="group" aria-label="Extreme more IO">
           <summary
             id="disneyExtremeMoreSummary"
             aria-keyshortcuts="Enter Space Shift+Enter"
@@ -1222,8 +1281,7 @@
         >
           <span class="extreme-hist-empty">fav · 0/8</span>
         </div>
-        <details
-          id="disneyExtremeStrips"
+        <details id="disneyExtremeStrips" role="region" aria-label="Extreme strips"
           title="Extreme strips · tips/capacity/roots/active/pin/dirty · PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · summary dbl-click copy · remembered"
         >
           <summary
@@ -1740,6 +1798,28 @@
       }
     </script>
     <script type="module">
+      /* disneyExtremeA11yPolish806Docs
+       * catalog · post-805 a11y polish notes
+       * readme · phase table 806+
+       * FACE_LIVE · a11y delta sync 806+
+       * docs · bind surface count 32
+       * docs · 183 button aria contract keep
+       * docs · chip modifier matrix keep
+       * docs · focus-visible map keep
+       * docs · live region policy keep
+       * docs · reduced motion policy
+       * docs · forced-colors policy
+       * docs · pointer coarse targets
+       * docs · landmark roles map
+       * docs · skip links
+       * docs · spark role=img
+       * docs · bind registry
+       * tests · a11y substring harness 806+
+       * final a11y polish audit · batch 806+
+       * bind registry · length assert
+       * bind registry · push once
+       * Extreme a11y audit batch 806
+       */
       /* disneyExtremeA11yPolish614
        * catalog · post-613 a11y polish notes
        * docs · bind surface count contract
@@ -2273,7 +2353,7 @@
         node.setAttribute('aria-label', node.textContent || '');
       }
 
-      const DISNEY_EXTREME_BIND_SURFACE_COUNT = 31;
+      const DISNEY_EXTREME_BIND_SURFACE_COUNT = 32;
 
       function syncDisneyExtremeToggleAria() {
         if (disneyExtremeEl) {
@@ -6599,9 +6679,9 @@
             moreIo.open = true;
           }
           syncDisneyExtremeDetailsAriaExpanded(moreIo, moreSummary);
-          moreIo.addEventListener('toggle', () => {
-            saveDisneyExtremeMoreIoOpen(!!moreIo.open);
-            syncDisneyExtremeDetailsAriaExpanded(moreIo, moreSummary);
+          // detailsWireHelperUseMore
+          wireDisneyExtremeDetailsToggle(moreIo, moreSummary, {
+            onToggle: (open) => saveDisneyExtremeMoreIoOpen(open),
           });
         }
         bindDisneyExtremeFlashCopySurface(moreSummary, {
@@ -6625,9 +6705,9 @@
             strips.open = true;
           }
           syncDisneyExtremeDetailsAriaExpanded(strips, stripsSummary);
-          strips.addEventListener('toggle', () => {
-            saveDisneyExtremeStripsOpen(!!strips.open);
-            syncDisneyExtremeDetailsAriaExpanded(strips, stripsSummary);
+          // detailsWireHelperUseStrips
+          wireDisneyExtremeDetailsToggle(strips, stripsSummary, {
+            onToggle: (open) => saveDisneyExtremeStripsOpen(open),
           });
         }
       }
@@ -7758,6 +7838,30 @@
         return ok && !empty;
       }
 
+      if (disneyExtremeEaseSpark) {
+        disneyExtremeEaseSpark.setAttribute('role', 'img'); // easeSparkRoleImg
+        disneyExtremeEaseSpark.setAttribute('aria-label', 'Extreme ease curve spark');
+      }
+      if (disneyExtremeBodySpark) {
+        disneyExtremeBodySpark.setAttribute('role', 'img');
+        disneyExtremeBodySpark.setAttribute('aria-label', 'Extreme body mix spark');
+      }
+      if (disneyExtremeFactorBars) {
+        disneyExtremeFactorBars.setAttribute('role', 'img');
+        disneyExtremeFactorBars.setAttribute('aria-label', 'Extreme factor bars');
+      }
+      if (hudExtremeSpark) {
+        hudExtremeSpark.setAttribute('role', 'img');
+        hudExtremeSpark.setAttribute('aria-label', 'HUD Extreme ease spark');
+      }
+      if (hudBodySpark) {
+        hudBodySpark.setAttribute('role', 'img');
+        hudBodySpark.setAttribute('aria-label', 'HUD Extreme body spark');
+      }
+      if (hudExtremeFactors) {
+        hudExtremeFactors.setAttribute('role', 'img');
+        hudExtremeFactors.setAttribute('aria-label', 'HUD Extreme factor bars');
+      }
       bindDisneyExtremeFlashCopySurface(disneyExtremeEaseSpark, {
         onFlash: () => flashDisneyExtremeEaseCurve(),
         onCopy: () => copyDisneyExtremeEaseSvg(),
