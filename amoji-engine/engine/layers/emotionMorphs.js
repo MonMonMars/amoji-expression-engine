@@ -917,6 +917,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'openBaselineAllStrips', help: '⇧Alt+Home open all strips', kind: 'note' },
   { id: 'copyBaselineAllStripsOpen', help: '⇧Alt+End copy all open', kind: 'note' },
   { id: 'allStrips', help: 'all strips · bundle', kind: 'note' },
+  { id: 'allStripsFiltered', help: 'all strips · filtered', kind: 'note' },
+  { id: 'allStripsFilterBit', help: 'filter · bundle', kind: 'note' },
   { id: 'dirtyStrip', help: 'dirty strip · live', kind: 'note' },
   {
     id: 'toggleBaselineStrips',
@@ -2761,6 +2763,144 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
   ].join('\n');
 }
 
+/** Default Extreme all-strips bundle line count (excludes optional curves line). */
+export const DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT = 11;
+
+/** Keys for each Extreme all-strips bundle line (default bundle order). */
+export const DISNEY_EXTREME_ALL_STRIPS_KEYS = [
+  'tips',
+  'capacity',
+  'roots',
+  'active',
+  'pin',
+  'dirty',
+  'factors',
+  'ease',
+  'mix',
+  'neck',
+  'summary',
+];
+
+/**
+ * Filter bit for Extreme all-strips readout when a strips filter is active.
+ * @param {{
+ *   filterQuery?: string,
+ *   filterVisible?: number,
+ *   filterTotal?: number,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeAllStripsFilterBit(opts = {}) {
+  const q = String(opts.filterQuery || '').trim();
+  if (!q) return '';
+  const visible = Math.max(0, Math.floor(Number(opts.filterVisible) || 0));
+  const total = Math.max(
+    0,
+    Math.floor(Number(opts.filterTotal) || DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT),
+  );
+  if (visible === 0) return `filter · "${q}" · none`;
+  return `filter · "${q}" · ${visible}/${total}`;
+}
+
+/**
+ * Build Extreme all-strips bundle entries (key + line text).
+ * @param {object} stacks
+ * @param {object} opts
+ * @returns {{ key: string, text: string }[]}
+ */
+export function buildDisneyExtremeAllStripsEntries(stacks = {}, opts = {}) {
+  const dirtyOpts = {
+    hasBaseline:
+      opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+    dirty: opts.dirty,
+    fp: opts.fp,
+    changeCount: opts.changeCount,
+  };
+  return [
+    { key: 'tips', text: formatDisneyExtremeBaselineTipsLabel(stacks) },
+    {
+      key: 'capacity',
+      text: formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
+    },
+    { key: 'roots', text: formatDisneyExtremeBaselineRootsLabel(stacks) },
+    {
+      key: 'active',
+      text: formatDisneyExtremeBaselineActiveLabel({
+        historyIndex: opts.historyIndex,
+        redoIndex: opts.redoIndex,
+        favoriteIndex: opts.favoriteIndex,
+      }),
+    },
+    { key: 'pin', text: formatDisneyExtremeBaselinePinStripLabel(opts.pin) },
+    {
+      key: 'dirty',
+      text: formatDisneyExtremeBaselineDirtyStripLabel(dirtyOpts),
+    },
+    {
+      key: 'factors',
+      text: formatDisneyExtremeBaselineFactorsStripLabel({
+        enabled: opts.enabled,
+        shapeFactor: opts.shapeFactor,
+        bodyOn: opts.bodyOn,
+        bodyFactor: opts.bodyFactor,
+        eyeFactor: opts.eyeFactor,
+        mouthFactor: opts.mouthFactor,
+      }),
+    },
+    {
+      key: 'ease',
+      text: formatDisneyExtremeBaselineEaseStripLabel({
+        enabled: opts.enabled,
+        markerT: opts.markerT ?? opts.shapeInt,
+      }),
+    },
+    {
+      key: 'mix',
+      text: formatDisneyExtremeBaselineMixStripLabel({
+        enabled: opts.enabled,
+        bodyOn: opts.bodyOn,
+        markerT: opts.bodyMarkerT ?? opts.bodyInt,
+      }),
+    },
+    {
+      key: 'neck',
+      text: formatDisneyExtremeBaselineNeckStripLabel({
+        enabled: opts.enabled,
+        bodyOn: opts.bodyOn,
+        neckBlend: opts.neckBlend,
+        bodyMix: opts.bodyMix,
+        bodyInt: opts.bodyInt,
+      }),
+    },
+    {
+      key: 'curves',
+      text: formatDisneyExtremeBaselineCurveStripsLabel({
+        enabled: opts.enabled,
+        markerT: opts.markerT ?? opts.shapeInt,
+        bodyOn: opts.bodyOn,
+        bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+        neckBlend: opts.neckBlend,
+        bodyMix: opts.bodyMix,
+        bodyInt: opts.bodyInt,
+      }),
+    },
+    {
+      key: 'summary',
+      text: formatDisneyExtremeBaselineStripsSummaryLabel(stacks, dirtyOpts),
+    },
+  ];
+}
+
+/**
+ * Filter Extreme all-strips bundle keys (defaults to full bundle when empty).
+ * @param {string[]|null|undefined} stripKeys
+ * @returns {string[]|null}
+ */
+export function filterDisneyExtremeAllStripsKeys(stripKeys) {
+  if (!Array.isArray(stripKeys) || !stripKeys.length) return null;
+  return stripKeys.map((k) => String(k || '').trim()).filter(Boolean);
+}
+
 /**
  * One-line Extreme all-strips readout (status flash).
  * @param {{
@@ -2789,6 +2929,10 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
  *   bodyFactor?: number,
  *   eyeFactor?: number,
  *   mouthFactor?: number,
+ *   filterQuery?: string,
+ *   filterVisible?: number,
+ *   filterTotal?: number,
+ *   stripKeys?: string[],
  * }} [opts]
  * @returns {string}
  */
@@ -2814,7 +2958,9 @@ export function formatDisneyExtremeBaselineAllStripsLabel(stacks = {}, opts = {}
     bodyMix: opts.bodyMix,
     bodyInt: opts.bodyInt,
   });
-  return `all · ${summary} · ${factors} · ${curves}`;
+  const filterBit = formatDisneyExtremeAllStripsFilterBit(opts);
+  const prefix = filterBit ? `all · ${filterBit}` : 'all';
+  return `${prefix} · ${summary} · ${factors} · ${curves}`;
 }
 
 /**
@@ -2852,55 +2998,12 @@ export function formatDisneyExtremeBaselineAllStripsBundle(
   stacks = {},
   opts = {},
 ) {
-  return [
-    formatDisneyExtremeBaselineTipsLabel(stacks),
-    formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
-    formatDisneyExtremeBaselineRootsLabel(stacks),
-    formatDisneyExtremeBaselineActiveLabel({
-      historyIndex: opts.historyIndex,
-      redoIndex: opts.redoIndex,
-      favoriteIndex: opts.favoriteIndex,
-    }),
-    formatDisneyExtremeBaselinePinStripLabel(opts.pin),
-    formatDisneyExtremeBaselineDirtyStripLabel({
-      hasBaseline:
-        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
-      dirty: opts.dirty,
-      fp: opts.fp,
-      changeCount: opts.changeCount,
-    }),
-    formatDisneyExtremeBaselineFactorsStripLabel({
-      enabled: opts.enabled,
-      shapeFactor: opts.shapeFactor,
-      bodyOn: opts.bodyOn,
-      bodyFactor: opts.bodyFactor,
-      eyeFactor: opts.eyeFactor,
-      mouthFactor: opts.mouthFactor,
-    }),
-    formatDisneyExtremeBaselineEaseStripLabel({
-      enabled: opts.enabled,
-      markerT: opts.markerT ?? opts.shapeInt,
-    }),
-    formatDisneyExtremeBaselineMixStripLabel({
-      enabled: opts.enabled,
-      bodyOn: opts.bodyOn,
-      markerT: opts.bodyMarkerT ?? opts.bodyInt,
-    }),
-    formatDisneyExtremeBaselineNeckStripLabel({
-      enabled: opts.enabled,
-      bodyOn: opts.bodyOn,
-      neckBlend: opts.neckBlend,
-      bodyMix: opts.bodyMix,
-      bodyInt: opts.bodyInt,
-    }),
-    formatDisneyExtremeBaselineStripsSummaryLabel(stacks, {
-      hasBaseline:
-        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
-      dirty: opts.dirty,
-      fp: opts.fp,
-      changeCount: opts.changeCount,
-    }),
-  ].join('\n');
+  const entries = buildDisneyExtremeAllStripsEntries(stacks, opts);
+  const stripKeys = filterDisneyExtremeAllStripsKeys(opts.stripKeys);
+  const selected = stripKeys
+    ? entries.filter((entry) => stripKeys.includes(entry.key))
+    : entries.filter((entry) => entry.key !== 'curves');
+  return selected.map((entry) => entry.text).join('\n');
 }
 
 /**

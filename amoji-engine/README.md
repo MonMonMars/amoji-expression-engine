@@ -428,7 +428,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 415 | Extreme Shift+F12 copy filter | Done |
 | Phase 416 | Extreme ⇧Alt+F12 clear filter | Done |
 | Phase 417 | Extreme Alt+F12 copy digest | Done |
-| Phase 418+ | Further production polish… | Specced |
+| Phase 418 | Extreme all-strips keys + filter bit | Done |
+| Phase 419 | Extreme filtered all-strips bundle | Done |
+| Phase 420 | Extreme filter-aware all-strips flash/copy | Done |
+| Phase 421 | Extreme all-strips filtered catalog + docs | Done |
+| Phase 422+ | Further production polish… | Specced |
 
 ## Quick start
 

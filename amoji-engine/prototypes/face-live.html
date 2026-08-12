@@ -987,8 +987,8 @@
           <button type="button" id="btnDisneyExtremeCopyHudBundle">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStrip">Dirty strip <kbd>Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
-          <button type="button" id="btnDisneyExtremeAllStrips">All strips <kbd>Alt+Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyAllStrips">Copy all strips <kbd>Alt+End</kbd></button>
+          <button type="button" id="btnDisneyExtremeAllStrips" title="All strips · filter-aware when filter active">All strips <kbd>Alt+Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStrips" title="Copy all strips · filtered bundle when filter active">Copy all strips <kbd>Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenAllStrips">Open all strips <kbd>⇧Alt+Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyAllStripsOpen">Copy all open <kbd>⇧Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
@@ -1620,8 +1620,10 @@
         formatDisneyExtremeBaselineNeckStripLabel,
         formatDisneyExtremeBaselineCurveStripsLabel,
         formatDisneyExtremeBaselineCurveStripsBundle,
+        DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT,
         formatDisneyExtremeBaselineAllStripsLabel,
         formatDisneyExtremeBaselineAllStripsBundle,
+        filterDisneyExtremeAllStripsKeys,
         formatDisneyExtremeNeckFactorsBundle,
         buildDisneyExtremeFactorBarsSvg,
         buildDisneyExtremeLiveSnapshot,
@@ -2906,9 +2908,29 @@
         };
       }
 
+      function disneyExtremeAllStripsVisibleKeys() {
+        applyDisneyExtremeStripsFilter();
+        const keys = [];
+        for (const id of DISNEY_EXTREME_STRIP_IDS) {
+          const el = document.getElementById(id);
+          if (el && !el.hidden) {
+            keys.push(DISNEY_EXTREME_STRIP_SHORT_NAMES[id] || id);
+          }
+        }
+        return filterDisneyExtremeAllStripsKeys(keys);
+      }
+
       function disneyExtremeAllStripsOpts() {
+        const filter = applyDisneyExtremeStripsFilter();
+        const q = String(filter.query || '').trim();
+        const base = disneyExtremeHudBundleActiveOpts();
+        if (!q) return base;
         return {
-          ...disneyExtremeHudBundleActiveOpts(),
+          ...base,
+          filterQuery: q,
+          filterVisible: filter.visible,
+          filterTotal: filter.total,
+          stripKeys: disneyExtremeAllStripsVisibleKeys(),
         };
       }
 
