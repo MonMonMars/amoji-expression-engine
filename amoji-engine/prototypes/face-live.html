@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -698,6 +698,34 @@
         --extreme-focus-offset: 2px;
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
+      }
+      /* disneyExtremeA11yPolish1190 */
+      @media print {
+        #hudExtremeSpark, #hudBodySpark, #hudExtremeFactors, #pillExtreme,
+        #disneyExtremeSkipPanel, #disneyExtremeSkipStrips, #disneyExtremeSkipMore {
+          display: none !important;
+        }
+        #disneyExtremeStatus { color: #000 !important; }
+      }
+      #disneyExtremePanel {
+        max-width: 100%;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+      }
+      #disneyExtremeHistory button.extreme-hist-chip,
+      #disneyExtremeHistory button.extreme-redo-chip,
+      #disneyExtremeFavorites button.extreme-fav-chip {
+        max-width: 12rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #disneyExtremeStatus {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+      #disneyExtremeToolbar {
+        flex-wrap: wrap;
       }
       /* disneyExtremeA11yPolish806 */
       @media (prefers-reduced-motion: reduce) {
@@ -1798,6 +1826,28 @@
       }
     </script>
     <script type="module">
+      /* disneyExtremeA11yPolish1190Docs
+       * catalog · post-1189 a11y polish notes
+       * readme · phase table 1190+
+       * FACE_LIVE · a11y delta sync 1190+
+       * docs · bind surface count 32 keep
+       * docs · 183 button aria keep
+       * docs · chip modifier matrix keep
+       * docs · focus-visible map keep
+       * docs · live region policy keep
+       * docs · reduced motion keep
+       * docs · forced-colors keep
+       * docs · pointer coarse keep
+       * docs · landmark roles keep
+       * docs · skip links keep
+       * docs · spark role=img keep
+       * docs · bind registry keep
+       * docs · English UI copy policy
+       * docs · print/zoom policy
+       * tests · a11y substring harness 1190+
+       * final a11y polish audit · batch 1190+
+       * Extreme a11y batch2 audit
+       */
       /* disneyExtremeA11yPolish806Docs
        * catalog · post-805 a11y polish notes
        * readme · phase table 806+
