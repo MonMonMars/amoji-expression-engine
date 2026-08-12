@@ -699,6 +699,32 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1958 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel :focus-visible {
+          outline-width: 3px;
+        }
+        #disneyExtremeStatus {
+          font-weight: 600;
+        }
+      }
+      #disneyExtremePanel {
+        scroll-padding-top: 0.5rem;
+        overscroll-behavior: contain;
+        box-sizing: border-box;
+      }
+      #disneyExtremePanel button,
+      #disneyExtremePanel input {
+        touch-action: manipulation;
+      }
+      #disneyExtremeStripsFilter {
+        caret-color: currentColor;
+      }
+      #disneyExtremeHistory button.extreme-hist-chip,
+      #disneyExtremeHistory button.extreme-redo-chip,
+      #disneyExtremeFavorites button.extreme-fav-chip {
+        font-variant-numeric: tabular-nums;
+      }
       /* disneyExtremeA11yPolish1190 */
       @media print {
         #hudExtremeSpark, #hudBodySpark, #hudExtremeFactors, #pillExtreme,
@@ -1826,6 +1852,28 @@
       }
     </script>
     <script type="module">
+      /* disneyExtremeA11yPolish1958Docs
+       * catalog · post-1957 a11y polish notes
+       * readme · phase table 1958+
+       * FACE_LIVE · a11y delta sync 1958+
+       * docs · bind surface count 32 keep4
+       * docs · 183 button aria keep4
+       * docs · chip modifier matrix keep4
+       * docs · focus-visible map keep4
+       * docs · live region policy keep4
+       * docs · reduced motion keep4
+       * docs · forced-colors keep4
+       * docs · pointer coarse keep4
+       * docs · landmark roles keep4
+       * docs · skip links keep4
+       * docs · spark role=img keep4
+       * docs · bind registry keep4
+       * docs · typography policy keep4
+       * docs · interaction policy keep4
+       * tests · a11y substring harness 1958+
+       * final a11y polish audit · batch 1958+
+       * Extreme a11y batch3 audit
+       */
       /* disneyExtremeA11yPolish1190Docs
        * catalog · post-1189 a11y polish notes
        * readme · phase table 1190+
