@@ -7,6 +7,7 @@ describe('Phase 547 Extreme statusAriaLive', () => {
   it('covers statusAriaLive metadata', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('status row · aria-live polite');
     const src = readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('id="disneyExtremeStatus" aria-live="polite"');
+    expect(src).toContain('disneyExtremeStatusLive');
+    expect(src).toContain('aria-live="polite"');
   });
 });

@@ -7,6 +7,6 @@ describe('Phase 540 Extreme extremeToggleAriaKeyshortcuts', () => {
   it('covers extremeToggleAriaKeyshortcuts metadata', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Extreme toggles · aria-keyshortcuts');
     const src = readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('aria-keyshortcuts="X Shift+X"');
+    expect(src).toContain('aria-keyshortcuts="X Shift+X Alt+X Shift+Alt+X"');
   });
 });

@@ -624,6 +624,198 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 611 | Extreme bind helper audit | Done |
 | Phase 612 | Extreme button aria audit | Done |
 | Phase 613 | Extreme final a11y audit | Done |
+| Phase 614 | Extreme reset/toggle static aria-label | Done |
+| Phase 615 | Extreme E/M/F/N static aria-label | Done |
+| Phase 616 | Extreme baseline/diff/pin static aria-label | Done |
+| Phase 617 | Extreme hist/fav jump static aria-label | Done |
+| Phase 618 | Extreme active/HUD/dirty static aria-label | Done |
+| Phase 619 | Extreme strips F-key static aria-label | Done |
+| Phase 620 | Extreme filter/focus static aria-label | Done |
+| Phase 621 | Extreme static aria-label | Done |
+| Phase 622 | Extreme static aria-label | Done |
+| Phase 623 | Extreme preserve existing aria-label | Done |
+| Phase 624 | Extreme skip empty title | Done |
+| Phase 625 | Extreme early boot before listeners | Done |
+| Phase 626 | Extreme 183 aria-label audit | Done |
+| Phase 627 | Extreme title/aria-label parity | Done |
+| Phase 628 | Extreme normalize ⇧→Shift | Done |
+| Phase 629 | Extreme normalize ←→↑↓ | Done |
+| Phase 630 | Extreme Alt token audit | Done |
+| Phase 631 | Extreme prefer markup aria-keyshortcuts | Done |
+| Phase 632 | Extreme kbd text fallback only | Done |
+| Phase 633 | Extreme Shift+Alt+F12 parity | Done |
+| Phase 634 | Extreme aria-keyshortcuts [ ] | Done |
+| Phase 635 | Extreme aria-keyshortcuts - = | Done |
+| Phase 636 | Extreme aria-keyshortcuts , . | Done |
+| Phase 637 | Extreme aria-keyshortcuts ; ' | Done |
+| Phase 638 | Extreme Alt+X ⇧Alt+X shortcuts | Done |
+| Phase 639 | Extreme enable extras shortcuts | Done |
+| Phase 640 | Extreme H Alt+H digest shortcuts | Done |
+| Phase 641 | Extreme paste shortcut metadata | Done |
+| Phase 642 | Extreme drop/paste shortcut audit | Done |
+| Phase 643 | Extreme focus-visible | Done |
+| Phase 644 | Extreme focus-visible | Done |
+| Phase 645 | Extreme focus-visible | Done |
+| Phase 646 | Extreme focus-visible | Done |
+| Phase 647 | Extreme focus-visible | Done |
+| Phase 648 | Extreme focus-visible | Done |
+| Phase 649 | Extreme focus-visible without role | Done |
+| Phase 650 | Extreme focus-visible | Done |
+| Phase 651 | Extreme focus-visible | Done |
+| Phase 652 | Extreme focus-visible | Done |
+| Phase 653 | Extreme focus-visible | Done |
+| Phase 654 | Extreme focus-visible | Done |
+| Phase 655 | Extreme focus-visible | Done |
+| Phase 656 | Extreme focus-visible selector | Done |
+| Phase 657 | Extreme shared focus-visible token | Done |
+| Phase 658 | Extreme contrast outline audit | Done |
+| Phase 659 | Extreme Ctrl+Space unstar fav | Done |
+| Phase 660 | Extreme Ctrl+Space remove hist/redo | Done |
+| Phase 661 | Extreme Meta+Space preview | Done |
+| Phase 662 | Extreme Ctrl+click unstar | Done |
+| Phase 663 | Extreme dbl-click pin | Done |
+| Phase 664 | Extreme Meta+click preview | Done |
+| Phase 665 | Extreme fav kind aware | Done |
+| Phase 666 | Extreme fav kind label | Done |
+| Phase 667 | Extreme optional Space copy | Done |
+| Phase 668 | Extreme Alt+Enter paste | Done |
+| Phase 669 | Extreme Escape clear opt | Done |
+| Phase 670 | Extreme status announce | Done |
+| Phase 671 | Extreme Δ announce | Done |
+| Phase 672 | Extreme Δ announce | Done |
+| Phase 673 | Extreme keyboard paste parity note | Done |
+| Phase 674 | Extreme Meta preview keyboard mirror | Done |
+| Phase 675 | Extreme Shift merge keyboard mirror | Done |
+| Phase 676 | Extreme ArrowUp blur/return | Done |
+| Phase 677 | Extreme Shift+Enter copy | Done |
+| Phase 678 | Extreme ⇧Enter clear | Done |
+| Phase 679 | Extreme Delete clear hold | Done |
+| Phase 680 | Extreme Escape clear dragover | Done |
+| Phase 681 | Extreme Delete clear active | Done |
+| Phase 682 | Extreme Delete clear active | Done |
+| Phase 683 | Extreme avoid double aria-live | Done |
+| Phase 684 | Extreme live sibling only | Done |
+| Phase 685 | Extreme aria-atomic assert | Done |
+| Phase 686 | Extreme aria-relevant additions | Done |
+| Phase 687 | Extreme no aria-live spam | Done |
+| Phase 688 | Extreme role=status keep | Done |
+| Phase 689 | Extreme aria-current | Done |
+| Phase 690 | Extreme aria-pressed | Done |
+| Phase 691 | Extreme aria-current when active | Done |
+| Phase 692 | Extreme aria-current when active | Done |
+| Phase 693 | Extreme aria-current when active | Done |
+| Phase 694 | Extreme aria-busy pulse | Done |
+| Phase 695 | Extreme aria-busy pulse | Done |
+| Phase 696 | Extreme live polite update | Done |
+| Phase 697 | Extreme open/close announce | Done |
+| Phase 698 | Extreme open/close announce | Done |
+| Phase 699 | Extreme polite update | Done |
+| Phase 700 | Extreme route via status live | Done |
+| Phase 701 | Extreme status announce | Done |
+| Phase 702 | Extreme status live assert | Done |
+| Phase 703 | Extreme announce | Done |
+| Phase 704 | Extreme role=switch opt | Done |
+| Phase 705 | Extreme role=switch opt | Done |
+| Phase 706 | Extreme aria-describedby help | Done |
+| Phase 707 | Extreme aria-describedby | Done |
+| Phase 708 | Extreme aria-describedby val | Done |
+| Phase 709 | Extreme aria-describedby val | Done |
+| Phase 710 | Extreme aria-describedby val | Done |
+| Phase 711 | Extreme aria-describedby val | Done |
+| Phase 712 | Extreme decorative audit | Done |
+| Phase 713 | Extreme aria-orientation horizontal | Done |
+| Phase 714 | Extreme step in valuetext | Done |
+| Phase 715 | Extreme disabled/aria-disabled sync | Done |
+| Phase 716 | Extreme aria-haspopup listbox | Done |
+| Phase 717 | Extreme aria-expanded | Done |
+| Phase 718 | Extreme aria-owns strips | Done |
+| Phase 719 | Extreme role=group label | Done |
+| Phase 720 | Extreme aria-autocomplete list assert | Done |
+| Phase 721 | Extreme not sole name | Done |
+| Phase 722 | Extreme shorten SR kbd noise | Done |
+| Phase 723 | Extreme hit target audit | Done |
+| Phase 724 | Extreme re-sync aria-label on title | Done |
+| Phase 725 | Extreme aria-keyshortcuts Ctrl+Space | Done |
+| Phase 726 | Extreme aria-keyshortcuts Meta+Space | Done |
+| Phase 727 | Extreme unstar/remove split | Done |
+| Phase 728 | Extreme native button no role=button | Done |
+| Phase 729 | Extreme native button tabindex audit | Done |
+| Phase 730 | Extreme focus ring + current | Done |
+| Phase 731 | Extreme shared modifier map | Done |
+| Phase 732 | Extreme click timer clear audit | Done |
+| Phase 733 | Extreme keyboard mirrors click | Done |
+| Phase 734 | Extreme fav unstar click/key parity | Done |
+| Phase 735 | Extreme hist/redo remove parity | Done |
+| Phase 736 | Extreme ariaFromTitle opt | Done |
+| Phase 737 | Extreme describedBy opt | Done |
+| Phase 738 | Extreme labelledBy opt | Done |
+| Phase 739 | Extreme keyshortcuts opt | Done |
+| Phase 740 | Extreme skipLive opt | Done |
+| Phase 741 | Extreme onDelete alias onClear | Done |
+| Phase 742 | Extreme ⇧Enter paste contract | Done |
+| Phase 743 | Extreme backgroundOnly contract | Done |
+| Phase 744 | Extreme ignoreChildTargets doc | Done |
+| Phase 745 | Extreme surface count audit | Done |
+| Phase 746 | Extreme tabindex 0 with skipRole | Done |
+| Phase 747 | Extreme skipRole native | Done |
+| Phase 748 | Extreme skipRole native | Done |
+| Phase 749 | Extreme skipRole status | Done |
+| Phase 750 | Extreme describedBy status | Done |
+| Phase 751 | Extreme skipRole/backgroundOnly assert | Done |
+| Phase 752 | Extreme copy guard | Done |
+| Phase 753 | Extreme chip active aria-current | Done |
+| Phase 754 | Extreme boot assert | Done |
+| Phase 755 | Extreme on disable flip | Done |
+| Phase 756 | Extreme aria-expanded with query | Done |
+| Phase 757 | Extreme empty id | Done |
+| Phase 758 | Extreme aria-controls assert | Done |
+| Phase 759 | Extreme aria-label from text | Done |
+| Phase 760 | Extreme describedBy live | Done |
+| Phase 761 | Extreme aria-label refresh | Done |
+| Phase 762 | Extreme aria-label refresh | Done |
+| Phase 763 | Extreme aria-label refresh | Done |
+| Phase 764 | Extreme aria-label refresh | Done |
+| Phase 765 | Extreme aria-dropeffect copy | Done |
+| Phase 766 | Extreme clear dropeffect | Done |
+| Phase 767 | Extreme dynamic aria-label | Done |
+| Phase 768 | Extreme aria-describedby ease/mix | Done |
+| Phase 769 | Extreme aria-describedby bars | Done |
+| Phase 770 | Extreme aria-labelledby assert | Done |
+| Phase 771 | Extreme aria-describedby assert | Done |
+| Phase 772 | Extreme aria parity with panel | Done |
+| Phase 773 | Extreme aria-describedby status | Done |
+| Phase 774 | Extreme aria-labelledby | Done |
+| Phase 775 | Extreme aria-hidden | Done |
+| Phase 776 | Extreme hidden/aria sync | Done |
+| Phase 777 | Extreme text→aria refresh | Done |
+| Phase 778 | Extreme text→aria refresh | Done |
+| Phase 779 | Extreme click map wire helper | Done |
+| Phase 780 | Extreme click map wire helper | Done |
+| Phase 781 | Extreme click map wire helper | Done |
+| Phase 782 | Extreme click map wire helper | Done |
+| Phase 783 | Extreme dedupe change listeners | Done |
+| Phase 784 | Extreme shared input/change wire | Done |
+| Phase 785 | Extreme extract preview/diff/compare | Done |
+| Phase 786 | Extreme registry list | Done |
+| Phase 787 | Extreme idempotent re-run | Done |
+| Phase 788 | Extreme toggle+persist+aria helper | Done |
+| Phase 789 | Extreme SR-visible state | Done |
+| Phase 790 | Extreme role=button assert | Done |
+| Phase 791 | Extreme tabindex 0 assert | Done |
+| Phase 792 | Extreme ignore interactive children | Done |
+| Phase 793 | Extreme aria-expanded live | Done |
+| Phase 794 | Extreme aria-expanded live | Done |
+| Phase 795 | Extreme marker hidden a11y | Done |
+| Phase 796 | Extreme post-613 a11y polish notes | Done |
+| Phase 797 | Extreme phase table 614+ | Done |
+| Phase 798 | Extreme a11y delta sync | Done |
+| Phase 799 | Extreme bind surface count contract | Done |
+| Phase 800 | Extreme 183 button aria contract | Done |
+| Phase 801 | Extreme chip modifier matrix | Done |
+| Phase 802 | Extreme focus-visible coverage map | Done |
+| Phase 803 | Extreme live region policy | Done |
+| Phase 804 | Extreme a11y substring harness batch | Done |
+| Phase 805 | Extreme batch 614+ | Done |
 
 ## Quick start
 

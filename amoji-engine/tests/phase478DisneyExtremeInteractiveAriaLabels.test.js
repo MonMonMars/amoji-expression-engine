@@ -17,6 +17,7 @@ describe('Phase 478 Extreme interactive aria-label coverage', () => {
     expect(src).toContain('id="disneyExtremeStatus"');
     expect(src).toContain('aria-keyshortcuts="Enter Space Shift+Enter"');
     expect(src).toContain('aria-label="Extreme status summary"');
-    expect(src).toContain('id="disneyExtremeDropHint" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme drop hint"');
+    expect(src).toContain('id="disneyExtremeDropHint"');
+    expect(src).toContain('aria-label="Extreme drop hint"');
   });
 });

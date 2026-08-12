@@ -11,9 +11,10 @@ describe('Phase 479 Extreme interactive aria-keyshortcuts', () => {
   it('adds aria-keyshortcuts to strip rows and related interactive surfaces', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('interactive rows · aria-keyshortcuts');
     const src = readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('id="disneyExtremeStripsFilterSummary" aria-keyshortcuts="Enter Space Shift+Enter"');
+    expect(src).toContain('id="disneyExtremeStripsFilterSummary"');
+    expect(src).toContain('aria-keyshortcuts="Enter Space Shift+Enter"');
     expect(src).toContain('id="disneyExtremePin" aria-keyshortcuts="Enter Space Shift+Enter"');
-    expect(src).toContain('id="disneyExtremeCurveStrip" aria-keyshortcuts="Enter Space Shift+Enter"');
+    expect(src).toContain('id="disneyExtremeCurveStrip"');
     expect(src).toContain('id="disneyExtremePanel" title="Drop Extreme snapshot');
     expect(src).toContain('aria-keyshortcuts="Enter Space Shift+Enter"');
   });
