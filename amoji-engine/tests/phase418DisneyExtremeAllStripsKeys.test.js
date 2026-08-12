@@ -26,7 +26,8 @@ describe('Phase 418 Extreme all-strips keys + filter bit', () => {
       'pin',
       'dirty',
     ]);
-    expect(filterDisneyExtremeAllStripsKeys([])).toBeNull();
+    expect(filterDisneyExtremeAllStripsKeys([])).toEqual([]);
+    expect(filterDisneyExtremeAllStripsKeys(null)).toBeNull();
     expect(engine.DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT).toBe(11);
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('filter · bundle');
   });

@@ -432,7 +432,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 419 | Extreme filtered all-strips bundle | Done |
 | Phase 420 | Extreme filter-aware all-strips flash/copy | Done |
 | Phase 421 | Extreme all-strips filtered catalog + docs | Done |
-| Phase 422+ | Further production polish… | Specced |
+| Phase 422 | Extreme empty-filter all-strips edge case | Done |
+| Phase 423 | Extreme filter-aware HUD bundle | Done |
+| Phase 424 | Extreme persist strips filter query | Done |
+| Phase 425 | Extreme filter status + copy polish | Done |
+| Phase 426+ | Further production polish… | Specced |
 
 ## Quick start
 

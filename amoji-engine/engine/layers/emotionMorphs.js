@@ -886,6 +886,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showBaselinePinStrip', help: 'Shift+Enter pin strip', kind: 'note' },
   { id: 'showBaselineHudBundle', help: 'Alt+Enter hud bundle', kind: 'note' },
   { id: 'copyBaselineHudBundle', help: '⇧Alt+Enter copy hud', kind: 'note' },
+  { id: 'hudBundleFiltered', help: 'hud bundle · filtered', kind: 'note' },
+  { id: 'persistStripsFilter', help: 'filter · remember query', kind: 'note' },
   {
     id: 'showBaselineRoots',
     keys: ['\\', '|'],
@@ -2618,6 +2620,81 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
   })}`;
 }
 
+/** Default Extreme HUD bundle line count. */
+export const DISNEY_EXTREME_HUD_BUNDLE_LINE_COUNT = 8;
+
+/** Keys for each Extreme HUD bundle line (default bundle order). */
+export const DISNEY_EXTREME_HUD_BUNDLE_KEYS = [
+  'tips',
+  'roots',
+  'capacity',
+  'active',
+  'pin',
+  'dirty',
+  'factors',
+  'curves',
+];
+
+/**
+ * Build Extreme HUD bundle entries (key + line text).
+ * @param {object} stacks
+ * @param {object} opts
+ * @returns {{ key: string, text: string }[]}
+ */
+export function buildDisneyExtremeHudBundleEntries(stacks = {}, opts = {}) {
+  const dirtyOpts = {
+    hasBaseline:
+      opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+    dirty: opts.dirty,
+    fp: opts.fp,
+    changeCount: opts.changeCount,
+  };
+  return [
+    { key: 'tips', text: formatDisneyExtremeBaselineTipsLabel(stacks) },
+    { key: 'roots', text: formatDisneyExtremeBaselineRootsLabel(stacks) },
+    {
+      key: 'capacity',
+      text: formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
+    },
+    {
+      key: 'active',
+      text: formatDisneyExtremeBaselineActiveLabel({
+        historyIndex: opts.historyIndex,
+        redoIndex: opts.redoIndex,
+        favoriteIndex: opts.favoriteIndex,
+      }),
+    },
+    { key: 'pin', text: formatDisneyExtremeBaselinePinStripLabel(opts.pin) },
+    {
+      key: 'dirty',
+      text: formatDisneyExtremeBaselineDirtyStripLabel(dirtyOpts),
+    },
+    {
+      key: 'factors',
+      text: formatDisneyExtremeBaselineFactorsStripLabel({
+        enabled: opts.enabled,
+        shapeFactor: opts.shapeFactor,
+        bodyOn: opts.bodyOn,
+        bodyFactor: opts.bodyFactor,
+        eyeFactor: opts.eyeFactor,
+        mouthFactor: opts.mouthFactor,
+      }),
+    },
+    {
+      key: 'curves',
+      text: formatDisneyExtremeBaselineCurveStripsLabel({
+        enabled: opts.enabled,
+        markerT: opts.markerT ?? opts.shapeInt,
+        bodyOn: opts.bodyOn,
+        bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
+        neckBlend: opts.neckBlend,
+        bodyMix: opts.bodyMix,
+        bodyInt: opts.bodyInt,
+      }),
+    },
+  ];
+}
+
 /**
  * One-line Extreme HUD bundle summary (status flash).
  * @param {{
@@ -2646,6 +2723,10 @@ export function formatDisneyExtremeBaselinePinStripLabel(snap) {
  *   bodyFactor?: number,
  *   eyeFactor?: number,
  *   mouthFactor?: number,
+ *   filterQuery?: string,
+ *   filterVisible?: number,
+ *   filterTotal?: number,
+ *   stripKeys?: string[],
  * }} [opts]
  * @returns {string}
  */
@@ -2687,7 +2768,9 @@ export function formatDisneyExtremeBaselineHudBundleSummary(
     bodyMix: opts.bodyMix,
     bodyInt: opts.bodyInt,
   });
-  return `hud · ${capacity} · ${active} · ${pin} · ${dirty} · ${factors} · ${curves}`;
+  const filterBit = formatDisneyExtremeAllStripsFilterBit(opts);
+  const prefix = filterBit ? `hud · ${filterBit}` : 'hud';
+  return `${prefix} · ${capacity} · ${active} · ${pin} · ${dirty} · ${factors} · ${curves}`;
 }
 
 /**
@@ -2726,41 +2809,15 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
   stacks = {},
   opts = {},
 ) {
-  return [
-    formatDisneyExtremeBaselineTipsLabel(stacks),
-    formatDisneyExtremeBaselineRootsLabel(stacks),
-    formatDisneyExtremeBaselineStacksCapacityLabel(stacks),
-    formatDisneyExtremeBaselineActiveLabel({
-      historyIndex: opts.historyIndex,
-      redoIndex: opts.redoIndex,
-      favoriteIndex: opts.favoriteIndex,
-    }),
-    formatDisneyExtremeBaselinePinStripLabel(opts.pin),
-    formatDisneyExtremeBaselineDirtyStripLabel({
-      hasBaseline:
-        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
-      dirty: opts.dirty,
-      fp: opts.fp,
-      changeCount: opts.changeCount,
-    }),
-    formatDisneyExtremeBaselineFactorsStripLabel({
-      enabled: opts.enabled,
-      shapeFactor: opts.shapeFactor,
-      bodyOn: opts.bodyOn,
-      bodyFactor: opts.bodyFactor,
-      eyeFactor: opts.eyeFactor,
-      mouthFactor: opts.mouthFactor,
-    }),
-    formatDisneyExtremeBaselineCurveStripsLabel({
-      enabled: opts.enabled,
-      markerT: opts.markerT ?? opts.shapeInt,
-      bodyOn: opts.bodyOn,
-      bodyMarkerT: opts.bodyMarkerT ?? opts.bodyInt,
-      neckBlend: opts.neckBlend,
-      bodyMix: opts.bodyMix,
-      bodyInt: opts.bodyInt,
-    }),
-  ].join('\n');
+  const entries = buildDisneyExtremeHudBundleEntries(stacks, opts);
+  const stripKeys = Array.isArray(opts.stripKeys)
+    ? filterDisneyExtremeAllStripsKeys(opts.stripKeys)
+    : null;
+  const selected =
+    stripKeys !== null
+      ? entries.filter((entry) => stripKeys.includes(entry.key))
+      : entries;
+  return selected.map((entry) => entry.text).join('\n');
 }
 
 /** Default Extreme all-strips bundle line count (excludes optional curves line). */
@@ -2897,7 +2954,7 @@ export function buildDisneyExtremeAllStripsEntries(stacks = {}, opts = {}) {
  * @returns {string[]|null}
  */
 export function filterDisneyExtremeAllStripsKeys(stripKeys) {
-  if (!Array.isArray(stripKeys) || !stripKeys.length) return null;
+  if (!Array.isArray(stripKeys)) return null;
   return stripKeys.map((k) => String(k || '').trim()).filter(Boolean);
 }
 
@@ -2999,10 +3056,13 @@ export function formatDisneyExtremeBaselineAllStripsBundle(
   opts = {},
 ) {
   const entries = buildDisneyExtremeAllStripsEntries(stacks, opts);
-  const stripKeys = filterDisneyExtremeAllStripsKeys(opts.stripKeys);
-  const selected = stripKeys
-    ? entries.filter((entry) => stripKeys.includes(entry.key))
-    : entries.filter((entry) => entry.key !== 'curves');
+  const stripKeys = Array.isArray(opts.stripKeys)
+    ? filterDisneyExtremeAllStripsKeys(opts.stripKeys)
+    : null;
+  const selected =
+    stripKeys !== null
+      ? entries.filter((entry) => stripKeys.includes(entry.key))
+      : entries.filter((entry) => entry.key !== 'curves');
   return selected.map((entry) => entry.text).join('\n');
 }
 
@@ -4234,6 +4294,48 @@ export function loadDisneyExtremeStripsOpen(opts = {}) {
     return storage.getItem(DISNEY_EXTREME_STRIPS_STORAGE_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+export const DISNEY_EXTREME_STRIPS_FILTER_STORAGE_KEY =
+  'amoji.disneyExtreme.stripsFilter.v1';
+
+/**
+ * Persist Extreme strips filter query (sessionStorage by default).
+ * @param {string} query
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {{ ok: boolean, query: string }}
+ */
+export function saveDisneyExtremeStripsFilter(query, opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  const q = String(query || '').trim();
+  if (!storage) return { ok: true, query: q };
+  try {
+    if (!q) {
+      storage.removeItem(DISNEY_EXTREME_STRIPS_FILTER_STORAGE_KEY);
+      return { ok: true, query: '' };
+    }
+    storage.setItem(DISNEY_EXTREME_STRIPS_FILTER_STORAGE_KEY, q);
+    return { ok: true, query: q };
+  } catch {
+    return { ok: false, query: q };
+  }
+}
+
+/**
+ * Load Extreme strips filter query (sessionStorage by default).
+ * @param {{ storage?: Storage|null, memory?: boolean }} [opts]
+ * @returns {string}
+ */
+export function loadDisneyExtremeStripsFilter(opts = {}) {
+  const storage = resolveDisneyExtremeBaselineStorage(opts);
+  if (!storage) return '';
+  try {
+    return String(
+      storage.getItem(DISNEY_EXTREME_STRIPS_FILTER_STORAGE_KEY) || '',
+    ).trim();
+  } catch {
+    return '';
   }
 }
 

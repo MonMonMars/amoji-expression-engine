@@ -1031,8 +1031,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
  * One-line summary of Disney Extreme prefs (for landing toast / title tooltips).
  * When on, includes od/ease; overdrive recipe; body-on also appends mix + neck.
  * Optional `opts.baseline` appends dirty/clean + short fp.
+ * Optional `opts.stripsFilter` appends active strips filter summary.
  * @param {object} [prefs]
- * @param {{ baseline?: object|null }} [opts]
+ * @param {{ baseline?: object|null, stripsFilter?: string }} [opts]
  * @returns {string}
  */
 export function summarizeDisneyExtremePrefs(prefs, opts = {}) {
@@ -1071,6 +1072,9 @@ export function summarizeDisneyExtremePrefs(prefs, opts = {}) {
     const dirty = isDisneyExtremeSnapshotDirty(snap, opts.baseline);
     const fp = disneyExtremeSnapshotFingerprintShort(opts.baseline);
     parts.push(dirty ? `dirty ${fp}` : `clean ${fp}`);
+  }
+  if (opts.stripsFilter) {
+    parts.push(String(opts.stripsFilter));
   }
   return parts.join(' · ');
 }

@@ -983,14 +983,14 @@
           <button type="button" id="btnDisneyExtremeActive">Active chips <kbd>⇧Alt+Space</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyActive">Copy active <kbd>Enter</kbd></button>
           <button type="button" id="btnDisneyExtremePinStrip">Pin strip <kbd>⇧Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremeHudBundle">HUD bundle <kbd>Alt+Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyHudBundle">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeHudBundle" title="HUD bundle · filter-aware when filter active">HUD bundle <kbd>Alt+Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyHudBundle" title="Copy HUD bundle · filtered when filter active">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStrip">Dirty strip <kbd>Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
           <button type="button" id="btnDisneyExtremeAllStrips" title="All strips · filter-aware when filter active">All strips <kbd>Alt+Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyAllStrips" title="Copy all strips · filtered bundle when filter active">Copy all strips <kbd>Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenAllStrips">Open all strips <kbd>⇧Alt+Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyAllStripsOpen">Copy all open <kbd>⇧Alt+End</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStripsOpen" title="Copy all strips · filtered bundle when filter active">Copy all open <kbd>⇧Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeCloseStrips">Close strips <kbd>Alt+PageUp</kbd></button>
@@ -1664,6 +1664,8 @@
         loadDisneyExtremeMoreIoOpen,
         saveDisneyExtremeStripsOpen,
         loadDisneyExtremeStripsOpen,
+        saveDisneyExtremeStripsFilter,
+        loadDisneyExtremeStripsFilter,
         DISNEY_EXTREME_HOTKEY_HELP,
         decodeDisneyExtremeBaselineStacksHash,
         decodeDisneyExtremeSnapshotHash,
@@ -2453,10 +2455,15 @@
         return { query: disneyExtremeStripsFilterQuery, visible, total };
       }
 
+      function persistDisneyExtremeStripsFilter() {
+        saveDisneyExtremeStripsFilter(disneyExtremeStripsFilterQuery);
+      }
+
       function clearDisneyExtremeStripsFilter() {
         disneyExtremeStripsFilterQuery = '';
         const input = document.getElementById('disneyExtremeStripsFilter');
         if (input) input.value = '';
+        persistDisneyExtremeStripsFilter();
         return applyDisneyExtremeStripsFilter();
       }
 
@@ -2524,6 +2531,7 @@
       function clearDisneyExtremeStripsFilterFlash() {
         const prev = String(disneyExtremeStripsFilterQuery || '').trim();
         clearDisneyExtremeStripsFilter();
+        syncDisneyExtremePrefsSummary();
         flashDisneyExtremeStatus(
           formatDisneyExtremeStripsFilterClearLabel({ query: prev }),
         );
@@ -2917,20 +2925,32 @@
             keys.push(DISNEY_EXTREME_STRIP_SHORT_NAMES[id] || id);
           }
         }
-        return filterDisneyExtremeAllStripsKeys(keys);
+        return keys;
       }
 
-      function disneyExtremeAllStripsOpts() {
+      function disneyExtremeStripsFilterOpts() {
         const filter = applyDisneyExtremeStripsFilter();
         const q = String(filter.query || '').trim();
-        const base = disneyExtremeHudBundleActiveOpts();
-        if (!q) return base;
+        if (!q) return {};
         return {
-          ...base,
           filterQuery: q,
           filterVisible: filter.visible,
           filterTotal: filter.total,
           stripKeys: disneyExtremeAllStripsVisibleKeys(),
+        };
+      }
+
+      function disneyExtremeAllStripsOpts() {
+        return {
+          ...disneyExtremeHudBundleActiveOpts(),
+          ...disneyExtremeStripsFilterOpts(),
+        };
+      }
+
+      function disneyExtremeHudBundleFilterOpts() {
+        return {
+          ...disneyExtremeHudBundleActiveOpts(),
+          ...disneyExtremeStripsFilterOpts(),
         };
       }
 
@@ -2981,7 +3001,7 @@
         flashDisneyExtremeStatus(
           formatDisneyExtremeBaselineHudBundleSummary(
             disneyExtremeHudBundleOpts(),
-            disneyExtremeHudBundleActiveOpts(),
+            disneyExtremeHudBundleFilterOpts(),
           ),
         );
         return true;
@@ -2990,7 +3010,7 @@
       async function copyDisneyExtremeBaselineHudBundle() {
         const text = formatDisneyExtremeBaselineHudBundleLabel(
           disneyExtremeHudBundleOpts(),
-          disneyExtremeHudBundleActiveOpts(),
+          disneyExtremeHudBundleFilterOpts(),
         );
         let ok = false;
         try {
@@ -3003,7 +3023,7 @@
         }
         const summary = formatDisneyExtremeBaselineHudBundleSummary(
           disneyExtremeHudBundleOpts(),
-          disneyExtremeHudBundleActiveOpts(),
+          disneyExtremeHudBundleFilterOpts(),
         );
         flashDisneyExtremeStatus(
           ok ? `copied · ${summary}` : `copy failed · ${summary}`,
@@ -4598,6 +4618,15 @@
 
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
+        const filter = applyDisneyExtremeStripsFilter();
+        const q = String(filter.query || '').trim();
+        const stripsFilter = q
+          ? formatDisneyExtremeStripsFilterSummary({
+              query: q,
+              visible: filter.visible,
+              total: filter.total,
+            })
+          : '';
         disneyExtremeStatus.title = summarizeDisneyExtremePrefs(
           prefsLike || {
             disneyExtreme: !!disneyExtremeEl?.checked,
@@ -4614,7 +4643,10 @@
             ),
             intensity,
           },
-          { baseline: lastExtremeBaselineSnap },
+          {
+            baseline: lastExtremeBaselineSnap,
+            stripsFilter: stripsFilter || undefined,
+          },
         );
         syncDisneyExtremePinUi();
         syncDisneyExtremeDirtyUi();
@@ -5527,6 +5559,8 @@
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {
         disneyExtremeStripsFilterQuery = String(ev.target?.value || '');
         applyDisneyExtremeStripsFilter();
+        persistDisneyExtremeStripsFilter();
+        syncDisneyExtremePrefsSummary();
       });
 
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('keydown', (ev) => {
@@ -5564,6 +5598,13 @@
 
       {
         const strips = document.getElementById('disneyExtremeStrips');
+        const filterInput = document.getElementById('disneyExtremeStripsFilter');
+        const savedFilter = loadDisneyExtremeStripsFilter();
+        if (savedFilter) {
+          disneyExtremeStripsFilterQuery = savedFilter;
+          if (filterInput) filterInput.value = savedFilter;
+          applyDisneyExtremeStripsFilter();
+        }
         if (strips) {
           if (loadDisneyExtremeStripsOpen()) {
             strips.open = true;
