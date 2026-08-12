@@ -750,9 +750,17 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'copyHotkeyHelp', help: 'Alt+H copy help', kind: 'note' },
   { id: 'showHotkeyDigest', help: 'H digest flash', kind: 'note' },
-  { id: 'copyHotkeyDigest', help: 'help digest · copy', kind: 'note' },
+  { id: 'copyHotkeyDigest', help: 'Alt+F12 copy digest', kind: 'note' },
   { id: 'clearTransient', help: '⇧Alt+Delete clear transient', kind: 'note' },
   { id: 'stripsFilter', help: 'strips filter · live', kind: 'note' },
+  {
+    id: 'focusStripsFilter',
+    keys: ['F12'],
+    help: 'F12 focus filter',
+    kind: 'action',
+  },
+  { id: 'copyStripsFilterSummary', help: 'Shift+F12 copy filter', kind: 'note' },
+  { id: 'clearStripsFilter', help: '⇧Alt+F12 clear filter', kind: 'note' },
   { id: 'copyBaselineHistoryList', help: 'Shift+H copy hist list', kind: 'note' },
   { id: 'copyBaselineRedoList', help: '⇧Alt+H copy redo list', kind: 'note' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
@@ -1259,6 +1267,36 @@ export function formatDisneyExtremeStripsFilterSummary(opts = {}) {
   if (!q) return `filter · all · ${total}`;
   if (visible === 0) return `filter · "${q}" · none`;
   return `filter · "${q}" · ${visible}/${total}`;
+}
+
+/**
+ * Clipboard text for Extreme strips filter (summary + optional visible ids).
+ * @param {{
+ *   query?: string,
+ *   visible?: number,
+ *   total?: number,
+ *   visibleIds?: string[],
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeStripsFilterCopyText(opts = {}) {
+  const summary = formatDisneyExtremeStripsFilterSummary(opts);
+  const ids = Array.isArray(opts.visibleIds)
+    ? opts.visibleIds.map((id) => String(id || '').trim()).filter(Boolean)
+    : [];
+  if (!ids.length) return summary;
+  return `${summary} · ${ids.join(' · ')}`;
+}
+
+/**
+ * Label after clearing Extreme strips filter.
+ * @param {{ query?: string }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeStripsFilterClearLabel(opts = {}) {
+  const q = String(opts.query || '').trim();
+  if (!q) return 'cleared · filter · none';
+  return `cleared · filter · "${q}"`;
 }
 
 /** How long Copy / Help / Reset flashes stick before live HUD resumes. */

@@ -269,6 +269,8 @@ export {
   formatDisneyExtremeHotkeyDigest,
   formatDisneyExtremeTransientClearLabel,
   formatDisneyExtremeStripsFilterSummary,
+  formatDisneyExtremeStripsFilterCopyText,
+  formatDisneyExtremeStripsFilterClearLabel,
   formatDisneyExtremeHotkeyCatalog,
   matchDisneyExtremeHotkey,
   disneyExtremeHistoryJumpIndex,

@@ -14,7 +14,7 @@ describe('Phase 411 Extreme H digest flash + copy digest', () => {
       resolveDisneyExtremeHotkey({ key: 'h', altKey: true }).action,
     ).toBe('copyHotkeyHelp');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('H digest flash');
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('help digest · copy');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt+F12 copy digest');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain("resolved.action === 'showHelp'");
     expect(src).toContain('formatDisneyExtremeHotkeyDigest({');

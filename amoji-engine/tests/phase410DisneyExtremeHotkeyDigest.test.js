@@ -14,7 +14,7 @@ describe('Phase 410 Extreme hotkey digest helpers', () => {
     expect(DISNEY_EXTREME_HOTKEY_DIGEST).not.toContain('Alt+H copy help');
     expect(DISNEY_EXTREME_HOTKEY_DIGEST).not.toContain('H digest flash');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('H digest flash');
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('help digest · copy');
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Alt+F12 copy digest');
     expect(formatDisneyExtremeHotkeyDigestCatalog()).toBe(
       DISNEY_EXTREME_HOTKEY_DIGEST,
     );

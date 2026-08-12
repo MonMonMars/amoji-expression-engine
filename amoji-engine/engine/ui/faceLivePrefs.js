@@ -255,6 +255,10 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+F10` → copy Extreme pin strip
  * - `F11` → flash Extreme dirty strip
  * - `Shift+F11` → copy Extreme dirty strip
+ * - `F12` → focus Extreme strips filter
+ * - `Shift+F12` → copy Extreme strips filter summary
+ * - `Alt+F12` → copy Extreme hotkey digest
+ * - `Shift+Alt+F12` → clear Extreme strips filter
  * - `Escape` → clear sticky status flash (and chip compare / active chips when set)
  * - `c` / `C` → copy Extreme prefs summary
  * - `Shift+C` → copy Extreme snapshot diff vs baseline
@@ -497,6 +501,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     const homeKey = key === 'Home';
     const endKey = key === 'End';
     const deleteKey = key === 'Delete' || key === 'Backspace';
+    const f12Key = key === 'F12';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -534,7 +539,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !pageUpKey &&
       !homeKey &&
       !endKey &&
-      !deleteKey
+      !deleteKey &&
+      !f12Key
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -968,6 +974,18 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     }
     if (entry.id === 'showBaselineStripsSummaryFKey') {
       return { ok: true, action: 'showBaselineStripsSummary' };
+    }
+    if (entry.id === 'focusStripsFilter' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'clearStripsFilter' };
+    }
+    if (entry.id === 'focusStripsFilter' && ev.altKey) {
+      return { ok: true, action: 'copyHotkeyDigest' };
+    }
+    if (entry.id === 'focusStripsFilter' && ev.shiftKey) {
+      return { ok: true, action: 'copyStripsFilterSummary' };
+    }
+    if (entry.id === 'focusStripsFilter') {
+      return { ok: true, action: 'focusStripsFilter' };
     }
     return { ok: true, action: entry.id };
   }

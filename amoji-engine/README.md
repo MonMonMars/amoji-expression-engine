@@ -424,7 +424,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 411 | Extreme H digest flash + copy digest | Done |
 | Phase 412 | Extreme ⇧Alt+Delete clear transient | Done |
 | Phase 413 | Extreme strips filter UI | Done |
-| Phase 414+ | Further production polish… | Specced |
+| Phase 414 | Extreme F12 focus strips filter | Done |
+| Phase 415 | Extreme Shift+F12 copy filter | Done |
+| Phase 416 | Extreme ⇧Alt+F12 clear filter | Done |
+| Phase 417 | Extreme Alt+F12 copy digest | Done |
+| Phase 418+ | Further production polish… | Specced |
 
 ## Quick start
 

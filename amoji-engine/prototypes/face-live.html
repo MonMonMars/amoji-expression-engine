@@ -1017,6 +1017,9 @@
           <button type="button" id="btnDisneyExtremeCopyPinStrip">Copy pin strip <kbd>⇧F10</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStripFKey">Dirty strip <kbd>F11</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey">Copy dirty <kbd>⇧F11</kbd></button>
+          <button type="button" id="btnDisneyExtremeFocusFilter">Focus filter <kbd>F12</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyFilter">Copy filter <kbd>⇧F12</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearFilter">Clear filter <kbd>⇧Alt+F12</kbd></button>
           <button type="button" id="btnDisneyExtremeStripsSummaryFKey">Strips summary <kbd>F1</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyStripsSummaryFKey">Copy strips <kbd>⇧F1</kbd></button>
           <button type="button" id="btnDisneyExtremeCurveStrip">Curve strips <kbd>Alt+PageDown</kbd></button>
@@ -1101,7 +1104,7 @@
             <button type="button" id="btnDisneyExtremeEnableFocus">Enable + focus <kbd>⇧Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyDigest">Copy hotkey digest</button>
+            <button type="button" id="btnDisneyExtremeCopyDigest">Copy hotkey digest <kbd>Alt+F12</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd> <kbd>⇧T</kbd></button>
             <button type="button" id="btnDisneyExtremeOpenMore">Open More IO <kbd>⇧Alt+T</kbd></button>
           </div>
@@ -1137,7 +1140,7 @@
               placeholder="Filter strips…"
               autocomplete="off"
               spellcheck="false"
-              title="Filter Extreme strips · live"
+              title="Filter Extreme strips · F12 focus · ⇧F12 copy · ⇧Alt+F12 clear · Esc clear"
             />
             <button type="button" id="btnDisneyExtremeStripsFilterClear">Clear filter</button>
             <span class="status" id="disneyExtremeStripsFilterSummary">filter · all · 11</span>
@@ -1605,6 +1608,8 @@
         formatDisneyExtremeHotkeyDigest,
         formatDisneyExtremeTransientClearLabel,
         formatDisneyExtremeStripsFilterSummary,
+        formatDisneyExtremeStripsFilterCopyText,
+        formatDisneyExtremeStripsFilterClearLabel,
         formatDisneyExtremeEaseCurveLabel,
         formatDisneyExtremeEaseCurveBundle,
         buildDisneyExtremeEaseSparkSvg,
@@ -2451,6 +2456,76 @@
         const input = document.getElementById('disneyExtremeStripsFilter');
         if (input) input.value = '';
         return applyDisneyExtremeStripsFilter();
+      }
+
+      const DISNEY_EXTREME_STRIP_SHORT_NAMES = {
+        disneyExtremeTips: 'tips',
+        disneyExtremeCapacity: 'capacity',
+        disneyExtremeRoots: 'roots',
+        disneyExtremeActive: 'active',
+        disneyExtremePin: 'pin',
+        disneyExtremeDirty: 'dirty',
+        disneyExtremeFactorsStrip: 'factors',
+        disneyExtremeEaseStrip: 'ease',
+        disneyExtremeMixStrip: 'mix',
+        disneyExtremeNeckStrip: 'neck',
+        disneyExtremeCurveStrip: 'curves',
+      };
+
+      function disneyExtremeStripsFilterVisibleIds() {
+        const ids = [];
+        for (const id of DISNEY_EXTREME_STRIP_IDS) {
+          const el = document.getElementById(id);
+          if (el && !el.hidden) {
+            ids.push(DISNEY_EXTREME_STRIP_SHORT_NAMES[id] || id);
+          }
+        }
+        return ids;
+      }
+
+      function focusDisneyExtremeStripsFilter() {
+        openDisneyExtremeStrips();
+        const input = document.getElementById('disneyExtremeStripsFilter');
+        if (!input) {
+          flashDisneyExtremeStatus('filter · missing');
+          return false;
+        }
+        input.focus();
+        input.select();
+        flashDisneyExtremeStatus('filter · focused');
+        return true;
+      }
+
+      async function copyDisneyExtremeStripsFilterSummary() {
+        const state = applyDisneyExtremeStripsFilter();
+        const text = formatDisneyExtremeStripsFilterCopyText({
+          query: state.query,
+          visible: state.visible,
+          total: state.total,
+          visibleIds: disneyExtremeStripsFilterVisibleIds(),
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? `copied · ${text}` : `copy failed · ${text}`,
+        );
+        return ok;
+      }
+
+      function clearDisneyExtremeStripsFilterFlash() {
+        const prev = String(disneyExtremeStripsFilterQuery || '').trim();
+        clearDisneyExtremeStripsFilter();
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeStripsFilterClearLabel({ query: prev }),
+        );
+        return true;
       }
 
       function flashDisneyExtremeBaselineStripsSummary(extremeSnap) {
@@ -5415,13 +5490,34 @@
         copyDisneyExtremeHotkeyDigest();
       });
 
+      document.getElementById('btnDisneyExtremeFocusFilter')?.addEventListener('click', () => {
+        focusDisneyExtremeStripsFilter();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyFilter')?.addEventListener('click', () => {
+        copyDisneyExtremeStripsFilterSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeClearFilter')?.addEventListener('click', () => {
+        clearDisneyExtremeStripsFilterFlash();
+      });
+
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {
         disneyExtremeStripsFilterQuery = String(ev.target?.value || '');
         applyDisneyExtremeStripsFilter();
       });
 
+      document.getElementById('disneyExtremeStripsFilter')?.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Escape') return;
+        const q = String(disneyExtremeStripsFilterQuery || '').trim();
+        if (!q) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        clearDisneyExtremeStripsFilterFlash();
+      });
+
       document.getElementById('btnDisneyExtremeStripsFilterClear')?.addEventListener('click', () => {
-        clearDisneyExtremeStripsFilter();
+        clearDisneyExtremeStripsFilterFlash();
       });
 
       document.getElementById('btnDisneyExtremeToggleMore')?.addEventListener('click', () => {
@@ -6617,6 +6713,21 @@
         if (resolved.action === 'copyHotkeyDigest') {
           ev.preventDefault();
           copyDisneyExtremeHotkeyDigest();
+          return;
+        }
+        if (resolved.action === 'focusStripsFilter') {
+          ev.preventDefault();
+          focusDisneyExtremeStripsFilter();
+          return;
+        }
+        if (resolved.action === 'copyStripsFilterSummary') {
+          ev.preventDefault();
+          copyDisneyExtremeStripsFilterSummary();
+          return;
+        }
+        if (resolved.action === 'clearStripsFilter') {
+          ev.preventDefault();
+          clearDisneyExtremeStripsFilterFlash();
           return;
         }
         if (resolved.action === 'toggleMoreIo') {
