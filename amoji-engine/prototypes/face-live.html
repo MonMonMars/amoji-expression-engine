@@ -675,6 +675,18 @@
         background: color-mix(in oklab, var(--accent) 18%, transparent);
         color: var(--accent);
       }
+      .status[role="button"]:focus-visible,
+      .pill[role="button"]:focus-visible,
+      .hud-extreme-spark[role="button"]:focus-visible,
+      .hud-body-spark[role="button"]:focus-visible,
+      .hud-extreme-factors[role="button"]:focus-visible,
+      .extreme-ease-spark[role="button"]:focus-visible,
+      .extreme-body-spark[role="button"]:focus-visible,
+      .extreme-factor-bars[role="button"]:focus-visible,
+      .group[role="button"]:focus-visible {
+        outline: 2px solid #8ac6ff;
+        outline-offset: 2px;
+      }
       #disneyExtremeMore {
         margin-top: 6px;
         width: 100%;
@@ -781,11 +793,11 @@
         <div class="pill">Tex <strong id="hudTex">—</strong></div>
         <div class="pill">Surf <strong id="hudSurf">6</strong></div>
         <div class="pill">G <strong id="hudGesture">—</strong></div>
-        <div class="pill pill-b">B <strong id="hudBody">—</strong><span id="hudBodySpark" class="hud-body-spark is-off" aria-hidden="true"></span></div>
+        <div class="pill pill-b">B <strong id="hudBody">—</strong><span id="hudBodySpark" class="hud-body-spark is-off" title="HUD body mix spark · click/Enter/Space flash · dbl-click/⇧Enter copy" aria-label="HUD body mix spark"></span></div>
         <div class="pill">E <strong id="hudEyes">—</strong></div>
         <div class="pill">Tris ≈ <strong id="hudTris">—</strong></div>
         <div class="pill">Emotion <strong id="hudEmo">neutral</strong></div>
-        <div class="pill pill-x" id="pillExtreme" title="X diff pill · click/Enter/Space flash diff · dbl-click/⇧Enter copy diff">X <strong id="hudExtreme">off</strong><span id="hudExtremeSpark" class="hud-extreme-spark is-off" aria-hidden="true"></span><span id="hudExtremeFactors" class="hud-extreme-factors is-off" aria-hidden="true"></span></div>
+        <div class="pill pill-x" id="pillExtreme" title="X diff pill · click/Enter/Space flash diff · dbl-click/⇧Enter copy diff">X <strong id="hudExtreme">off</strong><span id="hudExtremeSpark" class="hud-extreme-spark is-off" title="HUD ease spark · click/Enter/Space flash · dbl-click/⇧Enter copy" aria-label="HUD ease spark"></span><span id="hudExtremeFactors" class="hud-extreme-factors is-off" title="HUD factor bars spark · click/Enter/Space flash · dbl-click/⇧Enter copy" aria-label="HUD factor bars spark"></span></div>
         <div class="pill">FPS <strong id="hudFps">—</strong></div>
       </div>
     </div>
@@ -1251,6 +1263,7 @@
             id="disneyExtremeFactorBars"
             class="extreme-factor-bars is-off"
             title="Factor bars (shape/body/eye/mouth) · click/Enter/Space flash · dbl-click/⇧Enter copy · F · ⇧F"
+            aria-label="Extreme factor bars spark"
           ></div>
           <div class="status" id="disneyExtremeFactorBarsLabel" style="margin:0;" title="Live factors label · F flash · ⇧F copy">factors</div>
         </div>
@@ -1259,6 +1272,7 @@
             id="disneyExtremeEaseSpark"
             class="extreme-ease-spark"
             title="Ease overdrive curve (marker = shapeInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · E · ⇧E"
+            aria-label="Extreme ease spark"
           ></div>
           <div class="status" id="disneyExtremeEaseLabel" style="margin:0;" title="Live ease label · E flash · ⇧E copy">ease curve</div>
         </div>
@@ -1267,6 +1281,7 @@
             id="disneyExtremeBodySpark"
             class="extreme-body-spark is-off"
             title="Body mix curve (marker = bodyInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · M · ⇧M"
+            aria-label="Extreme body mix spark"
           ></div>
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;" title="Live mix label · M flash · ⇧M copy">body mix</div>
         </div>

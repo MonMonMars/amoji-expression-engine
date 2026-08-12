@@ -484,7 +484,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 471 | Extreme history row background actions | Done |
 | Phase 472 | Extreme favorites row background actions | Done |
 | Phase 473 | Extreme panel/rows docs sync | Done |
-| Phase 474+ | Further production polish… | Specced |
+| Phase 474 | Extreme interactive focus-visible polish | Done |
+| Phase 475 | Extreme HUD spark aria labels | Done |
+| Phase 476 | Extreme HUD title hints | Done |
+| Phase 477 | Extreme HUD a11y docs sync | Done |
+| Phase 478+ | Further production polish… | Specced |
 
 ## Quick start
 

@@ -1017,6 +1017,10 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'historyRowBackgroundDblClick', help: 'history row · background dbl-click copy', kind: 'note' },
   { id: 'favoritesRowBackgroundClick', help: 'favorites row · background click list', kind: 'note' },
   { id: 'favoritesRowBackgroundDblClick', help: 'favorites row · background dbl-click copy', kind: 'note' },
+  { id: 'interactiveFocusVisible', help: 'interactive focus-visible polish', kind: 'note' },
+  { id: 'hudSparkAriaFix', help: 'HUD sparks · aria labels', kind: 'note' },
+  { id: 'hudSparkTitleHints', help: 'HUD sparks · title hints', kind: 'note' },
+  { id: 'hudPillTitleHints', help: 'HUD pill · title hints', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
