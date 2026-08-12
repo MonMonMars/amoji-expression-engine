@@ -21,7 +21,7 @@ describe('Phase 385 Extreme Shift+F2 copy factors strip', () => {
     expect(src).toContain('function copyDisneyExtremeBaselineFactorsStrip');
     expect(src).toContain("resolved.action === 'copyBaselineFactorsStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremeFactorsStrip')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFactorsStrip')",
     );
   });
 });

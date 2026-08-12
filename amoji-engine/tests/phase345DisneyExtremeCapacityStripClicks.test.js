@@ -16,10 +16,7 @@ describe('Phase 345 Extreme capacity strip click actions', () => {
       /disneyExtremeCapacity[\s\S]*?copyDisneyExtremeBaselineStacksCapacity/,
     );
     expect(src).toContain(
-      "getElementById('disneyExtremeCapacity')?.addEventListener('click'",
-    );
-    expect(src).toContain(
-      "getElementById('disneyExtremeCapacity')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeCapacity')",
     );
   });
 });

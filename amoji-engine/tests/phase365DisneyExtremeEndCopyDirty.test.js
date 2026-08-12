@@ -21,10 +21,7 @@ describe('Phase 365 Extreme End copy dirty strip', () => {
     expect(src).toContain('function copyDisneyExtremeBaselineDirtyStrip');
     expect(src).toContain("resolved.action === 'copyBaselineDirtyStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremeDirty')?.addEventListener('click'",
-    );
-    expect(src).toContain(
-      "getElementById('disneyExtremeDirty')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeDirty')",
     );
   });
 });

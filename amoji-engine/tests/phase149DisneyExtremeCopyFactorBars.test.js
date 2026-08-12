@@ -30,7 +30,7 @@ describe('Phase 149 Extreme Shift+F copy factor bars SVG', () => {
       /copyDisneyExtremeFactorBarsSvg[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'factors SVG'/,
     );
     expect(src).toContain(
-      "disneyExtremeFactorBars?.addEventListener('click', () => {\n        flashDisneyExtremeFactorBars();\n      })",
+      'bindDisneyExtremeFlashCopySurface(disneyExtremeFactorBars',
     );
   });
 });

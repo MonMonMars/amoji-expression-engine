@@ -683,7 +683,13 @@
       .extreme-ease-spark[role="button"]:focus-visible,
       .extreme-body-spark[role="button"]:focus-visible,
       .extreme-factor-bars[role="button"]:focus-visible,
-      .group[role="button"]:focus-visible {
+      .group[role="button"]:focus-visible,
+      #disneyExtremeHistory button.extreme-hist-chip:focus-visible,
+      #disneyExtremeFavorites button.extreme-fav-chip:focus-visible,
+      #disneyExtremeHistory[role="button"]:focus-visible,
+      #disneyExtremeFavorites[role="button"]:focus-visible,
+      #disneyExtremeMore > summary:focus-visible,
+      #disneyExtremeStrips > summary:focus-visible {
         outline: 2px solid #8ac6ff;
         outline-offset: 2px;
       }
@@ -889,7 +895,7 @@
         <div class="status" id="tierHint">sculpt: medium band</div>
       </div>
 
-      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste" aria-label="Disney Extreme panel drop and quick actions" aria-keyshortcuts="Enter Space Shift+Enter">
+      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste" aria-label="Disney Extreme panel drop and quick actions" aria-keyshortcuts="Enter Space Shift+Enter" aria-describedby="disneyExtremeStatus disneyExtremeDropHint">
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
@@ -1043,7 +1049,7 @@
           <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey" title="Copy dirty · ⇧F11">Copy dirty <kbd>⇧F11</kbd></button>
           <button type="button" id="btnDisneyExtremeFocusFilter" title="Focus filter · F12">Focus filter <kbd>F12</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyFilter" title="Copy filter · ⇧F12">Copy filter <kbd>⇧F12</kbd></button>
-          <button type="button" id="btnDisneyExtremeClearFilter" title="Clear filter · ⇧Alt+F12">Clear filter <kbd>⇧Alt+F12</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearFilter" title="Clear filter · ⇧Alt+F12" aria-label="Clear Extreme strips filter" aria-keyshortcuts="Shift+Alt+F12">Clear filter <kbd>⇧Alt+F12</kbd></button>
           <button type="button" id="btnDisneyExtremeStripsSummaryFKey" title="Strips summary · F1">Strips summary <kbd>F1</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyStripsSummaryFKey" title="Copy strips · ⇧F1">Copy strips <kbd>⇧F1</kbd></button>
           <button type="button" id="btnDisneyExtremeCurveStrip" title="Curve strips · Alt+PageDown">Curve strips <kbd>Alt+PageDown</kbd></button>
@@ -1055,6 +1061,7 @@
             id="disneyExtremeMoreSummary"
             aria-keyshortcuts="Enter Space Shift+Enter"
             aria-label="Extreme more IO summary"
+            aria-controls="disneyExtremeMore"
             title="Alt+T / Shift+T toggle · ⇧Alt+T open · remembered · click flash · dbl-click copy · Enter/Space flash · ⇧Enter copy"
           >More Extreme IO · SVG · JSON · share · fav</summary>
           <div class="row" style="gap:8px;">
@@ -1167,7 +1174,7 @@
           title="Extreme strips · tips/capacity/roots/active/pin/dirty · PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · summary dbl-click copy · remembered"
         >
           <summary
-            id="disneyExtremeStripsSummary" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme strips summary"
+            id="disneyExtremeStripsSummary" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme strips summary" aria-controls="disneyExtremeStrips"
             title="PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · filter-aware · click flash · dbl-click copy · Enter/Space flash · ⇧Enter copy"
           >
             strips · hist 0/8 · redo 0/8 · fav 0/8 · dirty · none
@@ -1181,9 +1188,10 @@
               spellcheck="false"
               aria-label="Filter Extreme strips"
               aria-describedby="disneyExtremeStripsFilterSummary"
+              aria-controls="disneyExtremeStrips"
               title="Filter Extreme strips · F12 focus · ⇧F12 copy · Alt+F12 copy digest · ⇧Alt+F12 clear · Esc clear"
             />
-            <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12">Clear filter</button>
+            <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12" aria-label="Clear Extreme strips filter" aria-keyshortcuts="Shift+Alt+F12">Clear filter</button>
             <span class="status" id="disneyExtremeStripsFilterSummary" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme strips filter summary" title="Filter match count · click flash · ⇧F12 copy · dbl-click copy · Enter/Space flash · ⇧Enter copy">filter · all · 11</span>
           </div>
           <div
@@ -1192,6 +1200,7 @@
             hidden
             aria-keyshortcuts="Enter Space"
             aria-label="Extreme strips empty"
+            aria-describedby="disneyExtremeStripsFilterSummary"
             title="No strips match · click/Enter/Space clear · ⇧Alt+F12 clear filter"
           >No strips match</div>
           <div
@@ -1278,6 +1287,7 @@
             class="extreme-factor-bars is-off"
             title="Factor bars (shape/body/eye/mouth) · click/Enter/Space flash · dbl-click/⇧Enter copy · F · ⇧F"
             aria-label="Extreme factor bars spark"
+            aria-labelledby="disneyExtremeFactorBarsLabel"
             aria-keyshortcuts="Enter Space Shift+Enter"
           ></div>
           <div
@@ -1296,6 +1306,7 @@
             class="extreme-ease-spark"
             title="Ease overdrive curve (marker = shapeInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · E · ⇧E"
             aria-label="Extreme ease spark"
+            aria-labelledby="disneyExtremeEaseLabel"
             aria-keyshortcuts="Enter Space Shift+Enter"
           ></div>
           <div
@@ -1314,6 +1325,7 @@
             class="extreme-body-spark is-off"
             title="Body mix curve (marker = bodyInt) · click/Enter/Space flash · dbl-click/⇧Enter copy · M · ⇧M"
             aria-label="Extreme body mix spark"
+            aria-labelledby="disneyExtremeBodyMixLabel"
             aria-keyshortcuts="Enter Space Shift+Enter"
           ></div>
           <div
@@ -2152,6 +2164,13 @@
         };
       }
 
+      function applyDisneyExtremeCapacityBadgeAria(node, opts = {}) {
+        if (!node) return;
+        node.setAttribute('role', opts.separator ? 'separator' : 'status');
+        node.setAttribute('aria-live', 'polite');
+        node.setAttribute('aria-label', node.textContent || '');
+      }
+
       function syncDisneyExtremeHistoryUi() {
         const el = document.getElementById('disneyExtremeHistory');
         if (!el) return;
@@ -2160,6 +2179,7 @@
           const empty = document.createElement('span');
           empty.className = 'extreme-hist-empty';
           empty.textContent = formatDisneyExtremeBaselineHistoryCapacityLabel(0);
+          applyDisneyExtremeCapacityBadgeAria(empty);
           el.appendChild(empty);
           syncDisneyExtremeTipsUi();
           return;
@@ -2170,6 +2190,7 @@
           badge.textContent = formatDisneyExtremeBaselineHistoryCapacityLabel(
             extremeBaselineHistory.length,
           );
+          applyDisneyExtremeCapacityBadgeAria(badge);
           el.appendChild(badge);
         }
         if (!extremeBaselineHistory.length) {
@@ -2205,6 +2226,7 @@
             extremeBaselineRedo.length,
             { kind: 'redo' },
           );
+          applyDisneyExtremeCapacityBadgeAria(sep, { separator: true });
           el.appendChild(sep);
           for (let i = extremeBaselineRedo.length - 1; i >= 0; i--) {
             const snap = extremeBaselineRedo[i];
@@ -2239,6 +2261,8 @@
         const index = Number(opts.index) || 0;
         const kind =
           opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : 'hist';
+        btn.setAttribute('aria-label', btn.title || btn.textContent || '');
+        btn.setAttribute('aria-keyshortcuts', 'Enter Shift+Enter');
         let clickTimer = null;
         btn.addEventListener('click', (ev) => {
           if (ev.metaKey) {
@@ -2326,21 +2350,55 @@
             kind: kind === 'fav' ? 'hist' : kind,
           });
         });
+        btn.addEventListener('keydown', (ev) => {
+          if (ev.key !== 'Enter' || !ev.shiftKey) return;
+          ev.preventDefault();
+          if (clickTimer) {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+          }
+          pinDisneyExtremeBaselineFromChip(snap, {
+            index: index + 1,
+            kind: kind === 'fav' ? 'hist' : kind,
+          });
+        });
       }
 
       function bindDisneyExtremeFlashCopySurface(el, opts = {}) {
         if (!el) return;
         const onFlash = typeof opts.onFlash === 'function' ? opts.onFlash : null;
         const onCopy = typeof opts.onCopy === 'function' ? opts.onCopy : null;
+        const onPaste = typeof opts.onPaste === 'function' ? opts.onPaste : null;
+        const backgroundOnly = !!opts.backgroundOnly;
+        const pasteOnDblClick = !!opts.pasteOnDblClick;
+        const ignoreChildTargets = Array.isArray(opts.ignoreChildTargets)
+          ? opts.ignoreChildTargets.filter(Boolean)
+          : [];
+
+        function shouldIgnoreTarget(target) {
+          if (backgroundOnly && target !== el) return true;
+          return ignoreChildTargets.some(
+            (t) => t === target || (t && t.contains && t.contains(target)),
+          );
+        }
+
         if (onFlash) {
-          el.addEventListener('click', () => {
+          el.addEventListener('click', (ev) => {
+            if (shouldIgnoreTarget(ev.target)) return;
             onFlash();
           });
         }
         if (onCopy) {
           el.addEventListener('dblclick', (ev) => {
+            if (shouldIgnoreTarget(ev.target)) return;
             ev.preventDefault();
             onCopy();
+          });
+        } else if (onPaste && pasteOnDblClick) {
+          el.addEventListener('dblclick', (ev) => {
+            if (shouldIgnoreTarget(ev.target)) return;
+            ev.preventDefault();
+            onPaste();
           });
         }
         el.setAttribute('role', 'button');
@@ -2348,11 +2406,17 @@
         el.addEventListener('keydown', (ev) => {
           if (ev.key !== 'Enter' && ev.key !== ' ') return;
           ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter' && onCopy) {
-            onCopy();
-            return;
+          if (ev.shiftKey && ev.key === 'Enter') {
+            if (onPaste) {
+              onPaste();
+              return;
+            }
+            if (onCopy) {
+              onCopy();
+              return;
+            }
           }
-          onFlash?.();
+          if (!shouldIgnoreTarget(ev.target)) onFlash?.();
         });
       }
 
@@ -2371,6 +2435,7 @@
           badge.textContent = formatDisneyExtremeBaselineFavoritesCapacityLabel(
             extremeBaselineFavorites.length,
           );
+          applyDisneyExtremeCapacityBadgeAria(badge);
           el.appendChild(badge);
         }
         if (!extremeBaselineFavorites.length) {
@@ -5720,245 +5785,67 @@
         copyDisneyExtremeBaselineCurveStrip();
       });
 
-      document.getElementById('disneyExtremeStripsSummary')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineStripsSummary();
+      bindDisneyExtremeFlashCopySurface(
+        document.getElementById('disneyExtremeStripsSummary'),
+        {
+          onFlash: () => flashDisneyExtremeBaselineStripsSummary(),
+          onCopy: () => copyDisneyExtremeBaselineStripsSummary(),
+        },
+      );
+
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeTips'), {
+        onFlash: () => flashDisneyExtremeBaselineTips(),
+        onCopy: () => copyDisneyExtremeBaselineTips(),
       });
 
-      document.getElementById('disneyExtremeStripsSummary')?.addEventListener('dblclick', (ev) => {
-        ev.preventDefault();
-        copyDisneyExtremeBaselineStripsSummary();
-      });
-      document.getElementById('disneyExtremeStripsSummary')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeStripsSummary')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeStripsSummary')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineStripsSummary();
-            return;
-          }
-          flashDisneyExtremeBaselineStripsSummary();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeCapacity'), {
+        onFlash: () => flashDisneyExtremeBaselineStacksCapacity(),
+        onCopy: () => copyDisneyExtremeBaselineStacksCapacity(),
       });
 
-      document.getElementById('disneyExtremeTips')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineTips();
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeRoots'), {
+        onFlash: () => flashDisneyExtremeBaselineRoots(),
+        onCopy: () => copyDisneyExtremeBaselineRoots(),
       });
 
-      document.getElementById('disneyExtremeTips')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineTips();
-      });
-      document.getElementById('disneyExtremeTips')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeTips')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeTips')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineTips();
-            return;
-          }
-          flashDisneyExtremeBaselineTips();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeActive'), {
+        onFlash: () => flashDisneyExtremeBaselineActive(),
+        onCopy: () => copyDisneyExtremeBaselineActive(),
       });
 
-      document.getElementById('disneyExtremeCapacity')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineStacksCapacity();
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremePin'), {
+        onFlash: () => flashDisneyExtremeBaselinePinStrip(),
+        onCopy: () => jumpDisneyExtremeBaselinePinSummary(),
       });
 
-      document.getElementById('disneyExtremeCapacity')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineStacksCapacity();
-      });
-      document.getElementById('disneyExtremeCapacity')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeCapacity')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeCapacity')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineStacksCapacity();
-            return;
-          }
-          flashDisneyExtremeBaselineStacksCapacity();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeDirty'), {
+        onFlash: () => flashDisneyExtremeBaselineDirtyStrip(),
+        onCopy: () => copyDisneyExtremeBaselineDirtyStrip(),
       });
 
-      document.getElementById('disneyExtremeRoots')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineRoots();
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFactorsStrip'), {
+        onFlash: () => flashDisneyExtremeBaselineFactorsStrip(),
+        onCopy: () => copyDisneyExtremeBaselineFactorsStrip(),
       });
 
-      document.getElementById('disneyExtremeRoots')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineRoots();
-      });
-      document.getElementById('disneyExtremeRoots')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeRoots')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeRoots')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineRoots();
-            return;
-          }
-          flashDisneyExtremeBaselineRoots();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeEaseStrip'), {
+        onFlash: () => flashDisneyExtremeBaselineEaseStrip(),
+        onCopy: () => copyDisneyExtremeBaselineEaseStrip(),
       });
 
-      document.getElementById('disneyExtremeActive')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineActive();
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeMixStrip'), {
+        onFlash: () => flashDisneyExtremeBaselineMixStrip(),
+        onCopy: () => copyDisneyExtremeBaselineMixStrip(),
       });
 
-      document.getElementById('disneyExtremeActive')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineActive();
-      });
-      document.getElementById('disneyExtremeActive')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeActive')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeActive')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineActive();
-            return;
-          }
-          flashDisneyExtremeBaselineActive();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeNeckStrip'), {
+        onFlash: () => flashDisneyExtremeBaselineNeckStrip(),
+        onCopy: () => copyDisneyExtremeBaselineNeckStrip(),
       });
 
-      document.getElementById('disneyExtremePin')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselinePinStrip();
-      });
-
-      document.getElementById('disneyExtremePin')?.addEventListener('dblclick', () => {
-        jumpDisneyExtremeBaselinePinSummary();
-      });
-      document.getElementById('disneyExtremePin')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremePin')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremePin')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            jumpDisneyExtremeBaselinePinSummary();
-            return;
-          }
-          flashDisneyExtremeBaselinePinStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeDirty')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineDirtyStrip();
-      });
-
-      document.getElementById('disneyExtremeDirty')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineDirtyStrip();
-      });
-      document.getElementById('disneyExtremeDirty')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeDirty')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeDirty')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineDirtyStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineDirtyStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeFactorsStrip')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineFactorsStrip();
-      });
-
-      document.getElementById('disneyExtremeFactorsStrip')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineFactorsStrip();
-      });
-      document.getElementById('disneyExtremeFactorsStrip')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeFactorsStrip')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeFactorsStrip')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineFactorsStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineFactorsStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeEaseStrip')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineEaseStrip();
-      });
-
-      document.getElementById('disneyExtremeEaseStrip')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineEaseStrip();
-      });
-      document.getElementById('disneyExtremeEaseStrip')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeEaseStrip')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeEaseStrip')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineEaseStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineEaseStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeMixStrip')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineMixStrip();
-      });
-
-      document.getElementById('disneyExtremeMixStrip')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineMixStrip();
-      });
-      document.getElementById('disneyExtremeMixStrip')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeMixStrip')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeMixStrip')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineMixStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineMixStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeNeckStrip')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineNeckStrip();
-      });
-
-      document.getElementById('disneyExtremeNeckStrip')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineNeckStrip();
-      });
-      document.getElementById('disneyExtremeNeckStrip')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeNeckStrip')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeNeckStrip')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineNeckStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineNeckStrip();
-        }
-      });
-
-      document.getElementById('disneyExtremeCurveStrip')?.addEventListener('click', () => {
-        flashDisneyExtremeBaselineCurveStrip();
-      });
-
-      document.getElementById('disneyExtremeCurveStrip')?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBaselineCurveStrip();
-      });
-      document.getElementById('disneyExtremeCurveStrip')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeCurveStrip')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeCurveStrip')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineCurveStrip();
-            return;
-          }
-          flashDisneyExtremeBaselineCurveStrip();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeCurveStrip'), {
+        onFlash: () => flashDisneyExtremeBaselineCurveStrip(),
+        onCopy: () => copyDisneyExtremeBaselineCurveStrip(),
       });
 
       document.getElementById('btnDisneyExtremeJumpFavSummary')?.addEventListener('click', () => {
@@ -6198,26 +6085,13 @@
         clearDisneyExtremeStripsFilterFlash();
       });
 
-      document.getElementById('disneyExtremeStripsFilterSummary')?.addEventListener('click', () => {
-        flashDisneyExtremeStripsFilterSummary();
-      });
-
-      document.getElementById('disneyExtremeStripsFilterSummary')?.addEventListener('dblclick', (ev) => {
-        ev.preventDefault();
-        copyDisneyExtremeStripsFilterSummary();
-      });
-      document.getElementById('disneyExtremeStripsFilterSummary')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeStripsFilterSummary')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeStripsFilterSummary')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeStripsFilterSummary();
-            return;
-          }
-          flashDisneyExtremeStripsFilterSummary();
-        }
-      });
+      bindDisneyExtremeFlashCopySurface(
+        document.getElementById('disneyExtremeStripsFilterSummary'),
+        {
+          onFlash: () => flashDisneyExtremeStripsFilterSummary(),
+          onCopy: () => copyDisneyExtremeStripsFilterSummary(),
+        },
+      );
 
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {
         disneyExtremeStripsFilterQuery = String(ev.target?.value || '').trim();
@@ -6825,25 +6699,11 @@
       }
 
       const disneyExtremePanel = document.getElementById('disneyExtremePanel');
-      disneyExtremePanel?.addEventListener('click', (ev) => {
-        if (ev.target !== disneyExtremePanel) return;
-        flashDisneyExtremeDropHint();
-      });
-      disneyExtremePanel?.addEventListener('dblclick', (ev) => {
-        if (ev.target !== disneyExtremePanel) return;
-        pasteDisneyExtremeSnapshotJson();
-      });
-      disneyExtremePanel?.setAttribute('role', 'button');
-      disneyExtremePanel?.setAttribute('tabindex', '0');
-      disneyExtremePanel?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            pasteDisneyExtremeSnapshotJson();
-            return;
-          }
-          flashDisneyExtremeDropHint();
-        }
+      bindDisneyExtremeFlashCopySurface(disneyExtremePanel, {
+        backgroundOnly: true,
+        onFlash: () => flashDisneyExtremeDropHint(),
+        onPaste: () => pasteDisneyExtremeSnapshotJson(),
+        pasteOnDblClick: true,
       });
       disneyExtremePanel?.addEventListener('dragenter', (ev) => {
         ev.preventDefault();
@@ -6865,90 +6725,27 @@
         await handleDisneyExtremeSnapshotDrop(ev);
       });
 
-      document.getElementById('disneyExtremeDropHint')?.addEventListener('click', () => {
-        flashDisneyExtremeDropHint();
-      });
-      document.getElementById('disneyExtremeDropHint')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeDropHint')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeDropHint')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            pasteDisneyExtremeSnapshotJson();
-            return;
-          }
-          flashDisneyExtremeDropHint();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeDropHint'), {
+        onFlash: () => flashDisneyExtremeDropHint(),
+        onPaste: () => pasteDisneyExtremeSnapshotJson(),
+        pasteOnDblClick: true,
       });
 
-      document.getElementById('disneyExtremeDropHint')?.addEventListener(
-        'dblclick',
-        () => {
-          pasteDisneyExtremeSnapshotJson();
-        },
-      );
-
-      disneyExtremeStatus?.addEventListener('click', () => {
-        flashDisneyExtremeHotkeyDigestStatus();
-      });
-      disneyExtremeStatus?.setAttribute('role', 'button');
-      disneyExtremeStatus?.setAttribute('tabindex', '0');
-      disneyExtremeStatus?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeSummary();
-            return;
-          }
-          flashDisneyExtremeHotkeyDigestStatus();
-        }
+      bindDisneyExtremeFlashCopySurface(disneyExtremeStatus, {
+        onFlash: () => flashDisneyExtremeHotkeyDigestStatus(),
+        onCopy: () => copyDisneyExtremeSummary(),
       });
 
-      disneyExtremeStatus?.addEventListener('dblclick', (ev) => {
-        ev.preventDefault();
-        copyDisneyExtremeSummary();
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeHistory'), {
+        backgroundOnly: true,
+        onFlash: () => flashDisneyExtremeBaselineHistoryList(),
+        onCopy: () => copyDisneyExtremeBaselineHistoryList(),
       });
 
-      document.getElementById('disneyExtremeHistory')?.addEventListener('click', (ev) => {
-        if (ev.target !== ev.currentTarget) return;
-        flashDisneyExtremeBaselineHistoryList();
-      });
-      document.getElementById('disneyExtremeHistory')?.addEventListener('dblclick', (ev) => {
-        if (ev.target !== ev.currentTarget) return;
-        copyDisneyExtremeBaselineHistoryList();
-      });
-      document.getElementById('disneyExtremeHistory')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeHistory')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeHistory')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineHistoryList();
-            return;
-          }
-          flashDisneyExtremeBaselineHistoryList();
-        }
-      });
-
-      document.getElementById('disneyExtremeFavorites')?.addEventListener('click', (ev) => {
-        if (ev.target !== ev.currentTarget) return;
-        flashDisneyExtremeBaselineFavoritesList();
-      });
-      document.getElementById('disneyExtremeFavorites')?.addEventListener('dblclick', (ev) => {
-        if (ev.target !== ev.currentTarget) return;
-        copyDisneyExtremeBaselineFavoritesList();
-      });
-      document.getElementById('disneyExtremeFavorites')?.setAttribute('role', 'button');
-      document.getElementById('disneyExtremeFavorites')?.setAttribute('tabindex', '0');
-      document.getElementById('disneyExtremeFavorites')?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBaselineFavoritesList();
-            return;
-          }
-          flashDisneyExtremeBaselineFavoritesList();
-        }
+      bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFavorites'), {
+        backgroundOnly: true,
+        onFlash: () => flashDisneyExtremeBaselineFavoritesList(),
+        onCopy: () => copyDisneyExtremeBaselineFavoritesList(),
       });
 
       function flashDisneyExtremeSnapshotDiff() {
@@ -7465,153 +7262,40 @@
         return ok && !empty;
       }
 
-      disneyExtremeEaseSpark?.addEventListener('click', () => {
-        flashDisneyExtremeEaseCurve();
-      });
-      disneyExtremeEaseSpark?.addEventListener('dblclick', () => {
-        copyDisneyExtremeEaseSvg();
-      });
-      disneyExtremeEaseSpark?.setAttribute('role', 'button');
-      disneyExtremeEaseSpark?.setAttribute('tabindex', '0');
-      disneyExtremeEaseSpark?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeEaseSvg();
-            return;
-          }
-          flashDisneyExtremeEaseCurve();
-        }
+      bindDisneyExtremeFlashCopySurface(disneyExtremeEaseSpark, {
+        onFlash: () => flashDisneyExtremeEaseCurve(),
+        onCopy: () => copyDisneyExtremeEaseSvg(),
       });
 
-      disneyExtremeBodySpark?.addEventListener('click', () => {
-        flashDisneyExtremeBodyMix();
-      });
-      disneyExtremeBodySpark?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBodyMixSvg();
-      });
-      disneyExtremeBodySpark?.setAttribute('role', 'button');
-      disneyExtremeBodySpark?.setAttribute('tabindex', '0');
-      disneyExtremeBodySpark?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBodyMixSvg();
-            return;
-          }
-          flashDisneyExtremeBodyMix();
-        }
+      bindDisneyExtremeFlashCopySurface(disneyExtremeBodySpark, {
+        onFlash: () => flashDisneyExtremeBodyMix(),
+        onCopy: () => copyDisneyExtremeBodyMixSvg(),
       });
 
-      disneyExtremeFactorBars?.addEventListener('click', () => {
-        flashDisneyExtremeFactorBars();
-      });
-      disneyExtremeFactorBars?.addEventListener('dblclick', () => {
-        copyDisneyExtremeFactorBarsSvg();
-      });
-      disneyExtremeFactorBars?.setAttribute('role', 'button');
-      disneyExtremeFactorBars?.setAttribute('tabindex', '0');
-      disneyExtremeFactorBars?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeFactorBarsSvg();
-            return;
-          }
-          flashDisneyExtremeFactorBars();
-        }
+      bindDisneyExtremeFlashCopySurface(disneyExtremeFactorBars, {
+        onFlash: () => flashDisneyExtremeFactorBars(),
+        onCopy: () => copyDisneyExtremeFactorBarsSvg(),
       });
 
-      hudExtremeSpark?.addEventListener('click', () => {
-        flashDisneyExtremeEaseCurve();
-      });
-      hudExtremeSpark?.addEventListener('dblclick', () => {
-        copyDisneyExtremeEaseSvg();
-      });
-      hudExtremeSpark?.setAttribute('role', 'button');
-      hudExtremeSpark?.setAttribute('tabindex', '0');
-      hudExtremeSpark?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeEaseSvg();
-            return;
-          }
-          flashDisneyExtremeEaseCurve();
-        }
+      bindDisneyExtremeFlashCopySurface(hudExtremeSpark, {
+        onFlash: () => flashDisneyExtremeEaseCurve(),
+        onCopy: () => copyDisneyExtremeEaseSvg(),
       });
 
-      pillExtreme?.addEventListener('click', (ev) => {
-        if (
-          ev.target === hudExtremeSpark ||
-          hudExtremeSpark?.contains(ev.target) ||
-          ev.target === hudExtremeFactors ||
-          hudExtremeFactors?.contains(ev.target)
-        ) {
-          return;
-        }
-        flashDisneyExtremeSnapshotDiff();
-      });
-      pillExtreme?.addEventListener('dblclick', (ev) => {
-        if (
-          ev.target === hudExtremeSpark ||
-          hudExtremeSpark?.contains(ev.target) ||
-          ev.target === hudExtremeFactors ||
-          hudExtremeFactors?.contains(ev.target)
-        ) {
-          return;
-        }
-        copyDisneyExtremeSnapshotDiff();
-      });
-      pillExtreme?.setAttribute('role', 'button');
-      pillExtreme?.setAttribute('tabindex', '0');
-      pillExtreme?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeSnapshotDiff();
-            return;
-          }
-          flashDisneyExtremeSnapshotDiff();
-        }
+      bindDisneyExtremeFlashCopySurface(pillExtreme, {
+        onFlash: () => flashDisneyExtremeSnapshotDiff(),
+        onCopy: () => copyDisneyExtremeSnapshotDiff(),
+        ignoreChildTargets: [hudExtremeSpark, hudExtremeFactors],
       });
 
-      hudExtremeFactors?.addEventListener('click', () => {
-        flashDisneyExtremeFactorBars();
-      });
-      hudExtremeFactors?.addEventListener('dblclick', () => {
-        copyDisneyExtremeFactorBarsSvg();
-      });
-      hudExtremeFactors?.setAttribute('role', 'button');
-      hudExtremeFactors?.setAttribute('tabindex', '0');
-      hudExtremeFactors?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeFactorBarsSvg();
-            return;
-          }
-          flashDisneyExtremeFactorBars();
-        }
+      bindDisneyExtremeFlashCopySurface(hudExtremeFactors, {
+        onFlash: () => flashDisneyExtremeFactorBars(),
+        onCopy: () => copyDisneyExtremeFactorBarsSvg(),
       });
 
-      hudBodySpark?.addEventListener('click', () => {
-        flashDisneyExtremeBodyMix();
-      });
-      hudBodySpark?.addEventListener('dblclick', () => {
-        copyDisneyExtremeBodyMixSvg();
-      });
-      hudBodySpark?.setAttribute('role', 'button');
-      hudBodySpark?.setAttribute('tabindex', '0');
-      hudBodySpark?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (ev.shiftKey && ev.key === 'Enter') {
-            copyDisneyExtremeBodyMixSvg();
-            return;
-          }
-          flashDisneyExtremeBodyMix();
-        }
+      bindDisneyExtremeFlashCopySurface(hudBodySpark, {
+        onFlash: () => flashDisneyExtremeBodyMix(),
+        onCopy: () => copyDisneyExtremeBodyMixSvg(),
       });
 
       let disneyExtremeNudgeHold = null;

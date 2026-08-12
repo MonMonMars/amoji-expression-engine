@@ -46,7 +46,7 @@ describe('Phase 153 Extreme N neck flash + HUD factors click', () => {
     expect(src).toContain('function flashDisneyExtremeNeck()');
     expect(src).toContain('<kbd>N</kbd>');
     expect(src).toContain(
-      "hudExtremeFactors?.addEventListener('click', () => {\n        flashDisneyExtremeFactorBars();\n      })",
+      'bindDisneyExtremeFlashCopySurface(hudExtremeFactors',
     );
   });
 });

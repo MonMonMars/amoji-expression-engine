@@ -9,10 +9,10 @@ const faceLivePath = fileURLToPath(
 describe('Phase 184 Extreme X pill click flashes diff', () => {
   it('wires pillExtreme click/keyboard to snapshot diff', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('pillExtreme?.addEventListener(\'click\'');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(pillExtreme');
     expect(src).toContain('flashDisneyExtremeSnapshotDiff()');
-    expect(src).toContain("pillExtreme?.setAttribute('role', 'button')");
-    expect(src).toContain("pillExtreme?.setAttribute('tabindex', '0')");
+    expect(src).toContain("setAttribute('role', 'button')");
+    expect(src).toContain("setAttribute('tabindex', '0')");
     expect(src).toContain('.pill.pill-x:focus-visible');
   });
 });

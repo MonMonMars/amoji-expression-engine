@@ -21,10 +21,7 @@ describe('Phase 357 Extreme pin strip flash and clicks', () => {
     expect(src).toContain('function flashDisneyExtremeBaselinePinStrip');
     expect(src).toContain("resolved.action === 'showBaselinePinStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremePin')?.addEventListener('click'",
-    );
-    expect(src).toContain(
-      "getElementById('disneyExtremePin')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremePin')",
     );
     expect(src).toMatch(
       /disneyExtremePin[\s\S]*?flashDisneyExtremeBaselinePinStrip/,

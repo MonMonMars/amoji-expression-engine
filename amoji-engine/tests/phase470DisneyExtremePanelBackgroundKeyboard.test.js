@@ -12,10 +12,10 @@ describe('Phase 470 Extreme panel background keyboard interactions', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('Extreme panel · ⇧Enter paste');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('id="disneyExtremePanel" title="Drop Extreme snapshot');
-    expect(src).toContain("disneyExtremePanel?.addEventListener('click'");
-    expect(src).toContain("disneyExtremePanel?.addEventListener('dblclick'");
-    expect(src).toContain("if (ev.target !== disneyExtremePanel) return;");
-    expect(src).toContain('flashDisneyExtremeDropHint();');
-    expect(src).toContain('pasteDisneyExtremeSnapshotJson();');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremePanel');
+    expect(src).toContain('backgroundOnly: true');
+    expect(src).toContain('pasteOnDblClick: true');
+    expect(src).toContain('() => flashDisneyExtremeDropHint()');
+    expect(src).toContain('() => pasteDisneyExtremeSnapshotJson()');
   });
 });

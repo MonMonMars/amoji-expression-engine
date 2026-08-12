@@ -11,9 +11,8 @@ describe('Phase 471 Extreme history row background actions', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('history row · background click list');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('history row · background dbl-click copy');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain("getElementById('disneyExtremeHistory')?.addEventListener('click'");
-    expect(src).toContain("getElementById('disneyExtremeHistory')?.addEventListener('dblclick'");
-    expect(src).toContain("if (ev.target !== ev.currentTarget) return;");
+    expect(src).toContain("bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeHistory')");
+    expect(src).toContain('backgroundOnly: true');
     expect(src).toContain('flashDisneyExtremeBaselineHistoryList();');
     expect(src).toContain('copyDisneyExtremeBaselineHistoryList();');
   });

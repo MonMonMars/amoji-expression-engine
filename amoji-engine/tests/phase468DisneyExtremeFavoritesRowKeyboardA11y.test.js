@@ -11,8 +11,8 @@ describe('Phase 468 Extreme favorites row keyboard accessibility', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('favorites row · Enter/Space list');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('favorites row · ⇧Enter copy list');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain("getElementById('disneyExtremeFavorites')?.setAttribute('role', 'button')");
-    expect(src).toContain("getElementById('disneyExtremeFavorites')?.addEventListener('keydown'");
+    expect(src).toContain("bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFavorites')");
+    expect(src).toContain('backgroundOnly: true');
     expect(src).toContain('flashDisneyExtremeBaselineFavoritesList();');
     expect(src).toContain('copyDisneyExtremeBaselineFavoritesList();');
     expect(src).toContain('Starred favorites');

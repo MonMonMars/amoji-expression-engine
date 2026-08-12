@@ -504,7 +504,31 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 491 | Extreme spark label aria-describedby | Done |
 | Phase 492 | Extreme interactive bind helper | Done |
 | Phase 493 | Extreme label a11y docs sync | Done |
-| Phase 494+ | Further production polish… | Specced |
+| Phase 494 | Extreme bind helper paste | Done |
+| Phase 495 | Extreme summaries bind helper | Done |
+| Phase 496 | Extreme strip rows bind helper batch 1 | Done |
+| Phase 497 | Extreme strip rows bind helper batch 2 | Done |
+| Phase 498 | Extreme strip rows bind helper batch 3 | Done |
+| Phase 499 | Extreme panel sparks bind helper | Done |
+| Phase 500 | Extreme HUD sparks bind helper | Done |
+| Phase 501 | Extreme status/drop/panel bind helper | Done |
+| Phase 502 | Extreme history/favorites rows bind helper | Done |
+| Phase 503 | Extreme spark aria-labelledby | Done |
+| Phase 504 | Extreme panel aria-describedby | Done |
+| Phase 505 | Extreme filter clear button aria | Done |
+| Phase 506 | Extreme capacity badge aria | Done |
+| Phase 507 | Extreme chip aria metadata | Done |
+| Phase 508 | Extreme chip Shift+Enter pin | Done |
+| Phase 509 | Extreme strips empty aria-describedby | Done |
+| Phase 510 | Extreme details summary aria-controls | Done |
+| Phase 511 | Extreme filter input aria-controls | Done |
+| Phase 512 | Extreme chip focus-visible | Done |
+| Phase 513 | Extreme row/summary focus-visible | Done |
+| Phase 514 | Extreme redo separator aria | Done |
+| Phase 515 | Extreme bind migration audit | Done |
+| Phase 516 | Extreme readme phase table | Done |
+| Phase 517 | Extreme a11y docs sync | Done |
+| Phase 518+ | Further production polish… | Specced |
 
 ## Quick start
 

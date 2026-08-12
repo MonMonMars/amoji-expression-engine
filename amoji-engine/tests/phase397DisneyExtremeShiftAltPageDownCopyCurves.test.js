@@ -39,7 +39,7 @@ describe('Phase 397 Extreme ⇧Alt+PageDown copy curve strips', () => {
     expect(src).toContain('function copyDisneyExtremeBaselineCurveStrip');
     expect(src).toContain("resolved.action === 'copyBaselineCurveStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremeCurveStrip')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeCurveStrip')",
     );
   });
 });

@@ -11,8 +11,8 @@ describe('Phase 459 Extreme spark Shift+Enter copy', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('sparks · ⇧Enter copy');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('dbl-click/⇧Enter copy');
-    expect(src).toContain("disneyExtremeEaseSpark?.addEventListener('keydown'");
-    expect(src).toContain("hudExtremeSpark?.addEventListener('keydown'");
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeEaseSpark');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudExtremeSpark');
     expect(src).toContain("if (ev.shiftKey && ev.key === 'Enter') {");
     expect(src).toContain('copyDisneyExtremeEaseSvg();');
     expect(src).toContain('copyDisneyExtremeBodyMixSvg();');

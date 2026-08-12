@@ -10,12 +10,12 @@ describe('Phase 454 Extreme spark dbl-click copy', () => {
   it('wires panel/HUD spark dbl-click to copy SVG', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('sparks · dbl-click copy');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain("disneyExtremeEaseSpark?.addEventListener('dblclick'");
-    expect(src).toContain("disneyExtremeBodySpark?.addEventListener('dblclick'");
-    expect(src).toContain("disneyExtremeFactorBars?.addEventListener('dblclick'");
-    expect(src).toContain("hudExtremeSpark?.addEventListener('dblclick'");
-    expect(src).toContain("hudExtremeFactors?.addEventListener('dblclick'");
-    expect(src).toContain("hudBodySpark?.addEventListener('dblclick'");
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeEaseSpark');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeBodySpark');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeFactorBars');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudExtremeSpark');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudExtremeFactors');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudBodySpark');
     expect(src).toContain('copyDisneyExtremeEaseSvg();');
     expect(src).toContain('copyDisneyExtremeBodyMixSvg();');
     expect(src).toContain('copyDisneyExtremeFactorBarsSvg();');

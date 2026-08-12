@@ -15,9 +15,10 @@ describe('Phase 458 Extreme status/drop keyboard accessibility', () => {
     expect(src).toContain('id=\"disneyExtremeDropHint\"');
     expect(src).toContain('click/Enter/Space digest · dbl-click/⇧Enter copy · C');
     expect(src).toContain('click/Enter/Space flash · dbl-click paste');
-    expect(src).toContain("getElementById('disneyExtremeDropHint')?.setAttribute('role', 'button')");
-    expect(src).toContain("disneyExtremeStatus?.setAttribute('tabindex', '0')");
-    expect(src).toContain("disneyExtremeStatus?.addEventListener('keydown'");
+    expect(src).toContain("bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeDropHint')");
+    expect(src).toContain("bindDisneyExtremeFlashCopySurface(disneyExtremeStatus");
+    expect(src).toContain("setAttribute('role', 'button')");
+    expect(src).toContain("setAttribute('tabindex', '0')");
     expect(src).toContain('flashDisneyExtremeHotkeyDigestStatus();');
   });
 });

@@ -14,7 +14,7 @@ describe('Phase 354 Extreme active strip dbl-click copy', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('function copyDisneyExtremeBaselineActive');
     expect(src).toContain(
-      "getElementById('disneyExtremeActive')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeActive')",
     );
     expect(src).toContain('btnDisneyExtremeCopyActive');
     expect(src).toMatch(

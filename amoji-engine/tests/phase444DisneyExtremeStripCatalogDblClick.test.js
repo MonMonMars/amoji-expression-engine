@@ -23,7 +23,7 @@ describe('Phase 444 Extreme strip dbl-click catalog sync', () => {
     );
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain(
-      "getElementById('disneyExtremeStripsFilterSummary')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(\n        document.getElementById('disneyExtremeStripsFilterSummary')",
     );
     expect(src).toContain('copyDisneyExtremeStripsFilterSummary();');
     expect(src).toContain('dbl-click copy');

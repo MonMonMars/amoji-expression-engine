@@ -11,7 +11,7 @@ describe('Phase 489 Extreme status Shift+Enter copy', () => {
   it('copies summary on status Shift+Enter', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('status row · ⇧Enter copy summary');
     const src = readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('disneyExtremeStatus?.addEventListener(\'keydown\'');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeStatus');
     expect(src).toContain('copyDisneyExtremeSummary()');
     expect(src).toContain('id="disneyExtremeStatus" aria-keyshortcuts="Enter Space Shift+Enter"');
   });

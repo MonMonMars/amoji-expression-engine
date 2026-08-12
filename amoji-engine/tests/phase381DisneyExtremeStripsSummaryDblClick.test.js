@@ -14,7 +14,7 @@ describe('Phase 381 Extreme strips summary dbl-click copy', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('id="disneyExtremeStripsSummary"');
     expect(src).toContain(
-      "getElementById('disneyExtremeStripsSummary')?.addEventListener('dblclick'",
+      "bindDisneyExtremeFlashCopySurface(\n        document.getElementById('disneyExtremeStripsSummary')",
     );
     expect(src).toMatch(
       /disneyExtremeStripsSummary[\s\S]*?copyDisneyExtremeBaselineStripsSummary/,

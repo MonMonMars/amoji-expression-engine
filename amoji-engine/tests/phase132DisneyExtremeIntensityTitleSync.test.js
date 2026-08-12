@@ -11,7 +11,7 @@ describe('Phase 132 Extreme title sync + ease spark click', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('updateTierHintForDisneyExtreme();\n        syncDisneyExtremePrefsSummary();\n        temporal.intensity = intensity;');
     expect(src).toContain('function flashDisneyExtremeEaseCurve()');
-    expect(src).toContain("disneyExtremeEaseSpark?.addEventListener('click'");
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeEaseSpark');
     expect(src).toContain('formatDisneyExtremeEaseCurveLabel({');
     expect(src).toContain('click flash');
   });

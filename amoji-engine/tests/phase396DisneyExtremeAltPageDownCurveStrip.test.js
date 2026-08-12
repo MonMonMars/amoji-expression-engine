@@ -21,7 +21,7 @@ describe('Phase 396 Extreme Alt+PageDown curve strips flash', () => {
     expect(src).toContain('function flashDisneyExtremeBaselineCurveStrip');
     expect(src).toContain("resolved.action === 'showBaselineCurveStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremeCurveStrip')?.addEventListener('click'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeCurveStrip')",
     );
   });
 });

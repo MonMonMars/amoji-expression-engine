@@ -15,10 +15,9 @@ describe('Phase 450 Extreme drop hint + status click flash', () => {
     expect(src).toContain('function flashDisneyExtremeDropHint');
     expect(src).toContain('function flashDisneyExtremeHotkeyDigestStatus');
     expect(src).toContain(
-      "getElementById('disneyExtremeDropHint')?.addEventListener('click'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeDropHint')",
     );
-    expect(src).toContain('disneyExtremeStatus?.addEventListener(\'click\'');
-    expect(src).toContain('disneyExtremeStatus?.addEventListener(\'dblclick\'');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeStatus');
     expect(src).toContain('flashDisneyExtremeHotkeyDigestStatus();');
     expect(src).toContain('copyDisneyExtremeSummary();');
     expect(src).toContain('click/Enter/Space flash · dbl-click paste');

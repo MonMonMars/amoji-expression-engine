@@ -10,12 +10,8 @@ describe('Phase 141 Extreme HUD spark click flashes ease', () => {
   it('makes HUD mini spark interactive like the panel spark', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('pointer-events: auto');
-    expect(src).toContain("hudExtremeSpark?.addEventListener('click'");
-    expect(src).toContain(
-      "hudExtremeSpark?.addEventListener('click', () => {\n        flashDisneyExtremeEaseCurve();\n      })",
-    );
-    expect(src).toContain(
-      "disneyExtremeBodySpark?.addEventListener('click', () => {\n        flashDisneyExtremeBodyMix();\n      })",
-    );
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudExtremeSpark');
+    expect(src).toContain('flashDisneyExtremeEaseCurve()');
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(disneyExtremeBodySpark');
   });
 });

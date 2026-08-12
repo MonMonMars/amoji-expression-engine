@@ -11,8 +11,8 @@ describe('Phase 467 Extreme history row keyboard accessibility', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('history row · Enter/Space list');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('history row · ⇧Enter copy list');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain("getElementById('disneyExtremeHistory')?.setAttribute('role', 'button')");
-    expect(src).toContain("getElementById('disneyExtremeHistory')?.addEventListener('keydown'");
+    expect(src).toContain("bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeHistory')");
+    expect(src).toContain('backgroundOnly: true');
     expect(src).toContain('flashDisneyExtremeBaselineHistoryList();');
     expect(src).toContain('copyDisneyExtremeBaselineHistoryList();');
     expect(src).toContain('Enter/Space list · ⇧Enter copy list');

@@ -9,9 +9,7 @@ const faceLivePath = fileURLToPath(
 describe('Phase 145 Extreme HUD body spark click flashes mix', () => {
   it('makes HUD body mix spark interactive', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain(
-      "hudBodySpark?.addEventListener('click', () => {\n        flashDisneyExtremeBodyMix();\n      })",
-    );
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(hudBodySpark');
     expect(src).toContain('.hud-body-spark');
     expect(src).toContain('pointer-events: auto');
   });

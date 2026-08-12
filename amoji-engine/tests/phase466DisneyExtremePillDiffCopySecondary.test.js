@@ -12,7 +12,7 @@ describe('Phase 466 Extreme X pill diff copy secondary actions', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('X pill · dbl-click copy diff');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('id="pillExtreme" title="X diff pill · click/Enter/Space flash diff · dbl-click/⇧Enter copy diff"');
-    expect(src).toContain("pillExtreme?.addEventListener('dblclick'");
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(pillExtreme');
     expect(src).toContain("if (ev.shiftKey && ev.key === 'Enter') {");
     expect(src).toContain('copyDisneyExtremeSnapshotDiff();');
   });

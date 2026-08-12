@@ -11,7 +11,8 @@ describe('Phase 196 Extreme dbl-click drop hint paste', () => {
   it('wires dblclick paste and documents it in help', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain('id="disneyExtremeDropHint"');
-    expect(src).toContain("addEventListener(\n        'dblclick'");
+    expect(src).toContain('bindDisneyExtremeFlashCopySurface(document.getElementById(\'disneyExtremeDropHint\')');
+    expect(src).toContain('pasteOnDblClick: true');
     expect(src).toContain('pasteDisneyExtremeSnapshotJson()');
     expect(src).toContain('dbl-click paste');
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('dbl-click paste');

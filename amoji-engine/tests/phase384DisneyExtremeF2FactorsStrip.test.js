@@ -21,7 +21,7 @@ describe('Phase 384 Extreme F2 factors strip flash', () => {
     expect(src).toContain('function flashDisneyExtremeBaselineFactorsStrip');
     expect(src).toContain("resolved.action === 'showBaselineFactorsStrip'");
     expect(src).toContain(
-      "getElementById('disneyExtremeFactorsStrip')?.addEventListener('click'",
+      "bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFactorsStrip')",
     );
   });
 });
