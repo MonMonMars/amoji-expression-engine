@@ -1095,10 +1095,16 @@
             <button type="button" id="btnDisneyExtremeShareKit" title="Copy kit share · ⇧V">Copy kit share <kbd>⇧V</kbd></button>
             <button type="button" id="btnDisneyExtremeNextFav" title="Next favorite · Q">Next favorite <kbd>Q</kbd></button>
             <button type="button" id="btnDisneyExtremePrevFav" title="Prev favorite · ⇧Q">Prev favorite <kbd>⇧Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowFavNext" title="Cycle favorite next · →">Fav next <kbd>→</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowFavPrev" title="Cycle favorite prev · ←">Fav prev <kbd>←</kbd></button>
             <button type="button" id="btnDisneyExtremeNextHist" title="Next history · Alt+Q">Next history <kbd>Alt+Q</kbd></button>
             <button type="button" id="btnDisneyExtremePrevHist" title="Prev history · ⇧Alt+Q">Prev history <kbd>⇧Alt+Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowHistNext" title="Cycle history next · ↓">Hist next <kbd>↓</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowHistPrev" title="Cycle history prev · ↑">Hist prev <kbd>↑</kbd></button>
             <button type="button" id="btnDisneyExtremeNextRedo" title="Next redo · Alt+U">Next redo <kbd>Alt+U</kbd></button>
             <button type="button" id="btnDisneyExtremePrevRedo" title="Prev redo · ⇧Alt+U">Prev redo <kbd>⇧Alt+U</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowRedoNext" title="Cycle redo next · ⇧↓">Redo next <kbd>⇧↓</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowRedoPrev" title="Cycle redo prev · ⇧↑">Redo prev <kbd>⇧↑</kbd></button>
             <button type="button" id="btnDisneyExtremeJumpPin" title="Jump pin · Alt+R">Jump pin <kbd>Alt+R</kbd></button>
             <button type="button" id="btnDisneyExtremeJumpPinSummary" title="Jump pin summary · ⇧Alt+R">Jump pin summary <kbd>⇧Alt+R</kbd></button>
             <button type="button" id="btnDisneyExtremeReplacePin" title="Replace pin · ⇧P">Replace pin <kbd>⇧P</kbd></button>
@@ -1113,6 +1119,7 @@
             <button type="button" id="btnDisneyExtremeCopyPinBundle" title="Copy pin bundle · ⇧Alt+A">Copy pin bundle <kbd>⇧Alt+A</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyPinFp" title="Copy pin fp · ⇧Alt+P">Copy pin fp <kbd>⇧Alt+P</kbd></button>
             <button type="button" id="btnDisneyExtremeFocusPanel" title="Focus Extreme panel · Alt+X">Focus Extreme panel <kbd>Alt+X</kbd></button>
+            <button type="button" id="btnDisneyExtremeFocusPanelTab" title="Focus Extreme panel · Tab">Focus panel <kbd>Tab</kbd></button>
             <button type="button" id="btnDisneyExtremeEnableFocus" title="Enable + focus · ⇧Alt+X">Enable + focus <kbd>⇧Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav" title="Unstar favorite · Alt+S">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp" title="Copy hotkey help · Alt+H">Copy hotkey help <kbd>Alt+H</kbd></button>
@@ -1243,7 +1250,7 @@
           <div
             id="disneyExtremeFactorBars"
             class="extreme-factor-bars is-off"
-            title="Factor bars (shape/body/eye/mouth) · click to flash · F · Shift+F copy"
+            title="Factor bars (shape/body/eye/mouth) · click flash · dbl-click copy · F · ⇧F"
           ></div>
           <div class="status" id="disneyExtremeFactorBarsLabel" style="margin:0;" title="Live factors label · F flash · ⇧F copy">factors</div>
         </div>
@@ -1251,7 +1258,7 @@
           <div
             id="disneyExtremeEaseSpark"
             class="extreme-ease-spark"
-            title="Ease overdrive curve (marker = shapeInt) · click to flash"
+            title="Ease overdrive curve (marker = shapeInt) · click flash · dbl-click copy · E · ⇧E"
           ></div>
           <div class="status" id="disneyExtremeEaseLabel" style="margin:0;" title="Live ease label · E flash · ⇧E copy">ease curve</div>
         </div>
@@ -1259,7 +1266,7 @@
           <div
             id="disneyExtremeBodySpark"
             class="extreme-body-spark is-off"
-            title="Body mix curve (marker = bodyInt) · click to flash · M"
+            title="Body mix curve (marker = bodyInt) · click flash · dbl-click copy · M · ⇧M"
           ></div>
           <div class="status" id="disneyExtremeBodyMixLabel" style="margin:0;" title="Live mix label · M flash · ⇧M copy">body mix</div>
         </div>
@@ -5799,6 +5806,14 @@
         cycleDisneyExtremeBaselineFavorite({ prev: true });
       });
 
+      document.getElementById('btnDisneyExtremeArrowFavNext')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineFavorite();
+      });
+
+      document.getElementById('btnDisneyExtremeArrowFavPrev')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineFavorite({ prev: true });
+      });
+
       document.getElementById('btnDisneyExtremeNextHist')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineHistory();
       });
@@ -5807,11 +5822,27 @@
         cycleDisneyExtremeBaselineHistory({ prev: true });
       });
 
+      document.getElementById('btnDisneyExtremeArrowHistNext')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineHistory();
+      });
+
+      document.getElementById('btnDisneyExtremeArrowHistPrev')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineHistory({ prev: true });
+      });
+
       document.getElementById('btnDisneyExtremeNextRedo')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineRedo();
       });
 
       document.getElementById('btnDisneyExtremePrevRedo')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineRedo({ prev: true });
+      });
+
+      document.getElementById('btnDisneyExtremeArrowRedoNext')?.addEventListener('click', () => {
+        cycleDisneyExtremeBaselineRedo();
+      });
+
+      document.getElementById('btnDisneyExtremeArrowRedoPrev')?.addEventListener('click', () => {
         cycleDisneyExtremeBaselineRedo({ prev: true });
       });
 
@@ -5868,6 +5899,10 @@
       });
 
       document.getElementById('btnDisneyExtremeFocusPanel')?.addEventListener('click', () => {
+        focusDisneyExtremePanel();
+      });
+
+      document.getElementById('btnDisneyExtremeFocusPanelTab')?.addEventListener('click', () => {
         focusDisneyExtremePanel();
       });
 
@@ -7032,6 +7067,9 @@
       disneyExtremeEaseSpark?.addEventListener('click', () => {
         flashDisneyExtremeEaseCurve();
       });
+      disneyExtremeEaseSpark?.addEventListener('dblclick', () => {
+        copyDisneyExtremeEaseSvg();
+      });
       disneyExtremeEaseSpark?.setAttribute('role', 'button');
       disneyExtremeEaseSpark?.setAttribute('tabindex', '0');
       disneyExtremeEaseSpark?.addEventListener('keydown', (ev) => {
@@ -7043,6 +7081,9 @@
 
       disneyExtremeBodySpark?.addEventListener('click', () => {
         flashDisneyExtremeBodyMix();
+      });
+      disneyExtremeBodySpark?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBodyMixSvg();
       });
       disneyExtremeBodySpark?.setAttribute('role', 'button');
       disneyExtremeBodySpark?.setAttribute('tabindex', '0');
@@ -7056,6 +7097,9 @@
       disneyExtremeFactorBars?.addEventListener('click', () => {
         flashDisneyExtremeFactorBars();
       });
+      disneyExtremeFactorBars?.addEventListener('dblclick', () => {
+        copyDisneyExtremeFactorBarsSvg();
+      });
       disneyExtremeFactorBars?.setAttribute('role', 'button');
       disneyExtremeFactorBars?.setAttribute('tabindex', '0');
       disneyExtremeFactorBars?.addEventListener('keydown', (ev) => {
@@ -7067,6 +7111,9 @@
 
       hudExtremeSpark?.addEventListener('click', () => {
         flashDisneyExtremeEaseCurve();
+      });
+      hudExtremeSpark?.addEventListener('dblclick', () => {
+        copyDisneyExtremeEaseSvg();
       });
       hudExtremeSpark?.setAttribute('role', 'button');
       hudExtremeSpark?.setAttribute('tabindex', '0');
@@ -7100,6 +7147,9 @@
       hudExtremeFactors?.addEventListener('click', () => {
         flashDisneyExtremeFactorBars();
       });
+      hudExtremeFactors?.addEventListener('dblclick', () => {
+        copyDisneyExtremeFactorBarsSvg();
+      });
       hudExtremeFactors?.setAttribute('role', 'button');
       hudExtremeFactors?.setAttribute('tabindex', '0');
       hudExtremeFactors?.addEventListener('keydown', (ev) => {
@@ -7111,6 +7161,9 @@
 
       hudBodySpark?.addEventListener('click', () => {
         flashDisneyExtremeBodyMix();
+      });
+      hudBodySpark?.addEventListener('dblclick', () => {
+        copyDisneyExtremeBodyMixSvg();
       });
       hudBodySpark?.setAttribute('role', 'button');
       hudBodySpark?.setAttribute('tabindex', '0');

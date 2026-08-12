@@ -464,7 +464,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 451 | Extreme catalog copy summary notes | Done |
 | Phase 452 | Extreme spark label title tooltips | Done |
 | Phase 453 | Extreme X/B toggle buttons | Done |
-| Phase 454+ | Further production polish… | Specced |
+| Phase 454 | Extreme spark dbl-click copy wiring | Done |
+| Phase 455 | Extreme Tab focus panel button | Done |
+| Phase 456 | Extreme arrow cycle mirror buttons | Done |
+| Phase 457 | Extreme catalog/test/docs sync polish | Done |
+| Phase 458+ | Further production polish… | Specced |
 
 ## Quick start
 

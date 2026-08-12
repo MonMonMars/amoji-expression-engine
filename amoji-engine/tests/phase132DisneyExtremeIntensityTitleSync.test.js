@@ -13,6 +13,6 @@ describe('Phase 132 Extreme title sync + ease spark click', () => {
     expect(src).toContain('function flashDisneyExtremeEaseCurve()');
     expect(src).toContain("disneyExtremeEaseSpark?.addEventListener('click'");
     expect(src).toContain('formatDisneyExtremeEaseCurveLabel({');
-    expect(src).toContain('click to flash');
+    expect(src).toContain('click flash');
   });
 });

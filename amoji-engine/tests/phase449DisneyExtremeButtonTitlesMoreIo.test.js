@@ -9,7 +9,7 @@ describe('Phase 449 Extreme More IO button titles + copy-flash audit', () => {
   it('covers all Extreme buttons with title tooltips', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     const buttons = [...src.matchAll(/<button[^>]*id="(btnDisneyExtreme[^"]+)"[^>]*>/g)];
-    expect(buttons.length).toBe(176);
+    expect(buttons.length).toBe(183);
     for (const m of buttons) {
       expect(m[0], m[1]).toContain('title="');
     }

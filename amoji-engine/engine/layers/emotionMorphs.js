@@ -992,6 +992,11 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'sparkLabelTitles', help: 'spark/readout labels · title tooltips', kind: 'note' },
   { id: 'toggleExtremeButton', help: 'X toggle · button', kind: 'note' },
   { id: 'toggleBodyButton', help: 'B body toggle · button', kind: 'note' },
+  { id: 'tabFocusButton', help: 'Tab focus panel · button', kind: 'note' },
+  { id: 'arrowFavButtons', help: '→/← cycle fav · button', kind: 'note' },
+  { id: 'arrowHistButtons', help: '↓/↑ cycle hist · button', kind: 'note' },
+  { id: 'arrowRedoButtons', help: '⇧↓/⇧↑ cycle redo · button', kind: 'note' },
+  { id: 'sparkDblClickCopy', help: 'sparks · dbl-click copy', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
