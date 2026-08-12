@@ -699,6 +699,33 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish24998 */
+      @media (prefers-reduced-motion: reduce) {
+        #disneyExtremePanel button:hover:not(:disabled) {
+          filter: none;
+        }
+      }
+      #disneyExtremePanel [role="switch"][aria-checked="true"] {
+        outline-color: currentColor;
+      }
+      #disneyExtremePanel kbd {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85em;
+      }
+      #disneyExtremeStatus:empty::before {
+        content: '\200b';
+      }
+      #disneyExtremePanel a.extreme-skip:focus-visible {
+        z-index: 10;
+      }
+      @media (min-width: 64rem) {
+        #disneyExtremePanel {
+          max-width: min(100%, 48rem);
+        }
+      }
+      #disneyExtremeToolbar [aria-keyshortcuts] {
+        touch-action: manipulation;
+      }
       /* disneyExtremeA11yPolish12710 */
       @media (prefers-color-scheme: dark) {
         #disneyExtremePanel {
@@ -1962,6 +1989,32 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish24998Docs
+       * catalog · post-24997 a11y polish notes
+       * readme · phase table 24998+
+       * FACE_LIVE · a11y delta sync 24998+
+       * docs · bind surface count 32 keep8
+       * docs · 183 button aria keep8
+       * docs · chip modifier matrix keep8
+       * docs · focus-visible map keep8
+       * docs · live region policy keep8
+       * docs · reduced motion keep8
+       * docs · forced-colors keep8
+       * docs · pointer coarse keep8
+       * docs · landmark roles keep8
+       * docs · skip links keep8
+       * docs · spark role=img keep8
+       * docs · bind registry keep8
+       * docs · typography policy keep8
+       * docs · interaction policy keep8
+       * docs · layout policy keep8
+       * docs · motion policy keep8
+       * docs · hover policy keep8
+       * docs · kbd mono policy keep8
+       * tests · a11y substring harness 24998+
+       * final a11y polish audit · batch 24998+
+       * Extreme a11y batch7 audit
        */
       /* disneyExtremeA11yPolish12710Docs
        * catalog · post-12709 a11y polish notes
