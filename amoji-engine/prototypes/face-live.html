@@ -1106,7 +1106,10 @@
             <button type="button" id="btnDisneyExtremeEnableFocus">Enable + focus <kbd>⇧Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
+            <button type="button" id="btnDisneyExtremeShowHelp">Help digest <kbd>H</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyDigest">Copy hotkey digest <kbd>Alt+F12</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearActive">Clear active <kbd>Delete</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearTransient">Clear transient <kbd>⇧Alt+Delete</kbd></button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd> <kbd>⇧T</kbd></button>
             <button type="button" id="btnDisneyExtremeOpenMore">Open More IO <kbd>⇧Alt+T</kbd></button>
           </div>
@@ -1624,6 +1627,7 @@
         formatDisneyExtremeBaselineCurveStripsBundle,
         DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT,
         formatDisneyExtremeBaselineCopyFlashLabel,
+        formatDisneyExtremeStripCopyFilteredOutLabel,
         formatDisneyExtremeBaselineAllStripsLabel,
         formatDisneyExtremeBaselineAllStripsBundle,
         filterDisneyExtremeAllStripsKeys,
@@ -2621,22 +2625,27 @@
       }
 
       async function copyDisneyExtremeBaselinePinStrip() {
-        const text = formatDisneyExtremeBaselinePinStripLabel(
-          lastExtremeBaselineSnap,
-        );
+        const visible = disneyExtremeStripVisible('pin');
+        const text = visible
+          ? formatDisneyExtremeBaselinePinStripLabel(lastExtremeBaselineSnap)
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('pin');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function flashDisneyExtremeBaselineDirtyStrip(extremeSnap) {
@@ -2654,9 +2663,12 @@
 
       async function copyDisneyExtremeBaselineDirtyStrip(extremeSnap, opts = {}) {
         if (opts.open) openDisneyExtremeStrips();
-        const text = formatDisneyExtremeBaselineDirtyStripLabel(
-          disneyExtremeDirtyStripOpts(extremeSnap),
-        );
+        const visible = disneyExtremeStripVisible('dirty');
+        const text = visible
+          ? formatDisneyExtremeBaselineDirtyStripLabel(
+              disneyExtremeDirtyStripOpts(extremeSnap),
+            )
+          : '';
         const empty = !String(text || '').trim();
         let ok = false;
         try {
@@ -2667,12 +2679,15 @@
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('dirty');
         flashDisneyExtremeStatus(
           formatDisneyExtremeBaselineCopyFlashLabel({
             ok,
             empty,
             open: !!opts.open,
-            summary: text,
+            summary,
           }),
         );
         return ok && !empty;
@@ -2728,20 +2743,27 @@
               mouthFactor: extremeSnap.mouthFactor,
             }
           : disneyExtremeFactorOpts();
-        const text = formatDisneyExtremeBaselineFactorsStripLabel(opts);
+        const visible = disneyExtremeStripVisible('factors');
+        const text = visible
+          ? formatDisneyExtremeBaselineFactorsStripLabel(opts)
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('factors');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function disneyExtremeEaseStripOpts(extremeSnap) {
@@ -2792,22 +2814,29 @@
       }
 
       async function copyDisneyExtremeBaselineEaseStrip(extremeSnap) {
-        const text = formatDisneyExtremeBaselineEaseStripLabel(
-          disneyExtremeEaseStripOpts(extremeSnap),
-        );
+        const visible = disneyExtremeStripVisible('ease');
+        const text = visible
+          ? formatDisneyExtremeBaselineEaseStripLabel(
+              disneyExtremeEaseStripOpts(extremeSnap),
+            )
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('ease');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function syncDisneyExtremeMixStripUi(extremeSnap) {
@@ -2830,22 +2859,29 @@
       }
 
       async function copyDisneyExtremeBaselineMixStrip(extremeSnap) {
-        const text = formatDisneyExtremeBaselineMixStripLabel(
-          disneyExtremeMixStripOpts(extremeSnap),
-        );
+        const visible = disneyExtremeStripVisible('mix');
+        const text = visible
+          ? formatDisneyExtremeBaselineMixStripLabel(
+              disneyExtremeMixStripOpts(extremeSnap),
+            )
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('mix');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function syncDisneyExtremeNeckStripUi(extremeSnap) {
@@ -2868,22 +2904,29 @@
       }
 
       async function copyDisneyExtremeBaselineNeckStrip(extremeSnap) {
-        const text = formatDisneyExtremeBaselineNeckStripLabel(
-          disneyExtremeNeckStripOpts(extremeSnap),
-        );
+        const visible = disneyExtremeStripVisible('neck');
+        const text = visible
+          ? formatDisneyExtremeBaselineNeckStripLabel(
+              disneyExtremeNeckStripOpts(extremeSnap),
+            )
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('neck');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function disneyExtremeCurveStripOpts(extremeSnap) {
@@ -2917,14 +2960,14 @@
         return true;
       }
 
-      function disneyExtremeCurveStripVisible() {
+      function disneyExtremeStripVisible(stripKey) {
         const q = String(disneyExtremeStripsFilterQuery || '').trim();
         if (!q) return true;
-        return disneyExtremeAllStripsVisibleKeys().includes('curves');
+        return disneyExtremeAllStripsVisibleKeys().includes(stripKey);
       }
 
       async function copyDisneyExtremeBaselineCurveStrip(extremeSnap) {
-        const visible = disneyExtremeCurveStripVisible();
+        const visible = disneyExtremeStripVisible('curves');
         const text = visible
           ? formatDisneyExtremeBaselineCurveStripsBundle(
               disneyExtremeCurveStripOpts(extremeSnap),
@@ -2940,7 +2983,9 @@
         } catch {
           ok = false;
         }
-        const summary = visible ? 'curves' : 'curves · filtered out';
+        const summary = visible
+          ? 'curves'
+          : formatDisneyExtremeStripCopyFilteredOutLabel('curves');
         flashDisneyExtremeStatus(
           formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
@@ -3257,24 +3302,31 @@
       }
 
       async function copyDisneyExtremeBaselineActive() {
-        const text = formatDisneyExtremeBaselineActiveLabel({
-          historyIndex: extremeHistoryJumpIndexActive,
-          redoIndex: extremeRedoJumpIndexActive,
-          favoriteIndex: extremeFavoriteCycleIndex,
-        });
+        const visible = disneyExtremeStripVisible('active');
+        const text = visible
+          ? formatDisneyExtremeBaselineActiveLabel({
+              historyIndex: extremeHistoryJumpIndexActive,
+              redoIndex: extremeRedoJumpIndexActive,
+              favoriteIndex: extremeFavoriteCycleIndex,
+            })
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('active');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function jumpDisneyExtremeBaselineRedoTip() {
@@ -3353,24 +3405,31 @@
       }
 
       async function copyDisneyExtremeBaselineTips() {
-        const text = formatDisneyExtremeBaselineTipsLabel({
-          history: extremeBaselineHistory,
-          redo: extremeBaselineRedo,
-          favorites: extremeBaselineFavorites,
-        });
+        const visible = disneyExtremeStripVisible('tips');
+        const text = visible
+          ? formatDisneyExtremeBaselineTipsLabel({
+              history: extremeBaselineHistory,
+              redo: extremeBaselineRedo,
+              favorites: extremeBaselineFavorites,
+            })
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('tips');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function flashDisneyExtremeBaselineStacksCapacity() {
@@ -3385,24 +3444,31 @@
       }
 
       async function copyDisneyExtremeBaselineStacksCapacity() {
-        const text = formatDisneyExtremeBaselineStacksCapacityLabel({
-          history: extremeBaselineHistory,
-          redo: extremeBaselineRedo,
-          favorites: extremeBaselineFavorites,
-        });
+        const visible = disneyExtremeStripVisible('capacity');
+        const text = visible
+          ? formatDisneyExtremeBaselineStacksCapacityLabel({
+              history: extremeBaselineHistory,
+              redo: extremeBaselineRedo,
+              favorites: extremeBaselineFavorites,
+            })
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('capacity');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function flashDisneyExtremeBaselineRoots() {
@@ -3417,24 +3483,31 @@
       }
 
       async function copyDisneyExtremeBaselineRoots() {
-        const text = formatDisneyExtremeBaselineRootsLabel({
-          history: extremeBaselineHistory,
-          redo: extremeBaselineRedo,
-          favorites: extremeBaselineFavorites,
-        });
+        const visible = disneyExtremeStripVisible('roots');
+        const text = visible
+          ? formatDisneyExtremeBaselineRootsLabel({
+              history: extremeBaselineHistory,
+              redo: extremeBaselineRedo,
+              favorites: extremeBaselineFavorites,
+            })
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible
+          ? text
+          : formatDisneyExtremeStripCopyFilteredOutLabel('roots');
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function cycleDisneyExtremeBaselineFavorite(opts = {}) {
@@ -3526,9 +3599,10 @@
           return false;
         }
         const text = formatDisneyExtremeBundleLabel(lastExtremeBaselineSnap);
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3536,9 +3610,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · pin · ${text}` : `copy failed · pin · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: `pin · ${text}`,
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselinePinSummary() {
@@ -3550,9 +3628,10 @@
           lastExtremeBaselineSnap,
           { index: 1, kind: 'hist' },
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3560,9 +3639,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · pin · ${text}` : `copy failed · pin · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: `pin · ${text}`,
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselinePinFingerprint() {
@@ -3666,9 +3749,10 @@
         const text = formatDisneyExtremeBaselineFavoritesList(
           extremeBaselineFavorites,
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3676,9 +3760,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselineStacksSummary() {
@@ -3687,9 +3771,10 @@
           redo: extremeBaselineRedo,
           favorites: extremeBaselineFavorites,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3697,9 +3782,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function pasteDisneyExtremeBaselineStacksShareUrl(opts = {}) {
@@ -3846,9 +3931,10 @@
             redoDepth: extremeBaselineRedo.length,
           },
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3856,16 +3942,17 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselineRedoList() {
         const text = formatDisneyExtremeBaselineRedoList(extremeBaselineRedo);
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3873,26 +3960,33 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeHotkeyHelp() {
         const text = formatDisneyExtremeHotkeyHelp({
           enabled: !!disneyExtremeEl?.checked,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
-        flashDisneyExtremeStatus(ok ? 'copied · hotkey help' : 'copy failed · help');
-        return ok;
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'hotkey help',
+          }),
+        );
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeHotkeyDigest() {
@@ -5626,6 +5720,23 @@
         copyDisneyExtremeHotkeyHelp();
       });
 
+      document.getElementById('btnDisneyExtremeShowHelp')?.addEventListener('click', () => {
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeHotkeyDigest({
+            enabled: !!disneyExtremeEl?.checked,
+            stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
+          }),
+        );
+      });
+
+      document.getElementById('btnDisneyExtremeClearActive')?.addEventListener('click', () => {
+        clearDisneyExtremeTransient();
+      });
+
+      document.getElementById('btnDisneyExtremeClearTransient')?.addEventListener('click', () => {
+        clearDisneyExtremeTransient({ forceFlash: true });
+      });
+
       document.getElementById('btnDisneyExtremeCopyDigest')?.addEventListener('click', () => {
         copyDisneyExtremeHotkeyDigest();
       });
@@ -5821,9 +5932,10 @@
         const text = formatDisneyExtremeBundleLabel(disneyExtremeSnapshot(), {
           baseline: lastExtremeBaselineSnap,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -5831,9 +5943,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeSnapshotJson() {
@@ -6475,19 +6587,25 @@
           width: 280,
           height: 56,
         });
+        const text = spark.svg;
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(spark.svg);
+          if (!empty && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · ease SVG' : 'copy failed · ease SVG',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'ease SVG',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeEaseCurveLabel() {
@@ -6496,9 +6614,10 @@
           enabled: snap.enabled,
           markerT: snap.enabled ? snap.shapeInt : undefined,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6506,9 +6625,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeEaseCurveBundle() {
@@ -6517,9 +6636,10 @@
           enabled: snap.enabled,
           markerT: snap.enabled ? snap.shapeInt : undefined,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6527,9 +6647,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · ease+svg' : 'copy failed · ease+svg',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'ease+svg',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBodyMixSvg() {
@@ -6539,19 +6663,25 @@
           width: 280,
           height: 56,
         });
+        const text = spark.svg;
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(spark.svg);
+          if (!empty && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · mix SVG' : 'copy failed · mix SVG',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'mix SVG',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBodyMixLabel() {
@@ -6561,9 +6691,10 @@
           bodyOn: snap.bodyOn,
           markerT: snap.bodyOn ? snap.bodyInt : undefined,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6571,9 +6702,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBodyMixBundle() {
@@ -6583,9 +6714,10 @@
           bodyOn: snap.bodyOn,
           markerT: snap.bodyOn ? snap.bodyInt : undefined,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6593,9 +6725,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · mix+svg' : 'copy failed · mix+svg',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'mix+svg',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeNeckLabel() {
@@ -6607,9 +6743,10 @@
           bodyMix: snap.bodyMix,
           bodyInt: snap.bodyInt,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6617,9 +6754,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeNeckFactorsBundle() {
@@ -6630,9 +6767,10 @@
           bodyMix: snap.bodyMix,
           bodyInt: snap.bodyInt,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6640,9 +6778,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · neck+factors' : 'copy failed · neck+factors',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'neck+factors',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeFactorBarsSvg() {
@@ -6651,26 +6793,11 @@
           width: 280,
           height: 88,
         });
+        const text = spark.svg;
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(spark.svg);
-            ok = true;
-          }
-        } catch {
-          ok = false;
-        }
-        flashDisneyExtremeStatus(
-          ok ? 'copied · factors SVG' : 'copy failed · factors SVG',
-        );
-        return ok;
-      }
-
-      async function copyDisneyExtremeFactorBarsLabel() {
-        const text = formatDisneyExtremeFactorBarsLabel(disneyExtremeFactorOpts());
-        let ok = false;
-        try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -6678,9 +6805,31 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'factors SVG',
+          }),
         );
-        return ok;
+        return ok && !empty;
+      }
+
+      async function copyDisneyExtremeFactorBarsLabel() {
+        const text = formatDisneyExtremeFactorBarsLabel(disneyExtremeFactorOpts());
+        const empty = !String(text || '').trim();
+        let ok = false;
+        try {
+          if (!empty && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
+        );
+        return ok && !empty;
       }
 
       disneyExtremeEaseSpark?.addEventListener('click', () => {

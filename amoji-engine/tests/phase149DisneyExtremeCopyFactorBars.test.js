@@ -26,7 +26,9 @@ describe('Phase 149 Extreme Shift+F copy factor bars SVG', () => {
     expect(src).toContain('id="btnDisneyExtremeCopyFactors"');
     expect(src).toContain('async function copyDisneyExtremeFactorBarsSvg()');
     expect(src).toContain("resolved.action === 'copyFactorBars'");
-    expect(src).toContain('copied · factors SVG');
+    expect(src).toMatch(
+      /copyDisneyExtremeFactorBarsSvg[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'factors SVG'/,
+    );
     expect(src).toContain(
       "disneyExtremeFactorBars?.addEventListener('click', () => {\n        flashDisneyExtremeFactorBars();\n      })",
     );

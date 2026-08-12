@@ -444,7 +444,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 431 | Extreme unified copy-flash label rollout | Done |
 | Phase 432 | Extreme filter-aware strips summary + curve guard | Done |
 | Phase 433 | Extreme digest filter append (H / Alt+F12) | Done |
-| Phase 434+ | Further production polish… | Specced |
+| Phase 434 | Extreme strip copy-flash rollout (F2–F11) | Done |
+| Phase 435 | Extreme strip copy filter guards | Done |
+| Phase 436 | Extreme IO/SVG copy-flash rollout | Done |
+| Phase 437 | Extreme help/clear hotkey buttons | Done |
+| Phase 438+ | Further production polish… | Specced |
 
 ## Quick start
 

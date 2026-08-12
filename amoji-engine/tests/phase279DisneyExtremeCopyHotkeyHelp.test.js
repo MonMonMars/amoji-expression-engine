@@ -25,7 +25,9 @@ describe('Phase 279 Extreme Alt+H copy hotkey help', () => {
     expect(src).toContain('btnDisneyExtremeCopyHelp');
     expect(src).toContain('function copyDisneyExtremeHotkeyHelp');
     expect(src).toContain("resolved.action === 'copyHotkeyHelp'");
-    expect(src).toContain('copied · hotkey help');
+    expect(src).toMatch(
+      /copyDisneyExtremeHotkeyHelp[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'hotkey help'/,
+    );
     expect(src).toContain('DISNEY_EXTREME_HOTKEY_HELP');
   });
 });

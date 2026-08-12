@@ -26,6 +26,8 @@ describe('Phase 137 Extreme Shift+E copy ease SVG', () => {
     expect(src).toContain('id="btnDisneyExtremeCopyEase"');
     expect(src).toContain('async function copyDisneyExtremeEaseSvg()');
     expect(src).toContain("resolved.action === 'copyEaseCurve'");
-    expect(src).toContain('copied · ease SVG');
+    expect(src).toMatch(
+      /copyDisneyExtremeEaseSvg[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'ease SVG'/,
+    );
   });
 });

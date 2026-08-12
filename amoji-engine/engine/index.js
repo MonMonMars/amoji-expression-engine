@@ -383,6 +383,7 @@ export {
   buildDisneyExtremeAllStripsEntries,
   filterDisneyExtremeAllStripsKeys,
   formatDisneyExtremeBaselineCopyFlashLabel,
+  formatDisneyExtremeStripCopyFilteredOutLabel,
   formatDisneyExtremeBaselineAllStripsLabel,
   formatDisneyExtremeBaselineAllStripsBundle,
   formatDisneyExtremeBaselineDirtyStripLabel,

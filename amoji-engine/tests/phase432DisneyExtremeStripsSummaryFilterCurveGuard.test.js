@@ -27,8 +27,8 @@ describe('Phase 432 Extreme strips summary filter + curve copy guard', () => {
     ).toContain('filter · "pin" · 1/11');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('function disneyExtremeStripsSummaryOpts');
-    expect(src).toContain('function disneyExtremeCurveStripVisible');
-    expect(src).toContain('curves · filtered out');
+    expect(src).toContain('function disneyExtremeStripVisible');
+    expect(src).toContain('formatDisneyExtremeStripCopyFilteredOutLabel');
     expect(src).toContain("String(ev.target?.value || '').trim()");
     expect(src).toContain('disneyExtremeStripsFilterQuery = result.query');
   });

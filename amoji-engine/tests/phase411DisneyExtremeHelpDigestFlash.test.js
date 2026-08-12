@@ -24,6 +24,8 @@ describe('Phase 411 Extreme H digest flash + copy digest', () => {
       /copyDisneyExtremeHotkeyDigest[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'hotkey digest'/,
     );
     expect(src).toContain('function copyDisneyExtremeHotkeyHelp');
-    expect(src).toContain('copied · hotkey help');
+    expect(src).toMatch(
+      /copyDisneyExtremeHotkeyHelp[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'hotkey help'/,
+    );
   });
 });

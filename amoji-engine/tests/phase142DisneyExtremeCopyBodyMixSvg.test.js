@@ -26,6 +26,8 @@ describe('Phase 142 Extreme Shift+M copy body mix SVG', () => {
     expect(src).toContain('id="btnDisneyExtremeCopyMix"');
     expect(src).toContain('async function copyDisneyExtremeBodyMixSvg()');
     expect(src).toContain("resolved.action === 'copyBodyMixCurve'");
-    expect(src).toContain('copied · mix SVG');
+    expect(src).toMatch(
+      /copyDisneyExtremeBodyMixSvg[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'mix SVG'/,
+    );
   });
 });

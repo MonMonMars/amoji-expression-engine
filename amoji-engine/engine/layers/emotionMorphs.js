@@ -943,8 +943,13 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'copyBaselineStripsSummary', help: 'Shift+PageDown copy strips', kind: 'note' },
   { id: 'stripsSummaryFiltered', help: 'strips summary · filtered', kind: 'note' },
   { id: 'copyFlashLabel', help: 'copy flash · unified', kind: 'note' },
+  { id: 'stripCopyFlashLabel', help: 'strip copy flash · unified', kind: 'note' },
   { id: 'curveStripFiltered', help: 'curve copy · filtered out', kind: 'note' },
+  { id: 'stripCopyFiltered', help: 'strip copy · filtered out', kind: 'note' },
+  { id: 'ioCopyFlashLabel', help: 'IO copy flash · unified', kind: 'note' },
   { id: 'hotkeyDigestFiltered', help: 'digest · filter append', kind: 'note' },
+  { id: 'showHelpButton', help: 'H digest · button', kind: 'note' },
+  { id: 'clearTransientButton', help: '⇧Alt+Delete · button', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
@@ -2849,6 +2854,16 @@ export function formatDisneyExtremeBaselineCopyFlashLabel(opts = {}) {
     return `copied · open · ${summary}`;
   }
   return `copied · ${summary}`;
+}
+
+/**
+ * Summary when an Extreme strip copy is blocked by the strips filter.
+ * @param {string} [stripKey]
+ * @returns {string}
+ */
+export function formatDisneyExtremeStripCopyFilteredOutLabel(stripKey) {
+  const key = String(stripKey || '').trim();
+  return key ? `${key} · filtered out` : 'filtered out';
 }
 
 /** Default Extreme all-strips bundle line count (excludes optional curves line). */

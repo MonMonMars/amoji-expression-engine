@@ -24,6 +24,8 @@ describe('Phase 302 Extreme ⇧Alt+A copy pin bundle', () => {
     expect(src).toContain('btnDisneyExtremeCopyPinBundle');
     expect(src).toContain('function copyDisneyExtremeBaselinePinBundle');
     expect(src).toContain("resolved.action === 'copyBaselinePinBundle'");
-    expect(src).toContain('copied · pin ·');
+    expect(src).toMatch(
+      /copyDisneyExtremeBaselinePinBundle[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: `pin · \$\{text\}`/,
+    );
   });
 });
