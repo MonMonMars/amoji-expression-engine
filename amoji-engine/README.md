@@ -480,7 +480,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 467 | Extreme history row keyboard accessibility | Done |
 | Phase 468 | Extreme favorites row keyboard accessibility | Done |
 | Phase 469 | Extreme pill/history/favorites docs sync | Done |
-| Phase 470+ | Further production polish… | Specced |
+| Phase 470 | Extreme panel background interaction polish | Done |
+| Phase 471 | Extreme history row background actions | Done |
+| Phase 472 | Extreme favorites row background actions | Done |
+| Phase 473 | Extreme panel/rows docs sync | Done |
+| Phase 474+ | Further production polish… | Specced |
 
 ## Quick start
 

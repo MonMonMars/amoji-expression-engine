@@ -877,7 +877,7 @@
         <div class="status" id="tierHint">sculpt: medium band</div>
       </div>
 
-      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge">
+      <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste">
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
             <input id="disneyExtreme" type="checkbox" />
@@ -1134,14 +1134,14 @@
         <div
           class="row"
           id="disneyExtremeHistory"
-          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · Alt+Enter hud · ⇧Alt+Enter copy hud · Home dirty · End copy dirty · PageUp toggle strips · ⇧PageUp open · PageDown strips summary · ⇧PageDown copy strips · ↓↑ cycle hist · ⇧↓↑ cycle redo · →← cycle fav · Delete clear active · Insert pin · ⇧Insert replace pin · Alt+Insert jump pin · Tab focus panel · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active · Enter/Space list · ⇧Enter copy list"
+          title="Baseline history / redo · click jump · Meta+click preview · Alt+click diff · Shift+Alt+click compare · Shift+click star · Ctrl+click remove · dbl-click pin · 1–8 hist · ⇧1–8 redo · Alt+1–8 fav · ⇧Alt+1–8 fav summary · 9 hist tip · ⇧9 redo tip · Alt+9/⇧Alt+9 tip summary · 0 fav tip · ⇧0 fav tip summary · Alt+0 tips · ⇧Alt+0 copy tips · / hist root · Alt+/ redo root · ⇧Alt+/ fav root · Space/⇧Space/Alt+Space root summary · ⇧Alt+Space active · Enter copy active · ⇧Enter pin strip · Alt+Enter hud · ⇧Alt+Enter copy hud · Home dirty · End copy dirty · PageUp toggle strips · ⇧PageUp open · PageDown strips summary · ⇧PageDown copy strips · ↓↑ cycle hist · ⇧↓↑ cycle redo · →← cycle fav · Delete clear active · Insert pin · ⇧Insert replace pin · Alt+Insert jump pin · Tab focus panel · ` capacity · ⇧` copy capacity · L list · Alt+L stacks · ⇧Alt+L copy stacks · ⇧L copy · ⇧K clear hist · ⇧Alt+K clear hist keep redo · Alt+K clear pin · Alt+R jump pin · W wipe redo · ⇧W wipe favs · Alt+W wipe stacks · ⇧Alt+W wipe all · P pin · Alt+P fp · S star · Alt+S unstar · Q/⇧Q cycle fav · Alt+Q/⇧Alt+Q cycle hist · Alt+U/⇧Alt+U cycle redo · G/⇧G/Alt+G/⇧Alt+G fav JSON · T/Alt+F fav share · Alt+T more IO · Alt+H copy help · ⇧Alt+H copy redo list · Z/⇧Z/Alt+Z/⇧Alt+Z stacks · V/⇧V/Alt+V/Alt+B stacks/kit · O/⇧O/Alt+O redo JSON · Y/⇧Y/Alt+Y/⇧Alt+Y/Alt+J/Alt+I share paste · U undo · ⇧U redo · Esc clear active · background click list · background dbl-click copy · Enter/Space list · ⇧Enter copy list"
         >
           <span class="extreme-hist-empty">hist · 0/8</span>
         </div>
         <div
           class="row"
           id="disneyExtremeFavorites"
-          title="Starred favorites · click jump · S star · Alt+S unstar · Ctrl+click unstar · ⇧S list · Q/⇧Q cycle · Alt+1–8 jump · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Alt+W wipe stacks · Z/⇧Z/Alt+Z/V/⇧V stacks · Enter/Space list · ⇧Enter copy list"
+          title="Starred favorites · click jump · S star · Alt+S unstar · Ctrl+click unstar · ⇧S list · Q/⇧Q cycle · Alt+1–8 jump · Shift+click star · G/⇧G/Alt+G JSON · T share · ⇧W wipe · Alt+W wipe stacks · Z/⇧Z/Alt+Z/V/⇧V stacks · background click list · background dbl-click copy · Enter/Space list · ⇧Enter copy list"
         >
           <span class="extreme-hist-empty">fav · 0/8</span>
         </div>
@@ -6666,6 +6666,26 @@
       }
 
       const disneyExtremePanel = document.getElementById('disneyExtremePanel');
+      disneyExtremePanel?.addEventListener('click', (ev) => {
+        if (ev.target !== disneyExtremePanel) return;
+        flashDisneyExtremeDropHint();
+      });
+      disneyExtremePanel?.addEventListener('dblclick', (ev) => {
+        if (ev.target !== disneyExtremePanel) return;
+        pasteDisneyExtremeSnapshotJson();
+      });
+      disneyExtremePanel?.setAttribute('role', 'button');
+      disneyExtremePanel?.setAttribute('tabindex', '0');
+      disneyExtremePanel?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          if (ev.shiftKey && ev.key === 'Enter') {
+            pasteDisneyExtremeSnapshotJson();
+            return;
+          }
+          flashDisneyExtremeDropHint();
+        }
+      });
       disneyExtremePanel?.addEventListener('dragenter', (ev) => {
         ev.preventDefault();
         disneyExtremePanel.classList.add('dragover');
@@ -6722,6 +6742,14 @@
         copyDisneyExtremeSummary();
       });
 
+      document.getElementById('disneyExtremeHistory')?.addEventListener('click', (ev) => {
+        if (ev.target !== ev.currentTarget) return;
+        flashDisneyExtremeBaselineHistoryList();
+      });
+      document.getElementById('disneyExtremeHistory')?.addEventListener('dblclick', (ev) => {
+        if (ev.target !== ev.currentTarget) return;
+        copyDisneyExtremeBaselineHistoryList();
+      });
       document.getElementById('disneyExtremeHistory')?.setAttribute('role', 'button');
       document.getElementById('disneyExtremeHistory')?.setAttribute('tabindex', '0');
       document.getElementById('disneyExtremeHistory')?.addEventListener('keydown', (ev) => {
@@ -6735,6 +6763,14 @@
         }
       });
 
+      document.getElementById('disneyExtremeFavorites')?.addEventListener('click', (ev) => {
+        if (ev.target !== ev.currentTarget) return;
+        flashDisneyExtremeBaselineFavoritesList();
+      });
+      document.getElementById('disneyExtremeFavorites')?.addEventListener('dblclick', (ev) => {
+        if (ev.target !== ev.currentTarget) return;
+        copyDisneyExtremeBaselineFavoritesList();
+      });
       document.getElementById('disneyExtremeFavorites')?.setAttribute('role', 'button');
       document.getElementById('disneyExtremeFavorites')?.setAttribute('tabindex', '0');
       document.getElementById('disneyExtremeFavorites')?.addEventListener('keydown', (ev) => {
