@@ -1021,6 +1021,10 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'hudSparkAriaFix', help: 'HUD sparks · aria labels', kind: 'note' },
   { id: 'hudSparkTitleHints', help: 'HUD sparks · title hints', kind: 'note' },
   { id: 'hudPillTitleHints', help: 'HUD pill · title hints', kind: 'note' },
+  { id: 'interactiveAriaLabels', help: 'interactive rows · aria labels', kind: 'note' },
+  { id: 'interactiveAriaShortcuts', help: 'interactive rows · aria-keyshortcuts', kind: 'note' },
+  { id: 'hudAriaShortcuts', help: 'HUD sparks/pill · aria-keyshortcuts', kind: 'note' },
+  { id: 'panelAriaMetadata', help: 'Extreme panel · aria metadata', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',

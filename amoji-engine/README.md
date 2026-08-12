@@ -488,7 +488,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 475 | Extreme HUD spark aria labels | Done |
 | Phase 476 | Extreme HUD title hints | Done |
 | Phase 477 | Extreme HUD a11y docs sync | Done |
-| Phase 478+ | Further production polish… | Specced |
+| Phase 478 | Extreme interactive aria-label coverage | Done |
+| Phase 479 | Extreme interactive aria-keyshortcuts | Done |
+| Phase 480 | Extreme HUD/panel aria-keyshortcuts | Done |
+| Phase 481 | Extreme aria metadata docs sync | Done |
+| Phase 482+ | Further production polish… | Specced |
 
 ## Quick start
 
