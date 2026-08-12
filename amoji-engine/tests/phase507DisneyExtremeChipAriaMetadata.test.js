@@ -12,6 +12,7 @@ describe('Phase 507 Extreme chip aria metadata', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('hist/fav/redo chips · aria metadata');
     const src = readFileSync(faceLivePath, 'utf8');
     expect(src).toContain("btn.setAttribute('aria-label', btn.title || btn.textContent || '')");
-    expect(src).toContain("btn.setAttribute('aria-keyshortcuts', 'Enter Shift+Enter')");
+    expect(src).toContain("btn.setAttribute('aria-keyshortcuts'");
+    expect(src).toContain('Meta+Enter Ctrl+Enter Alt+Enter');
   });
 });

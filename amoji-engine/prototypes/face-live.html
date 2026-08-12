@@ -693,6 +693,17 @@
         outline: 2px solid #8ac6ff;
         outline-offset: 2px;
       }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
       #disneyExtremeMore {
         margin-top: 6px;
         width: 100%;
@@ -898,8 +909,13 @@
       <div class="group" id="disneyExtremePanel" title="Drop Extreme snapshot / hist / redo / fav / stacks JSON · Meta = preview · Shift = merge · background click flash · background dbl-click paste · Enter/Space flash · ⇧Enter paste" aria-label="Disney Extreme panel drop and quick actions" aria-keyshortcuts="Enter Space Shift+Enter" aria-describedby="disneyExtremeStatus disneyExtremeDropHint">
         <div class="row" style="gap:12px;align-items:center;margin-top:4px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <input id="disneyExtreme" type="checkbox" />
-            <span>Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>⇧C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>⇧J</kbd> <kbd>D</kbd> <kbd>⇧D</kbd> <kbd>K</kbd> <kbd>U</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
+            <input
+              id="disneyExtreme"
+              type="checkbox"
+              aria-labelledby="disneyExtremeLabel"
+              aria-keyshortcuts="X Shift+X"
+            />
+            <span id="disneyExtremeLabel">Disney Extreme (big deform) · <kbd>X</kbd> <kbd>B</kbd> <kbd>[</kbd><kbd>]</kbd> <kbd>-</kbd><kbd>=</kbd> <kbd>,</kbd><kbd>.</kbd> <kbd>;</kbd><kbd>'</kbd> <kbd>C</kbd> <kbd>⇧C</kbd> <kbd>R</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>⇧E</kbd> <kbd>M</kbd> <kbd>⇧M</kbd> <kbd>F</kbd> <kbd>⇧F</kbd> <kbd>N</kbd> <kbd>A</kbd> <kbd>⇧A</kbd> <kbd>J</kbd> <kbd>⇧J</kbd> <kbd>D</kbd> <kbd>⇧D</kbd> <kbd>K</kbd> <kbd>U</kbd> <kbd>Esc</kbd> · Shift/Alt</span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeFactorVal">1.60</span></span>
@@ -911,13 +927,20 @@
               step="0.05"
               value="1.6"
               disabled
+              aria-labelledby="disneyExtremeLabel"
             />
           </div>
         </div>
         <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <input id="disneyExtremeBody" type="checkbox" checked />
-            <span>Apply to body/head <kbd>B</kbd></span>
+            <input
+              id="disneyExtremeBody"
+              type="checkbox"
+              checked
+              aria-labelledby="disneyExtremeBodyLabel"
+              aria-keyshortcuts="B Shift+B"
+            />
+            <span id="disneyExtremeBodyLabel">Apply to body/head <kbd>B</kbd></span>
           </label>
           <div class="row" style="margin:0;flex:1;gap:10px;align-items:center;justify-content:flex-end;">
             <span style="opacity:0.9;">× <span id="disneyExtremeBodyFactorVal">1.60</span></span>
@@ -929,12 +952,13 @@
               step="0.05"
               value="1.6"
               disabled
+              aria-labelledby="disneyExtremeBodyLabel"
             />
           </div>
         </div>
         <div class="row" style="gap:12px;align-items:center;margin-top:6px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <span>Eyes × <span id="disneyExtremeEyeFactorVal">1.40</span></span>
+            <span id="disneyExtremeEyeLabel">Eyes × <span id="disneyExtremeEyeFactorVal">1.40</span></span>
             <input
               id="disneyExtremeEyeFactor"
               type="range"
@@ -943,12 +967,13 @@
               step="0.05"
               value="1.4"
               disabled
+              aria-labelledby="disneyExtremeEyeLabel"
             />
           </label>
         </div>
         <div class="row" style="gap:12px;align-items:center;margin-top:2px;">
           <label class="row" style="margin:0;gap:8px;align-items:center;">
-            <span>Mouth × <span id="disneyExtremeMouthFactorVal">1.50</span></span>
+            <span id="disneyExtremeMouthLabel">Mouth × <span id="disneyExtremeMouthFactorVal">1.50</span></span>
             <input
               id="disneyExtremeMouthFactor"
               type="range"
@@ -957,104 +982,105 @@
               step="0.05"
               value="1.5"
               disabled
+              aria-labelledby="disneyExtremeMouthLabel"
             />
           </label>
         </div>
         <div class="row" style="margin-top:6px;gap:8px;">
-          <button type="button" id="btnDisneyExtremeReset" title="Reset × defaults · R">Reset × defaults <kbd>R</kbd></button>
-          <button type="button" id="btnDisneyExtremeResetBundle" title="Reset + all · ⇧R">Reset + all <kbd>⇧R</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopy" title="Copy prefs summary · filter-aware when filter active">Copy summary <kbd>C</kbd></button>
-          <button type="button" id="btnDisneyExtremeToggle" title="Toggle Extreme · X">Toggle Extreme <kbd>X</kbd></button>
-          <button type="button" id="btnDisneyExtremeEnable" title="Enable Extreme tier · ⇧X">Enable Extreme <kbd>⇧X</kbd></button>
-          <button type="button" id="btnDisneyExtremeToggleBody" title="Toggle body apply · B">Toggle body <kbd>B</kbd></button>
-          <button type="button" id="btnDisneyExtremeEnableBody" title="Enable body deform · ⇧B">Enable body <kbd>⇧B</kbd></button>
-          <button type="button" id="btnDisneyExtremeBundle" title="All readout bundle · A">All readout <kbd>A</kbd></button>
-          <button type="button" id="btnDisneyExtremeEaseReadout" title="Flash ease curve readout · E">Ease readout <kbd>E</kbd></button>
-          <button type="button" id="btnDisneyExtremeMixReadout" title="Flash body mix readout · M">Mix readout <kbd>M</kbd></button>
-          <button type="button" id="btnDisneyExtremeFactorsReadout" title="Flash factor bars readout · F">Factors readout <kbd>F</kbd></button>
-          <button type="button" id="btnDisneyExtremeNeckReadout" title="Flash neck blend readout · N">Neck readout <kbd>N</kbd></button>
-          <button type="button" id="btnDisneyExtremeDiff" title="Diff live vs pinned baseline · D">Diff baseline <kbd>D</kbd></button>
-          <button type="button" id="btnDisneyExtremeRestore" title="Restore baseline · ⇧D">Restore baseline <kbd>⇧D</kbd></button>
-          <button type="button" id="btnDisneyExtremeClearBase" title="Clear baseline · K">Clear baseline <kbd>K</kbd></button>
-          <button type="button" id="btnDisneyExtremeClearHist" title="Clear hist · ⇧K">Clear hist <kbd>⇧K</kbd></button>
-          <button type="button" id="btnDisneyExtremeClearHistKeepRedo" title="Clear hist keep redo · ⇧Alt+K">Clear hist keep redo <kbd>⇧Alt+K</kbd></button>
-          <button type="button" id="btnDisneyExtremeWipeRedo" title="Wipe redo · W">Wipe redo <kbd>W</kbd></button>
-          <button type="button" id="btnDisneyExtremePinBase" title="Pin live snapshot as baseline · P">Pin baseline <kbd>P</kbd></button>
-          <button type="button" id="btnDisneyExtremeInsertPin" title="Pin live snapshot · Insert">Pin baseline <kbd>Insert</kbd></button>
-          <button type="button" id="btnDisneyExtremeReplacePinInsert" title="Replace pinned baseline · ⇧Insert">Replace pin <kbd>⇧Insert</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpPinInsert" title="Jump to pinned baseline · Alt+Insert">Jump pin <kbd>Alt+Insert</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpPinSummaryInsert" title="Jump pin + summary flash · ⇧Alt+Insert">Jump pin summary <kbd>⇧Alt+Insert</kbd></button>
-          <button type="button" id="btnDisneyExtremeStarFav" title="Star favorite · S">Star favorite <kbd>S</kbd></button>
-          <button type="button" id="btnDisneyExtremeUndoBase" title="Undo baseline · U">Undo baseline <kbd>U</kbd></button>
-          <button type="button" id="btnDisneyExtremeRedoBase" title="Redo baseline · ⇧U">Redo baseline <kbd>⇧U</kbd></button>
-          <button type="button" id="btnDisneyExtremeShare" title="Copy share link · Y">Copy share link <kbd>Y</kbd></button>
-          <button type="button" id="btnDisneyExtremeHistList" title="History list · L">History list <kbd>L</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyHistList" title="Copy hist list · ⇧H">Copy hist list <kbd>⇧H</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpHistTip" title="Jump hist tip · 9">Jump hist tip <kbd>9</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpRedoTip" title="Jump redo tip · ⇧9">Jump redo tip <kbd>⇧9</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpHistTipSummary" title="Jump hist tip summary · Alt+9">Jump hist tip summary <kbd>Alt+9</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpRedoTipSummary" title="Jump redo tip summary · ⇧Alt+9">Jump redo tip summary <kbd>⇧Alt+9</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavTip" title="Jump fav tip · 0">Jump fav tip <kbd>0</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavTipSummary" title="Jump fav tip summary · ⇧0">Jump fav tip summary <kbd>⇧0</kbd></button>
-          <button type="button" id="btnDisneyExtremeTips" title="Tips readout · Alt+0">Tips readout <kbd>Alt+0</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyTips" title="Copy tips · ⇧Alt+0">Copy tips <kbd>⇧Alt+0</kbd></button>
-          <button type="button" id="btnDisneyExtremeStacksCapacity" title="Stacks capacity · `">Stacks capacity <kbd>`</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyStacksCapacity" title="Copy capacity · ⇧`">Copy capacity <kbd>⇧`</kbd></button>
-          <button type="button" id="btnDisneyExtremeRoots" title="Roots readout · \">Roots readout <kbd>\</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyRoots" title="Copy roots · ⇧\">Copy roots <kbd>⇧\</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpHistRoot" title="Jump hist root · /">Jump hist root <kbd>/</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpRedoRoot" title="Jump redo root · Alt+/">Jump redo root <kbd>Alt+/</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavRoot" title="Jump fav root · ⇧Alt+/">Jump fav root <kbd>⇧Alt+/</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpHistRootSummary" title="Jump hist root summary · Space">Jump hist root summary <kbd>Space</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpRedoRootSummary" title="Jump redo root summary · ⇧Space">Jump redo root summary <kbd>⇧Space</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavRootSummary" title="Jump fav root summary · Alt+Space">Jump fav root summary <kbd>Alt+Space</kbd></button>
-          <button type="button" id="btnDisneyExtremeActive" title="Active chips · ⇧Alt+Space">Active chips <kbd>⇧Alt+Space</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyActive" title="Copy active · Enter">Copy active <kbd>Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremePinStrip" title="Pin strip · ⇧Enter">Pin strip <kbd>⇧Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremeHudBundle" title="HUD bundle · filter-aware when filter active">HUD bundle <kbd>Alt+Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyHudBundle" title="Copy HUD bundle · filtered when filter active">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
-          <button type="button" id="btnDisneyExtremeDirtyStrip" title="Dirty strip · Home">Dirty strip <kbd>Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyDirtyStrip" title="Copy dirty · End">Copy dirty <kbd>End</kbd></button>
-          <button type="button" id="btnDisneyExtremeOpenDirtyStrip" title="Open dirty · ⇧Home">Open dirty <kbd>⇧Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyDirtyStripOpen" title="Copy dirty open · ⇧End">Copy dirty open <kbd>⇧End</kbd></button>
-          <button type="button" id="btnDisneyExtremeAllStrips" title="All strips · filter-aware when filter active">All strips <kbd>Alt+Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyAllStrips" title="Copy all strips · filtered bundle when filter active">Copy all strips <kbd>Alt+End</kbd></button>
-          <button type="button" id="btnDisneyExtremeOpenAllStrips" title="Open all strips · ⇧Alt+Home">Open all strips <kbd>⇧Alt+Home</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyAllStripsOpen" title="Copy all strips · filtered bundle when filter active">Copy all open <kbd>⇧Alt+End</kbd></button>
-          <button type="button" id="btnDisneyExtremeToggleStrips" title="Toggle strips · PageUp">Toggle strips <kbd>PageUp</kbd></button>
-          <button type="button" id="btnDisneyExtremeOpenStrips" title="Open strips · ⇧PageUp">Open strips <kbd>⇧PageUp</kbd></button>
-          <button type="button" id="btnDisneyExtremeCloseStrips" title="Close strips · Alt+PageUp">Close strips <kbd>Alt+PageUp</kbd></button>
-          <button type="button" id="btnDisneyExtremeOpenCurveStrips" title="Open curves · ⇧Alt+PageUp">Open curves <kbd>⇧Alt+PageUp</kbd></button>
-          <button type="button" id="btnDisneyExtremeStripsSummary" title="Strips summary · PageDown">Strips summary <kbd>PageDown</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyStripsSummary" title="Copy strips · ⇧PageDown">Copy strips <kbd>⇧PageDown</kbd></button>
-          <button type="button" id="btnDisneyExtremeFactorsStrip" title="Factors strip · F2">Factors strip <kbd>F2</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyFactorsStrip" title="Copy factors strip · ⇧F2">Copy factors strip <kbd>⇧F2</kbd></button>
-          <button type="button" id="btnDisneyExtremeEaseStrip" title="Ease strip · F3">Ease strip <kbd>F3</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyEaseStrip" title="Copy ease strip · ⇧F3">Copy ease strip <kbd>⇧F3</kbd></button>
-          <button type="button" id="btnDisneyExtremeMixStrip" title="Mix strip · F4">Mix strip <kbd>F4</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyMixStrip" title="Copy mix strip · ⇧F4">Copy mix strip <kbd>⇧F4</kbd></button>
-          <button type="button" id="btnDisneyExtremeNeckStrip" title="Neck strip · F5">Neck strip <kbd>F5</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyNeckStrip" title="Copy neck strip · ⇧F5">Copy neck strip <kbd>⇧F5</kbd></button>
-          <button type="button" id="btnDisneyExtremeTipsFKey" title="Tips strip · F6">Tips strip <kbd>F6</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyTipsFKey" title="Copy tips · ⇧F6">Copy tips <kbd>⇧F6</kbd></button>
-          <button type="button" id="btnDisneyExtremeCapacityFKey" title="Capacity strip · F7">Capacity strip <kbd>F7</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyCapacityFKey" title="Copy capacity · ⇧F7">Copy capacity <kbd>⇧F7</kbd></button>
-          <button type="button" id="btnDisneyExtremeRootsFKey" title="Roots strip · F8">Roots strip <kbd>F8</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyRootsFKey" title="Copy roots · ⇧F8">Copy roots <kbd>⇧F8</kbd></button>
-          <button type="button" id="btnDisneyExtremeActiveFKey" title="Active strip · F9">Active strip <kbd>F9</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyActiveFKey" title="Copy active · ⇧F9">Copy active <kbd>⇧F9</kbd></button>
-          <button type="button" id="btnDisneyExtremePinStripFKey" title="Pin strip · F10">Pin strip <kbd>F10</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyPinStrip" title="Copy pin strip · ⇧F10">Copy pin strip <kbd>⇧F10</kbd></button>
-          <button type="button" id="btnDisneyExtremeDirtyStripFKey" title="Dirty strip · F11">Dirty strip <kbd>F11</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey" title="Copy dirty · ⇧F11">Copy dirty <kbd>⇧F11</kbd></button>
-          <button type="button" id="btnDisneyExtremeFocusFilter" title="Focus filter · F12">Focus filter <kbd>F12</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyFilter" title="Copy filter · ⇧F12">Copy filter <kbd>⇧F12</kbd></button>
+          <button type="button" id="btnDisneyExtremeReset" title="Reset × defaults · R" aria-keyshortcuts="R">Reset × defaults <kbd>R</kbd></button>
+          <button type="button" id="btnDisneyExtremeResetBundle" title="Reset + all · ⇧R" aria-keyshortcuts="⇧R">Reset + all <kbd>⇧R</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopy" title="Copy prefs summary · filter-aware when filter active" aria-keyshortcuts="C">Copy summary <kbd>C</kbd></button>
+          <button type="button" id="btnDisneyExtremeToggle" title="Toggle Extreme · X" aria-keyshortcuts="X">Toggle Extreme <kbd>X</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnable" title="Enable Extreme tier · ⇧X" aria-keyshortcuts="⇧X">Enable Extreme <kbd>⇧X</kbd></button>
+          <button type="button" id="btnDisneyExtremeToggleBody" title="Toggle body apply · B" aria-keyshortcuts="B">Toggle body <kbd>B</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnableBody" title="Enable body deform · ⇧B" aria-keyshortcuts="⇧B">Enable body <kbd>⇧B</kbd></button>
+          <button type="button" id="btnDisneyExtremeBundle" title="All readout bundle · A" aria-keyshortcuts="A">All readout <kbd>A</kbd></button>
+          <button type="button" id="btnDisneyExtremeEaseReadout" title="Flash ease curve readout · E" aria-keyshortcuts="E">Ease readout <kbd>E</kbd></button>
+          <button type="button" id="btnDisneyExtremeMixReadout" title="Flash body mix readout · M" aria-keyshortcuts="M">Mix readout <kbd>M</kbd></button>
+          <button type="button" id="btnDisneyExtremeFactorsReadout" title="Flash factor bars readout · F" aria-keyshortcuts="F">Factors readout <kbd>F</kbd></button>
+          <button type="button" id="btnDisneyExtremeNeckReadout" title="Flash neck blend readout · N" aria-keyshortcuts="N">Neck readout <kbd>N</kbd></button>
+          <button type="button" id="btnDisneyExtremeDiff" title="Diff live vs pinned baseline · D" aria-keyshortcuts="D">Diff baseline <kbd>D</kbd></button>
+          <button type="button" id="btnDisneyExtremeRestore" title="Restore baseline · ⇧D" aria-keyshortcuts="⇧D">Restore baseline <kbd>⇧D</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearBase" title="Clear baseline · K" aria-keyshortcuts="K">Clear baseline <kbd>K</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearHist" title="Clear hist · ⇧K" aria-keyshortcuts="⇧K">Clear hist <kbd>⇧K</kbd></button>
+          <button type="button" id="btnDisneyExtremeClearHistKeepRedo" title="Clear hist keep redo · ⇧Alt+K" aria-keyshortcuts="⇧Alt+K">Clear hist keep redo <kbd>⇧Alt+K</kbd></button>
+          <button type="button" id="btnDisneyExtremeWipeRedo" title="Wipe redo · W" aria-keyshortcuts="W">Wipe redo <kbd>W</kbd></button>
+          <button type="button" id="btnDisneyExtremePinBase" title="Pin live snapshot as baseline · P" aria-keyshortcuts="P">Pin baseline <kbd>P</kbd></button>
+          <button type="button" id="btnDisneyExtremeInsertPin" title="Pin live snapshot · Insert" aria-keyshortcuts="Insert">Pin baseline <kbd>Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeReplacePinInsert" title="Replace pinned baseline · ⇧Insert" aria-keyshortcuts="⇧Insert">Replace pin <kbd>⇧Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpPinInsert" title="Jump to pinned baseline · Alt+Insert" aria-keyshortcuts="Alt+Insert">Jump pin <kbd>Alt+Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpPinSummaryInsert" title="Jump pin + summary flash · ⇧Alt+Insert" aria-keyshortcuts="⇧Alt+Insert">Jump pin summary <kbd>⇧Alt+Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeStarFav" title="Star favorite · S" aria-keyshortcuts="S">Star favorite <kbd>S</kbd></button>
+          <button type="button" id="btnDisneyExtremeUndoBase" title="Undo baseline · U" aria-keyshortcuts="U">Undo baseline <kbd>U</kbd></button>
+          <button type="button" id="btnDisneyExtremeRedoBase" title="Redo baseline · ⇧U" aria-keyshortcuts="⇧U">Redo baseline <kbd>⇧U</kbd></button>
+          <button type="button" id="btnDisneyExtremeShare" title="Copy share link · Y" aria-keyshortcuts="Y">Copy share link <kbd>Y</kbd></button>
+          <button type="button" id="btnDisneyExtremeHistList" title="History list · L" aria-keyshortcuts="L">History list <kbd>L</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyHistList" title="Copy hist list · ⇧H" aria-keyshortcuts="⇧H">Copy hist list <kbd>⇧H</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistTip" title="Jump hist tip · 9" aria-keyshortcuts="9">Jump hist tip <kbd>9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoTip" title="Jump redo tip · ⇧9" aria-keyshortcuts="⇧9">Jump redo tip <kbd>⇧9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistTipSummary" title="Jump hist tip summary · Alt+9" aria-keyshortcuts="Alt+9">Jump hist tip summary <kbd>Alt+9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoTipSummary" title="Jump redo tip summary · ⇧Alt+9" aria-keyshortcuts="⇧Alt+9">Jump redo tip summary <kbd>⇧Alt+9</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavTip" title="Jump fav tip · 0" aria-keyshortcuts="0">Jump fav tip <kbd>0</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavTipSummary" title="Jump fav tip summary · ⇧0" aria-keyshortcuts="⇧0">Jump fav tip summary <kbd>⇧0</kbd></button>
+          <button type="button" id="btnDisneyExtremeTips" title="Tips readout · Alt+0" aria-keyshortcuts="Alt+0">Tips readout <kbd>Alt+0</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyTips" title="Copy tips · ⇧Alt+0" aria-keyshortcuts="⇧Alt+0">Copy tips <kbd>⇧Alt+0</kbd></button>
+          <button type="button" id="btnDisneyExtremeStacksCapacity" title="Stacks capacity · `" aria-keyshortcuts="`">Stacks capacity <kbd>`</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyStacksCapacity" title="Copy capacity · ⇧`" aria-keyshortcuts="⇧`">Copy capacity <kbd>⇧`</kbd></button>
+          <button type="button" id="btnDisneyExtremeRoots" title="Roots readout · \" aria-keyshortcuts="\">Roots readout <kbd>\</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyRoots" title="Copy roots · ⇧\" aria-keyshortcuts="⇧\">Copy roots <kbd>⇧\</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistRoot" title="Jump hist root · /" aria-keyshortcuts="/">Jump hist root <kbd>/</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoRoot" title="Jump redo root · Alt+/" aria-keyshortcuts="Alt+/">Jump redo root <kbd>Alt+/</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavRoot" title="Jump fav root · ⇧Alt+/" aria-keyshortcuts="⇧Alt+/">Jump fav root <kbd>⇧Alt+/</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpHistRootSummary" title="Jump hist root summary · Space" aria-keyshortcuts="Space">Jump hist root summary <kbd>Space</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpRedoRootSummary" title="Jump redo root summary · ⇧Space" aria-keyshortcuts="⇧Space">Jump redo root summary <kbd>⇧Space</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavRootSummary" title="Jump fav root summary · Alt+Space" aria-keyshortcuts="Alt+Space">Jump fav root summary <kbd>Alt+Space</kbd></button>
+          <button type="button" id="btnDisneyExtremeActive" title="Active chips · ⇧Alt+Space" aria-keyshortcuts="⇧Alt+Space">Active chips <kbd>⇧Alt+Space</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyActive" title="Copy active · Enter" aria-keyshortcuts="Enter">Copy active <kbd>Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremePinStrip" title="Pin strip · ⇧Enter" aria-keyshortcuts="⇧Enter">Pin strip <kbd>⇧Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeHudBundle" title="HUD bundle · filter-aware when filter active" aria-keyshortcuts="Alt+Enter">HUD bundle <kbd>Alt+Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyHudBundle" title="Copy HUD bundle · filtered when filter active" aria-keyshortcuts="⇧Alt+Enter">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
+          <button type="button" id="btnDisneyExtremeDirtyStrip" title="Dirty strip · Home" aria-keyshortcuts="Home">Dirty strip <kbd>Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyDirtyStrip" title="Copy dirty · End" aria-keyshortcuts="End">Copy dirty <kbd>End</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenDirtyStrip" title="Open dirty · ⇧Home" aria-keyshortcuts="⇧Home">Open dirty <kbd>⇧Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyDirtyStripOpen" title="Copy dirty open · ⇧End" aria-keyshortcuts="⇧End">Copy dirty open <kbd>⇧End</kbd></button>
+          <button type="button" id="btnDisneyExtremeAllStrips" title="All strips · filter-aware when filter active" aria-keyshortcuts="Alt+Home">All strips <kbd>Alt+Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStrips" title="Copy all strips · filtered bundle when filter active" aria-keyshortcuts="Alt+End">Copy all strips <kbd>Alt+End</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenAllStrips" title="Open all strips · ⇧Alt+Home" aria-keyshortcuts="⇧Alt+Home">Open all strips <kbd>⇧Alt+Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStripsOpen" title="Copy all strips · filtered bundle when filter active" aria-keyshortcuts="⇧Alt+End">Copy all open <kbd>⇧Alt+End</kbd></button>
+          <button type="button" id="btnDisneyExtremeToggleStrips" title="Toggle strips · PageUp" aria-keyshortcuts="PageUp">Toggle strips <kbd>PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenStrips" title="Open strips · ⇧PageUp" aria-keyshortcuts="⇧PageUp">Open strips <kbd>⇧PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeCloseStrips" title="Close strips · Alt+PageUp" aria-keyshortcuts="Alt+PageUp">Close strips <kbd>Alt+PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenCurveStrips" title="Open curves · ⇧Alt+PageUp" aria-keyshortcuts="⇧Alt+PageUp">Open curves <kbd>⇧Alt+PageUp</kbd></button>
+          <button type="button" id="btnDisneyExtremeStripsSummary" title="Strips summary · PageDown" aria-keyshortcuts="PageDown">Strips summary <kbd>PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyStripsSummary" title="Copy strips · ⇧PageDown" aria-keyshortcuts="⇧PageDown">Copy strips <kbd>⇧PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeFactorsStrip" title="Factors strip · F2" aria-keyshortcuts="F2">Factors strip <kbd>F2</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyFactorsStrip" title="Copy factors strip · ⇧F2" aria-keyshortcuts="⇧F2">Copy factors strip <kbd>⇧F2</kbd></button>
+          <button type="button" id="btnDisneyExtremeEaseStrip" title="Ease strip · F3" aria-keyshortcuts="F3">Ease strip <kbd>F3</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyEaseStrip" title="Copy ease strip · ⇧F3" aria-keyshortcuts="⇧F3">Copy ease strip <kbd>⇧F3</kbd></button>
+          <button type="button" id="btnDisneyExtremeMixStrip" title="Mix strip · F4" aria-keyshortcuts="F4">Mix strip <kbd>F4</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyMixStrip" title="Copy mix strip · ⇧F4" aria-keyshortcuts="⇧F4">Copy mix strip <kbd>⇧F4</kbd></button>
+          <button type="button" id="btnDisneyExtremeNeckStrip" title="Neck strip · F5" aria-keyshortcuts="F5">Neck strip <kbd>F5</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyNeckStrip" title="Copy neck strip · ⇧F5" aria-keyshortcuts="⇧F5">Copy neck strip <kbd>⇧F5</kbd></button>
+          <button type="button" id="btnDisneyExtremeTipsFKey" title="Tips strip · F6" aria-keyshortcuts="F6">Tips strip <kbd>F6</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyTipsFKey" title="Copy tips · ⇧F6" aria-keyshortcuts="⇧F6">Copy tips <kbd>⇧F6</kbd></button>
+          <button type="button" id="btnDisneyExtremeCapacityFKey" title="Capacity strip · F7" aria-keyshortcuts="F7">Capacity strip <kbd>F7</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyCapacityFKey" title="Copy capacity · ⇧F7" aria-keyshortcuts="⇧F7">Copy capacity <kbd>⇧F7</kbd></button>
+          <button type="button" id="btnDisneyExtremeRootsFKey" title="Roots strip · F8" aria-keyshortcuts="F8">Roots strip <kbd>F8</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyRootsFKey" title="Copy roots · ⇧F8" aria-keyshortcuts="⇧F8">Copy roots <kbd>⇧F8</kbd></button>
+          <button type="button" id="btnDisneyExtremeActiveFKey" title="Active strip · F9" aria-keyshortcuts="F9">Active strip <kbd>F9</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyActiveFKey" title="Copy active · ⇧F9" aria-keyshortcuts="⇧F9">Copy active <kbd>⇧F9</kbd></button>
+          <button type="button" id="btnDisneyExtremePinStripFKey" title="Pin strip · F10" aria-keyshortcuts="F10">Pin strip <kbd>F10</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyPinStrip" title="Copy pin strip · ⇧F10" aria-keyshortcuts="⇧F10">Copy pin strip <kbd>⇧F10</kbd></button>
+          <button type="button" id="btnDisneyExtremeDirtyStripFKey" title="Dirty strip · F11" aria-keyshortcuts="F11">Dirty strip <kbd>F11</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyDirtyStripFKey" title="Copy dirty · ⇧F11" aria-keyshortcuts="⇧F11">Copy dirty <kbd>⇧F11</kbd></button>
+          <button type="button" id="btnDisneyExtremeFocusFilter" title="Focus filter · F12" aria-keyshortcuts="F12">Focus filter <kbd>F12</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyFilter" title="Copy filter · ⇧F12" aria-keyshortcuts="⇧F12">Copy filter <kbd>⇧F12</kbd></button>
           <button type="button" id="btnDisneyExtremeClearFilter" title="Clear filter · ⇧Alt+F12" aria-label="Clear Extreme strips filter" aria-keyshortcuts="Shift+Alt+F12">Clear filter <kbd>⇧Alt+F12</kbd></button>
-          <button type="button" id="btnDisneyExtremeStripsSummaryFKey" title="Strips summary · F1">Strips summary <kbd>F1</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyStripsSummaryFKey" title="Copy strips · ⇧F1">Copy strips <kbd>⇧F1</kbd></button>
-          <button type="button" id="btnDisneyExtremeCurveStrip" title="Curve strips · Alt+PageDown">Curve strips <kbd>Alt+PageDown</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopyCurveStrip" title="Copy curves · ⇧Alt+PageDown">Copy curves <kbd>⇧Alt+PageDown</kbd></button>
-          <button type="button" id="btnDisneyExtremeJumpFavSummary" title="Jump fav summary · ⇧Alt+1–8">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
+          <button type="button" id="btnDisneyExtremeStripsSummaryFKey" title="Strips summary · F1" aria-keyshortcuts="F1">Strips summary <kbd>F1</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyStripsSummaryFKey" title="Copy strips · ⇧F1" aria-keyshortcuts="⇧F1">Copy strips <kbd>⇧F1</kbd></button>
+          <button type="button" id="btnDisneyExtremeCurveStrip" title="Curve strips · Alt+PageDown" aria-keyshortcuts="Alt+PageDown">Curve strips <kbd>Alt+PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyCurveStrip" title="Copy curves · ⇧Alt+PageDown" aria-keyshortcuts="⇧Alt+PageDown">Copy curves <kbd>⇧Alt+PageDown</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpFavSummary" title="Jump fav summary · ⇧Alt+1–8" aria-keyshortcuts="⇧Alt+1–8">Jump fav summary <kbd>⇧Alt+1–8</kbd></button>
         </div>
         <details id="disneyExtremeMore">
           <summary
@@ -1065,94 +1091,94 @@
             title="Alt+T / Shift+T toggle · ⇧Alt+T open · remembered · click flash · dbl-click copy · Enter/Space flash · ⇧Enter copy"
           >More Extreme IO · SVG · JSON · share · fav</summary>
           <div class="row" style="gap:8px;">
-            <button type="button" id="btnDisneyExtremeCopyEase" title="Copy ease SVG · ⇧E">Copy ease SVG <kbd>⇧E</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyEaseLabel" title="Copy ease label · Alt+E">Copy ease label <kbd>Alt+E</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyEaseBundle" title="Copy ease+svg · ⇧Alt+E">Copy ease+svg <kbd>⇧Alt+E</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyMix" title="Copy mix SVG · ⇧M">Copy mix SVG <kbd>⇧M</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyMixLabel" title="Copy mix label · Alt+M">Copy mix label <kbd>Alt+M</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyMixBundle" title="Copy mix+svg · ⇧Alt+M">Copy mix+svg <kbd>⇧Alt+M</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyNeckLabel" title="Copy neck label · Alt+N">Copy neck label <kbd>Alt+N</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyNeckFactors" title="Copy neck+factors · ⇧Alt+N">Copy neck+factors <kbd>⇧Alt+N</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFactors" title="Copy factors SVG · ⇧F">Copy factors SVG <kbd>⇧F</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFactorsLabel" title="Copy factors label · ⇧N">Copy factors label <kbd>⇧N</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyBundle" title="Copy all · ⇧A">Copy all <kbd>⇧A</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyJson" title="Copy JSON · J">Copy JSON <kbd>J</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteJson" title="Paste JSON · ⇧J">Paste JSON <kbd>⇧J</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteSnapShare" title="Paste snap share · Alt+J">Paste snap share <kbd>Alt+J</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteSnapLive" title="Paste snap live · ⇧Alt+J">Paste snap live <kbd>⇧Alt+J</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyDiff" title="Copy diff · ⇧C">Copy diff <kbd>⇧C</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyRedo" title="Copy redo JSON · O">Copy redo JSON <kbd>O</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteRedo" title="Paste redo JSON · ⇧O">Paste redo JSON <kbd>⇧O</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeRedo" title="Merge redo JSON · Alt+O">Merge redo JSON <kbd>Alt+O</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeRedoShare" title="Merge redo share · ⇧Alt+O">Merge redo share <kbd>⇧Alt+O</kbd></button>
-            <button type="button" id="btnDisneyExtremeShareHist" title="Copy hist share · ⇧Y">Copy hist share <kbd>⇧Y</kbd></button>
-            <button type="button" id="btnDisneyExtremeShareRedo" title="Copy redo share · Alt+Y">Copy redo share <kbd>Alt+Y</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteRedoShare" title="Paste redo share · ⇧Alt+Y">Paste redo share <kbd>⇧Alt+Y</kbd></button>
-            <button type="button" id="btnDisneyExtremeShareFav" title="Copy fav share · T">Copy fav share <kbd>T</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteFavShare" title="Paste fav share · Alt+F">Paste fav share <kbd>Alt+F</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeFavShare" title="Merge fav share · ⇧Alt+F">Merge fav share <kbd>⇧Alt+F</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyHist" title="Copy hist JSON · ⇧L">Copy hist JSON <kbd>⇧L</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyRedoList" title="Copy redo list · ⇧Alt+H">Copy redo list <kbd>⇧Alt+H</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteHist" title="Paste hist JSON · I">Paste hist JSON <kbd>I</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeHist" title="Merge hist JSON · ⇧I">Merge hist JSON <kbd>⇧I</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteHistShare" title="Paste hist share · Alt+I">Paste hist share <kbd>Alt+I</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeHistShare" title="Merge hist share · ⇧Alt+I">Merge hist share <kbd>⇧Alt+I</kbd></button>
-            <button type="button" id="btnDisneyExtremeFavList" title="Favorites list · ⇧S">Favorites list <kbd>⇧S</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFavList" title="Copy fav list · ⇧Alt+S">Copy fav list <kbd>⇧Alt+S</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFav" title="Copy fav JSON · G">Copy fav JSON <kbd>G</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFavBundle" title="Copy fav+json · ⇧Alt+G">Copy fav+json <kbd>⇧Alt+G</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteFav" title="Paste fav JSON · ⇧G">Paste fav JSON <kbd>⇧G</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeFav" title="Merge fav JSON · Alt+G">Merge fav JSON <kbd>Alt+G</kbd></button>
-            <button type="button" id="btnDisneyExtremeWipeFav" title="Wipe favorites · ⇧W">Wipe favorites <kbd>⇧W</kbd></button>
-            <button type="button" id="btnDisneyExtremeWipeStacks" title="Wipe stacks · Alt+W">Wipe stacks <kbd>Alt+W</kbd></button>
-            <button type="button" id="btnDisneyExtremeWipeAll" title="Wipe all · ⇧Alt+W">Wipe all <kbd>⇧Alt+W</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyFp" title="Copy fingerprint · Alt+P">Copy fingerprint <kbd>Alt+P</kbd></button>
-            <button type="button" id="btnDisneyExtremeStacksList" title="Stacks summary · Alt+L">Stacks summary <kbd>Alt+L</kbd></button>
-            <button type="button" id="btnDisneyExtremeClearPin" title="Clear pin only · Alt+K">Clear pin only <kbd>Alt+K</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteKit" title="Paste kit share · Alt+V">Paste kit share <kbd>Alt+V</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeKit" title="Merge kit share · ⇧Alt+V">Merge kit share <kbd>⇧Alt+V</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyStacks" title="Copy stacks JSON · Z">Copy stacks JSON <kbd>Z</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyStacksBundle" title="Copy stacks+json · ⇧Alt+Z">Copy stacks+json <kbd>⇧Alt+Z</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteStacks" title="Paste stacks JSON · ⇧Z">Paste stacks JSON <kbd>⇧Z</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeStacks" title="Merge stacks JSON · Alt+Z">Merge stacks JSON <kbd>Alt+Z</kbd></button>
-            <button type="button" id="btnDisneyExtremeShareStacks" title="Copy stacks share · V">Copy stacks share <kbd>V</kbd></button>
-            <button type="button" id="btnDisneyExtremeShareKit" title="Copy kit share · ⇧V">Copy kit share <kbd>⇧V</kbd></button>
-            <button type="button" id="btnDisneyExtremeNextFav" title="Next favorite · Q">Next favorite <kbd>Q</kbd></button>
-            <button type="button" id="btnDisneyExtremePrevFav" title="Prev favorite · ⇧Q">Prev favorite <kbd>⇧Q</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowFavNext" title="Cycle favorite next · →">Fav next <kbd>→</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowFavPrev" title="Cycle favorite prev · ←">Fav prev <kbd>←</kbd></button>
-            <button type="button" id="btnDisneyExtremeNextHist" title="Next history · Alt+Q">Next history <kbd>Alt+Q</kbd></button>
-            <button type="button" id="btnDisneyExtremePrevHist" title="Prev history · ⇧Alt+Q">Prev history <kbd>⇧Alt+Q</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowHistNext" title="Cycle history next · ↓">Hist next <kbd>↓</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowHistPrev" title="Cycle history prev · ↑">Hist prev <kbd>↑</kbd></button>
-            <button type="button" id="btnDisneyExtremeNextRedo" title="Next redo · Alt+U">Next redo <kbd>Alt+U</kbd></button>
-            <button type="button" id="btnDisneyExtremePrevRedo" title="Prev redo · ⇧Alt+U">Prev redo <kbd>⇧Alt+U</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowRedoNext" title="Cycle redo next · ⇧↓">Redo next <kbd>⇧↓</kbd></button>
-            <button type="button" id="btnDisneyExtremeArrowRedoPrev" title="Cycle redo prev · ⇧↑">Redo prev <kbd>⇧↑</kbd></button>
-            <button type="button" id="btnDisneyExtremeJumpPin" title="Jump pin · Alt+R">Jump pin <kbd>Alt+R</kbd></button>
-            <button type="button" id="btnDisneyExtremeJumpPinSummary" title="Jump pin summary · ⇧Alt+R">Jump pin summary <kbd>⇧Alt+R</kbd></button>
-            <button type="button" id="btnDisneyExtremeReplacePin" title="Replace pin · ⇧P">Replace pin <kbd>⇧P</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyStacksSummary" title="Copy stacks summary · ⇧Alt+L">Copy stacks summary <kbd>⇧Alt+L</kbd></button>
-            <button type="button" id="btnDisneyExtremePasteStacksShare" title="Paste stacks share · Alt+B">Paste stacks share <kbd>Alt+B</kbd></button>
-            <button type="button" id="btnDisneyExtremeMergeStacksShare" title="Merge stacks share · ⇧Alt+B">Merge stacks share <kbd>⇧Alt+B</kbd></button>
-            <button type="button" id="btnDisneyExtremeSharePin" title="Share pin · Alt+C">Share pin <kbd>Alt+C</kbd></button>
-            <button type="button" id="btnDisneyExtremePastePinShare" title="Paste pin share · ⇧Alt+C">Paste pin share <kbd>⇧Alt+C</kbd></button>
-            <button type="button" id="btnDisneyExtremePinSummary" title="Pin summary · Alt+D">Pin summary <kbd>Alt+D</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyPinSummary" title="Copy pin summary · ⇧Alt+D">Copy pin summary <kbd>⇧Alt+D</kbd></button>
-            <button type="button" id="btnDisneyExtremePinBundle" title="Pin bundle · Alt+A">Pin bundle <kbd>Alt+A</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyPinBundle" title="Copy pin bundle · ⇧Alt+A">Copy pin bundle <kbd>⇧Alt+A</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyPinFp" title="Copy pin fp · ⇧Alt+P">Copy pin fp <kbd>⇧Alt+P</kbd></button>
-            <button type="button" id="btnDisneyExtremeFocusPanel" title="Focus Extreme panel · Alt+X">Focus Extreme panel <kbd>Alt+X</kbd></button>
-            <button type="button" id="btnDisneyExtremeFocusPanelTab" title="Focus Extreme panel · Tab">Focus panel <kbd>Tab</kbd></button>
-            <button type="button" id="btnDisneyExtremeEnableFocus" title="Enable + focus · ⇧Alt+X">Enable + focus <kbd>⇧Alt+X</kbd></button>
-            <button type="button" id="btnDisneyExtremeUnstarFav" title="Unstar favorite · Alt+S">Unstar favorite <kbd>Alt+S</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyHelp" title="Copy hotkey help · Alt+H">Copy hotkey help <kbd>Alt+H</kbd></button>
-            <button type="button" id="btnDisneyExtremeShowHelp" title="Help digest · H">Help digest <kbd>H</kbd></button>
-            <button type="button" id="btnDisneyExtremeCopyDigest" title="Copy hotkey digest · Alt+F12">Copy hotkey digest <kbd>Alt+F12</kbd></button>
-            <button type="button" id="btnDisneyExtremeClearActive" title="Clear active · Delete">Clear active <kbd>Delete</kbd></button>
-            <button type="button" id="btnDisneyExtremeClearTransient" title="Clear transient · ⇧Alt+Delete">Clear transient <kbd>⇧Alt+Delete</kbd></button>
-            <button type="button" id="btnDisneyExtremeToggleMore" title="Toggle More IO · Alt+T · ⇧T">Toggle More IO <kbd>Alt+T</kbd> <kbd>⇧T</kbd></button>
-            <button type="button" id="btnDisneyExtremeOpenMore" title="Open More IO · ⇧Alt+T">Open More IO <kbd>⇧Alt+T</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyEase" title="Copy ease SVG · ⇧E" aria-keyshortcuts="⇧E">Copy ease SVG <kbd>⇧E</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyEaseLabel" title="Copy ease label · Alt+E" aria-keyshortcuts="Alt+E">Copy ease label <kbd>Alt+E</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyEaseBundle" title="Copy ease+svg · ⇧Alt+E" aria-keyshortcuts="⇧Alt+E">Copy ease+svg <kbd>⇧Alt+E</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyMix" title="Copy mix SVG · ⇧M" aria-keyshortcuts="⇧M">Copy mix SVG <kbd>⇧M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyMixLabel" title="Copy mix label · Alt+M" aria-keyshortcuts="Alt+M">Copy mix label <kbd>Alt+M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyMixBundle" title="Copy mix+svg · ⇧Alt+M" aria-keyshortcuts="⇧Alt+M">Copy mix+svg <kbd>⇧Alt+M</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyNeckLabel" title="Copy neck label · Alt+N" aria-keyshortcuts="Alt+N">Copy neck label <kbd>Alt+N</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyNeckFactors" title="Copy neck+factors · ⇧Alt+N" aria-keyshortcuts="⇧Alt+N">Copy neck+factors <kbd>⇧Alt+N</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFactors" title="Copy factors SVG · ⇧F" aria-keyshortcuts="⇧F">Copy factors SVG <kbd>⇧F</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFactorsLabel" title="Copy factors label · ⇧N" aria-keyshortcuts="⇧N">Copy factors label <kbd>⇧N</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyBundle" title="Copy all · ⇧A" aria-keyshortcuts="⇧A">Copy all <kbd>⇧A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyJson" title="Copy JSON · J" aria-keyshortcuts="J">Copy JSON <kbd>J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteJson" title="Paste JSON · ⇧J" aria-keyshortcuts="⇧J">Paste JSON <kbd>⇧J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteSnapShare" title="Paste snap share · Alt+J" aria-keyshortcuts="Alt+J">Paste snap share <kbd>Alt+J</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteSnapLive" title="Paste snap live · ⇧Alt+J" aria-keyshortcuts="⇧Alt+J">Paste snap live <kbd>⇧Alt+J</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyDiff" title="Copy diff · ⇧C" aria-keyshortcuts="⇧C">Copy diff <kbd>⇧C</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyRedo" title="Copy redo JSON · O" aria-keyshortcuts="O">Copy redo JSON <kbd>O</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteRedo" title="Paste redo JSON · ⇧O" aria-keyshortcuts="⇧O">Paste redo JSON <kbd>⇧O</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeRedo" title="Merge redo JSON · Alt+O" aria-keyshortcuts="Alt+O">Merge redo JSON <kbd>Alt+O</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeRedoShare" title="Merge redo share · ⇧Alt+O" aria-keyshortcuts="⇧Alt+O">Merge redo share <kbd>⇧Alt+O</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareHist" title="Copy hist share · ⇧Y" aria-keyshortcuts="⇧Y">Copy hist share <kbd>⇧Y</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareRedo" title="Copy redo share · Alt+Y" aria-keyshortcuts="Alt+Y">Copy redo share <kbd>Alt+Y</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteRedoShare" title="Paste redo share · ⇧Alt+Y" aria-keyshortcuts="⇧Alt+Y">Paste redo share <kbd>⇧Alt+Y</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareFav" title="Copy fav share · T" aria-keyshortcuts="T">Copy fav share <kbd>T</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteFavShare" title="Paste fav share · Alt+F" aria-keyshortcuts="Alt+F">Paste fav share <kbd>Alt+F</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeFavShare" title="Merge fav share · ⇧Alt+F" aria-keyshortcuts="⇧Alt+F">Merge fav share <kbd>⇧Alt+F</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyHist" title="Copy hist JSON · ⇧L" aria-keyshortcuts="⇧L">Copy hist JSON <kbd>⇧L</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyRedoList" title="Copy redo list · ⇧Alt+H" aria-keyshortcuts="⇧Alt+H">Copy redo list <kbd>⇧Alt+H</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteHist" title="Paste hist JSON · I" aria-keyshortcuts="I">Paste hist JSON <kbd>I</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeHist" title="Merge hist JSON · ⇧I" aria-keyshortcuts="⇧I">Merge hist JSON <kbd>⇧I</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteHistShare" title="Paste hist share · Alt+I" aria-keyshortcuts="Alt+I">Paste hist share <kbd>Alt+I</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeHistShare" title="Merge hist share · ⇧Alt+I" aria-keyshortcuts="⇧Alt+I">Merge hist share <kbd>⇧Alt+I</kbd></button>
+            <button type="button" id="btnDisneyExtremeFavList" title="Favorites list · ⇧S" aria-keyshortcuts="⇧S">Favorites list <kbd>⇧S</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFavList" title="Copy fav list · ⇧Alt+S" aria-keyshortcuts="⇧Alt+S">Copy fav list <kbd>⇧Alt+S</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFav" title="Copy fav JSON · G" aria-keyshortcuts="G">Copy fav JSON <kbd>G</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFavBundle" title="Copy fav+json · ⇧Alt+G" aria-keyshortcuts="⇧Alt+G">Copy fav+json <kbd>⇧Alt+G</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteFav" title="Paste fav JSON · ⇧G" aria-keyshortcuts="⇧G">Paste fav JSON <kbd>⇧G</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeFav" title="Merge fav JSON · Alt+G" aria-keyshortcuts="Alt+G">Merge fav JSON <kbd>Alt+G</kbd></button>
+            <button type="button" id="btnDisneyExtremeWipeFav" title="Wipe favorites · ⇧W" aria-keyshortcuts="⇧W">Wipe favorites <kbd>⇧W</kbd></button>
+            <button type="button" id="btnDisneyExtremeWipeStacks" title="Wipe stacks · Alt+W" aria-keyshortcuts="Alt+W">Wipe stacks <kbd>Alt+W</kbd></button>
+            <button type="button" id="btnDisneyExtremeWipeAll" title="Wipe all · ⇧Alt+W" aria-keyshortcuts="⇧Alt+W">Wipe all <kbd>⇧Alt+W</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyFp" title="Copy fingerprint · Alt+P" aria-keyshortcuts="Alt+P">Copy fingerprint <kbd>Alt+P</kbd></button>
+            <button type="button" id="btnDisneyExtremeStacksList" title="Stacks summary · Alt+L" aria-keyshortcuts="Alt+L">Stacks summary <kbd>Alt+L</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearPin" title="Clear pin only · Alt+K" aria-keyshortcuts="Alt+K">Clear pin only <kbd>Alt+K</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteKit" title="Paste kit share · Alt+V" aria-keyshortcuts="Alt+V">Paste kit share <kbd>Alt+V</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeKit" title="Merge kit share · ⇧Alt+V" aria-keyshortcuts="⇧Alt+V">Merge kit share <kbd>⇧Alt+V</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyStacks" title="Copy stacks JSON · Z" aria-keyshortcuts="Z">Copy stacks JSON <kbd>Z</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyStacksBundle" title="Copy stacks+json · ⇧Alt+Z" aria-keyshortcuts="⇧Alt+Z">Copy stacks+json <kbd>⇧Alt+Z</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteStacks" title="Paste stacks JSON · ⇧Z" aria-keyshortcuts="⇧Z">Paste stacks JSON <kbd>⇧Z</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeStacks" title="Merge stacks JSON · Alt+Z" aria-keyshortcuts="Alt+Z">Merge stacks JSON <kbd>Alt+Z</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareStacks" title="Copy stacks share · V" aria-keyshortcuts="V">Copy stacks share <kbd>V</kbd></button>
+            <button type="button" id="btnDisneyExtremeShareKit" title="Copy kit share · ⇧V" aria-keyshortcuts="⇧V">Copy kit share <kbd>⇧V</kbd></button>
+            <button type="button" id="btnDisneyExtremeNextFav" title="Next favorite · Q" aria-keyshortcuts="Q">Next favorite <kbd>Q</kbd></button>
+            <button type="button" id="btnDisneyExtremePrevFav" title="Prev favorite · ⇧Q" aria-keyshortcuts="⇧Q">Prev favorite <kbd>⇧Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowFavNext" title="Cycle favorite next · →" aria-keyshortcuts="→">Fav next <kbd>→</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowFavPrev" title="Cycle favorite prev · ←" aria-keyshortcuts="←">Fav prev <kbd>←</kbd></button>
+            <button type="button" id="btnDisneyExtremeNextHist" title="Next history · Alt+Q" aria-keyshortcuts="Alt+Q">Next history <kbd>Alt+Q</kbd></button>
+            <button type="button" id="btnDisneyExtremePrevHist" title="Prev history · ⇧Alt+Q" aria-keyshortcuts="⇧Alt+Q">Prev history <kbd>⇧Alt+Q</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowHistNext" title="Cycle history next · ↓" aria-keyshortcuts="↓">Hist next <kbd>↓</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowHistPrev" title="Cycle history prev · ↑" aria-keyshortcuts="↑">Hist prev <kbd>↑</kbd></button>
+            <button type="button" id="btnDisneyExtremeNextRedo" title="Next redo · Alt+U" aria-keyshortcuts="Alt+U">Next redo <kbd>Alt+U</kbd></button>
+            <button type="button" id="btnDisneyExtremePrevRedo" title="Prev redo · ⇧Alt+U" aria-keyshortcuts="⇧Alt+U">Prev redo <kbd>⇧Alt+U</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowRedoNext" title="Cycle redo next · ⇧↓" aria-keyshortcuts="⇧↓">Redo next <kbd>⇧↓</kbd></button>
+            <button type="button" id="btnDisneyExtremeArrowRedoPrev" title="Cycle redo prev · ⇧↑" aria-keyshortcuts="⇧↑">Redo prev <kbd>⇧↑</kbd></button>
+            <button type="button" id="btnDisneyExtremeJumpPin" title="Jump pin · Alt+R" aria-keyshortcuts="Alt+R">Jump pin <kbd>Alt+R</kbd></button>
+            <button type="button" id="btnDisneyExtremeJumpPinSummary" title="Jump pin summary · ⇧Alt+R" aria-keyshortcuts="⇧Alt+R">Jump pin summary <kbd>⇧Alt+R</kbd></button>
+            <button type="button" id="btnDisneyExtremeReplacePin" title="Replace pin · ⇧P" aria-keyshortcuts="⇧P">Replace pin <kbd>⇧P</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyStacksSummary" title="Copy stacks summary · ⇧Alt+L" aria-keyshortcuts="⇧Alt+L">Copy stacks summary <kbd>⇧Alt+L</kbd></button>
+            <button type="button" id="btnDisneyExtremePasteStacksShare" title="Paste stacks share · Alt+B" aria-keyshortcuts="Alt+B">Paste stacks share <kbd>Alt+B</kbd></button>
+            <button type="button" id="btnDisneyExtremeMergeStacksShare" title="Merge stacks share · ⇧Alt+B" aria-keyshortcuts="⇧Alt+B">Merge stacks share <kbd>⇧Alt+B</kbd></button>
+            <button type="button" id="btnDisneyExtremeSharePin" title="Share pin · Alt+C" aria-keyshortcuts="Alt+C">Share pin <kbd>Alt+C</kbd></button>
+            <button type="button" id="btnDisneyExtremePastePinShare" title="Paste pin share · ⇧Alt+C" aria-keyshortcuts="⇧Alt+C">Paste pin share <kbd>⇧Alt+C</kbd></button>
+            <button type="button" id="btnDisneyExtremePinSummary" title="Pin summary · Alt+D" aria-keyshortcuts="Alt+D">Pin summary <kbd>Alt+D</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinSummary" title="Copy pin summary · ⇧Alt+D" aria-keyshortcuts="⇧Alt+D">Copy pin summary <kbd>⇧Alt+D</kbd></button>
+            <button type="button" id="btnDisneyExtremePinBundle" title="Pin bundle · Alt+A" aria-keyshortcuts="Alt+A">Pin bundle <kbd>Alt+A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinBundle" title="Copy pin bundle · ⇧Alt+A" aria-keyshortcuts="⇧Alt+A">Copy pin bundle <kbd>⇧Alt+A</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyPinFp" title="Copy pin fp · ⇧Alt+P" aria-keyshortcuts="⇧Alt+P">Copy pin fp <kbd>⇧Alt+P</kbd></button>
+            <button type="button" id="btnDisneyExtremeFocusPanel" title="Focus Extreme panel · Alt+X" aria-keyshortcuts="Alt+X">Focus Extreme panel <kbd>Alt+X</kbd></button>
+            <button type="button" id="btnDisneyExtremeFocusPanelTab" title="Focus Extreme panel · Tab" aria-keyshortcuts="Tab">Focus panel <kbd>Tab</kbd></button>
+            <button type="button" id="btnDisneyExtremeEnableFocus" title="Enable + focus · ⇧Alt+X" aria-keyshortcuts="⇧Alt+X">Enable + focus <kbd>⇧Alt+X</kbd></button>
+            <button type="button" id="btnDisneyExtremeUnstarFav" title="Unstar favorite · Alt+S" aria-keyshortcuts="Alt+S">Unstar favorite <kbd>Alt+S</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyHelp" title="Copy hotkey help · Alt+H" aria-keyshortcuts="Alt+H">Copy hotkey help <kbd>Alt+H</kbd></button>
+            <button type="button" id="btnDisneyExtremeShowHelp" title="Help digest · H" aria-keyshortcuts="H">Help digest <kbd>H</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyDigest" title="Copy hotkey digest · Alt+F12" aria-keyshortcuts="Alt+F12">Copy hotkey digest <kbd>Alt+F12</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearActive" title="Clear active · Delete" aria-keyshortcuts="Delete">Clear active <kbd>Delete</kbd></button>
+            <button type="button" id="btnDisneyExtremeClearTransient" title="Clear transient · ⇧Alt+Delete" aria-keyshortcuts="⇧Alt+Delete">Clear transient <kbd>⇧Alt+Delete</kbd></button>
+            <button type="button" id="btnDisneyExtremeToggleMore" title="Toggle More IO · Alt+T · ⇧T" aria-keyshortcuts="Alt+T">Toggle More IO <kbd>Alt+T</kbd> <kbd>⇧T</kbd></button>
+            <button type="button" id="btnDisneyExtremeOpenMore" title="Open More IO · ⇧Alt+T" aria-keyshortcuts="⇧Alt+T">Open More IO <kbd>⇧Alt+T</kbd></button>
           </div>
         </details>
         <div
@@ -1186,9 +1212,12 @@
               placeholder="Filter strips…"
               autocomplete="off"
               spellcheck="false"
+              role="combobox"
               aria-label="Filter Extreme strips"
               aria-describedby="disneyExtremeStripsFilterSummary"
               aria-controls="disneyExtremeStrips"
+              aria-keyshortcuts="Enter Shift+F12 Alt+F12 ArrowDown Escape"
+              aria-autocomplete="list"
               title="Filter Extreme strips · F12 focus · ⇧F12 copy · Alt+F12 copy digest · ⇧Alt+F12 clear · Esc clear"
             />
             <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12" aria-label="Clear Extreme strips filter" aria-keyshortcuts="Shift+Alt+F12">Clear filter</button>
@@ -1338,7 +1367,9 @@
             title="Live mix label · M flash · ⇧M copy · click/Enter/Space flash · dbl-click/⇧Enter copy"
           >body mix</div>
         </div>
-        <div class="status" id="disneyExtremeStatus" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme status summary" title="Prefs summary tooltip · click/Enter/Space digest · dbl-click/⇧Enter copy · C" style="cursor:pointer;">extreme off</div>
+        <div class="status" id="disneyExtremeStatus" aria-live="polite" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme status summary" aria-describedby="disneyExtremeDropHint" title="Prefs summary tooltip · click/Enter/Space digest · dbl-click/⇧Enter copy · C" style="cursor:pointer;">extreme off</div>
+        <div id="disneyExtremeStatusLive" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+        <div id="disneyExtremeChipHints" class="visually-hidden">Meta+Enter preview · Ctrl+Enter remove · Alt+Enter diff · ⇧Alt+Enter compare · Space jump · ⇧Space star · ⇧Enter pin</div>
         <div class="status" id="disneyExtremeDropHint" aria-keyshortcuts="Enter Space Shift+Enter" aria-label="Extreme drop hint" title="Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · click/Enter/Space flash · dbl-click paste" style="cursor:pointer;">
           Drop snapshot / hist / redo / fav / stacks JSON · Meta preview · Shift merge · dbl-click paste
         </div>
@@ -2121,6 +2152,22 @@
             disneyExtremeMouthFactorEl.value || 1.5,
           ).toFixed(2);
         }
+        syncDisneyExtremeFactorSliderAria(
+          disneyExtremeFactorEl,
+          document.getElementById('disneyExtremeLabel'),
+        );
+        syncDisneyExtremeFactorSliderAria(
+          disneyExtremeBodyFactorEl,
+          document.getElementById('disneyExtremeBodyLabel'),
+        );
+        syncDisneyExtremeFactorSliderAria(
+          disneyExtremeEyeFactorEl,
+          document.getElementById('disneyExtremeEyeLabel'),
+        );
+        syncDisneyExtremeFactorSliderAria(
+          disneyExtremeMouthFactorEl,
+          document.getElementById('disneyExtremeMouthLabel'),
+        );
       }
 
       let disneyExtremeStatusHoldUntil = 0;
@@ -2169,6 +2216,83 @@
         node.setAttribute('role', opts.separator ? 'separator' : 'status');
         node.setAttribute('aria-live', 'polite');
         node.setAttribute('aria-label', node.textContent || '');
+      }
+
+      const DISNEY_EXTREME_BIND_SURFACE_COUNT = 30;
+
+      function syncDisneyExtremeToggleAria() {
+        if (disneyExtremeEl) {
+          disneyExtremeEl.setAttribute(
+            'aria-checked',
+            disneyExtremeEl.checked ? 'true' : 'false',
+          );
+        }
+        if (disneyExtremeBodyEl) {
+          disneyExtremeBodyEl.setAttribute(
+            'aria-checked',
+            disneyExtremeBodyEl.checked ? 'true' : 'false',
+          );
+        }
+      }
+
+      function syncDisneyExtremeFactorSliderAria(sliderEl, labelEl) {
+        if (!sliderEl) return;
+        const val = Number(sliderEl.value || sliderEl.getAttribute('value') || 0);
+        const min = Number(sliderEl.min || sliderEl.getAttribute('min') || 0);
+        const max = Number(sliderEl.max || sliderEl.getAttribute('max') || 0);
+        sliderEl.setAttribute('aria-valuenow', String(val));
+        sliderEl.setAttribute('aria-valuemin', String(min));
+        sliderEl.setAttribute('aria-valuemax', String(max));
+        sliderEl.setAttribute('aria-valuetext', `${val.toFixed(2)}×`);
+        sliderEl.setAttribute('aria-disabled', sliderEl.disabled ? 'true' : 'false');
+        if (labelEl?.id) {
+          sliderEl.setAttribute('aria-labelledby', labelEl.id);
+        }
+      }
+
+      function wireDisneyExtremeButtonAriaFromTitle(btn) {
+        if (!btn) return;
+        const title = String(btn.getAttribute('title') || btn.textContent || '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (title) btn.setAttribute('aria-label', title);
+        const kbd = btn.querySelector('kbd');
+        if (kbd?.textContent?.trim()) {
+          btn.setAttribute('aria-keyshortcuts', kbd.textContent.trim());
+        }
+      }
+
+      function wireDisneyExtremeToolbarButtonAria() {
+        document
+          .querySelectorAll('[id^="btnDisneyExtreme"]')
+          .forEach(wireDisneyExtremeButtonAriaFromTitle);
+      }
+
+      function auditDisneyExtremeDetailsAriaExpanded() {
+        for (const detailsEl of document.querySelectorAll(
+          '#disneyExtremeMore, #disneyExtremeStrips',
+        )) {
+          const summaryEl = detailsEl.querySelector('summary');
+          syncDisneyExtremeDetailsAriaExpanded(detailsEl, summaryEl);
+        }
+      }
+
+      function syncDisneyExtremeStripsFilterActivedescendant() {
+        const input = document.getElementById('disneyExtremeStripsFilter');
+        if (!input) return;
+        const q = String(disneyExtremeStripsFilterQuery || '').trim();
+        if (!q) {
+          input.removeAttribute('aria-activedescendant');
+          return;
+        }
+        for (const id of DISNEY_EXTREME_STRIP_IDS) {
+          const el = document.getElementById(id);
+          if (el && !el.hidden) {
+            input.setAttribute('aria-activedescendant', id);
+            return;
+          }
+        }
+        input.setAttribute('aria-activedescendant', 'disneyExtremeStripsEmpty');
       }
 
       function syncDisneyExtremeHistoryUi() {
@@ -2262,7 +2386,11 @@
         const kind =
           opts.kind === 'redo' ? 'redo' : opts.kind === 'fav' ? 'fav' : 'hist';
         btn.setAttribute('aria-label', btn.title || btn.textContent || '');
-        btn.setAttribute('aria-keyshortcuts', 'Enter Shift+Enter');
+        btn.setAttribute(
+          'aria-keyshortcuts',
+          'Enter Shift+Enter Meta+Enter Ctrl+Enter Alt+Enter Shift+Alt+Enter Space Shift+Space',
+        );
+        btn.setAttribute('aria-describedby', 'disneyExtremeChipHints');
         let clickTimer = null;
         btn.addEventListener('click', (ev) => {
           if (ev.metaKey) {
@@ -2351,16 +2479,96 @@
           });
         });
         btn.addEventListener('keydown', (ev) => {
-          if (ev.key !== 'Enter' || !ev.shiftKey) return;
+          if (ev.key === ' ' && !ev.shiftKey) {
+            ev.preventDefault();
+            if (kind === 'redo') jumpDisneyExtremeBaselineRedo(index);
+            else if (kind === 'fav') jumpDisneyExtremeBaselineFavorite(index);
+            else jumpDisneyExtremeBaselineHistory(index);
+            return;
+          }
+          if (ev.key === ' ' && ev.shiftKey) {
+            ev.preventDefault();
+            starDisneyExtremeBaselineFavoriteFromChip(snap, {
+              index: index + 1,
+              kind,
+            });
+            return;
+          }
+          if (ev.key !== 'Enter') return;
           ev.preventDefault();
           if (clickTimer) {
             clearTimeout(clickTimer);
             clickTimer = null;
           }
-          pinDisneyExtremeBaselineFromChip(snap, {
-            index: index + 1,
-            kind: kind === 'fav' ? 'hist' : kind,
-          });
+          if (ev.metaKey) {
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineChipPreviewLabel(snap, {
+                index: index + 1,
+                kind:
+                  kind === 'redo' ? 'redo' : kind === 'fav' ? 'fav' : undefined,
+              }),
+            );
+            return;
+          }
+          if (ev.ctrlKey && kind === 'fav') {
+            unstarDisneyExtremeBaselineFavoriteAt(index);
+            return;
+          }
+          if (ev.ctrlKey && (kind === 'hist' || kind === 'redo')) {
+            removeDisneyExtremeBaselineChipAt(index, kind);
+            return;
+          }
+          if (ev.altKey && ev.shiftKey) {
+            const a = lastExtremeChipCompare;
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineChipCompareLabel(
+                a?.snap,
+                snap,
+                {
+                  aIndex: a?.index,
+                  bIndex: index + 1,
+                  aKind: a?.kind === 'redo' ? 'redo' : 'hist',
+                  bKind: kind === 'redo' ? 'redo' : 'hist',
+                },
+              ),
+            );
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
+            return;
+          }
+          if (ev.altKey) {
+            rememberDisneyExtremeChipCompare(snap, {
+              index: index + 1,
+              kind,
+            });
+            flashDisneyExtremeStatus(
+              formatDisneyExtremeBaselineChipDiffLabel(
+                disneyExtremeSnapshot(),
+                snap,
+                {
+                  index: index + 1,
+                  kind: kind === 'redo' ? 'redo' : undefined,
+                },
+              ),
+            );
+            return;
+          }
+          if (ev.shiftKey) {
+            pinDisneyExtremeBaselineFromChip(snap, {
+              index: index + 1,
+              kind: kind === 'fav' ? 'hist' : kind,
+            });
+            return;
+          }
+          if (kind === 'redo') jumpDisneyExtremeBaselineRedo(index);
+          else if (kind === 'fav') jumpDisneyExtremeBaselineFavorite(index);
+          else jumpDisneyExtremeBaselineHistory(index);
         });
       }
 
@@ -2369,17 +2577,23 @@
         const onFlash = typeof opts.onFlash === 'function' ? opts.onFlash : null;
         const onCopy = typeof opts.onCopy === 'function' ? opts.onCopy : null;
         const onPaste = typeof opts.onPaste === 'function' ? opts.onPaste : null;
+        const onClear = typeof opts.onClear === 'function' ? opts.onClear : null;
         const backgroundOnly = !!opts.backgroundOnly;
         const pasteOnDblClick = !!opts.pasteOnDblClick;
+        const skipRole = !!opts.skipRole;
+        const skipTabindex = !!opts.skipTabindex;
         const ignoreChildTargets = Array.isArray(opts.ignoreChildTargets)
           ? opts.ignoreChildTargets.filter(Boolean)
           : [];
 
         function shouldIgnoreTarget(target) {
           if (backgroundOnly && target !== el) return true;
-          return ignoreChildTargets.some(
-            (t) => t === target || (t && t.contains && t.contains(target)),
-          );
+          return ignoreChildTargets.some((sel) => {
+            if (typeof sel === 'string') {
+              return target?.matches?.(sel) || target?.closest?.(sel);
+            }
+            return sel === target || (sel && sel.contains && sel.contains(target));
+          });
         }
 
         if (onFlash) {
@@ -2401,9 +2615,19 @@
             onPaste();
           });
         }
-        el.setAttribute('role', 'button');
-        el.setAttribute('tabindex', '0');
+        if (!skipRole) {
+          el.setAttribute('role', 'button');
+        }
+        if (!skipTabindex) {
+          el.setAttribute('tabindex', '0');
+        }
         el.addEventListener('keydown', (ev) => {
+          if (onClear && (ev.key === 'Delete' || ev.key === 'Backspace')) {
+            if (shouldIgnoreTarget(ev.target)) return;
+            ev.preventDefault();
+            onClear();
+            return;
+          }
           if (ev.key !== 'Enter' && ev.key !== ' ') return;
           ev.preventDefault();
           if (ev.shiftKey && ev.key === 'Enter') {
@@ -2637,6 +2861,7 @@
             total,
           });
         }
+        syncDisneyExtremeStripsFilterActivedescendant();
         return { query: disneyExtremeStripsFilterQuery, visible, total };
       }
 
@@ -5120,6 +5345,8 @@
 
       function flashDisneyExtremeStatus(text, holdMs = DISNEY_EXTREME_STATUS_HOLD_MS) {
         if (disneyExtremeStatus) disneyExtremeStatus.textContent = text;
+        const live = document.getElementById('disneyExtremeStatusLive');
+        if (live) live.textContent = text;
         const ms =
           typeof holdMs === 'number' && holdMs > 0
             ? holdMs
@@ -5170,6 +5397,7 @@
       }
       syncDisneyExtremeFactorLabels();
       bootstrapDisneyExtremeStripsFilter();
+      syncDisneyExtremeToggleAria();
       syncDisneyExtremePrefsSummary(savedPrefs);
       if (disneyExtremeStatus) {
         disneyExtremeStatus.textContent = formatDisneyExtremeHotkeyHelp({
@@ -5181,6 +5409,8 @@
         disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
         disneyExtremeEl.addEventListener('change', () => {
           disneyExtremeFactorEl.disabled = !disneyExtremeEl.checked;
+          syncDisneyExtremeFactorLabels();
+          syncDisneyExtremeToggleAria();
           updateTierHintForDisneyExtreme();
           maybeAutoBaselineDisneyExtreme();
           syncDisneyExtremePrefsSummary();
@@ -5202,10 +5432,12 @@
           const masterOn = !!disneyExtremeEl?.checked;
           disneyExtremeBodyFactorEl.disabled =
             !masterOn || !disneyExtremeBodyEl.checked;
+          syncDisneyExtremeFactorLabels();
         };
         syncBodyUi();
         disneyExtremeBodyEl.addEventListener('change', () => {
           syncBodyUi();
+          syncDisneyExtremeToggleAria();
           syncDisneyExtremePrefsSummary();
           persistPrefs();
         });
@@ -5788,6 +6020,7 @@
       bindDisneyExtremeFlashCopySurface(
         document.getElementById('disneyExtremeStripsSummary'),
         {
+          skipTabindex: true,
           onFlash: () => flashDisneyExtremeBaselineStripsSummary(),
           onCopy: () => copyDisneyExtremeBaselineStripsSummary(),
         },
@@ -6088,6 +6321,7 @@
       bindDisneyExtremeFlashCopySurface(
         document.getElementById('disneyExtremeStripsFilterSummary'),
         {
+          skipTabindex: true,
           onFlash: () => flashDisneyExtremeStripsFilterSummary(),
           onCopy: () => copyDisneyExtremeStripsFilterSummary(),
         },
@@ -6104,6 +6338,28 @@
       });
 
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          flashDisneyExtremeStripsFilterSummary();
+          return;
+        }
+        if (ev.key === 'ArrowDown') {
+          ev.preventDefault();
+          for (const id of DISNEY_EXTREME_STRIP_IDS) {
+            const el = document.getElementById(id);
+            if (el && !el.hidden) {
+              el.focus?.();
+              return;
+            }
+          }
+          document.getElementById('disneyExtremeStripsEmpty')?.focus?.();
+          return;
+        }
+        if (ev.altKey && ev.key === 'F12') {
+          ev.preventDefault();
+          copyDisneyExtremeHotkeyDigest();
+          return;
+        }
         if (ev.key !== 'Escape') return;
         const q = String(disneyExtremeStripsFilterQuery || '').trim();
         if (!q) return;
@@ -6138,6 +6394,7 @@
           });
         }
         bindDisneyExtremeFlashCopySurface(moreSummary, {
+          skipTabindex: true,
           onFlash: () => {
             const el = document.getElementById('disneyExtremeMore');
             flashDisneyExtremeStatus(el?.open ? 'more IO · closed' : 'more IO · open');
@@ -6167,6 +6424,9 @@
         document.getElementById('disneyExtremeStripsEmpty'),
         {
           onFlash: () => {
+            clearDisneyExtremeStripsFilterFlash();
+          },
+          onClear: () => {
             clearDisneyExtremeStripsFilterFlash();
           },
         },
@@ -6732,18 +6992,21 @@
       });
 
       bindDisneyExtremeFlashCopySurface(disneyExtremeStatus, {
+        skipRole: true,
         onFlash: () => flashDisneyExtremeHotkeyDigestStatus(),
         onCopy: () => copyDisneyExtremeSummary(),
       });
 
       bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeHistory'), {
         backgroundOnly: true,
+        ignoreChildTargets: ['.extreme-hist-chip', '.extreme-redo-chip'],
         onFlash: () => flashDisneyExtremeBaselineHistoryList(),
         onCopy: () => copyDisneyExtremeBaselineHistoryList(),
       });
 
       bindDisneyExtremeFlashCopySurface(document.getElementById('disneyExtremeFavorites'), {
         backgroundOnly: true,
+        ignoreChildTargets: ['.extreme-fav-chip'],
         onFlash: () => flashDisneyExtremeBaselineFavoritesList(),
         onCopy: () => copyDisneyExtremeBaselineFavoritesList(),
       });
@@ -7297,6 +7560,9 @@
         onFlash: () => flashDisneyExtremeBodyMix(),
         onCopy: () => copyDisneyExtremeBodyMixSvg(),
       });
+
+      wireDisneyExtremeToolbarButtonAria();
+      auditDisneyExtremeDetailsAriaExpanded();
 
       let disneyExtremeNudgeHold = null;
       document.addEventListener('keydown', (ev) => {

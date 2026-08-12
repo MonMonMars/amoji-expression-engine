@@ -528,7 +528,102 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 515 | Extreme bind migration audit | Done |
 | Phase 516 | Extreme readme phase table | Done |
 | Phase 517 | Extreme a11y docs sync | Done |
-| Phase 518+ | Further production polish… | Specced |
+| Phase 518 | Extreme skiprole for native/status | Done |
+| Phase 519 | Extreme onclear for empty row | Done |
+| Phase 520 | Extreme skiptabindex for summary | Done |
+| Phase 521 | Extreme 30 surfaces | Done |
+| Phase 522 | Extreme meta+enter preview | Done |
+| Phase 523 | Extreme ctrl+enter remove | Done |
+| Phase 524 | Extreme alt+enter diff | Done |
+| Phase 525 | Extreme ⇧alt+enter compare | Done |
+| Phase 526 | Extreme shift+space star | Done |
+| Phase 527 | Extreme space jump | Done |
+| Phase 528 | Extreme aria-keyshortcuts modifiers | Done |
+| Phase 529 | Extreme aria-describedby hints | Done |
+| Phase 530 | Extreme enter flash | Done |
+| Phase 531 | Extreme aria-keyshortcuts | Done |
+| Phase 532 | Extreme aria-activedescendant | Done |
+| Phase 533 | Extreme arrowdown focus strip | Done |
+| Phase 534 | Extreme alt+f12 digest | Done |
+| Phase 535 | Extreme combobox aria | Done |
+| Phase 536 | Extreme aria-checked | Done |
+| Phase 537 | Extreme aria-checked | Done |
+| Phase 538 | Extreme aria-labelledby | Done |
+| Phase 539 | Extreme aria-labelledby | Done |
+| Phase 540 | Extreme aria-keyshortcuts | Done |
+| Phase 541 | Extreme slider aria | Done |
+| Phase 542 | Extreme slider aria | Done |
+| Phase 543 | Extreme slider aria | Done |
+| Phase 544 | Extreme slider aria | Done |
+| Phase 545 | Extreme aria-valuetext × | Done |
+| Phase 546 | Extreme aria-disabled | Done |
+| Phase 547 | Extreme aria-live polite | Done |
+| Phase 548 | Extreme live region sibling | Done |
+| Phase 549 | Extreme aria-describedby drop hint | Done |
+| Phase 550 | Extreme aria from title | Done |
+| Phase 551 | Extreme reset/toggle aria batch | Done |
+| Phase 552 | Extreme e/m/f/n aria batch | Done |
+| Phase 553 | Extreme baseline/diff/pin aria batch | Done |
+| Phase 554 | Extreme hist/fav jump aria batch | Done |
+| Phase 555 | Extreme active/hud/dirty aria batch | Done |
+| Phase 556 | Extreme strips f-key aria batch | Done |
+| Phase 557 | Extreme filter/focus aria batch | Done |
+| Phase 558 | Extreme aria batch | Done |
+| Phase 559 | Extreme aria batch | Done |
+| Phase 560 | Extreme native button skiprole | Done |
+| Phase 561 | Extreme aria-expanded audit | Done |
+| Phase 562 | Extreme ignorechildtargets chips | Done |
+| Phase 563 | Extreme remember open | Done |
+| Phase 564 | Extreme ⇧↓↑ cycle redo | Done |
+| Phase 565 | Extreme shift+insert replace pin | Done |
+| Phase 566 | Extreme alt+insert jump pin | Done |
+| Phase 567 | Extreme ⇧alt+insert jump pin summary | Done |
+| Phase 568 | Extreme dbl-click copy | Done |
+| Phase 569 | Extreme shift+f2 copy factors | Done |
+| Phase 570 | Extreme dbl-click copy | Done |
+| Phase 571 | Extreme shift+f3 copy ease | Done |
+| Phase 572 | Extreme dbl-click copy | Done |
+| Phase 573 | Extreme shift+f4 copy mix | Done |
+| Phase 574 | Extreme dbl-click copy | Done |
+| Phase 575 | Extreme shift+f5 copy neck | Done |
+| Phase 576 | Extreme dbl-click copy | Done |
+| Phase 577 | Extreme shift+f6 copy tips | Done |
+| Phase 578 | Extreme shift+f7 copy capacity | Done |
+| Phase 579 | Extreme shift+f8 copy roots | Done |
+| Phase 580 | Extreme shift+f9 copy active | Done |
+| Phase 581 | Extreme shift+f10 copy pin | Done |
+| Phase 582 | Extreme shift+f11 copy dirty | Done |
+| Phase 583 | Extreme shift+f1 copy strips | Done |
+| Phase 584 | Extreme ⇧alt+pagedown copy curves | Done |
+| Phase 585 | Extreme dbl-click copy | Done |
+| Phase 586 | Extreme meta+click chip preview | Done |
+| Phase 587 | Extreme alt+click chip diff | Done |
+| Phase 588 | Extreme shift+alt+click chip compare | Done |
+| Phase 589 | Extreme shift+click chip star | Done |
+| Phase 590 | Extreme ctrl+click fav chip unstar | Done |
+| Phase 591 | Extreme ctrl+click hist/redo chip remove | Done |
+| Phase 592 | Extreme dbl-click chip pin | Done |
+| Phase 593 | Extreme shift+z paste stacks | Done |
+| Phase 594 | Extreme alt+z merge stacks | Done |
+| Phase 595 | Extreme ⇧alt+z copy stacks+json | Done |
+| Phase 596 | Extreme shift+v share kit | Done |
+| Phase 597 | Extreme alt+v paste kit | Done |
+| Phase 598 | Extreme ⇧alt+v merge kit | Done |
+| Phase 599 | Extreme shift+q prev fav | Done |
+| Phase 600 | Extreme alt+q next hist | Done |
+| Phase 601 | Extreme ⇧alt+q prev hist | Done |
+| Phase 602 | Extreme active | Done |
+| Phase 603 | Extreme active | Done |
+| Phase 604 | Extreme esc clear active chips | Done |
+| Phase 605 | Extreme dbl-click paste | Done |
+| Phase 606 | Extreme hold nudges | Done |
+| Phase 607 | Extreme shift coarse | Done |
+| Phase 608 | Extreme alt coarser | Done |
+| Phase 609 | Extreme readme phase table | Done |
+| Phase 610 | Extreme a11y docs sync | Done |
+| Phase 611 | Extreme bind helper audit | Done |
+| Phase 612 | Extreme button aria audit | Done |
+| Phase 613 | Extreme final a11y audit | Done |
 
 ## Quick start
 
