@@ -1000,6 +1000,9 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'sparkShiftEnterCopy', help: 'sparks · ⇧Enter copy', kind: 'note' },
   { id: 'statusKeyboardA11y', help: 'status row · Enter/Space digest', kind: 'note' },
   { id: 'dropHintKeyboardA11y', help: 'drop hint · Enter/Space flash', kind: 'note' },
+  { id: 'stripsKeyboardA11y', help: 'strip rows · Enter/Space flash', kind: 'note' },
+  { id: 'stripsShiftEnterCopy', help: 'strip rows · ⇧Enter copy/jump', kind: 'note' },
+  { id: 'filterSummaryShiftEnterCopy', help: 'filter summary · ⇧Enter copy', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
