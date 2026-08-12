@@ -699,6 +699,36 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish3494 */
+      @media (prefers-reduced-data: reduce) {
+        #disneyExtremeEaseSpark, #disneyExtremeBodySpark,
+        #hudExtremeSpark, #hudBodySpark {
+          background-image: none !important;
+        }
+      }
+      #disneyExtremePanel :focus-within {
+        outline: 1px solid transparent;
+      }
+      #disneyExtremePanel button,
+      #disneyExtremePanel input[type="search"] {
+        min-height: 2.25rem;
+      }
+      @media (pointer: coarse) {
+        #disneyExtremePanel button.extreme-hist-chip,
+        #disneyExtremePanel button.extreme-fav-chip,
+        #disneyExtremePanel button.extreme-redo-chip {
+          min-height: 2.75rem;
+        }
+      }
+      #disneyExtremeStatusLive {
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+      }
       /* disneyExtremeA11yPolish1958 */
       @media (prefers-contrast: more) {
         #disneyExtremePanel :focus-visible {
@@ -1873,6 +1903,28 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish3494Docs
+       * catalog · post-3493 a11y polish notes
+       * readme · phase table 3494+
+       * FACE_LIVE · a11y delta sync 3494+
+       * docs · bind surface count 32 keep5
+       * docs · 183 button aria keep5
+       * docs · chip modifier matrix keep4
+       * docs · focus-visible map keep4
+       * docs · live region policy keep4
+       * docs · reduced motion keep4
+       * docs · forced-colors keep4
+       * docs · pointer coarse keep4
+       * docs · landmark roles keep4
+       * docs · skip links keep4
+       * docs · spark role=img keep4
+       * docs · bind registry keep4
+       * docs · typography policy keep5
+       * docs · interaction policy keep5
+       * tests · a11y substring harness 3494+
+       * final a11y polish audit · batch 3494+
+       * Extreme a11y batch4 audit
        */
       /* disneyExtremeA11yPolish1190Docs
        * catalog · post-1189 a11y polish notes
