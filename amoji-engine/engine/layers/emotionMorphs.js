@@ -902,6 +902,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   },
   { id: 'showBaselineAllStrips', help: 'Alt+Home all strips', kind: 'note' },
   { id: 'copyBaselineAllStrips', help: 'Alt+End copy all strips', kind: 'note' },
+  { id: 'openBaselineAllStrips', help: '⇧Alt+Home open all strips', kind: 'note' },
+  { id: 'copyBaselineAllStripsOpen', help: '⇧Alt+End copy all open', kind: 'note' },
   { id: 'allStrips', help: 'all strips · bundle', kind: 'note' },
   { id: 'dirtyStrip', help: 'dirty strip · live', kind: 'note' },
   {
@@ -2786,6 +2788,13 @@ export function formatDisneyExtremeBaselineAllStripsBundle(
       neckBlend: opts.neckBlend,
       bodyMix: opts.bodyMix,
       bodyInt: opts.bodyInt,
+    }),
+    formatDisneyExtremeBaselineStripsSummaryLabel(stacks, {
+      hasBaseline:
+        opts.hasBaseline != null ? !!opts.hasBaseline : opts.pin != null,
+      dirty: opts.dirty,
+      fp: opts.fp,
+      changeCount: opts.changeCount,
     }),
   ].join('\n');
 }

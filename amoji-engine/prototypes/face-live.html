@@ -966,6 +966,8 @@
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
           <button type="button" id="btnDisneyExtremeAllStrips">All strips <kbd>Alt+Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyAllStrips">Copy all strips <kbd>Alt+End</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenAllStrips">Open all strips <kbd>⇧Alt+Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyAllStripsOpen">Copy all open <kbd>⇧Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeToggleStrips">Toggle strips <kbd>PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenStrips">Open strips <kbd>⇧PageUp</kbd></button>
           <button type="button" id="btnDisneyExtremeCloseStrips">Close strips <kbd>Alt+PageUp</kbd></button>
@@ -2740,8 +2742,8 @@
         };
       }
 
-      function flashDisneyExtremeBaselineAllStrips() {
-        openDisneyExtremeStrips();
+      function flashDisneyExtremeBaselineAllStrips(opts = {}) {
+        if (opts.open) openDisneyExtremeStrips();
         const text = formatDisneyExtremeBaselineAllStripsLabel(
           disneyExtremeHudBundleOpts(),
           disneyExtremeAllStripsOpts(),
@@ -2750,7 +2752,12 @@
         return true;
       }
 
-      async function copyDisneyExtremeBaselineAllStrips() {
+      function openDisneyExtremeAllStrips() {
+        return flashDisneyExtremeBaselineAllStrips({ open: true });
+      }
+
+      async function copyDisneyExtremeBaselineAllStrips(opts = {}) {
+        if (opts.open) openDisneyExtremeStrips();
         const text = formatDisneyExtremeBaselineAllStripsBundle(
           disneyExtremeHudBundleOpts(),
           disneyExtremeAllStripsOpts(),
@@ -2772,6 +2779,10 @@
           ok ? `copied · ${summary}` : `copy failed · ${summary}`,
         );
         return ok;
+      }
+
+      async function copyDisneyExtremeBaselineAllStripsOpen() {
+        return copyDisneyExtremeBaselineAllStrips({ open: true });
       }
 
       function flashDisneyExtremeBaselineHudBundle() {
@@ -4862,6 +4873,14 @@
 
       document.getElementById('btnDisneyExtremeCopyAllStrips')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineAllStrips();
+      });
+
+      document.getElementById('btnDisneyExtremeOpenAllStrips')?.addEventListener('click', () => {
+        openDisneyExtremeAllStrips();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyAllStripsOpen')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineAllStripsOpen();
       });
 
       document.getElementById('btnDisneyExtremeToggleStrips')?.addEventListener('click', () => {
@@ -7071,6 +7090,16 @@
         if (resolved.action === 'copyBaselineAllStrips') {
           ev.preventDefault();
           copyDisneyExtremeBaselineAllStrips();
+          return;
+        }
+        if (resolved.action === 'openBaselineAllStrips') {
+          ev.preventDefault();
+          openDisneyExtremeAllStrips();
+          return;
+        }
+        if (resolved.action === 'copyBaselineAllStripsOpen') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineAllStripsOpen();
           return;
         }
         if (resolved.action === 'toggleBaselineStrips') {

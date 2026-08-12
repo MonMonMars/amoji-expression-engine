@@ -8,7 +8,7 @@ import {
 import * as engine from '../engine/index.js';
 
 describe('Phase 404 Extreme all-strips formatters', () => {
-  it('formats all-strips summary and 10-line clipboard bundle', () => {
+  it('formats all-strips summary and 11-line clipboard bundle', () => {
     const snap = buildDisneyExtremeLiveSnapshot({
       enabled: true,
       intensity: 0.5,
@@ -40,12 +40,13 @@ describe('Phase 404 Extreme all-strips formatters', () => {
     expect(summary).toContain('curves ·');
     const bundle = formatDisneyExtremeBaselineAllStripsBundle(stacks, opts);
     const lines = bundle.split('\n');
-    expect(lines).toHaveLength(10);
+    expect(lines).toHaveLength(11);
     expect(lines[0]).toMatch(/^tips · /);
     expect(lines[6]).toMatch(/^factors · /);
     expect(lines[7]).toMatch(/^ease · /);
     expect(lines[8]).toMatch(/^mix · /);
     expect(lines[9]).toMatch(/^neck · /);
+    expect(lines[10]).toMatch(/^strips · /);
     expect(typeof engine.formatDisneyExtremeBaselineAllStripsLabel).toBe(
       'function',
     );

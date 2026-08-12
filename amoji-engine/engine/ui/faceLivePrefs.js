@@ -213,6 +213,8 @@ export function disneyExtremeUiDefaults() {
  * - `End` → copy Extreme dirty/clean pin-drift strip
  * - `Alt+Home` → flash Extreme all-strips summary
  * - `Alt+End` → copy Extreme all-strips bundle
+ * - `Shift+Alt+Home` → open Extreme strips and flash all-strips summary
+ * - `Shift+Alt+End` → open Extreme strips and copy all-strips bundle
  * - `PageUp` → toggle Extreme strips panel
  * - `Shift+PageUp` → open Extreme strips panel
  * - `Alt+PageUp` → close Extreme strips panel
@@ -895,8 +897,14 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       if (ev.shiftKey) return { ok: false, reason: 'modifier' };
       return { ok: true, action: 'focusExtremePanel' };
     }
+    if (entry.id === 'showBaselineDirtyStrip' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'openBaselineAllStrips' };
+    }
     if (entry.id === 'showBaselineDirtyStrip' && ev.altKey) {
       return { ok: true, action: 'showBaselineAllStrips' };
+    }
+    if (entry.id === 'copyBaselineDirtyStrip' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineAllStripsOpen' };
     }
     if (entry.id === 'copyBaselineDirtyStrip' && ev.altKey) {
       return { ok: true, action: 'copyBaselineAllStrips' };
