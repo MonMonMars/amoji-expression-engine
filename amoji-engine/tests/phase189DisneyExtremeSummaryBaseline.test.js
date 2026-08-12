@@ -49,7 +49,8 @@ describe('Phase 189 Extreme summary includes baseline dirty', () => {
 
   it('Face Live passes baseline into summarize on title + copy', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
-    expect(src).toContain('{ baseline: lastExtremeBaselineSnap }');
+    expect(src).toContain('baseline: lastExtremeBaselineSnap');
+    expect(src).toContain('stripsFilter: disneyExtremeStripsFilterSummaryText()');
     expect(src).toContain('syncDisneyExtremePrefsSummary()');
   });
 });

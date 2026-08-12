@@ -1621,6 +1621,7 @@
         formatDisneyExtremeBaselineCurveStripsLabel,
         formatDisneyExtremeBaselineCurveStripsBundle,
         DISNEY_EXTREME_ALL_STRIPS_LINE_COUNT,
+        formatDisneyExtremeBaselineCopyFlashLabel,
         formatDisneyExtremeBaselineAllStripsLabel,
         formatDisneyExtremeBaselineAllStripsBundle,
         filterDisneyExtremeAllStripsKeys,
@@ -2467,6 +2468,26 @@
         return applyDisneyExtremeStripsFilter();
       }
 
+      function disneyExtremeStripsFilterSummaryText() {
+        const filter = applyDisneyExtremeStripsFilter();
+        const q = String(filter.query || '').trim();
+        if (!q) return '';
+        return formatDisneyExtremeStripsFilterSummary({
+          query: q,
+          visible: filter.visible,
+          total: filter.total,
+        });
+      }
+
+      function bootstrapDisneyExtremeStripsFilter() {
+        const savedFilter = loadDisneyExtremeStripsFilter();
+        if (!savedFilter) return;
+        disneyExtremeStripsFilterQuery = savedFilter;
+        const filterInput = document.getElementById('disneyExtremeStripsFilter');
+        if (filterInput) filterInput.value = savedFilter;
+        applyDisneyExtremeStripsFilter();
+      }
+
       const DISNEY_EXTREME_STRIP_SHORT_NAMES = {
         disneyExtremeTips: 'tips',
         disneyExtremeCapacity: 'capacity',
@@ -2609,6 +2630,11 @@
         return true;
       }
 
+      function openDisneyExtremeDirtyStrip(extremeSnap) {
+        openDisneyExtremeStrips();
+        return flashDisneyExtremeBaselineDirtyStrip(extremeSnap);
+      }
+
       async function copyDisneyExtremeBaselineDirtyStrip(extremeSnap) {
         const text = formatDisneyExtremeBaselineDirtyStripLabel(
           disneyExtremeDirtyStripOpts(extremeSnap),
@@ -2626,6 +2652,11 @@
           ok ? `copied · ${text}` : `copy failed · ${text}`,
         );
         return ok;
+      }
+
+      async function copyDisneyExtremeBaselineDirtyStripOpen(extremeSnap) {
+        openDisneyExtremeStrips();
+        return copyDisneyExtremeBaselineDirtyStrip(extremeSnap);
       }
 
       function syncDisneyExtremeFactorsStripUi(extremeSnap) {
@@ -2974,9 +3005,10 @@
           disneyExtremeHudBundleOpts(),
           disneyExtremeAllStripsOpts(),
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -2988,9 +3020,14 @@
           disneyExtremeAllStripsOpts(),
         );
         flashDisneyExtremeStatus(
-          ok ? `copied · ${summary}` : `copy failed · ${summary}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            open: !!opts.open,
+            summary,
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselineAllStripsOpen() {
@@ -3012,9 +3049,10 @@
           disneyExtremeHudBundleOpts(),
           disneyExtremeHudBundleFilterOpts(),
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3026,9 +3064,9 @@
           disneyExtremeHudBundleFilterOpts(),
         );
         flashDisneyExtremeStatus(
-          ok ? `copied · ${summary}` : `copy failed · ${summary}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function flashDisneyExtremeBaselineHistoryList() {
@@ -4618,15 +4656,7 @@
 
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
-        const filter = applyDisneyExtremeStripsFilter();
-        const q = String(filter.query || '').trim();
-        const stripsFilter = q
-          ? formatDisneyExtremeStripsFilterSummary({
-              query: q,
-              visible: filter.visible,
-              total: filter.total,
-            })
-          : '';
+        const stripsFilter = disneyExtremeStripsFilterSummaryText();
         disneyExtremeStatus.title = summarizeDisneyExtremePrefs(
           prefsLike || {
             disneyExtreme: !!disneyExtremeEl?.checked,
@@ -4703,6 +4733,7 @@
         );
       }
       syncDisneyExtremeFactorLabels();
+      bootstrapDisneyExtremeStripsFilter();
       syncDisneyExtremePrefsSummary(savedPrefs);
       if (disneyExtremeStatus) {
         disneyExtremeStatus.textContent = formatDisneyExtremeHotkeyHelp({
@@ -4833,7 +4864,10 @@
             ),
             intensity,
           },
-          { baseline: lastExtremeBaselineSnap },
+          {
+            baseline: lastExtremeBaselineSnap,
+            stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
+          },
         );
         let ok = false;
         try {
@@ -5598,13 +5632,6 @@
 
       {
         const strips = document.getElementById('disneyExtremeStrips');
-        const filterInput = document.getElementById('disneyExtremeStripsFilter');
-        const savedFilter = loadDisneyExtremeStripsFilter();
-        if (savedFilter) {
-          disneyExtremeStripsFilterQuery = savedFilter;
-          if (filterInput) filterInput.value = savedFilter;
-          applyDisneyExtremeStripsFilter();
-        }
         if (strips) {
           if (loadDisneyExtremeStripsOpen()) {
             strips.open = true;
@@ -7398,9 +7425,19 @@
           flashDisneyExtremeBaselineDirtyStrip();
           return;
         }
+        if (resolved.action === 'openBaselineDirtyStrip') {
+          ev.preventDefault();
+          openDisneyExtremeDirtyStrip();
+          return;
+        }
         if (resolved.action === 'copyBaselineDirtyStrip') {
           ev.preventDefault();
           copyDisneyExtremeBaselineDirtyStrip();
+          return;
+        }
+        if (resolved.action === 'copyBaselineDirtyStripOpen') {
+          ev.preventDefault();
+          copyDisneyExtremeBaselineDirtyStripOpen();
           return;
         }
         if (resolved.action === 'showBaselineAllStrips') {

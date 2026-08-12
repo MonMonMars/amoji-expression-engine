@@ -48,7 +48,8 @@ describe('Phase 131 Extreme summary includes ease + od', () => {
     expect(src).toContain(
       'disneyExtremeMouthFactorEl?.value || 1.5,\n            ),\n            intensity,\n          }',
     );
-    expect(src).toContain('{ baseline: lastExtremeBaselineSnap }');
+    expect(src).toContain('baseline: lastExtremeBaselineSnap');
+    expect(src).toContain('stripsFilter: disneyExtremeStripsFilterSummaryText()');
     expect(src).toContain('summarizeDisneyExtremePrefs(');
   });
 });

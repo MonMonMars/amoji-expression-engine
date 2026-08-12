@@ -382,6 +382,7 @@ export {
   formatDisneyExtremeAllStripsFilterBit,
   buildDisneyExtremeAllStripsEntries,
   filterDisneyExtremeAllStripsKeys,
+  formatDisneyExtremeBaselineCopyFlashLabel,
   formatDisneyExtremeBaselineAllStripsLabel,
   formatDisneyExtremeBaselineAllStripsBundle,
   formatDisneyExtremeBaselineDirtyStripLabel,

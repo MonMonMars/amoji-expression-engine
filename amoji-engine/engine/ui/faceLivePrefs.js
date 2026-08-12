@@ -211,6 +211,8 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+Alt+Enter` → copy Extreme HUD bundle (tips/roots/capacity/active/pin)
  * - `Home` → flash Extreme dirty/clean pin-drift strip
  * - `End` → copy Extreme dirty/clean pin-drift strip
+ * - `Shift+Home` → open Extreme strips and flash dirty strip
+ * - `Shift+End` → open Extreme strips and copy dirty strip
  * - `Alt+Home` → flash Extreme all-strips summary
  * - `Alt+End` → copy Extreme all-strips bundle
  * - `Shift+Alt+Home` → open Extreme strips and flash all-strips summary
@@ -915,11 +917,17 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     if (entry.id === 'showBaselineDirtyStrip' && ev.altKey) {
       return { ok: true, action: 'showBaselineAllStrips' };
     }
+    if (entry.id === 'showBaselineDirtyStrip' && ev.shiftKey) {
+      return { ok: true, action: 'openBaselineDirtyStrip' };
+    }
     if (entry.id === 'copyBaselineDirtyStrip' && ev.altKey && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineAllStripsOpen' };
     }
     if (entry.id === 'copyBaselineDirtyStrip' && ev.altKey) {
       return { ok: true, action: 'copyBaselineAllStrips' };
+    }
+    if (entry.id === 'copyBaselineDirtyStrip' && ev.shiftKey) {
+      return { ok: true, action: 'copyBaselineDirtyStripOpen' };
     }
     if (entry.id === 'showBaselineFactorsStrip' && ev.shiftKey) {
       return { ok: true, action: 'copyBaselineFactorsStrip' };

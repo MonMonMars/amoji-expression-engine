@@ -740,6 +740,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     factor: 'mouth',
   },
   { id: 'copySummary', keys: ['c', 'C'], help: 'C copy', kind: 'action' },
+  { id: 'copySummaryFilter', help: 'C copy · includes filter', kind: 'note' },
   { id: 'copySnapshotDiff', help: 'Shift+C copy diff', kind: 'note' },
   { id: 'copyBaselinePinShareUrl', help: 'Alt+C share pin', kind: 'note' },
   { id: 'pasteBaselinePinShareUrl', help: '⇧Alt+C paste pin', kind: 'note' },
@@ -914,6 +915,8 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     help: 'End copy dirty',
     kind: 'action',
   },
+  { id: 'openBaselineDirtyStrip', help: 'Shift+Home open dirty', kind: 'note' },
+  { id: 'copyBaselineDirtyStripOpen', help: 'Shift+End copy dirty open', kind: 'note' },
   { id: 'showBaselineAllStrips', help: 'Alt+Home all strips', kind: 'note' },
   { id: 'copyBaselineAllStrips', help: 'Alt+End copy all strips', kind: 'note' },
   { id: 'openBaselineAllStrips', help: '⇧Alt+Home open all strips', kind: 'note' },
@@ -2818,6 +2821,26 @@ export function formatDisneyExtremeBaselineHudBundleLabel(
       ? entries.filter((entry) => stripKeys.includes(entry.key))
       : entries;
   return selected.map((entry) => entry.text).join('\n');
+}
+
+/**
+ * Status flash label for Extreme clipboard copy actions.
+ * @param {{ ok?: boolean, empty?: boolean, open?: boolean, summary?: string }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeBaselineCopyFlashLabel(opts = {}) {
+  const summary = String(opts.summary || '');
+  if (opts.empty) {
+    const openPrefix = opts.open ? 'open · ' : '';
+    return `empty · ${openPrefix}${summary}`;
+  }
+  if (!opts.ok) {
+    return `copy failed · ${summary}`;
+  }
+  if (opts.open) {
+    return `copied · open · ${summary}`;
+  }
+  return `copied · ${summary}`;
 }
 
 /** Default Extreme all-strips bundle line count (excludes optional curves line). */
