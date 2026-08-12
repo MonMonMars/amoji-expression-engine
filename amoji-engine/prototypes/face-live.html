@@ -699,6 +699,34 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish12710 */
+      @media (prefers-color-scheme: dark) {
+        #disneyExtremePanel {
+          color-scheme: light;
+        }
+      }
+      #disneyExtremePanel :focus-visible {
+        outline-offset: var(--extreme-focus-offset, 2px);
+      }
+      #disneyExtremeCapacityBadge[data-warn="1"] {
+        font-weight: 600;
+      }
+      #disneyExtremePanel details > summary {
+        cursor: pointer;
+        list-style: none;
+      }
+      #disneyExtremePanel details > summary::-webkit-details-marker {
+        display: none;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        #disneyExtremePanel button:hover:not(:disabled) {
+          filter: brightness(1.05);
+        }
+      }
+      #disneyExtremeChipHints {
+        font-size: 0.75rem;
+        opacity: 0.85;
+      }
       /* disneyExtremeA11yPolish6566 */
       @media (prefers-reduced-transparency: reduce) {
         #disneyExtremePanel {
@@ -1934,6 +1962,31 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish12710Docs
+       * catalog · post-12709 a11y polish notes
+       * readme · phase table 12710+
+       * FACE_LIVE · a11y delta sync 12710+
+       * docs · bind surface count 32 keep7
+       * docs · 183 button aria keep7
+       * docs · chip modifier matrix keep7
+       * docs · focus-visible map keep7
+       * docs · live region policy keep7
+       * docs · reduced motion keep7
+       * docs · forced-colors keep7
+       * docs · pointer coarse keep7
+       * docs · landmark roles keep7
+       * docs · skip links keep7
+       * docs · spark role=img keep7
+       * docs · bind registry keep7
+       * docs · typography policy keep7
+       * docs · interaction policy keep7
+       * docs · layout policy keep7
+       * docs · motion policy keep7
+       * docs · hover policy keep7
+       * tests · a11y substring harness 12710+
+       * final a11y polish audit · batch 12710+
+       * Extreme a11y batch6 audit
        */
       /* disneyExtremeA11yPolish6566Docs
        * catalog · post-6565 a11y polish notes
