@@ -699,6 +699,37 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish6566 */
+      @media (prefers-reduced-transparency: reduce) {
+        #disneyExtremePanel {
+          backdrop-filter: none !important;
+        }
+      }
+      #disneyExtremePanel [aria-busy="true"] {
+        cursor: progress;
+      }
+      #disneyExtremePanel button:disabled,
+      #disneyExtremePanel input:disabled {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      #disneyExtremeStripsFilter::placeholder {
+        opacity: 0.75;
+      }
+      @supports (scrollbar-width: thin) {
+        #disneyExtremePanel {
+          scrollbar-width: thin;
+        }
+      }
+      #disneyExtremeSkipPanel:focus,
+      #disneyExtremeSkipStrips:focus,
+      #disneyExtremeSkipMore:focus {
+        position: static;
+        width: auto;
+        height: auto;
+        clip: auto;
+        clip-path: none;
+      }
       /* disneyExtremeA11yPolish3494 */
       @media (prefers-reduced-data: reduce) {
         #disneyExtremeEaseSpark, #disneyExtremeBodySpark,
@@ -1903,6 +1934,30 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish6566Docs
+       * catalog · post-6565 a11y polish notes
+       * readme · phase table 6566+
+       * FACE_LIVE · a11y delta sync 6566+
+       * docs · bind surface count 32 keep6
+       * docs · 183 button aria keep6
+       * docs · chip modifier matrix keep6
+       * docs · focus-visible map keep6
+       * docs · live region policy keep6
+       * docs · reduced motion keep6
+       * docs · forced-colors keep6
+       * docs · pointer coarse keep6
+       * docs · landmark roles keep6
+       * docs · skip links keep6
+       * docs · spark role=img keep6
+       * docs · bind registry keep6
+       * docs · typography policy keep6
+       * docs · interaction policy keep6
+       * docs · layout policy keep6
+       * docs · motion policy keep6
+       * tests · a11y substring harness 6566+
+       * final a11y polish audit · batch 6566+
+       * Extreme a11y batch5 audit
        */
       /* disneyExtremeA11yPolish3494Docs
        * catalog · post-3493 a11y polish notes
