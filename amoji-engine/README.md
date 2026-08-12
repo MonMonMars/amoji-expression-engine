@@ -476,7 +476,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 463 | Extreme strip/filter Shift+Enter actions | Done |
 | Phase 464 | Extreme strip title keyboard hints | Done |
 | Phase 465 | Extreme strips keyboard docs sync | Done |
-| Phase 466+ | Further production polish… | Specced |
+| Phase 466 | Extreme X pill secondary diff copy actions | Done |
+| Phase 467 | Extreme history row keyboard accessibility | Done |
+| Phase 468 | Extreme favorites row keyboard accessibility | Done |
+| Phase 469 | Extreme pill/history/favorites docs sync | Done |
+| Phase 470+ | Further production polish… | Specced |
 
 ## Quick start
 

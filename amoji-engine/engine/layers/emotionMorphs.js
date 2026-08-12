@@ -1003,6 +1003,12 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'stripsKeyboardA11y', help: 'strip rows · Enter/Space flash', kind: 'note' },
   { id: 'stripsShiftEnterCopy', help: 'strip rows · ⇧Enter copy/jump', kind: 'note' },
   { id: 'filterSummaryShiftEnterCopy', help: 'filter summary · ⇧Enter copy', kind: 'note' },
+  { id: 'pillShiftEnterCopy', help: 'X pill · ⇧Enter copy diff', kind: 'note' },
+  { id: 'pillDblClickCopy', help: 'X pill · dbl-click copy diff', kind: 'note' },
+  { id: 'historyRowKeyboardA11y', help: 'history row · Enter/Space list', kind: 'note' },
+  { id: 'historyRowShiftEnterCopy', help: 'history row · ⇧Enter copy list', kind: 'note' },
+  { id: 'favoritesRowKeyboardA11y', help: 'favorites row · Enter/Space list', kind: 'note' },
+  { id: 'favoritesRowShiftEnterCopy', help: 'favorites row · ⇧Enter copy list', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
