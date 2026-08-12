@@ -28,6 +28,6 @@ describe('Phase 118 Extreme status flash hold', () => {
     expect(src).toContain('shouldHoldDisneyExtremeStatus');
     expect(src).toContain("flashDisneyExtremeStatus('reset · × defaults')");
     expect(src).toContain('flashDisneyExtremeStatus(\n          ok ? `copied');
-    expect(src).toContain('flashDisneyExtremeStatus(\n            formatDisneyExtremeHotkeyHelp');
+    expect(src).toContain('flashDisneyExtremeStatus(\n            formatDisneyExtremeHotkeyDigest');
   });
 });

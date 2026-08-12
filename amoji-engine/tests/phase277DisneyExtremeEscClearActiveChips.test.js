@@ -23,7 +23,8 @@ describe('Phase 277 Extreme Esc clears active chips', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('holdingActiveChips:');
     expect(src).toContain('function clearDisneyExtremeActiveChips');
-    expect(src).toContain('cleared · active chips');
+    expect(src).toContain('formatDisneyExtremeTransientClearLabel({');
+    expect(src).toContain('clearedActive');
     expect(src).toContain('extremeFavoriteCycleIndex = null');
     expect(src).toContain('extremeHistoryJumpIndexActive = null');
     expect(src).toContain('extremeRedoJumpIndexActive = null');

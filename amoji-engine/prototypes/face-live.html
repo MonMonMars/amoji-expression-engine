@@ -592,6 +592,29 @@
         margin-bottom: 4px;
         opacity: 1;
       }
+      #disneyExtremeStripsFilterRow {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 4px 0 6px;
+        flex-wrap: wrap;
+      }
+      #disneyExtremeStripsFilter {
+        flex: 1;
+        min-width: 8rem;
+        font: inherit;
+        font-size: 0.85em;
+      }
+      #disneyExtremeStripsFilterSummary {
+        margin: 0;
+        opacity: 0.8;
+        font-size: 0.8em;
+      }
+      #disneyExtremeStripsEmpty {
+        margin: 2px 0 6px;
+        opacity: 0.7;
+        font-size: 0.85em;
+      }
       #disneyExtremeHistory {
         margin-top: 6px;
         flex-wrap: wrap;
@@ -1078,6 +1101,7 @@
             <button type="button" id="btnDisneyExtremeEnableFocus">Enable + focus <kbd>⇧Alt+X</kbd></button>
             <button type="button" id="btnDisneyExtremeUnstarFav">Unstar favorite <kbd>Alt+S</kbd></button>
             <button type="button" id="btnDisneyExtremeCopyHelp">Copy hotkey help <kbd>Alt+H</kbd></button>
+            <button type="button" id="btnDisneyExtremeCopyDigest">Copy hotkey digest</button>
             <button type="button" id="btnDisneyExtremeToggleMore">Toggle More IO <kbd>Alt+T</kbd> <kbd>⇧T</kbd></button>
             <button type="button" id="btnDisneyExtremeOpenMore">Open More IO <kbd>⇧Alt+T</kbd></button>
           </div>
@@ -1106,6 +1130,19 @@
           >
             strips · hist 0/8 · redo 0/8 · fav 0/8 · dirty · none
           </summary>
+          <div class="row" id="disneyExtremeStripsFilterRow">
+            <input
+              type="search"
+              id="disneyExtremeStripsFilter"
+              placeholder="Filter strips…"
+              autocomplete="off"
+              spellcheck="false"
+              title="Filter Extreme strips · live"
+            />
+            <button type="button" id="btnDisneyExtremeStripsFilterClear">Clear filter</button>
+            <span class="status" id="disneyExtremeStripsFilterSummary">filter · all · 11</span>
+          </div>
+          <div class="status" id="disneyExtremeStripsEmpty" hidden>No strips match</div>
           <div
             class="status"
             id="disneyExtremeTips"
@@ -1565,6 +1602,9 @@
         amplifyDisneyExtremeMorphs,
         formatDisneyExtremeLiveHud,
         formatDisneyExtremeHotkeyHelp,
+        formatDisneyExtremeHotkeyDigest,
+        formatDisneyExtremeTransientClearLabel,
+        formatDisneyExtremeStripsFilterSummary,
         formatDisneyExtremeEaseCurveLabel,
         formatDisneyExtremeEaseCurveBundle,
         buildDisneyExtremeEaseSparkSvg,
@@ -2251,7 +2291,8 @@
           favorites: extremeBaselineFavorites,
         });
         syncDisneyExtremeCapacityUi();
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function syncDisneyExtremeCapacityUi() {
         const el = document.getElementById('disneyExtremeCapacity');
@@ -2291,7 +2332,8 @@
         el.textContent = formatDisneyExtremeBaselinePinStripLabel(
           lastExtremeBaselineSnap,
         );
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function disneyExtremeDirtyStripOpts(extremeSnap) {
         const snap =
@@ -2325,7 +2367,8 @@
         el.textContent = formatDisneyExtremeBaselineDirtyStripLabel(opts);
         el.classList.toggle('is-dirty', !!opts.dirty);
         syncDisneyExtremeStripsSummaryUi(extremeSnap);
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function syncDisneyExtremeStripsSummaryUi(extremeSnap) {
         const el = document.getElementById('disneyExtremeStripsSummary');
@@ -2361,6 +2404,53 @@
       function openDisneyExtremeCurveStrips() {
         openDisneyExtremeStrips();
         return flashDisneyExtremeBaselineCurveStrip();
+      }
+
+      const DISNEY_EXTREME_STRIP_IDS = [
+        'disneyExtremeTips',
+        'disneyExtremeCapacity',
+        'disneyExtremeRoots',
+        'disneyExtremeActive',
+        'disneyExtremePin',
+        'disneyExtremeDirty',
+        'disneyExtremeFactorsStrip',
+        'disneyExtremeEaseStrip',
+        'disneyExtremeMixStrip',
+        'disneyExtremeNeckStrip',
+        'disneyExtremeCurveStrip',
+      ];
+
+      let disneyExtremeStripsFilterQuery = '';
+
+      function applyDisneyExtremeStripsFilter() {
+        const q = String(disneyExtremeStripsFilterQuery || '').trim().toLowerCase();
+        let visible = 0;
+        const total = DISNEY_EXTREME_STRIP_IDS.length;
+        for (const id of DISNEY_EXTREME_STRIP_IDS) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const match = !q || String(el.textContent || '').toLowerCase().includes(q);
+          el.hidden = !match;
+          if (match) visible += 1;
+        }
+        const empty = document.getElementById('disneyExtremeStripsEmpty');
+        if (empty) empty.hidden = !(q && visible === 0);
+        const summary = document.getElementById('disneyExtremeStripsFilterSummary');
+        if (summary) {
+          summary.textContent = formatDisneyExtremeStripsFilterSummary({
+            query: disneyExtremeStripsFilterQuery,
+            visible,
+            total,
+          });
+        }
+        return { query: disneyExtremeStripsFilterQuery, visible, total };
+      }
+
+      function clearDisneyExtremeStripsFilter() {
+        disneyExtremeStripsFilterQuery = '';
+        const input = document.getElementById('disneyExtremeStripsFilter');
+        if (input) input.value = '';
+        return applyDisneyExtremeStripsFilter();
       }
 
       function flashDisneyExtremeBaselineStripsSummary(extremeSnap) {
@@ -2467,7 +2557,8 @@
             }
           : disneyExtremeFactorOpts();
         el.textContent = formatDisneyExtremeBaselineFactorsStripLabel(opts);
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function flashDisneyExtremeBaselineFactorsStrip(extremeSnap) {
         const opts = extremeSnap
@@ -2548,7 +2639,8 @@
         el.textContent = formatDisneyExtremeBaselineEaseStripLabel(
           disneyExtremeEaseStripOpts(extremeSnap),
         );
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function flashDisneyExtremeBaselineEaseStrip(extremeSnap) {
         const text = formatDisneyExtremeBaselineEaseStripLabel(
@@ -2585,7 +2677,8 @@
         el.textContent = formatDisneyExtremeBaselineMixStripLabel(
           disneyExtremeMixStripOpts(extremeSnap),
         );
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function flashDisneyExtremeBaselineMixStrip(extremeSnap) {
         const text = formatDisneyExtremeBaselineMixStripLabel(
@@ -2622,7 +2715,8 @@
         el.textContent = formatDisneyExtremeBaselineNeckStripLabel(
           disneyExtremeNeckStripOpts(extremeSnap),
         );
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function flashDisneyExtremeBaselineNeckStrip(extremeSnap) {
         const text = formatDisneyExtremeBaselineNeckStripLabel(
@@ -2671,7 +2765,8 @@
         el.textContent = formatDisneyExtremeBaselineCurveStripsLabel(
           disneyExtremeCurveStripOpts(extremeSnap),
         );
-      }
+              applyDisneyExtremeStripsFilter();
+}
 
       function flashDisneyExtremeBaselineCurveStrip(extremeSnap) {
         const text = formatDisneyExtremeBaselineCurveStripsLabel(
@@ -3609,6 +3704,45 @@
         }
         flashDisneyExtremeStatus(ok ? 'copied · hotkey help' : 'copy failed · help');
         return ok;
+      }
+
+      async function copyDisneyExtremeHotkeyDigest() {
+        const text = formatDisneyExtremeHotkeyDigest({
+          enabled: !!disneyExtremeEl?.checked,
+        });
+        let ok = false;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            ok = true;
+          }
+        } catch {
+          ok = false;
+        }
+        flashDisneyExtremeStatus(
+          ok ? 'copied · hotkey digest' : 'copy failed · digest',
+        );
+        return ok;
+      }
+
+      function clearDisneyExtremeTransient(opts = {}) {
+        const now = performance.now();
+        const clearedHold =
+          typeof disneyExtremeStatusHoldUntil === 'number' &&
+          disneyExtremeStatusHoldUntil > now;
+        disneyExtremeStatusHoldUntil = 0;
+        const clearedCompare = !!lastExtremeChipCompare;
+        if (clearedCompare) lastExtremeChipCompare = null;
+        const clearedActive = clearDisneyExtremeActiveChips();
+        const label = formatDisneyExtremeTransientClearLabel({
+          clearedHold,
+          clearedCompare,
+          clearedActive,
+        });
+        if (clearedHold || clearedCompare || clearedActive || opts.forceFlash) {
+          flashDisneyExtremeStatus(label);
+        }
+        return clearedHold || clearedCompare || clearedActive;
       }
 
       function starDisneyExtremeBaselineFavorite() {
@@ -5277,6 +5411,19 @@
         copyDisneyExtremeHotkeyHelp();
       });
 
+      document.getElementById('btnDisneyExtremeCopyDigest')?.addEventListener('click', () => {
+        copyDisneyExtremeHotkeyDigest();
+      });
+
+      document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {
+        disneyExtremeStripsFilterQuery = String(ev.target?.value || '');
+        applyDisneyExtremeStripsFilter();
+      });
+
+      document.getElementById('btnDisneyExtremeStripsFilterClear')?.addEventListener('click', () => {
+        clearDisneyExtremeStripsFilter();
+      });
+
       document.getElementById('btnDisneyExtremeToggleMore')?.addEventListener('click', () => {
         toggleDisneyExtremeMoreIo();
       });
@@ -6409,17 +6556,12 @@
         }
         if (resolved.action === 'clearStatusHold') {
           ev.preventDefault();
-          disneyExtremeStatusHoldUntil = 0;
-          const clearedCompare = !!lastExtremeChipCompare;
-          if (clearedCompare) lastExtremeChipCompare = null;
-          const clearedActive = clearDisneyExtremeActiveChips();
-          if (clearedCompare && clearedActive) {
-            flashDisneyExtremeStatus('cleared · compare · chips');
-          } else if (clearedCompare) {
-            flashDisneyExtremeStatus('cleared · chip compare');
-          } else if (clearedActive) {
-            flashDisneyExtremeStatus('cleared · active chips');
-          }
+          clearDisneyExtremeTransient();
+          return;
+        }
+        if (resolved.action === 'clearTransient') {
+          ev.preventDefault();
+          clearDisneyExtremeTransient({ forceFlash: true });
           return;
         }
         if (resolved.action === 'toggle') {
@@ -6461,7 +6603,7 @@
         if (resolved.action === 'showHelp') {
           ev.preventDefault();
           flashDisneyExtremeStatus(
-            formatDisneyExtremeHotkeyHelp({
+            formatDisneyExtremeHotkeyDigest({
               enabled: !!disneyExtremeEl.checked,
             }),
           );
@@ -6470,6 +6612,11 @@
         if (resolved.action === 'copyHotkeyHelp') {
           ev.preventDefault();
           copyDisneyExtremeHotkeyHelp();
+          return;
+        }
+        if (resolved.action === 'copyHotkeyDigest') {
+          ev.preventDefault();
+          copyDisneyExtremeHotkeyDigest();
           return;
         }
         if (resolved.action === 'toggleMoreIo') {

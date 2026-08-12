@@ -27,6 +27,7 @@ describe('Phase 260 Extreme Esc clears chip compare', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('holdingChipCompare: !!lastExtremeChipCompare');
     expect(src).toContain('lastExtremeChipCompare = null');
-    expect(src).toContain('cleared · chip compare');
+    expect(src).toContain('formatDisneyExtremeTransientClearLabel({');
+    expect(src).toContain('clearedCompare');
   });
 });

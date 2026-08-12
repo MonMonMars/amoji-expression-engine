@@ -749,6 +749,10 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   { id: 'jumpBaselinePinSummary', help: '⇧Alt+R jump pin summary', kind: 'note' },
   { id: 'showHelp', keys: ['h', 'H', '?'], help: 'H help', kind: 'action' },
   { id: 'copyHotkeyHelp', help: 'Alt+H copy help', kind: 'note' },
+  { id: 'showHotkeyDigest', help: 'H digest flash', kind: 'note' },
+  { id: 'copyHotkeyDigest', help: 'help digest · copy', kind: 'note' },
+  { id: 'clearTransient', help: '⇧Alt+Delete clear transient', kind: 'note' },
+  { id: 'stripsFilter', help: 'strips filter · live', kind: 'note' },
   { id: 'copyBaselineHistoryList', help: 'Shift+H copy hist list', kind: 'note' },
   { id: 'copyBaselineRedoList', help: '⇧Alt+H copy redo list', kind: 'note' },
   { id: 'showEaseCurve', keys: ['e', 'E'], help: 'E ease', kind: 'action' },
@@ -1140,6 +1144,27 @@ export function formatDisneyExtremeHotkeyCatalog(
 export const DISNEY_EXTREME_HOTKEY_HELP = formatDisneyExtremeHotkeyCatalog();
 
 /**
+ * Compact Extreme hotkey digest (actions / nudges / escape only).
+ * @param {typeof DISNEY_EXTREME_HOTKEY_CATALOG} [catalog]
+ * @returns {string}
+ */
+export function formatDisneyExtremeHotkeyDigestCatalog(
+  catalog = DISNEY_EXTREME_HOTKEY_CATALOG,
+) {
+  return catalog
+    .filter(
+      (e) =>
+        e.kind === 'action' || e.kind === 'nudge' || e.kind === 'escape',
+    )
+    .map((e) => e.help)
+    .join(' · ');
+}
+
+/** Compact Extreme hotkey digest (no note-only entries). */
+export const DISNEY_EXTREME_HOTKEY_DIGEST =
+  formatDisneyExtremeHotkeyDigestCatalog();
+
+/**
  * Match a key against the Extreme hotkey catalog.
  * @param {string} key
  * @returns {{ entry: object, dir: number }|null}
@@ -1193,6 +1218,47 @@ export function isDisneyExtremeNudgeHotkeyKey(key) {
  */
 export function formatDisneyExtremeHotkeyHelp(opts = {}) {
   return `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_HELP}`;
+}
+
+/**
+ * Status prefix + compact hotkey digest for Extreme flash / short copy.
+ * @param {{ enabled?: boolean }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeHotkeyDigest(opts = {}) {
+  return `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_DIGEST}`;
+}
+
+/**
+ * Label for clearing Extreme transient UI state (hold / compare / chips).
+ * @param {{
+ *   clearedHold?: boolean,
+ *   clearedCompare?: boolean,
+ *   clearedActive?: boolean,
+ * }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeTransientClearLabel(opts = {}) {
+  const parts = [];
+  if (opts.clearedHold) parts.push('hold');
+  if (opts.clearedCompare) parts.push('compare');
+  if (opts.clearedActive) parts.push('chips');
+  if (!parts.length) return 'cleared · none';
+  return `cleared · ${parts.join(' · ')}`;
+}
+
+/**
+ * Summary for Extreme strips filter UI.
+ * @param {{ query?: string, visible?: number, total?: number }} [opts]
+ * @returns {string}
+ */
+export function formatDisneyExtremeStripsFilterSummary(opts = {}) {
+  const q = String(opts.query || '').trim();
+  const visible = Math.max(0, Math.floor(Number(opts.visible) || 0));
+  const total = Math.max(0, Math.floor(Number(opts.total) || 0));
+  if (!q) return `filter · all · ${total}`;
+  if (visible === 0) return `filter · "${q}" · none`;
+  return `filter · "${q}" · ${visible}/${total}`;
 }
 
 /** How long Copy / Help / Reset flashes stick before live HUD resumes. */

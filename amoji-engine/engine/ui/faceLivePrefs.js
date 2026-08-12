@@ -227,6 +227,7 @@ export function disneyExtremeUiDefaults() {
  * - `Shift+ArrowDown` / `Shift+ArrowUp` → cycle Extreme redo next / previous
  * - `ArrowRight` / `ArrowLeft` → cycle Extreme favorite next / previous
  * - `Delete` / `Backspace` → clear Extreme active chips / status hold
+ * - `Shift+Alt+Delete` / `Shift+Alt+Backspace` → clear Extreme transient state (hold / compare / chips)
  * - `Insert` → pin current Extreme factors as baseline
  * - `Shift+Insert` → replace Extreme pinned baseline
  * - `Alt+Insert` → jump / restore Extreme pinned baseline
@@ -495,6 +496,7 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
     const pageUpKey = key === 'PageUp';
     const homeKey = key === 'Home';
     const endKey = key === 'End';
+    const deleteKey = key === 'Delete' || key === 'Backspace';
     if (
       lower !== 'o' &&
       lower !== 'y' &&
@@ -531,7 +533,8 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
       !pageDownKey &&
       !pageUpKey &&
       !homeKey &&
-      !endKey
+      !endKey &&
+      !deleteKey
     ) {
       return { ok: false, reason: 'modifier' };
     }
@@ -876,6 +879,9 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
             ? 'cycleBaselineFavoritePrev'
             : 'cycleBaselineFavoriteNext',
       };
+    }
+    if (entry.id === 'clearActiveChipsKey' && ev.altKey && ev.shiftKey) {
+      return { ok: true, action: 'clearTransient' };
     }
     if (entry.id === 'clearActiveChipsKey') {
       return { ok: true, action: 'clearStatusHold' };

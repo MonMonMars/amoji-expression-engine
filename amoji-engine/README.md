@@ -420,7 +420,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 407 | Extreme ⇧Alt+End copy all open | Done |
 | Phase 408 | Extreme all-strips bundle + summary | Done |
 | Phase 409 | Extreme all-strips open opts wiring | Done |
-| Phase 410+ | Further production polish… | Specced |
+| Phase 410 | Extreme hotkey digest helpers | Done |
+| Phase 411 | Extreme H digest flash + copy digest | Done |
+| Phase 412 | Extreme ⇧Alt+Delete clear transient | Done |
+| Phase 413 | Extreme strips filter UI | Done |
+| Phase 414+ | Further production polish… | Specced |
 
 ## Quick start
 

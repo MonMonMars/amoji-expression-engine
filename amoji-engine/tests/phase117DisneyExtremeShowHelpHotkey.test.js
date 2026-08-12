@@ -19,10 +19,11 @@ describe('Phase 117 Extreme H/? show help hotkey', () => {
     expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('H help');
   });
 
-  it('Face Live flashes formatDisneyExtremeHotkeyHelp on showHelp', () => {
+  it('Face Live flashes formatDisneyExtremeHotkeyDigest on showHelp', () => {
     const src = fs.readFileSync(faceLivePath, 'utf8');
     expect(src).toContain("resolved.action === 'showHelp'");
-    expect(src).toContain('formatDisneyExtremeHotkeyHelp({');
+    expect(src).toContain('formatDisneyExtremeHotkeyDigest({');
     expect(src).toContain('<kbd>H</kbd>');
   });
 });
+
