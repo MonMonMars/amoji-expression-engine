@@ -440,7 +440,11 @@ Converts AI script semantics (`dialogue + emotion + mood`) into facial/body perf
 | Phase 427 | Extreme C copy includes filter | Done |
 | Phase 428 | Extreme filter bootstrap on load | Done |
 | Phase 429 | Extreme empty-filter copy polish | Done |
-| Phase 430+ | Further production polish… | Specced |
+| Phase 430 | Extreme ⇧Home/⇧End dirty strip buttons | Done |
+| Phase 431 | Extreme unified copy-flash label rollout | Done |
+| Phase 432 | Extreme filter-aware strips summary + curve guard | Done |
+| Phase 433 | Extreme digest filter append (H / Alt+F12) | Done |
+| Phase 434+ | Further production polish… | Specced |
 
 ## Quick start
 

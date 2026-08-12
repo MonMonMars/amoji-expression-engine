@@ -987,6 +987,8 @@
           <button type="button" id="btnDisneyExtremeCopyHudBundle" title="Copy HUD bundle · filtered when filter active">Copy HUD <kbd>⇧Alt+Enter</kbd></button>
           <button type="button" id="btnDisneyExtremeDirtyStrip">Dirty strip <kbd>Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyDirtyStrip">Copy dirty <kbd>End</kbd></button>
+          <button type="button" id="btnDisneyExtremeOpenDirtyStrip">Open dirty <kbd>⇧Home</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopyDirtyStripOpen">Copy dirty open <kbd>⇧End</kbd></button>
           <button type="button" id="btnDisneyExtremeAllStrips" title="All strips · filter-aware when filter active">All strips <kbd>Alt+Home</kbd></button>
           <button type="button" id="btnDisneyExtremeCopyAllStrips" title="Copy all strips · filtered bundle when filter active">Copy all strips <kbd>Alt+End</kbd></button>
           <button type="button" id="btnDisneyExtremeOpenAllStrips">Open all strips <kbd>⇧Alt+Home</kbd></button>
@@ -1129,7 +1131,7 @@
         >
           <summary
             id="disneyExtremeStripsSummary"
-            title="PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · dbl-click copy"
+            title="PageUp toggle · ⇧PageUp open · PageDown summary · ⇧PageDown copy · filter-aware · dbl-click copy"
           >
             strips · hist 0/8 · redo 0/8 · fav 0/8 · dirty · none
           </summary>
@@ -1140,9 +1142,9 @@
               placeholder="Filter strips…"
               autocomplete="off"
               spellcheck="false"
-              title="Filter Extreme strips · F12 focus · ⇧F12 copy · ⇧Alt+F12 clear · Esc clear"
+              title="Filter Extreme strips · F12 focus · ⇧F12 copy · Alt+F12 copy digest · ⇧Alt+F12 clear · Esc clear"
             />
-            <button type="button" id="btnDisneyExtremeStripsFilterClear">Clear filter</button>
+            <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12">Clear filter</button>
             <span class="status" id="disneyExtremeStripsFilterSummary">filter · all · 11</span>
           </div>
           <div class="status" id="disneyExtremeStripsEmpty" hidden>No strips match</div>
@@ -1184,7 +1186,7 @@
           <div
             class="status"
             id="disneyExtremeDirty"
-            title="Pin drift · Home flash · End copy · F11 flash · ⇧F11 copy · click flash · dbl-click copy"
+            title="Pin drift · Home flash · End copy · ⇧Home open · ⇧End copy open · F11 flash · ⇧F11 copy · click flash · dbl-click copy"
           >
             dirty · none
           </div>
@@ -2370,6 +2372,13 @@
         };
       }
 
+      function disneyExtremeStripsSummaryOpts(extremeSnap) {
+        return {
+          ...disneyExtremeDirtyStripOpts(extremeSnap),
+          ...disneyExtremeStripsFilterOpts(),
+        };
+      }
+
       function syncDisneyExtremeDirtyUi(extremeSnap) {
         const el = document.getElementById('disneyExtremeDirty');
         if (!el) return;
@@ -2389,7 +2398,7 @@
             redo: extremeBaselineRedo,
             favorites: extremeBaselineFavorites,
           },
-          disneyExtremeDirtyStripOpts(extremeSnap),
+          disneyExtremeStripsSummaryOpts(extremeSnap),
         );
       }
 
@@ -2457,7 +2466,8 @@
       }
 
       function persistDisneyExtremeStripsFilter() {
-        saveDisneyExtremeStripsFilter(disneyExtremeStripsFilterQuery);
+        const result = saveDisneyExtremeStripsFilter(disneyExtremeStripsFilterQuery);
+        disneyExtremeStripsFilterQuery = result.query;
       }
 
       function clearDisneyExtremeStripsFilter() {
@@ -2482,9 +2492,9 @@
       function bootstrapDisneyExtremeStripsFilter() {
         const savedFilter = loadDisneyExtremeStripsFilter();
         if (!savedFilter) return;
-        disneyExtremeStripsFilterQuery = savedFilter;
+        disneyExtremeStripsFilterQuery = String(savedFilter || '').trim();
         const filterInput = document.getElementById('disneyExtremeStripsFilter');
-        if (filterInput) filterInput.value = savedFilter;
+        if (filterInput) filterInput.value = disneyExtremeStripsFilterQuery;
         applyDisneyExtremeStripsFilter();
       }
 
@@ -2534,19 +2544,25 @@
           total: state.total,
           visibleIds: disneyExtremeStripsFilterVisibleIds(),
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = formatDisneyExtremeStripsFilterSummary({
+          query: state.query,
+          visible: state.visible,
+          total: state.total,
+        });
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function clearDisneyExtremeStripsFilterFlash() {
@@ -2566,7 +2582,7 @@
             redo: extremeBaselineRedo,
             favorites: extremeBaselineFavorites,
           },
-          disneyExtremeDirtyStripOpts(extremeSnap),
+          disneyExtremeStripsSummaryOpts(extremeSnap),
         );
         flashDisneyExtremeStatus(text);
         return true;
@@ -2579,11 +2595,12 @@
             redo: extremeBaselineRedo,
             favorites: extremeBaselineFavorites,
           },
-          disneyExtremeDirtyStripOpts(extremeSnap),
+          disneyExtremeStripsSummaryOpts(extremeSnap),
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -2591,9 +2608,9 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary: text }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function flashDisneyExtremeBaselinePinStrip() {
@@ -2635,13 +2652,15 @@
         return flashDisneyExtremeBaselineDirtyStrip(extremeSnap);
       }
 
-      async function copyDisneyExtremeBaselineDirtyStrip(extremeSnap) {
+      async function copyDisneyExtremeBaselineDirtyStrip(extremeSnap, opts = {}) {
+        if (opts.open) openDisneyExtremeStrips();
         const text = formatDisneyExtremeBaselineDirtyStripLabel(
           disneyExtremeDirtyStripOpts(extremeSnap),
         );
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -2649,14 +2668,18 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            open: !!opts.open,
+            summary: text,
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       async function copyDisneyExtremeBaselineDirtyStripOpen(extremeSnap) {
-        openDisneyExtremeStrips();
-        return copyDisneyExtremeBaselineDirtyStrip(extremeSnap);
+        return copyDisneyExtremeBaselineDirtyStrip(extremeSnap, { open: true });
       }
 
       function syncDisneyExtremeFactorsStripUi(extremeSnap) {
@@ -2894,23 +2917,34 @@
         return true;
       }
 
+      function disneyExtremeCurveStripVisible() {
+        const q = String(disneyExtremeStripsFilterQuery || '').trim();
+        if (!q) return true;
+        return disneyExtremeAllStripsVisibleKeys().includes('curves');
+      }
+
       async function copyDisneyExtremeBaselineCurveStrip(extremeSnap) {
-        const text = formatDisneyExtremeBaselineCurveStripsBundle(
-          disneyExtremeCurveStripOpts(extremeSnap),
-        );
+        const visible = disneyExtremeCurveStripVisible();
+        const text = visible
+          ? formatDisneyExtremeBaselineCurveStripsBundle(
+              disneyExtremeCurveStripOpts(extremeSnap),
+            )
+          : '';
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
         } catch {
           ok = false;
         }
+        const summary = visible ? 'curves' : 'curves · filtered out';
         flashDisneyExtremeStatus(
-          ok ? `copied · curves` : `copy failed · curves`,
+          formatDisneyExtremeBaselineCopyFlashLabel({ ok, empty, summary }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function disneyExtremeHudBundleOpts() {
@@ -3864,10 +3898,12 @@
       async function copyDisneyExtremeHotkeyDigest() {
         const text = formatDisneyExtremeHotkeyDigest({
           enabled: !!disneyExtremeEl?.checked,
+          stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
         });
+        const empty = !String(text || '').trim();
         let ok = false;
         try {
-          if (navigator.clipboard?.writeText) {
+          if (!empty && navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
             ok = true;
           }
@@ -3875,9 +3911,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? 'copied · hotkey digest' : 'copy failed · digest',
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty,
+            summary: 'hotkey digest',
+          }),
         );
-        return ok;
+        return ok && !empty;
       }
 
       function clearDisneyExtremeTransient(opts = {}) {
@@ -4879,9 +4919,13 @@
           ok = false;
         }
         flashDisneyExtremeStatus(
-          ok ? `copied · ${text}` : `copy failed · ${text}`,
+          formatDisneyExtremeBaselineCopyFlashLabel({
+            ok,
+            empty: !String(text || '').trim(),
+            summary: text,
+          }),
         );
-        return ok;
+        return ok && !!String(text || '').trim();
       }
 
       document.getElementById('btnDisneyExtremeReset')?.addEventListener('click', () => {
@@ -5162,6 +5206,14 @@
 
       document.getElementById('btnDisneyExtremeCopyDirtyStrip')?.addEventListener('click', () => {
         copyDisneyExtremeBaselineDirtyStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeOpenDirtyStrip')?.addEventListener('click', () => {
+        openDisneyExtremeDirtyStrip();
+      });
+
+      document.getElementById('btnDisneyExtremeCopyDirtyStripOpen')?.addEventListener('click', () => {
+        copyDisneyExtremeBaselineDirtyStripOpen();
       });
 
       document.getElementById('btnDisneyExtremeAllStrips')?.addEventListener('click', () => {
@@ -5591,7 +5643,10 @@
       });
 
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {
-        disneyExtremeStripsFilterQuery = String(ev.target?.value || '');
+        disneyExtremeStripsFilterQuery = String(ev.target?.value || '').trim();
+        if (ev.target && ev.target.value !== disneyExtremeStripsFilterQuery) {
+          ev.target.value = disneyExtremeStripsFilterQuery;
+        }
         applyDisneyExtremeStripsFilter();
         persistDisneyExtremeStripsFilter();
         syncDisneyExtremePrefsSummary();
@@ -6791,6 +6846,7 @@
           flashDisneyExtremeStatus(
             formatDisneyExtremeHotkeyDigest({
               enabled: !!disneyExtremeEl.checked,
+              stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
             }),
           );
           return;

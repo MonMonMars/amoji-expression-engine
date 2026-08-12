@@ -37,6 +37,8 @@ describe('Phase 417 Extreme Alt+F12 copy digest', () => {
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
     expect(src).toContain('<kbd>Alt+F12</kbd>');
     expect(src).toContain("resolved.action === 'copyHotkeyDigest'");
-    expect(src).toContain('copied · hotkey digest');
+    expect(src).toMatch(
+      /copyDisneyExtremeHotkeyDigest[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'hotkey digest'/,
+    );
   });
 });

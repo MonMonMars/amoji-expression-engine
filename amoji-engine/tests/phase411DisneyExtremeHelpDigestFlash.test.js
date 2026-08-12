@@ -20,7 +20,9 @@ describe('Phase 411 Extreme H digest flash + copy digest', () => {
     expect(src).toContain('formatDisneyExtremeHotkeyDigest({');
     expect(src).toContain('btnDisneyExtremeCopyDigest');
     expect(src).toContain('function copyDisneyExtremeHotkeyDigest');
-    expect(src).toContain('copied · hotkey digest');
+    expect(src).toMatch(
+      /copyDisneyExtremeHotkeyDigest[\s\S]*?formatDisneyExtremeBaselineCopyFlashLabel[\s\S]*?summary: 'hotkey digest'/,
+    );
     expect(src).toContain('function copyDisneyExtremeHotkeyHelp');
     expect(src).toContain('copied · hotkey help');
   });

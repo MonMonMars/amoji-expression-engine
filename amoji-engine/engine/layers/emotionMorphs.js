@@ -941,6 +941,10 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
     kind: 'action',
   },
   { id: 'copyBaselineStripsSummary', help: 'Shift+PageDown copy strips', kind: 'note' },
+  { id: 'stripsSummaryFiltered', help: 'strips summary · filtered', kind: 'note' },
+  { id: 'copyFlashLabel', help: 'copy flash · unified', kind: 'note' },
+  { id: 'curveStripFiltered', help: 'curve copy · filtered out', kind: 'note' },
+  { id: 'hotkeyDigestFiltered', help: 'digest · filter append', kind: 'note' },
   { id: 'persistStrips', help: 'strips · remember open', kind: 'note' },
   {
     id: 'arrowCycleHistory',
@@ -1241,7 +1245,9 @@ export function formatDisneyExtremeHotkeyHelp(opts = {}) {
  * @returns {string}
  */
 export function formatDisneyExtremeHotkeyDigest(opts = {}) {
-  return `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_DIGEST}`;
+  const base = `${opts.enabled ? 'extreme on' : 'extreme off'} · ${DISNEY_EXTREME_HOTKEY_DIGEST}`;
+  const filter = String(opts.stripsFilter || '').trim();
+  return filter ? `${base} · ${filter}` : base;
 }
 
 /**
@@ -2321,7 +2327,9 @@ export function formatDisneyExtremeBaselineStripsSummaryLabel(
     stacks,
   ).replace(/^stacks · /, '');
   const dirty = formatDisneyExtremeBaselineDirtyStripLabel(dirtyOpts);
-  return `strips · ${capacity} · ${dirty}`;
+  const filterBit = formatDisneyExtremeAllStripsFilterBit(dirtyOpts);
+  const prefix = filterBit ? `strips · ${filterBit}` : 'strips';
+  return `${prefix} · ${capacity} · ${dirty}`;
 }
 
 /**
