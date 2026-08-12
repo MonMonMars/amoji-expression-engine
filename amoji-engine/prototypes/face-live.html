@@ -945,17 +945,25 @@
         <div class="row" style="margin-top:6px;gap:8px;">
           <button type="button" id="btnDisneyExtremeReset">Reset × defaults <kbd>R</kbd></button>
           <button type="button" id="btnDisneyExtremeResetBundle">Reset + all <kbd>⇧R</kbd></button>
-          <button type="button" id="btnDisneyExtremeCopy">Copy summary <kbd>C</kbd></button>
-          <button type="button" id="btnDisneyExtremeEnable">Enable Extreme <kbd>⇧X</kbd></button>
-          <button type="button" id="btnDisneyExtremeEnableBody">Enable body <kbd>⇧B</kbd></button>
-          <button type="button" id="btnDisneyExtremeBundle">All readout <kbd>A</kbd></button>
-          <button type="button" id="btnDisneyExtremeDiff">Diff baseline <kbd>D</kbd></button>
+          <button type="button" id="btnDisneyExtremeCopy" title="Copy prefs summary · filter-aware when filter active">Copy summary <kbd>C</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnable" title="Enable Extreme tier · ⇧X">Enable Extreme <kbd>⇧X</kbd></button>
+          <button type="button" id="btnDisneyExtremeEnableBody" title="Enable body deform · ⇧B">Enable body <kbd>⇧B</kbd></button>
+          <button type="button" id="btnDisneyExtremeBundle" title="All readout bundle · A">All readout <kbd>A</kbd></button>
+          <button type="button" id="btnDisneyExtremeEaseReadout" title="Flash ease curve readout · E">Ease readout <kbd>E</kbd></button>
+          <button type="button" id="btnDisneyExtremeMixReadout" title="Flash body mix readout · M">Mix readout <kbd>M</kbd></button>
+          <button type="button" id="btnDisneyExtremeFactorsReadout" title="Flash factor bars readout · F">Factors readout <kbd>F</kbd></button>
+          <button type="button" id="btnDisneyExtremeNeckReadout" title="Flash neck blend readout · N">Neck readout <kbd>N</kbd></button>
+          <button type="button" id="btnDisneyExtremeDiff" title="Diff live vs pinned baseline · D">Diff baseline <kbd>D</kbd></button>
           <button type="button" id="btnDisneyExtremeRestore">Restore baseline <kbd>⇧D</kbd></button>
           <button type="button" id="btnDisneyExtremeClearBase">Clear baseline <kbd>K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHist">Clear hist <kbd>⇧K</kbd></button>
           <button type="button" id="btnDisneyExtremeClearHistKeepRedo">Clear hist keep redo <kbd>⇧Alt+K</kbd></button>
           <button type="button" id="btnDisneyExtremeWipeRedo">Wipe redo <kbd>W</kbd></button>
-          <button type="button" id="btnDisneyExtremePinBase">Pin baseline <kbd>P</kbd></button>
+          <button type="button" id="btnDisneyExtremePinBase" title="Pin live snapshot as baseline · P">Pin baseline <kbd>P</kbd></button>
+          <button type="button" id="btnDisneyExtremeInsertPin" title="Pin live snapshot · Insert">Pin baseline <kbd>Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeReplacePinInsert" title="Replace pinned baseline · ⇧Insert">Replace pin <kbd>⇧Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpPinInsert" title="Jump to pinned baseline · Alt+Insert">Jump pin <kbd>Alt+Insert</kbd></button>
+          <button type="button" id="btnDisneyExtremeJumpPinSummaryInsert" title="Jump pin + summary flash · ⇧Alt+Insert">Jump pin summary <kbd>⇧Alt+Insert</kbd></button>
           <button type="button" id="btnDisneyExtremeStarFav">Star favorite <kbd>S</kbd></button>
           <button type="button" id="btnDisneyExtremeUndoBase">Undo baseline <kbd>U</kbd></button>
           <button type="button" id="btnDisneyExtremeRedoBase">Redo baseline <kbd>⇧U</kbd></button>
@@ -1148,7 +1156,7 @@
               title="Filter Extreme strips · F12 focus · ⇧F12 copy · Alt+F12 copy digest · ⇧Alt+F12 clear · Esc clear"
             />
             <button type="button" id="btnDisneyExtremeStripsFilterClear" title="Clear strips filter · ⇧Alt+F12">Clear filter</button>
-            <span class="status" id="disneyExtremeStripsFilterSummary">filter · all · 11</span>
+            <span class="status" id="disneyExtremeStripsFilterSummary" title="Filter match count · ⇧F12 copy · dbl-click copy">filter · all · 11</span>
           </div>
           <div class="status" id="disneyExtremeStripsEmpty" hidden>No strips match</div>
           <div
@@ -4831,9 +4839,23 @@
         return true;
       }
 
+      function disneyExtremePrefsSummaryOpts() {
+        return {
+          baseline: lastExtremeBaselineSnap,
+          stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
+          stacks: {
+            history: extremeBaselineHistory,
+            redo: extremeBaselineRedo,
+            favorites: extremeBaselineFavorites,
+          },
+          pinFp: lastExtremeBaselineSnap
+            ? disneyExtremeSnapshotFingerprintShort(lastExtremeBaselineSnap)
+            : null,
+        };
+      }
+
       function syncDisneyExtremePrefsSummary(prefsLike) {
         if (!disneyExtremeStatus) return;
-        const stripsFilter = disneyExtremeStripsFilterSummaryText();
         disneyExtremeStatus.title = summarizeDisneyExtremePrefs(
           prefsLike || {
             disneyExtreme: !!disneyExtremeEl?.checked,
@@ -4850,10 +4872,7 @@
             ),
             intensity,
           },
-          {
-            baseline: lastExtremeBaselineSnap,
-            stripsFilter: stripsFilter || undefined,
-          },
+          disneyExtremePrefsSummaryOpts(),
         );
         syncDisneyExtremePinUi();
         syncDisneyExtremeDirtyUi();
@@ -5041,10 +5060,7 @@
             ),
             intensity,
           },
-          {
-            baseline: lastExtremeBaselineSnap,
-            stripsFilter: disneyExtremeStripsFilterSummaryText() || undefined,
-          },
+          disneyExtremePrefsSummaryOpts(),
         );
         let ok = false;
         try {
@@ -5179,6 +5195,38 @@
 
       document.getElementById('btnDisneyExtremePinBase')?.addEventListener('click', () => {
         pinDisneyExtremeBaseline();
+      });
+
+      document.getElementById('btnDisneyExtremeInsertPin')?.addEventListener('click', () => {
+        pinDisneyExtremeBaseline();
+      });
+
+      document.getElementById('btnDisneyExtremeReplacePinInsert')?.addEventListener('click', () => {
+        replaceDisneyExtremeBaselinePin();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpPinInsert')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselinePin();
+      });
+
+      document.getElementById('btnDisneyExtremeJumpPinSummaryInsert')?.addEventListener('click', () => {
+        jumpDisneyExtremeBaselinePinSummary();
+      });
+
+      document.getElementById('btnDisneyExtremeEaseReadout')?.addEventListener('click', () => {
+        flashDisneyExtremeEaseCurve();
+      });
+
+      document.getElementById('btnDisneyExtremeMixReadout')?.addEventListener('click', () => {
+        flashDisneyExtremeBodyMix();
+      });
+
+      document.getElementById('btnDisneyExtremeFactorsReadout')?.addEventListener('click', () => {
+        flashDisneyExtremeFactorBars();
+      });
+
+      document.getElementById('btnDisneyExtremeNeckReadout')?.addEventListener('click', () => {
+        flashDisneyExtremeNeck();
       });
 
       document.getElementById('btnDisneyExtremeStarFav')?.addEventListener('click', () => {
@@ -5794,6 +5842,11 @@
 
       document.getElementById('btnDisneyExtremeClearFilter')?.addEventListener('click', () => {
         clearDisneyExtremeStripsFilterFlash();
+      });
+
+      document.getElementById('disneyExtremeStripsFilterSummary')?.addEventListener('dblclick', (ev) => {
+        ev.preventDefault();
+        copyDisneyExtremeStripsFilterSummary();
       });
 
       document.getElementById('disneyExtremeStripsFilter')?.addEventListener('input', (ev) => {

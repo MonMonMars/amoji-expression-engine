@@ -11,6 +11,7 @@ import {
   DISNEY_EXTREME_EASE_OVERDRIVE_GAIN,
   isDisneyExtremeSnapshotDirty,
   disneyExtremeSnapshotFingerprintShort,
+  formatDisneyExtremeBaselineStacksSummaryLabel,
 } from '../layers/emotionMorphs.js';
 
 export const FACE_LIVE_PREFS_KEY = 'amoji.faceLive.prefs.v1';
@@ -1040,8 +1041,15 @@ export function resolveDisneyExtremeHotkey(ev, opts = {}) {
  * When on, includes od/ease; overdrive recipe; body-on also appends mix + neck.
  * Optional `opts.baseline` appends dirty/clean + short fp.
  * Optional `opts.stripsFilter` appends active strips filter summary.
+ * Optional `opts.stacks` appends hist/redo/fav stack depths (object or preformatted string).
+ * Optional `opts.pinFp` appends pinned baseline short fp (`null` → pin · none).
  * @param {object} [prefs]
- * @param {{ baseline?: object|null, stripsFilter?: string }} [opts]
+ * @param {{
+ *   baseline?: object|null,
+ *   stripsFilter?: string,
+ *   stacks?: { history?: object[], redo?: object[], favorites?: object[] }|string,
+ *   pinFp?: string|null,
+ * }} [opts]
  * @returns {string}
  */
 export function summarizeDisneyExtremePrefs(prefs, opts = {}) {
@@ -1083,6 +1091,18 @@ export function summarizeDisneyExtremePrefs(prefs, opts = {}) {
   }
   if (opts.stripsFilter) {
     parts.push(String(opts.stripsFilter));
+  }
+  if (opts.stacks) {
+    const stacksText =
+      typeof opts.stacks === 'string'
+        ? opts.stacks
+        : formatDisneyExtremeBaselineStacksSummaryLabel(opts.stacks);
+    if (stacksText !== 'stacks · empty') {
+      parts.push(stacksText);
+    }
+  }
+  if ('pinFp' in opts) {
+    parts.push(opts.pinFp ? `pin ${opts.pinFp}` : 'pin · none');
   }
   return parts.join(' · ');
 }

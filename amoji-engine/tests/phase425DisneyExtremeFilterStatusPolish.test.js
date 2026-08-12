@@ -22,7 +22,8 @@ describe('Phase 425 Extreme filter status polish', () => {
     );
     expect(title).toContain('filter · "pin" · 1/11');
     const src = readFileSync(join(root, 'prototypes/face-live.html'), 'utf8');
-    expect(src).toContain('stripsFilter: stripsFilter || undefined');
+    expect(src).toContain('function disneyExtremePrefsSummaryOpts');
+    expect(src).toContain('stripsFilter: disneyExtremeStripsFilterSummaryText()');
     expect(src).toContain('filtered bundle when filter active');
     expect(src).toContain('filter-aware when filter active');
   });
