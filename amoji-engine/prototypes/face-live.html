@@ -699,6 +699,53 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish786854 */
+      @media (prefers-contrast: less) {
+        #disneyExtremePanel {
+          --extreme-focus-ring: 2px solid CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-expanded="false"] + * {
+        display: none;
+      }
+      #disneyExtremePanel time {
+        font-variant-numeric: tabular-nums;
+      }
+      #disneyExtremePanel [role="separator"] {
+        border-block-start: 1px solid currentColor;
+        opacity: 0.35;
+      }
+      @media (hover: none) {
+        #disneyExtremePanel button:hover:not(:disabled) {
+          filter: none;
+        }
+      }
+      #disneyExtremePanel .extreme-fav-chip[aria-pressed="true"] {
+        text-decoration: underline;
+      }
+      /* disneyExtremeA11yPolish393638 */
+      @media (prefers-reduced-data: reduce) {
+        #disneyExtremeEaseSpark, #disneyExtremeBodySpark {
+          background-image: none !important;
+        }
+      }
+      #disneyExtremePanel [aria-invalid="true"] {
+        outline-color: Mark;
+      }
+      #disneyExtremePanel label {
+        cursor: default;
+      }
+      #disneyExtremePanel [role="group"] {
+        min-inline-size: 0;
+      }
+      @media (min-width: 80rem) {
+        #disneyExtremePanel {
+          max-width: min(100%, 56rem);
+        }
+      }
+      #disneyExtremePanel .extreme-hist-chip[aria-current="true"] {
+        font-weight: 600;
+      }
       /* disneyExtremeA11yPolish197030 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel .extreme-focus-ring {
@@ -2077,6 +2124,67 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish786854Docs
+       * catalog · post-786853 a11y polish notes
+       * readme · phase table 786854+
+       * FACE_LIVE · a11y delta sync 786854+
+       * docs · bind surface count 32 keep13
+       * docs · 183 button aria keep13
+       * docs · chip modifier matrix keep13
+       * docs · focus-visible map keep13
+       * docs · live region policy keep13
+       * docs · reduced motion keep13
+       * docs · forced-colors keep13
+       * docs · pointer coarse keep13
+       * docs · landmark roles keep13
+       * docs · skip links keep13
+       * docs · spark role=img keep13
+       * docs · bind registry keep13
+       * docs · typography policy keep13
+       * docs · interaction policy keep13
+       * docs · layout policy keep13
+       * docs · motion policy keep13
+       * docs · hover policy keep13
+       * docs · kbd mono policy keep13
+       * docs · sr-only utility keep13
+       * docs · contrast border policy keep13
+       * docs · dirty inset policy keep13
+       * docs · wide panel policy keep13
+       * docs · hover-none policy keep13
+       * tests · a11y substring harness 786854+
+       * final a11y polish audit · batch 786854+
+       * Extreme a11y batch12 audit
+       */
+      /* disneyExtremeA11yPolish393638Docs
+       * catalog · post-393637 a11y polish notes
+       * readme · phase table 393638+
+       * FACE_LIVE · a11y delta sync 393638+
+       * docs · bind surface count 32 keep12
+       * docs · 183 button aria keep12
+       * docs · chip modifier matrix keep12
+       * docs · focus-visible map keep12
+       * docs · live region policy keep12
+       * docs · reduced motion keep12
+       * docs · forced-colors keep12
+       * docs · pointer coarse keep12
+       * docs · landmark roles keep12
+       * docs · skip links keep12
+       * docs · spark role=img keep12
+       * docs · bind registry keep12
+       * docs · typography policy keep12
+       * docs · interaction policy keep12
+       * docs · layout policy keep12
+       * docs · motion policy keep12
+       * docs · hover policy keep12
+       * docs · kbd mono policy keep12
+       * docs · sr-only utility keep12
+       * docs · contrast border policy keep12
+       * docs · dirty inset policy keep12
+       * docs · wide panel policy keep12
+       * tests · a11y substring harness 393638+
+       * final a11y polish audit · batch 393638+
+       * Extreme a11y batch11 audit
        */
       /* disneyExtremeA11yPolish197030Docs
        * catalog · post-197029 a11y polish notes
