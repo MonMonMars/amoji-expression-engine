@@ -699,6 +699,37 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish98726 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel button,
+        #disneyExtremePanel input {
+          border-width: 2px;
+        }
+      }
+      #disneyExtremePanel [role="status"] {
+        min-height: 1.25em;
+      }
+      #disneyExtremePanel [aria-live="polite"] {
+        speak: normal;
+      }
+      #disneyExtremePanel fieldset {
+        min-inline-size: 0;
+        border: 0;
+        padding: 0;
+        margin: 0;
+      }
+      @media print {
+        #disneyExtremePanel [role="status"] {
+          color: CanvasText;
+        }
+      }
+      #disneyExtremePanel button[aria-pressed="true"] {
+        font-weight: 600;
+      }
+      #disneyExtremePanel .extreme-focus-ring {
+        outline: var(--extreme-focus-ring, 2px solid #8ac6ff);
+        outline-offset: var(--extreme-focus-offset, 2px);
+      }
       /* disneyExtremeA11yPolish49574 */
       @media (forced-colors: active) {
         #disneyExtremePanel :focus-visible {
@@ -2022,6 +2053,34 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish98726Docs
+       * catalog · post-98725 a11y polish notes
+       * readme · phase table 98726+
+       * FACE_LIVE · a11y delta sync 98726+
+       * docs · bind surface count 32 keep10
+       * docs · 183 button aria keep10
+       * docs · chip modifier matrix keep10
+       * docs · focus-visible map keep10
+       * docs · live region policy keep10
+       * docs · reduced motion keep10
+       * docs · forced-colors keep10
+       * docs · pointer coarse keep10
+       * docs · landmark roles keep10
+       * docs · skip links keep10
+       * docs · spark role=img keep10
+       * docs · bind registry keep10
+       * docs · typography policy keep10
+       * docs · interaction policy keep10
+       * docs · layout policy keep10
+       * docs · motion policy keep10
+       * docs · hover policy keep10
+       * docs · kbd mono policy keep10
+       * docs · sr-only utility keep10
+       * docs · contrast border policy keep10
+       * tests · a11y substring harness 98726+
+       * final a11y polish audit · batch 98726+
+       * Extreme a11y batch9 audit
        */
       /* disneyExtremeA11yPolish49574Docs
        * catalog · post-49573 a11y polish notes
