@@ -300,7 +300,11 @@ export default [
   { id: 'copyBaselinePinStrip', help: 'Shift+F10 copy pin', kind: 'note' },
   { id: 'copyBaselineDirtyStripFKey', help: 'Shift+F11 copy dirty', kind: 'note' },
   { id: 'copyBaselineStripsSummaryFKey', help: 'Shift+F1 copy strips', kind: 'note' },
+  {
+    id: 'showBaselineCurveStrip',
+    help: 'Alt+PageDown curve strips',
     kind: 'note',
+  },
   { id: 'copyBaselineCurveStrip', help: '⇧Alt+PageDown copy curves', kind: 'note' },
   { id: 'curveStrip', help: 'curve strips · live · dbl-click copy', kind: 'note' },
   { id: 'previewBaselineChip', help: 'Meta+click chip preview', kind: 'note' },
