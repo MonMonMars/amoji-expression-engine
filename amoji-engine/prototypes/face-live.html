@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish3096998 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel button:focus-visible {
+          outline-color: Highlight;
+        }
+      }
+      #disneyExtremePanel [aria-selected="true"] {
+        text-decoration-thickness: from-font;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        outline-offset: 7px;
+      }
       /* disneyExtremeA11yPolish3072422 */
       @media (forced-colors: active) {
         #disneyExtremePanel .extreme-chip {
@@ -2878,6 +2890,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish3096998Docs
+       * catalog · post-3096997 a11y polish notes
+       * readme · phase table 3096998+
+       * FACE_LIVE · a11y delta sync 3096998+
+       * docs · bind surface count 32 keep76
+       * docs · 183 button aria keep76
+       * docs · chip modifier matrix keep76
+       * docs · focus-visible map keep76
+       * docs · live region policy keep76
+       * docs · reduced motion keep76
+       * docs · forced-colors keep76
+       * docs · pointer coarse keep76
+       * docs · landmark roles keep76
+       * docs · skip links keep76
+       * docs · spark role=img keep76
+       * docs · bind registry keep76
+       * docs · typography policy keep76
+       * docs · interaction policy keep76
+       * docs · layout policy keep76
+       * docs · motion policy keep76
+       * docs · hover policy keep76
+       * docs · kbd mono policy keep76
+       * docs · sr-only utility keep76
+       * docs · contrast border policy keep76
+       * docs · dirty inset policy keep76
+       * docs · wide panel policy keep76
+       * docs · hover-none policy keep76
+       * docs · forced-colors button focus Highlight policy keep76
+       * docs · aria-selected text-decoration-thickness from-font policy keep76
+       * docs · skip focus outline-offset 7px policy keep76
+       * tests · a11y substring harness 3096998+
+       * final a11y polish audit · batch 3096998+
+       * Extreme a11y batch75 audit
        */
       /* disneyExtremeA11yPolish3072422Docs
        * catalog · post-3072421 a11y polish notes
