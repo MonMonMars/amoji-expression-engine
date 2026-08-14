@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1794470 */
+      @media (hover: hover) {
+        #disneyExtremePanel button:focus-visible {
+          text-decoration: underline;
+        }
+      }
+      #disneyExtremePanel [role="status"][aria-live="polite"] {
+        speak-as: spell-out;
+      }
+      #disneyExtremeToolbar {
+        flex-wrap: wrap;
+      }
       /* disneyExtremeA11yPolish1769894 */
       @media (prefers-color-scheme: light) {
         #disneyExtremePanel {
@@ -2236,6 +2248,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish1794470Docs
+       * catalog · post-1794469 a11y polish notes
+       * readme · phase table 1794470+
+       * FACE_LIVE · a11y delta sync 1794470+
+       * docs · bind surface count 32 keep23
+       * docs · 183 button aria keep23
+       * docs · chip modifier matrix keep23
+       * docs · focus-visible map keep23
+       * docs · live region policy keep23
+       * docs · reduced motion keep23
+       * docs · forced-colors keep23
+       * docs · pointer coarse keep23
+       * docs · landmark roles keep23
+       * docs · skip links keep23
+       * docs · spark role=img keep23
+       * docs · bind registry keep23
+       * docs · typography policy keep23
+       * docs · interaction policy keep23
+       * docs · layout policy keep23
+       * docs · motion policy keep23
+       * docs · hover policy keep23
+       * docs · kbd mono policy keep23
+       * docs · sr-only utility keep23
+       * docs · contrast border policy keep23
+       * docs · dirty inset policy keep23
+       * docs · wide panel policy keep23
+       * docs · hover-none policy keep23
+       * docs · hover underline focus policy keep23
+       * docs · status speak-as policy keep23
+       * docs · toolbar flex-wrap policy keep23
+       * tests · a11y substring harness 1794470+
+       * final a11y polish audit · batch 1794470+
+       * Extreme a11y batch22 audit
        */
       /* disneyExtremeA11yPolish1769894Docs
        * catalog · post-1769893 a11y polish notes
