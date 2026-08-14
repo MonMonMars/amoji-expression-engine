@@ -699,6 +699,19 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1843622 */
+      @media (prefers-reduced-data: reduce) {
+        #disneyExtremePanel img,
+        #disneyExtremePanel svg {
+          content-visibility: auto;
+        }
+      }
+      #disneyExtremePanel [aria-disabled="true"] {
+        pointer-events: none;
+      }
+      #disneyExtremePanel .extreme-fav-chip {
+        touch-action: manipulation;
+      }
       /* disneyExtremeA11yPolish1819046 */
       @media (forced-colors: active) {
         #disneyExtremePanel [aria-current="true"] {
@@ -2260,6 +2273,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish1843622Docs
+       * catalog · post-1843621 a11y polish notes
+       * readme · phase table 1843622+
+       * FACE_LIVE · a11y delta sync 1843622+
+       * docs · bind surface count 32 keep25
+       * docs · 183 button aria keep25
+       * docs · chip modifier matrix keep25
+       * docs · focus-visible map keep25
+       * docs · live region policy keep25
+       * docs · reduced motion keep25
+       * docs · forced-colors keep25
+       * docs · pointer coarse keep25
+       * docs · landmark roles keep25
+       * docs · skip links keep25
+       * docs · spark role=img keep25
+       * docs · bind registry keep25
+       * docs · typography policy keep25
+       * docs · interaction policy keep25
+       * docs · layout policy keep25
+       * docs · motion policy keep25
+       * docs · hover policy keep25
+       * docs · kbd mono policy keep25
+       * docs · sr-only utility keep25
+       * docs · contrast border policy keep25
+       * docs · dirty inset policy keep25
+       * docs · wide panel policy keep25
+       * docs · hover-none policy keep25
+       * docs · reduced-data content-visibility policy keep25
+       * docs · disabled pointer-events policy keep25
+       * docs · fav touch-action policy keep25
+       * tests · a11y substring harness 1843622+
+       * final a11y polish audit · batch 1843622+
+       * Extreme a11y batch24 audit
        */
       /* disneyExtremeA11yPolish1819046Docs
        * catalog · post-1819045 a11y polish notes
