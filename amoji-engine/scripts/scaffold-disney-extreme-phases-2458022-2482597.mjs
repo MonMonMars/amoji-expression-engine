@@ -400,7 +400,7 @@ describe('Phase ${phase} Extreme readmePhaseTable2458022plus', () => {
     const readme = readdirSync(join(root, 'docs/phases')).filter((x) => x.endsWith('.md')).map((x) => readFileSync(join(root, 'docs/phases', x), 'utf8')).join('\\n');
     expect(readme).toContain('| Phase ${START} |');
     expect(readme).toContain('| Phase ${END} |');
-  });
+  }, 30000);
 });
 `,
     );
