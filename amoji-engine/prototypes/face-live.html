@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2261414 */
+      @media (update: slow) {
+        #disneyExtremePanel .extreme-focus-ring {
+          transition: none;
+        }
+      }
+      #disneyExtremePanel [aria-orientation="vertical"] {
+        flex-direction: column;
+      }
+      #disneyExtremePanel label:has(+ :focus-visible) {
+        font-weight: 600;
+      }
       /* disneyExtremeA11yPolish2236838 */
       @media (prefers-reduced-data: reduce) {
         #disneyExtremePanel .extreme-hist-chip {
@@ -2467,6 +2479,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2261414Docs
+       * catalog · post-2261413 a11y polish notes
+       * readme · phase table 2261414+
+       * FACE_LIVE · a11y delta sync 2261414+
+       * docs · bind surface count 32 keep42
+       * docs · 183 button aria keep42
+       * docs · chip modifier matrix keep42
+       * docs · focus-visible map keep42
+       * docs · live region policy keep42
+       * docs · reduced motion keep42
+       * docs · forced-colors keep42
+       * docs · pointer coarse keep42
+       * docs · landmark roles keep42
+       * docs · skip links keep42
+       * docs · spark role=img keep42
+       * docs · bind registry keep42
+       * docs · typography policy keep42
+       * docs · interaction policy keep42
+       * docs · layout policy keep42
+       * docs · motion policy keep42
+       * docs · hover policy keep42
+       * docs · kbd mono policy keep42
+       * docs · sr-only utility keep42
+       * docs · contrast border policy keep42
+       * docs · dirty inset policy keep42
+       * docs · wide panel policy keep42
+       * docs · hover-none policy keep42
+       * docs · update-slow focus-ring transition policy keep42
+       * docs · aria-orientation vertical flex policy keep42
+       * docs · label has focus-visible weight policy keep42
+       * tests · a11y substring harness 2261414+
+       * final a11y polish audit · batch 2261414+
+       * Extreme a11y batch41 audit
        */
       /* disneyExtremeA11yPolish2236838Docs
        * catalog · post-2236837 a11y polish notes
