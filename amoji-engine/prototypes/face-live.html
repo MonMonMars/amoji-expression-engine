@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1696166 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel .extreme-skip:focus {
+          outline-width: 3px;
+        }
+      }
+      #disneyExtremePanel [aria-busy="true"] {
+        cursor: progress;
+      }
+      #disneyExtremeFilter {
+        field-sizing: content;
+      }
       /* disneyExtremeA11yPolish1671590 */
       @media print {
         #disneyExtremePanel {
@@ -2187,6 +2199,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish1696166Docs
+       * catalog · post-1696165 a11y polish notes
+       * readme · phase table 1696166+
+       * FACE_LIVE · a11y delta sync 1696166+
+       * docs · bind surface count 32 keep19
+       * docs · 183 button aria keep19
+       * docs · chip modifier matrix keep19
+       * docs · focus-visible map keep19
+       * docs · live region policy keep19
+       * docs · reduced motion keep19
+       * docs · forced-colors keep19
+       * docs · pointer coarse keep19
+       * docs · landmark roles keep19
+       * docs · skip links keep19
+       * docs · spark role=img keep19
+       * docs · bind registry keep19
+       * docs · typography policy keep19
+       * docs · interaction policy keep19
+       * docs · layout policy keep19
+       * docs · motion policy keep19
+       * docs · hover policy keep19
+       * docs · kbd mono policy keep19
+       * docs · sr-only utility keep19
+       * docs · contrast border policy keep19
+       * docs · dirty inset policy keep19
+       * docs · wide panel policy keep19
+       * docs · hover-none policy keep19
+       * docs · contrast skip outline-width policy keep19
+       * docs · busy cursor progress policy keep19
+       * docs · filter field-sizing policy keep19
+       * tests · a11y substring harness 1696166+
+       * final a11y polish audit · batch 1696166+
+       * Extreme a11y batch18 audit
        */
       /* disneyExtremeA11yPolish1671590Docs
        * catalog · post-1671589 a11y polish notes
