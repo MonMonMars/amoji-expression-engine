@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2187686 */
+      @media (prefers-color-scheme: dark) {
+        #disneyExtremePanel {
+          color-scheme: dark;
+        }
+      }
+      #disneyExtremePanel [aria-haspopup="true"] {
+        cursor: context-menu;
+      }
+      #disneyExtremePanel .extreme-hist-chip[aria-current="true"]:focus-visible {
+        outline-width: 3px;
+      }
       /* disneyExtremeA11yPolish2163110 */
       @media (forced-colors: active) {
         #disneyExtremePanel [role="switch"][aria-checked="true"] {
@@ -2431,6 +2443,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2187686Docs
+       * catalog · post-2187685 a11y polish notes
+       * readme · phase table 2187686+
+       * FACE_LIVE · a11y delta sync 2187686+
+       * docs · bind surface count 32 keep39
+       * docs · 183 button aria keep39
+       * docs · chip modifier matrix keep39
+       * docs · focus-visible map keep39
+       * docs · live region policy keep39
+       * docs · reduced motion keep39
+       * docs · forced-colors keep39
+       * docs · pointer coarse keep39
+       * docs · landmark roles keep39
+       * docs · skip links keep39
+       * docs · spark role=img keep39
+       * docs · bind registry keep39
+       * docs · typography policy keep39
+       * docs · interaction policy keep39
+       * docs · layout policy keep39
+       * docs · motion policy keep39
+       * docs · hover policy keep39
+       * docs · kbd mono policy keep39
+       * docs · sr-only utility keep39
+       * docs · contrast border policy keep39
+       * docs · dirty inset policy keep39
+       * docs · wide panel policy keep39
+       * docs · hover-none policy keep39
+       * docs · color-scheme dark policy keep39
+       * docs · aria-haspopup context-menu cursor policy keep39
+       * docs · current chip focus outline-width policy keep39
+       * tests · a11y substring harness 2187686+
+       * final a11y polish audit · batch 2187686+
+       * Extreme a11y batch38 audit
        */
       /* disneyExtremeA11yPolish2163110Docs
        * catalog · post-2163109 a11y polish notes
