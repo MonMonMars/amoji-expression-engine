@@ -830,6 +830,7 @@ import shard124 from './disneyExtremeCatalogShards/shard124.js';
 import shard125 from './disneyExtremeCatalogShards/shard125.js';
 import shard126 from './disneyExtremeCatalogShards/shard126.js';
 import shard127 from './disneyExtremeCatalogShards/shard127.js';
+import shard128 from './disneyExtremeCatalogShards/shard128.js';
 
 export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   ...shard000,
@@ -960,6 +961,7 @@ export const DISNEY_EXTREME_HOTKEY_CATALOG = [
   ...shard125,
   ...shard126,
   ...shard127,
+  ...shard128,
 ];
 
 /**
