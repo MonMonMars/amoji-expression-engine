@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2949542 */
+      @media (prefers-reduced-motion: reduce) {
+        #disneyExtremePanel [role="tablist"] {
+          scroll-padding-inline: 0;
+        }
+      }
+      #disneyExtremePanel [aria-busy="true"] {
+        font-kerning: none;
+      }
+      #disneyExtremePanel kbd:focus-visible {
+        outline-style: inset;
+      }
       /* disneyExtremeA11yPolish2924966 */
       @media (prefers-contrast: more) {
         #disneyExtremePanel [role="status"] {
@@ -2806,6 +2818,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2949542Docs
+       * catalog · post-2949541 a11y polish notes
+       * readme · phase table 2949542+
+       * FACE_LIVE · a11y delta sync 2949542+
+       * docs · bind surface count 32 keep70
+       * docs · 183 button aria keep70
+       * docs · chip modifier matrix keep70
+       * docs · focus-visible map keep70
+       * docs · live region policy keep70
+       * docs · reduced motion keep70
+       * docs · forced-colors keep70
+       * docs · pointer coarse keep70
+       * docs · landmark roles keep70
+       * docs · skip links keep70
+       * docs · spark role=img keep70
+       * docs · bind registry keep70
+       * docs · typography policy keep70
+       * docs · interaction policy keep70
+       * docs · layout policy keep70
+       * docs · motion policy keep70
+       * docs · hover policy keep70
+       * docs · kbd mono policy keep70
+       * docs · sr-only utility keep70
+       * docs · contrast border policy keep70
+       * docs · dirty inset policy keep70
+       * docs · wide panel policy keep70
+       * docs · hover-none policy keep70
+       * docs · reduced-motion tablist scroll-padding-inline policy keep70
+       * docs · aria-busy font-kerning none policy keep70
+       * docs · kbd focus outline-style inset policy keep70
+       * tests · a11y substring harness 2949542+
+       * final a11y polish audit · batch 2949542+
+       * Extreme a11y batch69 audit
        */
       /* disneyExtremeA11yPolish2924966Docs
        * catalog · post-2924965 a11y polish notes
