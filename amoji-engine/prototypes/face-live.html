@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2900390 */
+      @media (prefers-reduced-data: reduce) {
+        #disneyExtremePanel {
+          overscroll-behavior-x: none;
+        }
+      }
+      #disneyExtremePanel [aria-hidden="true"] {
+        speak: never;
+      }
+      #disneyExtremePanel .extreme-chip:focus-visible {
+        outline-style: groove;
+      }
       /* disneyExtremeA11yPolish2875814 */
       @media (forced-colors: active) {
         #disneyExtremePanel a:focus-visible {
@@ -2782,6 +2794,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2900390Docs
+       * catalog · post-2900389 a11y polish notes
+       * readme · phase table 2900390+
+       * FACE_LIVE · a11y delta sync 2900390+
+       * docs · bind surface count 32 keep68
+       * docs · 183 button aria keep68
+       * docs · chip modifier matrix keep68
+       * docs · focus-visible map keep68
+       * docs · live region policy keep68
+       * docs · reduced motion keep68
+       * docs · forced-colors keep68
+       * docs · pointer coarse keep68
+       * docs · landmark roles keep68
+       * docs · skip links keep68
+       * docs · spark role=img keep68
+       * docs · bind registry keep68
+       * docs · typography policy keep68
+       * docs · interaction policy keep68
+       * docs · layout policy keep68
+       * docs · motion policy keep68
+       * docs · hover policy keep68
+       * docs · kbd mono policy keep68
+       * docs · sr-only utility keep68
+       * docs · contrast border policy keep68
+       * docs · dirty inset policy keep68
+       * docs · wide panel policy keep68
+       * docs · hover-none policy keep68
+       * docs · reduced-data overscroll-behavior-x none policy keep68
+       * docs · aria-hidden speak never policy keep68
+       * docs · chip focus outline-style groove policy keep68
+       * tests · a11y substring harness 2900390+
+       * final a11y polish audit · batch 2900390+
+       * Extreme a11y batch67 audit
        */
       /* disneyExtremeA11yPolish2875814Docs
        * catalog · post-2875813 a11y polish notes
