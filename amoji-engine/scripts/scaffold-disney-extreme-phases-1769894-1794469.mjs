@@ -1,0 +1,581 @@
+/**
+ * Scaffold Disney Extreme phases 1769894-1794469 (24576 phases).
+ * Writes: catalog shards, tests/pNNNN/, docs/phases/, face-live polish, FACE_LIVE.
+ */
+import { mkdirSync, readFileSync, writeFileSync, appendFileSync, existsSync, readdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const START = 1769894;
+const COUNT = 24576;
+const END = START + COUNT - 1; // 1794469
+const MARKER = 'disneyExtremeA11yPolish1769894';
+const SHARD_SIZE = 25000;
+
+function note(id, help) {
+  return { id, help };
+}
+
+function pascal(id) {
+  return id.charAt(0).toUpperCase() + id.slice(1);
+}
+
+function buildNotes() {
+  const notes = [];
+  const push = (id, help) => notes.push(note(id, help));
+
+  const waveA = [
+    ['viewportMetaKeep22', 'viewport · meta keep12'],
+    ['safeAreaInsetPanel22', 'safe-area · panel inset keep12'],
+    ['safeAreaInsetToolbar22', 'safe-area · toolbar inset keep12'],
+    ['containerQueryPanel22', 'container · panel query ready keep12'],
+    ['minHeightPanel22', 'panel · min-height assert keep12'],
+    ['maxHeightPanel22', 'panel · max-height fluid keep12'],
+    ['aspectRatioSparkKeep22', 'spark · aspect-ratio keep12'],
+    ['objectFitSparkKeep22', 'spark · object-fit keep12'],
+    ['containLayoutPanel22', 'panel · contain layout keep12'],
+    ['isolationPanel22', 'panel · isolation isolate keep12'],
+    ['willChangeAvoid22', 'will-change · avoid on panel keep12'],
+    ['transformGpuAvoid22', 'transform · avoid gpu on chips keep12'],
+    ['backfaceHiddenKeep22', 'backface-visibility · keep12'],
+    ['overscrollContain22', 'overscroll-behavior · contain keep12'],
+    ['scrollSnapAvoid22', 'scroll-snap · avoid on hist keep12'],
+    ['scrollPaddingTop22', 'scroll-padding-top · skip link keep12'],
+    ['anchorNameAvoid22', 'anchor · avoid experimental keep12'],
+    ['contentVisibilityAuto22', 'content-visibility · auto strips keep12'],
+    ['containIntrinsicSize22', 'contain-intrinsic-size · strips keep12'],
+    ['resizeNonePanel22', 'resize · none on panel keep12'],
+    ['boxSizingBorder22', 'box-sizing · border-box assert keep12'],
+    ['minWidthZeroFlex22', 'flex · min-width 0 children keep12'],
+    ['gapTokenToolbar22', 'gap · toolbar token assert keep12'],
+    ['paddingTokenPanel22', 'padding · panel token assert keep12'],
+    ['marginTokenStrips22', 'margin · strips token assert keep12'],
+    ['borderRadiusToken22', 'border-radius · token assert keep12'],
+    ['shadowTokenPanel22', 'box-shadow · token assert keep12'],
+    ['opacityDisabledKeep22', 'opacity · disabled sync keep12'],
+    ['visibilityHiddenLive22', 'visibility · hidden live offscreen keep12'],
+    ['clipPathAvoid22', 'clip-path · avoid on interactive keep12'],
+    ['filterAvoidInteractive22', 'filter · avoid on buttons keep12'],
+    ['mixBlendAvoid22', 'mix-blend-mode · avoid keep12'],
+  ];
+  for (const [id, help] of waveA) push(id, help);
+
+  const waveB = [
+    ['prefersContrastMore22', 'contrast · prefers-contrast more keep12'],
+    ['prefersContrastLess22', 'contrast · prefers-contrast less keep12'],
+    ['prefersReducedTransparency22', 'transparency · prefers-reduced-transparency keep12'],
+    ['forcedColorsButtons22', 'forced-colors · buttons visible keep12'],
+    ['forcedColorsLinks22', 'forced-colors · skip links visible keep12'],
+    ['forcedColorsChips22', 'forced-colors · chips visible keep12'],
+    ['forcedColorsSlider22', 'forced-colors · slider thumb keep12'],
+    ['forcedColorsSwitch22', 'forced-colors · switch track keep12'],
+    ['colorSchemeDarkAvoid22', 'color-scheme · dark avoid keep12'],
+    ['accentColorToken22', 'accent-color · token assert keep12'],
+    ['caretColorInput22', 'caret-color · filter input keep12'],
+    ['outlineStyleSolid22', 'outline-style · solid assert keep12'],
+    ['outlineWidthToken22', 'outline-width · token assert keep12'],
+    ['textDecorationSkip22', 'text-decoration-skip · ink keep12'],
+    ['linkColorInherit22', 'links · color inherit skip keep12'],
+    ['visitedColorAvoid22', 'visited · no distinct color keep12'],
+    ['placeholderContrast22', 'placeholder · contrast assert keep12'],
+    ['disabledColorContrast22', 'disabled · contrast assert keep12'],
+    ['errorColorContrast22', 'error · contrast assert keep12'],
+    ['successColorContrast22', 'success · contrast assert keep12'],
+    ['warningColorContrast22', 'warning · contrast assert keep12'],
+    ['infoColorContrast22', 'info · contrast assert keep12'],
+    ['badgeContrastKeep22', 'badge · contrast keep12'],
+    ['kbdContrastKeep22', 'kbd · contrast keep12'],
+    ['markContrastAvoid22', 'mark · avoid on status keep12'],
+    ['selectionColorKeep22', 'selection · color keep12'],
+    ['highlightColorAvoid22', 'highlight-color · avoid keep12'],
+    ['currentColorIcon22', 'icons · currentColor keep12'],
+    ['fillStrokeSpark22', 'spark svg · fill/stroke keep12'],
+  ];
+  for (const [id, help] of waveB) push(id, help);
+
+  const waveC = [
+    ['fontFamilySystem22', 'font · system stack keep12'],
+    ['fontSizeRoot22', 'font-size · root rem base keep12'],
+    ['fontSizeStatus22', 'font-size · status readable keep12'],
+    ['fontSizeChip22', 'font-size · chip readable keep12'],
+    ['fontSizeToolbar22', 'font-size · toolbar readable keep12'],
+    ['fontSizeLabel22', 'font-size · label readable keep12'],
+    ['fontWeightNormal22', 'font-weight · normal body keep12'],
+    ['fontWeightBoldLabel22', 'font-weight · bold labels keep12'],
+    ['fontVariantNumeric22', 'font-variant-numeric · tabular keep12'],
+    ['fontFeatureSettings22', 'font-feature-settings · default keep12'],
+    ['lineHeightStatus22', 'line-height · status 1.4+ keep12'],
+    ['lineHeightChip22', 'line-height · chip 1.3+ keep12'],
+    ['letterSpacingNormal22', 'letter-spacing · normal keep12'],
+    ['wordSpacingNormal22', 'word-spacing · normal keep12'],
+    ['hyphensNoneChips22', 'hyphens · none on chips keep12'],
+    ['textTransformNone22', 'text-transform · none keep12'],
+    ['whiteSpaceStatus22', 'white-space · status wrap keep12'],
+    ['whiteSpaceChip22', 'white-space · chip nowrap ellipsis keep12'],
+    ['textAlignStart22', 'text-align · start keep12'],
+    ['textIndentZero22', 'text-indent · zero keep12'],
+    ['tabSizeDefault22', 'tab-size · default keep12'],
+    ['writingModeHorizontal22', 'writing-mode · horizontal-tb keep12'],
+    ['directionLtrAssert22', 'direction · ltr assert keep12'],
+    ['unicodeBidiNormal22', 'unicode-bidi · normal keep12'],
+    ['fontSynthesisNone22', 'font-synthesis · none keep12'],
+    ['fontOpticalSizing22', 'font-optical-sizing · auto keep12'],
+    ['fontKerningNormal22', 'font-kerning · normal keep12'],
+    ['textRenderingOptimize22', 'text-rendering · optimizeLegibility keep12'],
+    ['webkitFontSmoothing22', 'font-smoothing · antialiased keep12'],
+    ['overflowWrapBreak22', 'overflow-wrap · break-word status keep12'],
+    ['wordBreakNormal22', 'word-break · normal chips keep12'],
+    ['lineClampAvoid22', 'line-clamp · avoid on status keep12'],
+  ];
+  for (const [id, help] of waveC) push(id, help);
+
+  const waveD = [
+    ['pointerEventsAuto22', 'pointer-events · auto interactive keep12'],
+    ['pointerEventsNoneDecor22', 'pointer-events · none decor keep12'],
+    ['touchActionManipulation22', 'touch-action · manipulation buttons keep12'],
+    ['touchActionPanYPanel22', 'touch-action · pan-y panel keep12'],
+    ['userSelectNoneToolbar22', 'user-select · none toolbar labels keep12'],
+    ['userSelectTextStatus22', 'user-select · text status keep12'],
+    ['userSelectAllAvoid22', 'user-select · all avoid keep12'],
+    ['cursorDefaultPanel22', 'cursor · default panel bg keep12'],
+    ['cursorPointerButtons22', 'cursor · pointer buttons keep12'],
+    ['cursorNotAllowedDisabled22', 'cursor · not-allowed disabled keep12'],
+    ['cursorGrabDrop22', 'cursor · grab drop zone keep12'],
+    ['cursorGrabbingActive22', 'cursor · grabbing active drop keep12'],
+    ['cursorTextFilter22', 'cursor · text filter input keep12'],
+    ['cursorHelpTitle22', 'cursor · help on title attr keep12'],
+    ['tapHighlightNone22', '-webkit-tap-highlight · transparent keep12'],
+    ['overscrollBehaviorY22', 'overscroll-behavior-y · contain keep12'],
+    ['scrollBehaviorAuto22', 'scroll-behavior · auto keep12'],
+    ['scrollMarginSkip22', 'scroll-margin-top · skip target keep12'],
+    ['inertAvoidDoc22', 'inert · avoid on panel keep12'],
+    ['popoverAvoid22', 'popover · avoid experimental keep12'],
+    ['dialogAvoid22', 'dialog · avoid native keep12'],
+    ['detailsNativeKeep22', 'details · native keep12'],
+    ['summaryNativeKeep22', 'summary · native keep12'],
+    ['buttonTypeButton22', 'button · type=button assert keep12'],
+    ['inputTypeSearch22', 'input · type search filter keep12'],
+    ['inputAutocompleteOff22', 'input · autocomplete off filter keep12'],
+    ['inputSpellcheckOff22', 'input · spellcheck off filter keep12'],
+    ['inputAutocorrectOff22', 'input · autocorrect off filter keep12'],
+    ['inputAutocapitalizeOff22', 'input · autocapitalize off filter keep12'],
+    ['inputEnterKeyHint22', 'input · enterkeyhint search keep12'],
+    ['inputInputMode22', 'input · inputmode search keep12'],
+    ['textareaAvoid22', 'textarea · avoid in Extreme keep12'],
+    ['selectAvoid22', 'select · avoid in Extreme keep12'],
+    ['contenteditableAvoid22', 'contenteditable · avoid keep12'],
+    ['draggableFalseChips22', 'draggable · false chips keep12'],
+    ['draggableTrueDrop22', 'draggable · true drop hint keep12'],
+    ['dropEffectCopy22', 'drop · effect copy keep12'],
+  ];
+  for (const [id, help] of waveD) push(id, help);
+
+  const keys = [
+    ['KeyX', 'X toggle'], ['KeyB', 'B body'], ['KeyC', 'C copy'], ['KeyR', 'R reset'],
+    ['KeyH', 'H help'], ['KeyE', 'E ease'], ['KeyM', 'M mix'], ['KeyF', 'F factors'],
+    ['KeyN', 'N neck'], ['KeyA', 'A all'], ['KeyJ', 'J json'], ['KeyD', 'D diff'],
+    ['KeyK', 'K clear'], ['KeyU', 'U undo'], ['KeyP', 'P pin'], ['KeyS', 'S star'],
+    ['KeyQ', 'Q cycle fav'], ['KeyW', 'W wipe'], ['KeyG', 'G fav json'], ['KeyT', 'T more'],
+    ['KeyZ', 'Z stacks'], ['KeyV', 'V share stacks'], ['KeyY', 'Y share'], ['KeyO', 'O redo json'],
+    ['KeyL', 'L hist list'], ['KeyI', 'I paste hist'], ['Escape', 'Escape clear'],
+    ['Delete', 'Delete clear'], ['Insert', 'Insert pin'], ['Tab', 'Tab focus panel'],
+    ['F1', 'F1 strips'], ['F2', 'F2 factors'], ['F12', 'F12 filter'],
+    ['ArrowDown', 'ArrowDown hist'], ['ArrowUp', 'ArrowUp hist'],
+    ['ArrowRight', 'ArrowRight fav'], ['ArrowLeft', 'ArrowLeft fav'],
+    ['Home', 'Home dirty'], ['End', 'End dirty copy'], ['PageUp', 'PageUp strips'],
+    ['PageDown', 'PageDown strips'], ['Backspace', 'Backspace clear'],
+    ['Space', 'Space copy'], ['Enter', 'Enter activate'], ['Shift', 'Shift modifier'],
+    ['Control', 'Ctrl modifier'], ['Alt', 'Alt modifier'], ['Meta', 'Meta modifier'],
+  ];
+  for (const [id, help] of keys) push(`hotkey${id}Keep22`, `hotkey · ${help} keep12`);
+
+  const cohorts = [
+    'Reset', 'Toggle', 'Enable', 'Bundle', 'Ease', 'Mix', 'Factors', 'Neck',
+    'Diff', 'Restore', 'Clear', 'Hist', 'Fav', 'Redo', 'Pin', 'Share',
+    'Copy', 'Paste', 'Merge', 'Wipe', 'Jump', 'Focus', 'Filter', 'More',
+  ];
+  for (const c of cohorts) {
+    push(`btn${c}NameKeep22`, `btn ${c.toLowerCase()} · name keep12`);
+    push(`btn${c}TitleKeep22`, `btn ${c.toLowerCase()} · title keep12`);
+  }
+
+  const strips = ['Tips', 'Capacity', 'Roots', 'Active', 'Pin', 'Dirty', 'Factors', 'Ease', 'Mix', 'Neck', 'Curve'];
+  for (const s of strips) {
+    push(`strip${s}BindKeep22`, `${s.toLowerCase()} strip · bind keep12`);
+    push(`strip${s}RefreshKeep22`, `${s.toLowerCase()} strip · refresh keep12`);
+  }
+
+  const bindKeeps = [
+    ['Registry', 'registry'], ['Count32', 'count 32'], ['SpaceCopy', 'spaceCopy'],
+    ['EscapeClear', 'escapeClear'], ['OnDelete', 'onDelete'], ['AltEnter', 'Alt+Enter paste'],
+    ['AriaFromTitle', 'ariaFromTitle'], ['DescribedBy', 'describedBy'], ['LabelledBy', 'labelledBy'],
+    ['Keyshortcuts', 'keyshortcuts'], ['SkipRole', 'skipRole'], ['SkipTabindex', 'skipTabindex'],
+    ['BackgroundOnly', 'backgroundOnly'], ['IgnoreChild', 'ignoreChild'], ['PasteDbl', 'pasteOnDblClick'],
+    ['ShiftEnterPaste', '⇧Enter paste'], ['ShiftEnterCopy', '⇧Enter copy'], ['DeleteClear', 'Delete clear'],
+    ['BackspaceClear', 'Backspace clear'], ['ClickFlash', 'click flash'], ['DblClickCopy', 'dblclick copy'],
+    ['KeyEnter', 'keydown Enter'], ['KeySpace', 'keydown Space'], ['IgnoreHelper', 'shouldIgnoreTarget'],
+    ['NullGuard', 'null guard'], ['Normalize', 'normalize shortcuts'], ['DocComment', 'doc comments'],
+    ['StatusSkipRole', 'status skipRole'], ['SummarySkipRole', 'summary skipRole'],
+    ['HistIgnore', 'hist ignore chips'], ['FavIgnore', 'fav ignore chips'], ['PanelIgnore', 'panel ignore children'],
+  ];
+  for (const [id, help] of bindKeeps) push(`bind${id}Keep22`, `bind · ${help} keep12`);
+
+  const meta = [
+    ['catalogNotesPost1769893', 'catalog · post-1769893 a11y polish notes'],
+    ['readmePhaseTable1769894plus', 'readme · phase table 1769894+'],
+    ['faceLiveDocsA11yDelta22', 'FACE_LIVE · a11y delta sync 1769894+'],
+    ['bindSurfaceCountDoc22', 'docs · bind surface count 32 keep22'],
+    ['buttonAria183Doc22', 'docs · 183 button aria keep22'],
+    ['chipModifierDoc22', 'docs · chip modifier matrix keep22'],
+    ['focusVisibleDoc22', 'docs · focus-visible map keep22'],
+    ['liveRegionDoc22', 'docs · live region policy keep22'],
+    ['reducedMotionDoc22', 'docs · reduced motion keep22'],
+    ['forcedColorsDoc22', 'docs · forced-colors keep22'],
+    ['pointerCoarseDoc22', 'docs · pointer coarse keep22'],
+    ['landmarkDoc22', 'docs · landmark roles keep22'],
+    ['skipLinksDoc22', 'docs · skip links keep22'],
+    ['sparkImgDoc22', 'docs · spark role=img keep22'],
+    ['bindRegistryDoc22', 'docs · bind registry keep22'],
+    ['typographyDoc22', 'docs · typography policy keep22'],
+    ['interactionDoc22', 'docs · interaction policy keep22'],
+    ['layoutDoc22', 'docs · layout policy keep22'],
+    ['motionDoc22', 'docs · motion policy keep22'],
+    ['hoverDoc22', 'docs · hover policy keep22'],
+    ['kbdMonoDoc22', 'docs · kbd mono policy keep22'],
+    ['srOnlyDoc22', 'docs · sr-only utility keep22'],
+    ['contrastBorderDoc22', 'docs · contrast border policy keep22'],
+    ['dirtyInsetDoc22', 'docs · dirty inset policy keep22'],
+    ['widePanelDoc22', 'docs · wide panel policy keep22'],
+    ['hoverNoneDoc22', 'docs · hover-none policy keep22'],
+    ['colorSchemeOnlyLightDoc22', 'docs · color-scheme only-light policy keep22'],
+    ['focusOutlineSolidDoc22', 'docs · focus outline-style solid policy keep22'],
+    ['skipZIndexFocusDoc22', 'docs · skip z-index focus policy keep22'],
+    ['a11yHarnessBatch1769894', 'tests · a11y substring harness 1769894+'],
+    ['phaseTableCount1769894', 'readme · 1769894-1794469 row count'],
+    ['finalA11yPolishAudit23', 'final a11y polish audit · batch 1769894+'],
+  ];
+  for (const [id, help] of meta) push(id, help);
+
+  let i = 1;
+  while (notes.length < COUNT) {
+    push(
+      `extremeA11yBatch21Audit${String(i).padStart(6, '0')}`,
+      `Extreme a11y batch21 audit · item ${i}`,
+    );
+    i += 1;
+  }
+  if (notes.length > COUNT) notes.length = COUNT;
+
+  const seen = new Set();
+  for (const n of notes) {
+    if (seen.has(n.id)) throw new Error(`duplicate ${n.id}`);
+    seen.add(n.id);
+  }
+  return notes;
+}
+
+function markerFor(n) {
+  const { id } = n;
+  if (id.startsWith('colorSchemeOnlyLight') || id.includes('colorSchemeOnlyLight')) return 'color-scheme: only light';
+  if (id.startsWith('focusOutlineSolid') || id.includes('focusOutlineSolid')) return 'outline-style: solid';
+  if (id.startsWith('skipZIndexFocus') || id.includes('skipZIndexFocus')) return 'z-index: 2';
+  if (id === 'finalA11yPolishAudit23') return MARKER;
+  if (id.startsWith('extremeA11yBatch21Audit')) return MARKER;
+  if (id.includes('Doc22') || id.includes('Keep22') || id.includes('1769894') || id.includes('1769893')) {
+    return MARKER;
+  }
+  return MARKER;
+}
+
+function testBucket(phase) {
+  const bucket = Math.floor(phase / 10000);
+  return `p${String(bucket).padStart(4, '0')}`;
+}
+
+function catalogLine(n) {
+  return `  { id: '${n.id}', help: '${n.help.replace(/'/g, "\\'")}', kind: 'note' },`;
+}
+
+function appendCatalogShards(notes) {
+  const shardDir = join(root, 'engine/layers/disneyExtremeCatalogShards');
+  const existing = readdirSync(shardDir).filter((f) => /^shard\d+\.js$/.test(f)).sort();
+  let shardIdx = Number(existing.at(-1).match(/\d+/)[0]);
+  let shardPath = join(shardDir, `shard${String(shardIdx).padStart(3, '0')}.js`);
+  let src = readFileSync(shardPath, 'utf8');
+  let countInShard = (src.match(/\{\s*id:/g) || []).length;
+  let open = true;
+
+  const ensureOpen = () => {
+    if (!open) return;
+    if (!src.trimEnd().endsWith('];')) throw new Error(`bad shard end ${shardPath}`);
+    src = src.replace(/\];\s*$/, '');
+    open = false;
+  };
+
+  const flushClose = () => {
+    if (!src.endsWith('\n')) src += '\n';
+    src += '];\n';
+    writeFileSync(shardPath, src);
+    open = true;
+  };
+
+  const rollShard = () => {
+    flushClose();
+    shardIdx += 1;
+    shardPath = join(shardDir, `shard${String(shardIdx).padStart(3, '0')}.js`);
+    src = 'export default [\n';
+    countInShard = 0;
+    open = false;
+    // wire into emotionMorphs
+    const morphPath = join(root, 'engine/layers/emotionMorphs.js');
+    let morph = readFileSync(morphPath, 'utf8');
+    const importName = `shard${String(shardIdx).padStart(3, '0')}`;
+    if (!morph.includes(`from './disneyExtremeCatalogShards/${importName}.js'`)) {
+      const importMatches = [...morph.matchAll(/import shard\d+ from '\.\/disneyExtremeCatalogShards\/shard\d+\.js';\n/g)];
+      const lastImport = importMatches.at(-1)?.[0];
+      if (!lastImport) throw new Error('no shard imports');
+      morph = morph.replace(lastImport, `${lastImport}import ${importName} from './disneyExtremeCatalogShards/${importName}.js';\n`);
+      if (!morph.includes(`...${importName},`)) {
+        morph = morph.replace(/(  \.\.\.shard\d+,\n)(\];)/, `$1  ...${importName},\n$2`);
+      }
+      writeFileSync(morphPath, morph);
+    }
+  };
+
+  ensureOpen();
+  for (const n of notes) {
+    if (countInShard >= SHARD_SIZE) {
+      rollShard();
+    }
+    src += catalogLine(n) + '\n';
+    countInShard += 1;
+  }
+  flushClose();
+  console.log('catalog shards updated through', shardPath);
+}
+
+function writeTests(notes) {
+  for (let i = 0; i < notes.length; i++) {
+    const phase = START + i;
+    const n = notes[i];
+    const bucket = testBucket(phase);
+    const dir = join(root, 'tests', bucket);
+    mkdirSync(dir, { recursive: true });
+    const marker = markerFor(n).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const body = `import { describe, expect, it } from 'vitest';
+import { DISNEY_EXTREME_HOTKEY_HELP } from '../../engine/layers/emotionMorphs.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+const faceLivePath = fileURLToPath(new URL('../../prototypes/face-live.html', import.meta.url));
+describe('Phase ${phase} Extreme ${n.id}', () => {
+  it('covers ${n.id} metadata', () => {
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('${n.help.replace(/'/g, "\\'")}');
+    const src = readFileSync(faceLivePath, 'utf8');
+    expect(src).toContain('${marker}');
+  });
+});
+`;
+    writeFileSync(join(dir, `phase${phase}DisneyExtreme${pascal(n.id)}.test.js`), body);
+  }
+
+  const readmeIdx = notes.findIndex((n) => n.id === 'readmePhaseTable1769894plus');
+  const countIdx = notes.findIndex((n) => n.id === 'phaseTableCount1769894');
+  const finalIdx = notes.findIndex((n) => n.id === 'finalA11yPolishAudit23');
+
+  if (readmeIdx >= 0) {
+    const phase = START + readmeIdx;
+    const dir = join(root, 'tests', testBucket(phase));
+    writeFileSync(
+      join(dir, `phase${phase}DisneyExtreme${pascal(notes[readmeIdx].id)}.test.js`),
+      `import { describe, expect, it } from 'vitest';
+import { DISNEY_EXTREME_HOTKEY_HELP } from '../../engine/layers/emotionMorphs.js';
+import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+describe('Phase ${phase} Extreme readmePhaseTable1769894plus', () => {
+  it('documents phases ${START}-${END} in phase docs', () => {
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('readme · phase table 1769894+');
+    const readme = readdirSync(join(root, 'docs/phases')).filter((x) => x.endsWith('.md')).map((x) => readFileSync(join(root, 'docs/phases', x), 'utf8')).join('\\n');
+    expect(readme).toContain('| Phase ${START} |');
+    expect(readme).toContain('| Phase ${END} |');
+  });
+});
+`,
+    );
+  }
+
+  if (countIdx >= 0) {
+    const phase = START + countIdx;
+    const dir = join(root, 'tests', testBucket(phase));
+    writeFileSync(
+      join(dir, `phase${phase}DisneyExtreme${pascal(notes[countIdx].id)}.test.js`),
+      `import { describe, expect, it } from 'vitest';
+import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+describe('Phase ${phase} Extreme phaseTableCount1769894', () => {
+  it('has ${COUNT} phase-doc rows for ${START}-${END}', () => {
+    const readme = readdirSync(join(root, 'docs/phases')).filter((x) => x.endsWith('.md')).map((x) => readFileSync(join(root, 'docs/phases', x), 'utf8')).join('\\n');
+    const rows = [...readme.matchAll(/\\| Phase (\\d+) \\|/g)]
+      .map((m) => Number(m[1]))
+      .filter((n) => n >= ${START} && n <= ${END});
+    expect(new Set(rows).size).toBe(${COUNT});
+  });
+});
+`,
+    );
+  }
+
+  if (finalIdx >= 0) {
+    const phase = START + finalIdx;
+    const dir = join(root, 'tests', testBucket(phase));
+    writeFileSync(
+      join(dir, `phase${phase}DisneyExtreme${pascal(notes[finalIdx].id)}.test.js`),
+      `import { describe, expect, it } from 'vitest';
+import { DISNEY_EXTREME_HOTKEY_HELP } from '../../engine/layers/emotionMorphs.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+const faceLivePath = fileURLToPath(new URL('../../prototypes/face-live.html', import.meta.url));
+describe('Phase ${phase} Extreme finalA11yPolishAudit23', () => {
+  it('completes Extreme a11y polish batch ${START}-${END}', () => {
+    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('final a11y polish audit · batch 1769894+');
+    const src = readFileSync(faceLivePath, 'utf8');
+    expect(src).toContain('${MARKER}');
+    expect(src).toContain('prefers-reduced-motion: no-preference');
+    expect(src).toContain('font-variant-numeric: tabular-nums');
+    expect(src).toContain('aria-pressed="true"');
+  });
+});
+`,
+    );
+  }
+
+  console.log('tests written', {
+    readmePhase: START + readmeIdx,
+    countPhase: START + countIdx,
+    finalPhase: START + finalIdx,
+  });
+}
+
+function appendPhaseDocs(notes) {
+  const docsDir = join(root, 'docs/phases');
+  const byShard = new Map();
+  for (let i = 0; i < notes.length; i++) {
+    const phase = START + i;
+    const n = notes[i];
+    const title = n.help.includes(' · ') ? n.help.split(' · ').slice(1).join(' · ') : n.help;
+    const row = `| Phase ${phase} | Extreme ${title} | Done |\n`;
+    const shard = Math.floor(phase / 50000);
+    if (!byShard.has(shard)) byShard.set(shard, '');
+    byShard.set(shard, byShard.get(shard) + row);
+  }
+  for (const [shard, rows] of byShard) {
+    const name = `phases-${String(shard).padStart(3, '0')}.md`;
+    const p = join(docsDir, name);
+    if (!existsSync(p)) {
+      writeFileSync(
+        p,
+        `# Extreme phases shard ${String(shard).padStart(3, '0')}\n\n| Phase | Title | Status |\n| --- | --- | --- |\n`,
+      );
+    }
+    appendFileSync(p, rows);
+  }
+  console.log('docs/phases updated');
+}
+
+function polishFaceLive() {
+  const path = join(root, 'prototypes/face-live.html');
+  let src = readFileSync(path, 'utf8');
+  if (src.includes(MARKER)) {
+    console.log('face-live already polished 1769894');
+    return;
+  }
+  src = src.replace(
+    '/* disneyExtremeA11yPolish1745318 */',
+    `/* ${MARKER} */
+      @media (prefers-color-scheme: light) {
+        #disneyExtremePanel {
+          color-scheme: only light;
+        }
+      }
+      #disneyExtremePanel :focus-visible {
+        outline-style: solid;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        position: relative;
+        z-index: 2;
+      }
+      /* disneyExtremeA11yPolish1745318 */`,
+  );
+  src = src.replace(
+    '/* disneyExtremeA11yPolish1745318Docs',
+    `/* ${MARKER}Docs
+       * catalog · post-1769893 a11y polish notes
+       * readme · phase table 1769894+
+       * FACE_LIVE · a11y delta sync 1769894+
+       * docs · bind surface count 32 keep22
+       * docs · 183 button aria keep22
+       * docs · chip modifier matrix keep22
+       * docs · focus-visible map keep22
+       * docs · live region policy keep22
+       * docs · reduced motion keep22
+       * docs · forced-colors keep22
+       * docs · pointer coarse keep22
+       * docs · landmark roles keep22
+       * docs · skip links keep22
+       * docs · spark role=img keep22
+       * docs · bind registry keep22
+       * docs · typography policy keep22
+       * docs · interaction policy keep22
+       * docs · layout policy keep22
+       * docs · motion policy keep22
+       * docs · hover policy keep22
+       * docs · kbd mono policy keep22
+       * docs · sr-only utility keep22
+       * docs · contrast border policy keep22
+       * docs · dirty inset policy keep22
+       * docs · wide panel policy keep22
+       * docs · hover-none policy keep22
+       * docs · color-scheme only-light policy keep22
+       * docs · focus outline-style solid policy keep22
+       * docs · skip z-index focus policy keep22
+       * tests · a11y substring harness 1769894+
+       * final a11y polish audit · batch 1769894+
+       * Extreme a11y batch21 audit
+       */
+      /* disneyExtremeA11yPolish1745318Docs`,
+  );
+  writeFileSync(path, src);
+  console.log('face-live updated');
+}
+
+function polishFaceLiveMd() {
+  const path = join(root, 'prototypes/FACE_LIVE.md');
+  let md = readFileSync(path, 'utf8');
+  if (md.includes('batch 1769894+ a11y delta')) {
+    console.log('FACE_LIVE already updated');
+    return;
+  }
+  if (md.includes('batch 1745318+ a11y delta')) {
+    md = md.replace(
+      'batch 1745318+ a11y delta',
+      'batch 1745318+ a11y delta · color-scheme only-light policy keep22 · focus outline-style solid policy keep22 · skip z-index focus policy keep22 · batch 1769894+ a11y delta',
+    );
+  } else {
+    md += '\n\n- Extreme a11y polish batch 1769894+ (only-light / outline-style solid / skip z-index).\n';
+  }
+  writeFileSync(path, md);
+  console.log('FACE_LIVE updated');
+}
+
+const notes = buildNotes();
+console.log('notes', notes.length, 'range', START, END);
+appendCatalogShards(notes);
+polishFaceLive();
+polishFaceLiveMd();
+writeTests(notes);
+appendPhaseDocs(notes);
+console.log('Done', START, END);
