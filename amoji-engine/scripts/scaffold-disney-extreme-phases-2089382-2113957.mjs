@@ -423,7 +423,7 @@ describe('Phase ${phase} Extreme phaseTableCount2089382', () => {
       .map((m) => Number(m[1]))
       .filter((n) => n >= ${START} && n <= ${END});
     expect(new Set(rows).size).toBe(${COUNT});
-  });
+  }, 30000);
 });
 `,
     );

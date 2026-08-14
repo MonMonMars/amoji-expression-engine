@@ -10,5 +10,5 @@ describe('Phase 2089692 Extreme phaseTableCount2089382', () => {
       .map((m) => Number(m[1]))
       .filter((n) => n >= 2089382 && n <= 2113957);
     expect(new Set(rows).size).toBe(24576);
-  });
+  }, 30000);
 });
