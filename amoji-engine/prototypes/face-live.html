@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2752934 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel [aria-expanded="true"] {
+          outline: 2px solid Highlight;
+        }
+      }
+      #disneyExtremePanel [aria-relevant] {
+        speak-as: normal;
+      }
+      #disneyExtremePanel .extreme-hist-chip:focus-visible {
+        z-index: 2;
+      }
       /* disneyExtremeA11yPolish2728358 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel [role="progressbar"] {
@@ -2710,6 +2722,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2752934Docs
+       * catalog · post-2752933 a11y polish notes
+       * readme · phase table 2752934+
+       * FACE_LIVE · a11y delta sync 2752934+
+       * docs · bind surface count 32 keep62
+       * docs · 183 button aria keep62
+       * docs · chip modifier matrix keep62
+       * docs · focus-visible map keep62
+       * docs · live region policy keep62
+       * docs · reduced motion keep62
+       * docs · forced-colors keep62
+       * docs · pointer coarse keep62
+       * docs · landmark roles keep62
+       * docs · skip links keep62
+       * docs · spark role=img keep62
+       * docs · bind registry keep62
+       * docs · typography policy keep62
+       * docs · interaction policy keep62
+       * docs · layout policy keep62
+       * docs · motion policy keep62
+       * docs · hover policy keep62
+       * docs · kbd mono policy keep62
+       * docs · sr-only utility keep62
+       * docs · contrast border policy keep62
+       * docs · dirty inset policy keep62
+       * docs · wide panel policy keep62
+       * docs · hover-none policy keep62
+       * docs · forced-colors expanded Highlight outline policy keep62
+       * docs · aria-relevant speak-as policy keep62
+       * docs · chip focus z-index policy keep62
+       * tests · a11y substring harness 2752934+
+       * final a11y polish audit · batch 2752934+
+       * Extreme a11y batch61 audit
        */
       /* disneyExtremeA11yPolish2728358Docs
        * catalog · post-2728357 a11y polish notes
