@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2408870 */
+      @media (pointer: fine) {
+        #disneyExtremePanel .extreme-hist-chip {
+          min-inline-size: 2.25rem;
+        }
+      }
+      #disneyExtremePanel [aria-errormessage] {
+        border-inline-end: 2px solid Mark;
+      }
+      #disneyExtremePanel :where(summary, details):focus-visible {
+        outline-color: Highlight;
+      }
       /* disneyExtremeA11yPolish2384294 */
       @media (prefers-reduced-transparency: reduce) {
         #disneyExtremePanel .extreme-focus-ring {
@@ -2539,6 +2551,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2408870Docs
+       * catalog · post-2408869 a11y polish notes
+       * readme · phase table 2408870+
+       * FACE_LIVE · a11y delta sync 2408870+
+       * docs · bind surface count 32 keep48
+       * docs · 183 button aria keep48
+       * docs · chip modifier matrix keep48
+       * docs · focus-visible map keep48
+       * docs · live region policy keep48
+       * docs · reduced motion keep48
+       * docs · forced-colors keep48
+       * docs · pointer coarse keep48
+       * docs · landmark roles keep48
+       * docs · skip links keep48
+       * docs · spark role=img keep48
+       * docs · bind registry keep48
+       * docs · typography policy keep48
+       * docs · interaction policy keep48
+       * docs · layout policy keep48
+       * docs · motion policy keep48
+       * docs · hover policy keep48
+       * docs · kbd mono policy keep48
+       * docs · sr-only utility keep48
+       * docs · contrast border policy keep48
+       * docs · dirty inset policy keep48
+       * docs · wide panel policy keep48
+       * docs · hover-none policy keep48
+       * docs · pointer-fine chip min-inline-size policy keep48
+       * docs · aria-errormessage border Mark policy keep48
+       * docs · summary details focus outline-color policy keep48
+       * tests · a11y substring harness 2408870+
+       * final a11y polish audit · batch 2408870+
+       * Extreme a11y batch47 audit
        */
       /* disneyExtremeA11yPolish2384294Docs
        * catalog · post-2384293 a11y polish notes
