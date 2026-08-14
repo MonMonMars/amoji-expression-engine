@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2875814 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel a:focus-visible {
+          color: LinkText;
+        }
+      }
+      #disneyExtremePanel [aria-invalid="true"] {
+        border-inline-end-color: currentColor;
+      }
+      #disneyExtremePanel button:focus-visible {
+        outline-offset: 5px;
+      }
       /* disneyExtremeA11yPolish2851238 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel {
@@ -2770,6 +2782,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2875814Docs
+       * catalog · post-2875813 a11y polish notes
+       * readme · phase table 2875814+
+       * FACE_LIVE · a11y delta sync 2875814+
+       * docs · bind surface count 32 keep67
+       * docs · 183 button aria keep67
+       * docs · chip modifier matrix keep67
+       * docs · focus-visible map keep67
+       * docs · live region policy keep67
+       * docs · reduced motion keep67
+       * docs · forced-colors keep67
+       * docs · pointer coarse keep67
+       * docs · landmark roles keep67
+       * docs · skip links keep67
+       * docs · spark role=img keep67
+       * docs · bind registry keep67
+       * docs · typography policy keep67
+       * docs · interaction policy keep67
+       * docs · layout policy keep67
+       * docs · motion policy keep67
+       * docs · hover policy keep67
+       * docs · kbd mono policy keep67
+       * docs · sr-only utility keep67
+       * docs · contrast border policy keep67
+       * docs · dirty inset policy keep67
+       * docs · wide panel policy keep67
+       * docs · hover-none policy keep67
+       * docs · forced-colors link focus LinkText policy keep67
+       * docs · aria-invalid border-inline-end policy keep67
+       * docs · button focus outline-offset 5px policy keep67
+       * tests · a11y substring harness 2875814+
+       * final a11y polish audit · batch 2875814+
+       * Extreme a11y batch66 audit
        */
       /* disneyExtremeA11yPolish2851238Docs
        * catalog · post-2851237 a11y polish notes
