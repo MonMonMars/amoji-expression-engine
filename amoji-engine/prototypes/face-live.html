@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2064806 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel [aria-current="page"] {
+          border-inline-start: 3px solid CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-expanded="false"] {
+        opacity: 0.92;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        text-decoration-thickness: 2px;
+      }
       /* disneyExtremeA11yPolish2040230 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel {
@@ -2371,6 +2383,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2064806Docs
+       * catalog · post-2064805 a11y polish notes
+       * readme · phase table 2064806+
+       * FACE_LIVE · a11y delta sync 2064806+
+       * docs · bind surface count 32 keep34
+       * docs · 183 button aria keep34
+       * docs · chip modifier matrix keep34
+       * docs · focus-visible map keep34
+       * docs · live region policy keep34
+       * docs · reduced motion keep34
+       * docs · forced-colors keep34
+       * docs · pointer coarse keep34
+       * docs · landmark roles keep34
+       * docs · skip links keep34
+       * docs · spark role=img keep34
+       * docs · bind registry keep34
+       * docs · typography policy keep34
+       * docs · interaction policy keep34
+       * docs · layout policy keep34
+       * docs · motion policy keep34
+       * docs · hover policy keep34
+       * docs · kbd mono policy keep34
+       * docs · sr-only utility keep34
+       * docs · contrast border policy keep34
+       * docs · dirty inset policy keep34
+       * docs · wide panel policy keep34
+       * docs · hover-none policy keep34
+       * docs · aria-current page border policy keep34
+       * docs · aria-expanded false opacity policy keep34
+       * docs · skip focus underline thickness policy keep34
+       * tests · a11y substring harness 2064806+
+       * final a11y polish audit · batch 2064806+
+       * Extreme a11y batch33 audit
        */
       /* disneyExtremeA11yPolish2040230Docs
        * catalog · post-2040229 a11y polish notes
