@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish3023270 */
+      @media (prefers-reduced-transparency: reduce) {
+        #disneyExtremePanel [role="status"] {
+          hanging-punctuation: none;
+        }
+      }
+      #disneyExtremePanel [aria-expanded="true"] {
+        font-variant-ligatures: none;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        outline-offset: 6px;
+      }
       /* disneyExtremeA11yPolish2998694 */
       @media (prefers-contrast: less) {
         #disneyExtremePanel [role="status"] {
@@ -2842,6 +2854,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish3023270Docs
+       * catalog · post-3023269 a11y polish notes
+       * readme · phase table 3023270+
+       * FACE_LIVE · a11y delta sync 3023270+
+       * docs · bind surface count 32 keep73
+       * docs · 183 button aria keep73
+       * docs · chip modifier matrix keep73
+       * docs · focus-visible map keep73
+       * docs · live region policy keep73
+       * docs · reduced motion keep73
+       * docs · forced-colors keep73
+       * docs · pointer coarse keep73
+       * docs · landmark roles keep73
+       * docs · skip links keep73
+       * docs · spark role=img keep73
+       * docs · bind registry keep73
+       * docs · typography policy keep73
+       * docs · interaction policy keep73
+       * docs · layout policy keep73
+       * docs · motion policy keep73
+       * docs · hover policy keep73
+       * docs · kbd mono policy keep73
+       * docs · sr-only utility keep73
+       * docs · contrast border policy keep73
+       * docs · dirty inset policy keep73
+       * docs · wide panel policy keep73
+       * docs · hover-none policy keep73
+       * docs · reduced-transparency hanging-punctuation none policy keep73
+       * docs · aria-expanded font-variant-ligatures none policy keep73
+       * docs · skip focus outline-offset 6px policy keep73
+       * tests · a11y substring harness 3023270+
+       * final a11y polish audit · batch 3023270+
+       * Extreme a11y batch72 audit
        */
       /* disneyExtremeA11yPolish2998694Docs
        * catalog · post-2998693 a11y polish notes
