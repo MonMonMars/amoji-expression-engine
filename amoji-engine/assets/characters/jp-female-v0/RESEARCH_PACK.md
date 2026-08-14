@@ -122,6 +122,10 @@ Your own research says **do not default to MetaHuman-class photoreal**:
 | **Ready Player Me / VRoid** | ToS / CC limits | Fast avatar, less “own IP” |
 | **Manual box-model** | Full ownership | Slowest, cleanest IP |
 
+### Mixamo body library (wired in Face Live)
+
+Adobe Mixamo is **royalty-free for commercial use** when clips are baked into the product (not sold as raw FBX packs). Face Live → **Mixamo body** retargets `mixamorig*` clips onto Sakura HI via `engine/layers/mixamoRetarget.js`. Demo clips live in `mixamo/`; replace with your own downloads from [mixamo.com](https://www.mixamo.com/) (FBX · Without Skin).
+
 MB-Lab is **AGPL-3** — if Amoji ships the mesh binary derived from MB-Lab, get a lawyer’s read on AGPL obligations (or rebuild topology from scratch using it only as reference).
 
 ---

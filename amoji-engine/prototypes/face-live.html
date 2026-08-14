@@ -2053,6 +2053,19 @@
       </div>
 
       <div class="group">
+        <div class="label">Mixamo body <span style="text-transform:none;letter-spacing:0">(Adobe · commercial OK)</span></div>
+        <label class="row" style="gap:8px;align-items:center;margin:0 0 8px;">
+          <input id="mixamoBody" type="checkbox" role="switch" aria-labelledby="mixamoBodyLabel" aria-describedby="mixamoStatus" />
+          <span id="mixamoBodyLabel">Play Mixamo clip on Sakura</span>
+        </label>
+        <select id="mixamoClipSel" class="ctl" aria-label="Mixamo clip">
+          <option value="samba">Samba Dancing</option>
+          <option value="mixamoIdle">Mixamo pack</option>
+        </select>
+        <div class="status" id="mixamoStatus">mixamo off · royalty-free body library</div>
+      </div>
+
+      <div class="group">
         <div class="label">Layer G · Gesture</div>
         <select id="emblemSel" class="ctl">
           <option value="">— no emblem —</option>
@@ -5532,6 +5545,16 @@
       import * as THREE from 'three';
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+      import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+      import {
+        MIXAMO_DEMO_CLIPS,
+        MIXAMO_BODY_BONE_RE,
+        mixamoRetargetOptions,
+        findSkinnedMesh,
+        pickMixamoClip,
+        estimateMixamoHipScale,
+      } from '/engine/layers/mixamoRetarget.js';
       import {
         EMOTIONS,
         INTENSITY_TIERS,
@@ -12964,6 +12987,111 @@
       /** @type {Record<string, { x: number, y: number, z: number }>} */
       let boneRest = {};
       const BODY_BONE_RE = /^(upperarm|lowerarm|hand)_[LR]$|^(head|neck|spine0[123]|clavicle_[LR])$/;
+      const MIXAMO_ASSET_BASE = '/assets/characters/jp-female-v0/mixamo/';
+      const mixamoBodyEl = document.getElementById('mixamoBody');
+      const mixamoClipSel = document.getElementById('mixamoClipSel');
+      const mixamoStatus = document.getElementById('mixamoStatus');
+      /** @type {THREE.AnimationMixer | null} */
+      let mixamoMixer = null;
+      /** @type {THREE.AnimationAction | null} */
+      let mixamoAction = null;
+      /** @type {string | null} */
+      let mixamoActiveId = null;
+      const fbxLoader = new FBXLoader();
+      /** @type {Map<string, { root: THREE.Object3D, clip: THREE.AnimationClip, skinned: any }>} */
+      const mixamoCache = new Map();
+
+      function setMixamoStatus(text, ok = false) {
+        if (!mixamoStatus) return;
+        mixamoStatus.textContent = text;
+        mixamoStatus.className = ok ? 'status ok' : 'status';
+      }
+
+      function stopMixamoBody() {
+        if (mixamoAction) {
+          mixamoAction.stop();
+          mixamoAction = null;
+        }
+        if (mixamoMixer) {
+          mixamoMixer.stopAllAction();
+          mixamoMixer = null;
+        }
+        mixamoActiveId = null;
+      }
+
+      async function loadMixamoSource(clipId) {
+        const meta = MIXAMO_DEMO_CLIPS.find((c) => c.id === clipId) || MIXAMO_DEMO_CLIPS[0];
+        if (mixamoCache.has(meta.id)) return { meta, ...mixamoCache.get(meta.id) };
+        const root = await fbxLoader.loadAsync(MIXAMO_ASSET_BASE + meta.file);
+        root.visible = false;
+        root.traverse((o) => {
+          if (o.isMesh) o.frustumCulled = false;
+        });
+        const skinned = findSkinnedMesh(root);
+        if (!skinned) throw new Error(`Mixamo FBX has no skinned mesh: ${meta.file}`);
+        const clip = pickMixamoClip(root.animations || []);
+        if (!clip) throw new Error(`Mixamo FBX has no clip: ${meta.file}`);
+        const entry = { root, clip, skinned };
+        mixamoCache.set(meta.id, entry);
+        return { meta, ...entry };
+      }
+
+      async function startMixamoBody(clipId) {
+        if (!model) {
+          setMixamoStatus('mixamo · load a mesh first');
+          return false;
+        }
+        if (lod !== 'hi') {
+          setMixamoStatus('mixamo · switch to High poly (skinned)');
+          if (mixamoBodyEl) mixamoBodyEl.checked = false;
+          return false;
+        }
+        const sakuraSkinned = findSkinnedMesh(model);
+        if (!sakuraSkinned) {
+          setMixamoStatus('mixamo · Sakura HI has no skeleton');
+          if (mixamoBodyEl) mixamoBodyEl.checked = false;
+          return false;
+        }
+        setMixamoStatus('mixamo · loading clip…');
+        try {
+          const { meta, root, clip, skinned } = await loadMixamoSource(clipId);
+          // Keep source in scene graph for matrix updates during retarget
+          if (!root.parent) {
+            root.position.set(1000, 0, 0); // park off-camera
+            scene.add(root);
+          }
+          const scale = estimateMixamoHipScale(sakuraSkinned, skinned);
+          const opts = mixamoRetargetOptions({ scale });
+          // Expand bone capture so procedural layers can resume cleanly after stop
+          model.traverse((c) => {
+            if (!c?.name || !MIXAMO_BODY_BONE_RE.test(c.name) || boneMap[c.name]) return;
+            boneMap[c.name] = c;
+            boneRest[c.name] = { x: c.rotation.x, y: c.rotation.y, z: c.rotation.z };
+          });
+          sakuraSkinned.skeleton.bones.forEach((b) => {
+            if (!b?.name || !MIXAMO_BODY_BONE_RE.test(b.name) || boneMap[b.name]) return;
+            boneMap[b.name] = b;
+            boneRest[b.name] = { x: b.rotation.x, y: b.rotation.y, z: b.rotation.z };
+          });
+          stopMixamoBody();
+          const retargeted = SkeletonUtils.retargetClip(sakuraSkinned, skinned, clip, opts);
+          retargeted.name = `mixamo:${meta.id}`;
+          mixamoMixer = new THREE.AnimationMixer(sakuraSkinned);
+          mixamoAction = mixamoMixer.clipAction(retargeted);
+          mixamoAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.25).play();
+          mixamoActiveId = meta.id;
+          // IdleSway / Layer I root sway off while Mixamo drives body
+          mixer = null;
+          setMixamoStatus(`mixamo · ${meta.label} · ${retargeted.duration.toFixed(1)}s · scale ${scale.toFixed(3)}`, true);
+          return true;
+        } catch (err) {
+          console.error(err);
+          stopMixamoBody();
+          setMixamoStatus(`mixamo · failed: ${err?.message || err}`);
+          if (mixamoBodyEl) mixamoBodyEl.checked = false;
+          return false;
+        }
+      }
       const temporalStatus = document.getElementById('temporalStatus');
       const idleStatus = document.getElementById('idleStatus');
       const latencyStatus = document.getElementById('latencyStatus');
@@ -13376,6 +13504,9 @@
       }
 
       async function loadLod(next) {
+        stopMixamoBody();
+        if (mixamoBodyEl) mixamoBodyEl.checked = false;
+        setMixamoStatus('mixamo off · royalty-free body library');
         loadStatus.textContent = `Loading mesh ${next.toUpperCase()}…`;
         loadStatus.className = 'status';
         const gltf = await loader.loadAsync(ASSETS[next]);
@@ -13704,6 +13835,20 @@
         cancelActiveCompoundLifecycle('idle_pick');
         idleOn = !idleOn;
         e.currentTarget.classList.toggle('primary', idleOn);
+      });
+      mixamoBodyEl?.addEventListener('change', async () => {
+        cancelActiveCompoundLifecycle('mixamo_pick');
+        if (!mixamoBodyEl.checked) {
+          stopMixamoBody();
+          setMixamoStatus('mixamo off · royalty-free body library');
+          return;
+        }
+        await startMixamoBody(mixamoClipSel?.value || 'samba');
+      });
+      mixamoClipSel?.addEventListener('change', async () => {
+        cancelActiveCompoundLifecycle('mixamo_clip');
+        if (!mixamoBodyEl?.checked) return;
+        await startMixamoBody(mixamoClipSel.value);
       });
       document.getElementById('btnSpin').addEventListener('click', (e) => {
         cancelActiveCompoundLifecycle('spin_pick');
@@ -15518,7 +15663,7 @@
         // Naughty Dog: idle motion overlays emotion — Layer I breath + persona variants.
         if (spinOn && model) model.rotation.y += dt * 0.6;
         const idleState = idle.tick(dt);
-        if (idleOn && model && !mixer) {
+        if (idleOn && model && !mixer && !mixamoMixer) {
           const ch = idleState.channels;
           model.rotation.y = ch.headYaw + Math.sin(clock.elapsedTime * 0.35) * 0.02;
           model.position.y = ch.headY + ch.chest;
@@ -15529,6 +15674,7 @@
           }
         }
         if (mixer) mixer.update(dt);
+        if (mixamoMixer) mixamoMixer.update(dt);
         idleStatus.textContent = `${PERSONAS[idle.personaId]?.label || idle.personaId} · ${idleState.arousal} · ${idleState.variant} · ${idleState.breath.bpm.toFixed(0)} bpm · next ${idleState.nextVariantIn.toFixed(0)}s`;
 
         if (compoundCrossfade) {
@@ -15955,7 +16101,7 @@
         walkPhase = (walkPhase + dt * gaitOut.gait.cadence * 1.2) % 1;
         const walk = sampleWalkPose(gaitOut.gait, walkPhase);
         gaitStatus.textContent = `${gaitOut.emotion} · spd ${gaitOut.gait.walkSpeed.toFixed(2)} · stride ${gaitOut.gait.strideLength.toFixed(2)} · arm ${gaitOut.gait.armSwingOrigin} · ${gaitOut.gait.footstepWeight}`;
-        if (idleOn && model && !mixer) {
+        if (idleOn && model && !mixer && !mixamoMixer) {
           model.position.y += walk.vertical * 0.5;
         }
 
@@ -15974,8 +16120,10 @@
             latencyState.phase === 'waiting' ? latencyState.adaptor || null : null,
         });
         gestureStatus.textContent = `${gestureState.lock} · ${gestureState.layer} · ${gestureState.label} · gap ${gestureState.gapSec.toFixed(1)}s`;
-        document.getElementById('hudGesture').textContent = gestureState.layer;
-        if (model && Object.keys(boneMap).length) {
+        document.getElementById('hudGesture').textContent = mixamoMixer
+          ? `mixamo:${mixamoActiveId || 'on'}`
+          : gestureState.layer;
+        if (model && Object.keys(boneMap).length && !mixamoMixer) {
           applyGestureBones(boneMap, boneRest, gestureState, 1);
         }
         if (emblemSel.value && !gestures.emblem) {
@@ -15991,7 +16139,7 @@
           lookY,
           gazeLock,
         });
-        if (model && boneMap.head) {
+        if (model && boneMap.head && !mixamoMixer) {
           if (smileState.kind === 'laughter' && smileState.body) {
             applyLaughBones(boneMap, boneRest, smileState.body, 1);
           } else {
