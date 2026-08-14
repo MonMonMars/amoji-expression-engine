@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2974118 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel [role="status"] {
+          caret-color: CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-live] {
+        word-break: keep-all;
+      }
+      #disneyExtremePanel a:focus-visible {
+        outline-style: outset;
+      }
       /* disneyExtremeA11yPolish2949542 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel [role="tablist"] {
@@ -2818,6 +2830,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2974118Docs
+       * catalog · post-2974117 a11y polish notes
+       * readme · phase table 2974118+
+       * FACE_LIVE · a11y delta sync 2974118+
+       * docs · bind surface count 32 keep71
+       * docs · 183 button aria keep71
+       * docs · chip modifier matrix keep71
+       * docs · focus-visible map keep71
+       * docs · live region policy keep71
+       * docs · reduced motion keep71
+       * docs · forced-colors keep71
+       * docs · pointer coarse keep71
+       * docs · landmark roles keep71
+       * docs · skip links keep71
+       * docs · spark role=img keep71
+       * docs · bind registry keep71
+       * docs · typography policy keep71
+       * docs · interaction policy keep71
+       * docs · layout policy keep71
+       * docs · motion policy keep71
+       * docs · hover policy keep71
+       * docs · kbd mono policy keep71
+       * docs · sr-only utility keep71
+       * docs · contrast border policy keep71
+       * docs · dirty inset policy keep71
+       * docs · wide panel policy keep71
+       * docs · hover-none policy keep71
+       * docs · forced-colors status caret CanvasText policy keep71
+       * docs · aria-live word-break keep-all policy keep71
+       * docs · link focus outline-style outset policy keep71
+       * tests · a11y substring harness 2974118+
+       * final a11y polish audit · batch 2974118+
+       * Extreme a11y batch70 audit
        */
       /* disneyExtremeA11yPolish2949542Docs
        * catalog · post-2949541 a11y polish notes
