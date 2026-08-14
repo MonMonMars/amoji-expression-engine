@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2113958 */
+      @media (pointer: coarse) {
+        #disneyExtremePanel .extreme-hist-chip {
+          min-block-size: 2.5rem;
+        }
+      }
+      #disneyExtremePanel [aria-selected="true"] {
+        text-decoration-line: underline;
+      }
+      #disneyExtremePanel kbd:focus-visible {
+        outline: 2px solid Highlight;
+      }
       /* disneyExtremeA11yPolish2089382 */
       @media (prefers-reduced-transparency: reduce) {
         #disneyExtremePanel .extreme-hist-chip {
@@ -2395,6 +2407,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2113958Docs
+       * catalog · post-2113957 a11y polish notes
+       * readme · phase table 2113958+
+       * FACE_LIVE · a11y delta sync 2113958+
+       * docs · bind surface count 32 keep36
+       * docs · 183 button aria keep36
+       * docs · chip modifier matrix keep36
+       * docs · focus-visible map keep36
+       * docs · live region policy keep36
+       * docs · reduced motion keep36
+       * docs · forced-colors keep36
+       * docs · pointer coarse keep36
+       * docs · landmark roles keep36
+       * docs · skip links keep36
+       * docs · spark role=img keep36
+       * docs · bind registry keep36
+       * docs · typography policy keep36
+       * docs · interaction policy keep36
+       * docs · layout policy keep36
+       * docs · motion policy keep36
+       * docs · hover policy keep36
+       * docs · kbd mono policy keep36
+       * docs · sr-only utility keep36
+       * docs · contrast border policy keep36
+       * docs · dirty inset policy keep36
+       * docs · wide panel policy keep36
+       * docs · hover-none policy keep36
+       * docs · coarse chip min-block-size policy keep36
+       * docs · aria-selected underline policy keep36
+       * docs · kbd focus-visible outline policy keep36
+       * tests · a11y substring harness 2113958+
+       * final a11y polish audit · batch 2113958+
+       * Extreme a11y batch35 audit
        */
       /* disneyExtremeA11yPolish2089382Docs
        * catalog · post-2089381 a11y polish notes
