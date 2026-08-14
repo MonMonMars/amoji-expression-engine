@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish3072422 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel .extreme-chip {
+          border-color: CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-busy="true"] {
+        letter-spacing: 0.02em;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        outline-style: dotted;
+      }
       /* disneyExtremeA11yPolish3047846 */
       @media (prefers-reduced-data: reduce) {
         #disneyExtremePanel [role="status"] {
@@ -2866,6 +2878,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish3072422Docs
+       * catalog · post-3072421 a11y polish notes
+       * readme · phase table 3072422+
+       * FACE_LIVE · a11y delta sync 3072422+
+       * docs · bind surface count 32 keep75
+       * docs · 183 button aria keep75
+       * docs · chip modifier matrix keep75
+       * docs · focus-visible map keep75
+       * docs · live region policy keep75
+       * docs · reduced motion keep75
+       * docs · forced-colors keep75
+       * docs · pointer coarse keep75
+       * docs · landmark roles keep75
+       * docs · skip links keep75
+       * docs · spark role=img keep75
+       * docs · bind registry keep75
+       * docs · typography policy keep75
+       * docs · interaction policy keep75
+       * docs · layout policy keep75
+       * docs · motion policy keep75
+       * docs · hover policy keep75
+       * docs · kbd mono policy keep75
+       * docs · sr-only utility keep75
+       * docs · contrast border policy keep75
+       * docs · dirty inset policy keep75
+       * docs · wide panel policy keep75
+       * docs · hover-none policy keep75
+       * docs · forced-colors chip border CanvasText policy keep75
+       * docs · aria-busy letter-spacing policy keep75
+       * docs · skip focus outline-style dotted policy keep75
+       * tests · a11y substring harness 3072422+
+       * final a11y polish audit · batch 3072422+
+       * Extreme a11y batch74 audit
        */
       /* disneyExtremeA11yPolish3047846Docs
        * catalog · post-3047845 a11y polish notes
