@@ -699,6 +699,20 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1671590 */
+      @media print {
+        #disneyExtremePanel {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+      }
+      #disneyExtremePanel details > summary::-webkit-details-marker {
+        color: currentColor;
+      }
+      #disneyExtremePanel .extreme-hist-chip,
+      #disneyExtremePanel .extreme-fav-chip {
+        min-block-size: 2.75rem;
+      }
       /* disneyExtremeA11yPolish1647014 */
       @media (forced-colors: active) {
         #disneyExtremePanel .extreme-skip {
@@ -2173,6 +2187,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish1671590Docs
+       * catalog · post-1671589 a11y polish notes
+       * readme · phase table 1671590+
+       * FACE_LIVE · a11y delta sync 1671590+
+       * docs · bind surface count 32 keep18
+       * docs · 183 button aria keep18
+       * docs · chip modifier matrix keep18
+       * docs · focus-visible map keep18
+       * docs · live region policy keep18
+       * docs · reduced motion keep18
+       * docs · forced-colors keep18
+       * docs · pointer coarse keep18
+       * docs · landmark roles keep18
+       * docs · skip links keep18
+       * docs · spark role=img keep18
+       * docs · bind registry keep18
+       * docs · typography policy keep18
+       * docs · interaction policy keep18
+       * docs · layout policy keep18
+       * docs · motion policy keep18
+       * docs · hover policy keep18
+       * docs · kbd mono policy keep18
+       * docs · sr-only utility keep18
+       * docs · contrast border policy keep18
+       * docs · dirty inset policy keep18
+       * docs · wide panel policy keep18
+       * docs · hover-none policy keep18
+       * docs · print color-adjust policy keep18
+       * docs · details marker policy keep18
+       * docs · chip min-height touch policy keep18
+       * tests · a11y substring harness 1671590+
+       * final a11y polish audit · batch 1671590+
+       * Extreme a11y batch17 audit
        */
       /* disneyExtremeA11yPolish1647014Docs
        * catalog · post-1647013 a11y polish notes
