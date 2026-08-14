@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2236838 */
+      @media (prefers-reduced-data: reduce) {
+        #disneyExtremePanel .extreme-hist-chip {
+          background-image: none;
+        }
+      }
+      #disneyExtremePanel [role="tablist"] {
+        scrollbar-width: thin;
+      }
+      #disneyExtremePanel summary:focus-visible {
+        outline-style: solid;
+      }
       /* disneyExtremeA11yPolish2212262 */
       @media (hover: none) {
         #disneyExtremePanel button:hover {
@@ -2455,6 +2467,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2236838Docs
+       * catalog · post-2236837 a11y polish notes
+       * readme · phase table 2236838+
+       * FACE_LIVE · a11y delta sync 2236838+
+       * docs · bind surface count 32 keep41
+       * docs · 183 button aria keep41
+       * docs · chip modifier matrix keep41
+       * docs · focus-visible map keep41
+       * docs · live region policy keep41
+       * docs · reduced motion keep41
+       * docs · forced-colors keep41
+       * docs · pointer coarse keep41
+       * docs · landmark roles keep41
+       * docs · skip links keep41
+       * docs · spark role=img keep41
+       * docs · bind registry keep41
+       * docs · typography policy keep41
+       * docs · interaction policy keep41
+       * docs · layout policy keep41
+       * docs · motion policy keep41
+       * docs · hover policy keep41
+       * docs · kbd mono policy keep41
+       * docs · sr-only utility keep41
+       * docs · contrast border policy keep41
+       * docs · dirty inset policy keep41
+       * docs · wide panel policy keep41
+       * docs · hover-none policy keep41
+       * docs · reduced-data chip background policy keep41
+       * docs · tablist scrollbar-width policy keep41
+       * docs · summary focus-visible outline-style policy keep41
+       * tests · a11y substring harness 2236838+
+       * final a11y polish audit · batch 2236838+
+       * Extreme a11y batch40 audit
        */
       /* disneyExtremeA11yPolish2212262Docs
        * catalog · post-2212261 a11y polish notes
