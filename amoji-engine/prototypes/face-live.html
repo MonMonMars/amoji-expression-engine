@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2728358 */
+      @media (prefers-reduced-motion: reduce) {
+        #disneyExtremePanel [role="progressbar"] {
+          animation: none;
+        }
+      }
+      #disneyExtremePanel [aria-valuetext] {
+        font-variant-numeric: tabular-nums;
+      }
+      #disneyExtremePanel summary:focus-visible {
+        outline-offset: 2px;
+      }
       /* disneyExtremeA11yPolish2703782 */
       @media (prefers-reduced-data: reduce) {
         #disneyExtremePanel img,
@@ -2698,6 +2710,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2728358Docs
+       * catalog · post-2728357 a11y polish notes
+       * readme · phase table 2728358+
+       * FACE_LIVE · a11y delta sync 2728358+
+       * docs · bind surface count 32 keep61
+       * docs · 183 button aria keep61
+       * docs · chip modifier matrix keep61
+       * docs · focus-visible map keep61
+       * docs · live region policy keep61
+       * docs · reduced motion keep61
+       * docs · forced-colors keep61
+       * docs · pointer coarse keep61
+       * docs · landmark roles keep61
+       * docs · skip links keep61
+       * docs · spark role=img keep61
+       * docs · bind registry keep61
+       * docs · typography policy keep61
+       * docs · interaction policy keep61
+       * docs · layout policy keep61
+       * docs · motion policy keep61
+       * docs · hover policy keep61
+       * docs · kbd mono policy keep61
+       * docs · sr-only utility keep61
+       * docs · contrast border policy keep61
+       * docs · dirty inset policy keep61
+       * docs · wide panel policy keep61
+       * docs · hover-none policy keep61
+       * docs · reduced-motion progressbar animation policy keep61
+       * docs · aria-valuetext tabular-nums policy keep61
+       * docs · summary focus outline-offset policy keep61
+       * tests · a11y substring harness 2728358+
+       * final a11y polish audit · batch 2728358+
+       * Extreme a11y batch60 audit
        */
       /* disneyExtremeA11yPolish2703782Docs
        * catalog · post-2703781 a11y polish notes
