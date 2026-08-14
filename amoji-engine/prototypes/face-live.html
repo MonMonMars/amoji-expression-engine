@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2482598 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel button:disabled {
+          outline: 1px solid GrayText;
+        }
+      }
+      #disneyExtremePanel [aria-flowto] {
+        scroll-margin-inline: 0.5rem;
+      }
+      #disneyExtremePanel .extreme-focus-ring:focus-visible {
+        outline-style: auto;
+      }
       /* disneyExtremeA11yPolish2458022 */
       @media (forced-colors: active) {
         #disneyExtremePanel [aria-selected="true"] {
@@ -2577,6 +2589,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2482598Docs
+       * catalog · post-2482597 a11y polish notes
+       * readme · phase table 2482598+
+       * FACE_LIVE · a11y delta sync 2482598+
+       * docs · bind surface count 32 keep51
+       * docs · 183 button aria keep51
+       * docs · chip modifier matrix keep51
+       * docs · focus-visible map keep51
+       * docs · live region policy keep51
+       * docs · reduced motion keep51
+       * docs · forced-colors keep51
+       * docs · pointer coarse keep51
+       * docs · landmark roles keep51
+       * docs · skip links keep51
+       * docs · spark role=img keep51
+       * docs · bind registry keep51
+       * docs · typography policy keep51
+       * docs · interaction policy keep51
+       * docs · layout policy keep51
+       * docs · motion policy keep51
+       * docs · hover policy keep51
+       * docs · kbd mono policy keep51
+       * docs · sr-only utility keep51
+       * docs · contrast border policy keep51
+       * docs · dirty inset policy keep51
+       * docs · wide panel policy keep51
+       * docs · hover-none policy keep51
+       * docs · contrast-more disabled button outline policy keep51
+       * docs · aria-flowto scroll-margin policy keep51
+       * docs · focus-ring outline-style auto policy keep51
+       * tests · a11y substring harness 2482598+
+       * final a11y polish audit · batch 2482598+
+       * Extreme a11y batch50 audit
        */
       /* disneyExtremeA11yPolish2458022Docs
        * catalog · post-2458021 a11y polish notes
