@@ -388,21 +388,29 @@ describe('Phase ${phase} Extreme ${n.id}', () => {
     const dir = join(root, 'tests', testBucket(phase));
     writeFileSync(
       join(dir, `phase${phase}DisneyExtreme${pascal(notes[readmeIdx].id)}.test.js`),
-      `import { describe, expect, it } from 'vitest';
-import { DISNEY_EXTREME_HOTKEY_HELP } from '../../engine/layers/emotionMorphs.js';
-import { readFileSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
-describe('Phase ${phase} Extreme readmePhaseTable2556326plus', () => {
-  it('documents phases ${START}-${END} in phase docs', () => {
-    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('readme · phase table 2556326+');
-    const readme = readdirSync(join(root, 'docs/phases')).filter((x) => x.endsWith('.md')).map((x) => readFileSync(join(root, 'docs/phases', x), 'utf8')).join('\\n');
-    expect(readme).toContain('| Phase ${START} |');
-    expect(readme).toContain('| Phase ${END} |');
-  }, 30000);
-});
-`,
+      [
+        "import { describe, expect, it } from 'vitest';",
+        "import { DISNEY_EXTREME_HOTKEY_HELP } from '../../engine/layers/emotionMorphs.js';",
+        "import { readFileSync } from 'node:fs';",
+        "import { fileURLToPath } from 'node:url';",
+        "import { dirname, join } from 'node:path';",
+        "const root = join(dirname(fileURLToPath(import.meta.url)), '../..');",
+        `describe('Phase ${phase} Extreme readmePhaseTable${START}plus', () => {`,
+        `  it('documents phases ${START}-${END} in phase docs', () => {`,
+        `    expect(DISNEY_EXTREME_HOTKEY_HELP).toContain('readme · phase table ${START}+');`,
+        `    const startDoc = Math.floor(${START} / 50000);`,
+        `    const endDoc = Math.floor(${END} / 50000);`,
+        "    const readme = [];",
+        "    for (let i = startDoc; i <= endDoc; i += 1) {",
+        "      readme.push(readFileSync(join(root, 'docs/phases', 'phases-' + String(i).padStart(3, '0') + '.md'), 'utf8'));",
+        "    }",
+        "    const text = readme.join('\\n');",
+        `    expect(text).toContain('| Phase ${START} |');`,
+        `    expect(text).toContain('| Phase ${END} |');`,
+        "  }, 30000);",
+        "});",
+        "",
+      ].join('\n'),
     );
   }
 
@@ -411,21 +419,29 @@ describe('Phase ${phase} Extreme readmePhaseTable2556326plus', () => {
     const dir = join(root, 'tests', testBucket(phase));
     writeFileSync(
       join(dir, `phase${phase}DisneyExtreme${pascal(notes[countIdx].id)}.test.js`),
-      `import { describe, expect, it } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
-describe('Phase ${phase} Extreme phaseTableCount2556326', () => {
-  it('has ${COUNT} phase-doc rows for ${START}-${END}', () => {
-    const readme = readdirSync(join(root, 'docs/phases')).filter((x) => x.endsWith('.md')).map((x) => readFileSync(join(root, 'docs/phases', x), 'utf8')).join('\\n');
-    const rows = [...readme.matchAll(/\\| Phase (\\d+) \\|/g)]
-      .map((m) => Number(m[1]))
-      .filter((n) => n >= ${START} && n <= ${END});
-    expect(new Set(rows).size).toBe(${COUNT});
-  }, 30000);
-});
-`,
+      [
+        "import { describe, expect, it } from 'vitest';",
+        "import { readFileSync } from 'node:fs';",
+        "import { fileURLToPath } from 'node:url';",
+        "import { dirname, join } from 'node:path';",
+        "const root = join(dirname(fileURLToPath(import.meta.url)), '../..');",
+        `describe('Phase ${phase} Extreme phaseTableCount${START}', () => {`,
+        `  it('has ${COUNT} phase-doc rows for ${START}-${END}', () => {`,
+        `    const startDoc = Math.floor(${START} / 50000);`,
+        `    const endDoc = Math.floor(${END} / 50000);`,
+        "    const readme = [];",
+        "    for (let i = startDoc; i <= endDoc; i += 1) {",
+        "      readme.push(readFileSync(join(root, 'docs/phases', 'phases-' + String(i).padStart(3, '0') + '.md'), 'utf8'));",
+        "    }",
+        "    const text = readme.join('\\n');",
+        "    const rows = [...text.matchAll(/\\| Phase (\\d+) \\|/g)]",
+        "      .map((m) => Number(m[1]))",
+        `      .filter((n) => n >= ${START} && n <= ${END});`,
+        `    expect(new Set(rows).size).toBe(${COUNT});`,
+        "  }, 30000);",
+        "});",
+        "",
+      ].join('\n'),
     );
   }
 
