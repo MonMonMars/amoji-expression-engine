@@ -699,6 +699,20 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2458022 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel [aria-selected="true"] {
+          background-color: Highlight;
+          color: HighlightText;
+          forced-color-adjust: none;
+        }
+      }
+      #disneyExtremePanel [aria-autocomplete] {
+        field-sizing: content;
+      }
+      #disneyExtremePanel .extreme-skip:not(:focus):not(:focus-visible) {
+        clip-path: inset(50%);
+      }
       /* disneyExtremeA11yPolish2433446 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel [role="tab"] {
@@ -2563,6 +2577,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2458022Docs
+       * catalog · post-2458021 a11y polish notes
+       * readme · phase table 2458022+
+       * FACE_LIVE · a11y delta sync 2458022+
+       * docs · bind surface count 32 keep50
+       * docs · 183 button aria keep50
+       * docs · chip modifier matrix keep50
+       * docs · focus-visible map keep50
+       * docs · live region policy keep50
+       * docs · reduced motion keep50
+       * docs · forced-colors keep50
+       * docs · pointer coarse keep50
+       * docs · landmark roles keep50
+       * docs · skip links keep50
+       * docs · spark role=img keep50
+       * docs · bind registry keep50
+       * docs · typography policy keep50
+       * docs · interaction policy keep50
+       * docs · layout policy keep50
+       * docs · motion policy keep50
+       * docs · hover policy keep50
+       * docs · kbd mono policy keep50
+       * docs · sr-only utility keep50
+       * docs · contrast border policy keep50
+       * docs · dirty inset policy keep50
+       * docs · wide panel policy keep50
+       * docs · hover-none policy keep50
+       * docs · forced-colors selected Highlight policy keep50
+       * docs · aria-autocomplete field-sizing policy keep50
+       * docs · skip unfocused clip-path policy keep50
+       * tests · a11y substring harness 2458022+
+       * final a11y polish audit · batch 2458022+
+       * Extreme a11y batch49 audit
        */
       /* disneyExtremeA11yPolish2433446Docs
        * catalog · post-2433445 a11y polish notes
