@@ -699,6 +699,19 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish1966502 */
+      @media (prefers-reduced-transparency: reduce) {
+        #disneyExtremePanel {
+          background-color: Canvas;
+        }
+      }
+      #disneyExtremePanel [aria-selected="true"] {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+      #disneyExtremePanel dialog::backdrop {
+        background: color-mix(in srgb, CanvasText 35%, transparent);
+      }
       /* disneyExtremeA11yPolish1941926 */
       @media (update: fast) {
         #disneyExtremePanel .extreme-focus-ring {
@@ -2322,6 +2335,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish1966502Docs
+       * catalog · post-1966501 a11y polish notes
+       * readme · phase table 1966502+
+       * FACE_LIVE · a11y delta sync 1966502+
+       * docs · bind surface count 32 keep30
+       * docs · 183 button aria keep30
+       * docs · chip modifier matrix keep30
+       * docs · focus-visible map keep30
+       * docs · live region policy keep30
+       * docs · reduced motion keep30
+       * docs · forced-colors keep30
+       * docs · pointer coarse keep30
+       * docs · landmark roles keep30
+       * docs · skip links keep30
+       * docs · spark role=img keep30
+       * docs · bind registry keep30
+       * docs · typography policy keep30
+       * docs · interaction policy keep30
+       * docs · layout policy keep30
+       * docs · motion policy keep30
+       * docs · hover policy keep30
+       * docs · kbd mono policy keep30
+       * docs · sr-only utility keep30
+       * docs · contrast border policy keep30
+       * docs · dirty inset policy keep30
+       * docs · wide panel policy keep30
+       * docs · hover-none policy keep30
+       * docs · reduced-transparency canvas policy keep30
+       * docs · selected underline-offset policy keep30
+       * docs · dialog backdrop mix policy keep30
+       * tests · a11y substring harness 1966502+
+       * final a11y polish audit · batch 1966502+
+       * Extreme a11y batch29 audit
        */
       /* disneyExtremeA11yPolish1941926Docs
        * catalog · post-1941925 a11y polish notes
