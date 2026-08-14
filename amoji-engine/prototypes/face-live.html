@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2015654 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel a:focus-visible {
+          outline: 3px solid LinkText;
+        }
+      }
+      #disneyExtremePanel [aria-controls] {
+        cursor: pointer;
+      }
+      #disneyExtremePanel .extreme-hist-chip[aria-current="true"] {
+        outline-offset: 3px;
+      }
       /* disneyExtremeA11yPolish1991078 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel * {
@@ -2347,6 +2359,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2015654Docs
+       * catalog · post-2015653 a11y polish notes
+       * readme · phase table 2015654+
+       * FACE_LIVE · a11y delta sync 2015654+
+       * docs · bind surface count 32 keep32
+       * docs · 183 button aria keep32
+       * docs · chip modifier matrix keep32
+       * docs · focus-visible map keep32
+       * docs · live region policy keep32
+       * docs · reduced motion keep32
+       * docs · forced-colors keep32
+       * docs · pointer coarse keep32
+       * docs · landmark roles keep32
+       * docs · skip links keep32
+       * docs · spark role=img keep32
+       * docs · bind registry keep32
+       * docs · typography policy keep32
+       * docs · interaction policy keep32
+       * docs · layout policy keep32
+       * docs · motion policy keep32
+       * docs · hover policy keep32
+       * docs · kbd mono policy keep32
+       * docs · sr-only utility keep32
+       * docs · contrast border policy keep32
+       * docs · dirty inset policy keep32
+       * docs · wide panel policy keep32
+       * docs · hover-none policy keep32
+       * docs · forced-colors link focus policy keep32
+       * docs · aria-controls cursor policy keep32
+       * docs · current chip outline-offset policy keep32
+       * tests · a11y substring harness 2015654+
+       * final a11y polish audit · batch 2015654+
+       * Extreme a11y batch31 audit
        */
       /* disneyExtremeA11yPolish1991078Docs
        * catalog · post-1991077 a11y polish notes
