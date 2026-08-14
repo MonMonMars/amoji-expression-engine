@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2802086 */
+      @media (prefers-contrast: more) {
+        #disneyExtremePanel [aria-checked="true"] {
+          border-color: CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-dropeffect] {
+        cursor: copy;
+      }
+      #disneyExtremePanel .extreme-skip:focus-visible {
+        outline-offset: 4px;
+      }
       /* disneyExtremeA11yPolish2777510 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel [role="dialog"] {
@@ -2734,6 +2746,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2802086Docs
+       * catalog · post-2802085 a11y polish notes
+       * readme · phase table 2802086+
+       * FACE_LIVE · a11y delta sync 2802086+
+       * docs · bind surface count 32 keep64
+       * docs · 183 button aria keep64
+       * docs · chip modifier matrix keep64
+       * docs · focus-visible map keep64
+       * docs · live region policy keep64
+       * docs · reduced motion keep64
+       * docs · forced-colors keep64
+       * docs · pointer coarse keep64
+       * docs · landmark roles keep64
+       * docs · skip links keep64
+       * docs · spark role=img keep64
+       * docs · bind registry keep64
+       * docs · typography policy keep64
+       * docs · interaction policy keep64
+       * docs · layout policy keep64
+       * docs · motion policy keep64
+       * docs · hover policy keep64
+       * docs · kbd mono policy keep64
+       * docs · sr-only utility keep64
+       * docs · contrast border policy keep64
+       * docs · dirty inset policy keep64
+       * docs · wide panel policy keep64
+       * docs · hover-none policy keep64
+       * docs · contrast-more checked CanvasText border policy keep64
+       * docs · aria-dropeffect copy cursor policy keep64
+       * docs · skip focus outline-offset policy keep64
+       * tests · a11y substring harness 2802086+
+       * final a11y polish audit · batch 2802086+
+       * Extreme a11y batch63 audit
        */
       /* disneyExtremeA11yPolish2777510Docs
        * catalog · post-2777509 a11y polish notes
