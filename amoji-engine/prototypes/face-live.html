@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2163110 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel [role="switch"][aria-checked="true"] {
+          outline: 2px solid Highlight;
+        }
+      }
+      #disneyExtremePanel [aria-live="polite"] {
+        speak-as: spell-out;
+      }
+      #disneyExtremePanel button:disabled {
+        opacity: 0.55;
+      }
       /* disneyExtremeA11yPolish2138534 */
       @media (prefers-reduced-motion: reduce) {
         #disneyExtremePanel [role="status"] {
@@ -2419,6 +2431,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2163110Docs
+       * catalog · post-2163109 a11y polish notes
+       * readme · phase table 2163110+
+       * FACE_LIVE · a11y delta sync 2163110+
+       * docs · bind surface count 32 keep38
+       * docs · 183 button aria keep38
+       * docs · chip modifier matrix keep38
+       * docs · focus-visible map keep38
+       * docs · live region policy keep38
+       * docs · reduced motion keep38
+       * docs · forced-colors keep38
+       * docs · pointer coarse keep38
+       * docs · landmark roles keep38
+       * docs · skip links keep38
+       * docs · spark role=img keep38
+       * docs · bind registry keep38
+       * docs · typography policy keep38
+       * docs · interaction policy keep38
+       * docs · layout policy keep38
+       * docs · motion policy keep38
+       * docs · hover policy keep38
+       * docs · kbd mono policy keep38
+       * docs · sr-only utility keep38
+       * docs · contrast border policy keep38
+       * docs · dirty inset policy keep38
+       * docs · wide panel policy keep38
+       * docs · hover-none policy keep38
+       * docs · forced-colors switch checked outline policy keep38
+       * docs · aria-live polite speak-as policy keep38
+       * docs · disabled button opacity policy keep38
+       * tests · a11y substring harness 2163110+
+       * final a11y polish audit · batch 2163110+
+       * Extreme a11y batch37 audit
        */
       /* disneyExtremeA11yPolish2138534Docs
        * catalog · post-2138533 a11y polish notes
