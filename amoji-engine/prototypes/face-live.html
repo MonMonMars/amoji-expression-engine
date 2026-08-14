@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2433446 */
+      @media (prefers-reduced-motion: reduce) {
+        #disneyExtremePanel [role="tab"] {
+          scroll-margin-block: 0;
+        }
+      }
+      #disneyExtremePanel [aria-roledescription] {
+        font-style: normal;
+      }
+      #disneyExtremePanel .extreme-hist-chip[aria-pressed="true"] {
+        box-shadow: inset 0 0 0 1px currentColor;
+      }
       /* disneyExtremeA11yPolish2408870 */
       @media (pointer: fine) {
         #disneyExtremePanel .extreme-hist-chip {
@@ -2551,6 +2563,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2433446Docs
+       * catalog · post-2433445 a11y polish notes
+       * readme · phase table 2433446+
+       * FACE_LIVE · a11y delta sync 2433446+
+       * docs · bind surface count 32 keep49
+       * docs · 183 button aria keep49
+       * docs · chip modifier matrix keep49
+       * docs · focus-visible map keep49
+       * docs · live region policy keep49
+       * docs · reduced motion keep49
+       * docs · forced-colors keep49
+       * docs · pointer coarse keep49
+       * docs · landmark roles keep49
+       * docs · skip links keep49
+       * docs · spark role=img keep49
+       * docs · bind registry keep49
+       * docs · typography policy keep49
+       * docs · interaction policy keep49
+       * docs · layout policy keep49
+       * docs · motion policy keep49
+       * docs · hover policy keep49
+       * docs · kbd mono policy keep49
+       * docs · sr-only utility keep49
+       * docs · contrast border policy keep49
+       * docs · dirty inset policy keep49
+       * docs · wide panel policy keep49
+       * docs · hover-none policy keep49
+       * docs · reduced-motion tab scroll-margin policy keep49
+       * docs · aria-roledescription font-style policy keep49
+       * docs · pressed chip inset shadow policy keep49
+       * tests · a11y substring harness 2433446+
+       * final a11y polish audit · batch 2433446+
+       * Extreme a11y batch48 audit
        */
       /* disneyExtremeA11yPolish2408870Docs
        * catalog · post-2408869 a11y polish notes
