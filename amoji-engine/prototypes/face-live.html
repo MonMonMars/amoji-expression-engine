@@ -699,6 +699,18 @@
         --extreme-focus-ring-width: 2px;
         color-scheme: light;
       }
+      /* disneyExtremeA11yPolish2359718 */
+      @media (forced-colors: active) {
+        #disneyExtremePanel [aria-busy="true"] {
+          outline: 2px dashed CanvasText;
+        }
+      }
+      #disneyExtremePanel [aria-details] {
+        text-decoration-style: dotted;
+      }
+      #disneyExtremePanel .extreme-hist-chip:disabled {
+        opacity: 0.6;
+      }
       /* disneyExtremeA11yPolish2335142 */
       @media (prefers-reduced-motion: no-preference) {
         #disneyExtremePanel [role="status"] {
@@ -2515,6 +2527,40 @@
        * tests · a11y substring harness 1958+
        * final a11y polish audit · batch 1958+
        * Extreme a11y batch3 audit
+       */
+      /* disneyExtremeA11yPolish2359718Docs
+       * catalog · post-2359717 a11y polish notes
+       * readme · phase table 2359718+
+       * FACE_LIVE · a11y delta sync 2359718+
+       * docs · bind surface count 32 keep46
+       * docs · 183 button aria keep46
+       * docs · chip modifier matrix keep46
+       * docs · focus-visible map keep46
+       * docs · live region policy keep46
+       * docs · reduced motion keep46
+       * docs · forced-colors keep46
+       * docs · pointer coarse keep46
+       * docs · landmark roles keep46
+       * docs · skip links keep46
+       * docs · spark role=img keep46
+       * docs · bind registry keep46
+       * docs · typography policy keep46
+       * docs · interaction policy keep46
+       * docs · layout policy keep46
+       * docs · motion policy keep46
+       * docs · hover policy keep46
+       * docs · kbd mono policy keep46
+       * docs · sr-only utility keep46
+       * docs · contrast border policy keep46
+       * docs · dirty inset policy keep46
+       * docs · wide panel policy keep46
+       * docs · hover-none policy keep46
+       * docs · forced-colors busy dashed outline policy keep46
+       * docs · aria-details dotted underline policy keep46
+       * docs · disabled chip opacity policy keep46
+       * tests · a11y substring harness 2359718+
+       * final a11y polish audit · batch 2359718+
+       * Extreme a11y batch45 audit
        */
       /* disneyExtremeA11yPolish2335142Docs
        * catalog · post-2335141 a11y polish notes
