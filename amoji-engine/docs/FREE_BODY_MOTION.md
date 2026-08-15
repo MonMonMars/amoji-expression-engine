@@ -14,3 +14,5 @@ Shortlist for Amoji Sakura body animation beyond Adobe Mixamo.
 | three.js `pirouette.bvh` | Examples redistrib | Verify | Experimental | Partial bone map |
 
 Runtime: Face Live **Body motion** panel → `SkeletonUtils.retargetClip` via `engine/layers/bodyMotionRetarget.js`.
+
+For the full free/OSS content map (characters, face, hair, tools), see [`FREE_OPEN_CONTENT.md`](./FREE_OPEN_CONTENT.md).

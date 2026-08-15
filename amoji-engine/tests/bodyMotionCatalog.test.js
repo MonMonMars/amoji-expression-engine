@@ -32,6 +32,9 @@ describe('bodyMotionCatalog', () => {
     const groups = bodyMotionClipsBySource();
     expect(groups.some((g) => g.source === 'quaternius' && g.clips.length >= 3)).toBe(true);
     expect(getBodyMotionClip('q-walk')?.animationName).toBe('Walk_Loop');
+    expect(getBodyMotionClip('q-sprint')?.animationName).toBe('Sprint_Loop');
+    expect(getBodyMotionClip('q-talk')?.animationName).toBe('Idle_Talking_Loop');
+    expect(BODY_MOTION_CLIPS.filter((c) => c.source === 'quaternius').length).toBeGreaterThanOrEqual(15);
   });
 });
 
