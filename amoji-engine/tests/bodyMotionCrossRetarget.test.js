@@ -9,9 +9,10 @@ describe('cross-skeleton body retarget', () => {
   it('maps mannequin ← Quaternius UAL (idle/walk source)', () => {
     const names = buildRetargetNames('mannequin', 'quaternius');
     expect(names.pelvis).toBe('DEF-hips');
-    expect(names.upperarm_l).toBe('DEF-upper_arm.L');
-    expect(names.thigh_r).toBe('DEF-thigh.R');
+    expect(names.upperarm_l).toBe('DEF-upper_armL');
+    expect(names.thigh_r).toBe('DEF-thighR');
     expect(names.Head).toBe('DEF-head');
+    expect(names.spine_01).toBe('DEF-spine001');
   });
 
   it('maps MPFB mixamoPlain ← CMU walk', () => {
