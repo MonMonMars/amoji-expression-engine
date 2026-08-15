@@ -2075,6 +2075,11 @@
           <input id="robotBridgeOn" type="checkbox" role="switch" />
           <span>Stream to robot-bridge (ws://127.0.0.1:7880)</span>
         </label>
+        <div class="row" style="gap:8px;margin:6px 0;flex-wrap:wrap;">
+          <button type="button" class="ctl" id="robotBridgeCopyBtn" style="width:auto;padding:6px 10px;">Copy vendor JSON</button>
+          <button type="button" class="ctl" id="robotBridgeReconnectBtn" style="width:auto;padding:6px 10px;">Reconnect bridge</button>
+        </div>
+        <div class="status" id="robotBridgeLinkStatus">bridge · off</div>
         <div class="status" id="robotVendorStatus">vendor · idle</div>
       </div>
 
@@ -13118,6 +13123,22 @@
       /** @type {WebSocket | null} */
       let robotBridgeWs = null;
       let robotBridgeHttpOk = false;
+      let lastRobotBridgePublishAt = 0;
+      /** @type {object | null} */
+      let lastVendorBridgeObj = null;
+
+      function setRobotBridgeLinkStatus(text) {
+        const el = document.getElementById('robotBridgeLinkStatus');
+        if (el) el.textContent = text;
+      }
+
+      function vendorBridgeFingerprint(bridge) {
+        if (!bridge) return '';
+        const { ts, ...rest } = bridge;
+        return JSON.stringify(rest, (_k, v) =>
+          typeof v === 'number' ? Math.round(v * 100) / 100 : v,
+        );
+      }
 
       function syncUnitreePlatformVisibility() {
         const sel = document.getElementById('unitreePlatformSel');
@@ -13158,28 +13179,40 @@
             }
             robotBridgeWs = null;
           }
+          setRobotBridgeLinkStatus('bridge · off');
           return;
         }
         if (robotBridgeWs && robotBridgeWs.readyState <= 1) return;
+        setRobotBridgeLinkStatus('bridge · connecting…');
         try {
           robotBridgeWs = new WebSocket('ws://127.0.0.1:7880');
           robotBridgeWs.addEventListener('open', () => {
-            const el = document.getElementById('robotVendorStatus');
-            if (el) el.textContent = `${el.textContent} · bridge ws ok`;
+            robotBridgeHttpOk = false;
+            setRobotBridgeLinkStatus('bridge · ws connected');
           });
           robotBridgeWs.addEventListener('close', () => {
             robotBridgeWs = null;
+            if (robotBridgeOn) {
+              setRobotBridgeLinkStatus('bridge · ws closed · will retry / HTTP');
+              robotBridgeHttpOk = true;
+            }
           });
           robotBridgeWs.addEventListener('error', () => {
-            robotBridgeHttpOk = true; // fall back to HTTP publish
+            robotBridgeHttpOk = true;
+            setRobotBridgeLinkStatus('bridge · ws error · HTTP fallback');
           });
         } catch {
           robotBridgeHttpOk = true;
+          setRobotBridgeLinkStatus('bridge · HTTP fallback');
         }
       }
 
       function publishRobotBridge(payload) {
         if (!robotBridgeOn || !payload) return;
+        const now =
+          typeof performance !== 'undefined' ? performance.now() : Date.now();
+        if (now - lastRobotBridgePublishAt < 100) return; // ≤10 Hz
+        lastRobotBridgePublishAt = now;
         ensureRobotBridgeWs();
         const msg = JSON.stringify({ type: 'publish', payload });
         if (robotBridgeWs && robotBridgeWs.readyState === 1) {
@@ -13194,7 +13227,13 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        }).catch(() => {});
+        })
+          .then((r) => {
+            if (r.ok) setRobotBridgeLinkStatus('bridge · HTTP ok');
+          })
+          .catch(() => {
+            setRobotBridgeLinkStatus('bridge · unreachable (run npm run robot-bridge)');
+          });
       }
 
       function populateBodyMotionClipSelect() {
@@ -14125,7 +14164,45 @@
               /* ignore */
             }
             robotBridgeWs = null;
+            setRobotBridgeLinkStatus('bridge · off');
           }
+        });
+      }
+      const robotBridgeCopyBtn = document.getElementById('robotBridgeCopyBtn');
+      if (robotBridgeCopyBtn) {
+        robotBridgeCopyBtn.addEventListener('click', async () => {
+          const obj = lastVendorBridgeObj || window.__amojiRobotVendor;
+          if (!obj) {
+            setRobotBridgeLinkStatus('bridge · nothing to copy yet');
+            return;
+          }
+          try {
+            await navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
+            setRobotBridgeLinkStatus('bridge · copied vendor JSON');
+          } catch {
+            setRobotBridgeLinkStatus('bridge · copy failed');
+          }
+        });
+      }
+      const robotBridgeReconnectBtn = document.getElementById('robotBridgeReconnectBtn');
+      if (robotBridgeReconnectBtn) {
+        robotBridgeReconnectBtn.addEventListener('click', () => {
+          if (robotBridgeWs) {
+            try {
+              robotBridgeWs.close();
+            } catch {
+              /* ignore */
+            }
+            robotBridgeWs = null;
+          }
+          if (!robotBridgeOn) {
+            const el = document.getElementById('robotBridgeOn');
+            if (el) {
+              el.checked = true;
+              robotBridgeOn = true;
+            }
+          }
+          ensureRobotBridgeWs();
         });
       }
       if (unitreePlatformSel) {
@@ -16897,9 +16974,10 @@
             arkitWeights: arkitLive,
             streaming: true,
           });
-          const vjson = JSON.stringify(vendorBridge);
+          const vjson = vendorBridgeFingerprint(vendorBridge);
           if (vjson !== lastVendorBridgeJson) {
             lastVendorBridgeJson = vjson;
+            lastVendorBridgeObj = vendorBridge;
             window.__amojiRobotVendor = vendorBridge;
             if (vendorBridge.payload?.humanFace) {
               window.__amojiHumanFaceRobot = vendorBridge.payload.humanFace;

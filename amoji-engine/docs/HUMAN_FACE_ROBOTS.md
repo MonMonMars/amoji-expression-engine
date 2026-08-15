@@ -32,19 +32,22 @@ Furhat FaceCore accepts ARKit-compatible gesture params. Face Live already compu
 # Terminal A — relay
 cd amoji-engine && npm run robot-bridge
 
-# Terminal B — Face Live (enable "Stream to robot-bridge")
+# Terminal B — Face Live
+# enable "Stream to robot-bridge" · optional "Human-face vendors only"
+# Copy vendor JSON / Reconnect bridge buttons available
 npm run face-live
 
 # Terminal C — Furhat companion
 python3 scripts/human_face_robot_amoji_bridge.py --subscribe --live-furhat 192.168.1.20
+
+# Or QTrobot (prints SDK + ROS2; add --qtrobot-execute if luxai SDK installed)
+python3 scripts/human_face_robot_amoji_bridge.py --subscribe --live-qtrobot 192.168.1.30
 ```
 
-Or one-shot:
-
-```bash
-python3 scripts/human_face_robot_amoji_bridge.py \
-  --file /tmp/vendor.json --live-furhat 192.168.1.20
-```
+Streaming notes:
+- Face Live fingerprints payloads **without** `ts` and rounds floats so churn is lower  
+- Publish is capped at **~10 Hz**  
+- Companion `--min-interval 0.12` further rate-limits robot hardware calls  
 
 ## Face Live
 
