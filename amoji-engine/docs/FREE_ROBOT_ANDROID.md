@@ -25,6 +25,8 @@ Live bridge payload is exposed as `window.__amojiAndroidRobot` while a robot is 
 
 **Unitree (Go2 / G1 / H1):** see `docs/UNITREE_BRIDGE.md` — `window.__amojiUnitree` (`amoji.unitree.v1`) + `scripts/unitree_amoji_bridge.py`.
 
+**Multi-vendor (Spot, Pepper, Misty, …):** see `docs/ROBOT_VENDOR_BRIDGES.md` — `window.__amojiRobotVendor` (`amoji.robotVendor.v1`).
+
 ## Related OSS robot / Android stacks (not vendored)
 
 | Project | License | Fit |

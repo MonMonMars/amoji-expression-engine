@@ -2057,14 +2057,17 @@
       </div>
 
       <div class="group">
-        <div class="label">Unitree bridge <span style="text-transform:none;letter-spacing:0">(sdk2 · dry-run JSON)</span></div>
-        <select id="unitreePlatformSel" class="ctl" aria-label="Unitree robot platform">
-          <option value="auto">Auto (Go2 + G1 bundle)</option>
-          <option value="go2">Go2 / B2 Sport + VUI</option>
-          <option value="g1">G1 Loco + Arm + LED</option>
-          <option value="h1">H1 Loco</option>
+        <div class="label">Robot vendor bridge <span style="text-transform:none;letter-spacing:0">(Spot · Pepper · Misty · Unitree…)</span></div>
+        <select id="robotVendorSel" class="ctl" aria-label="Robot vendor platform">
+          <!-- filled from robotVendorCatalog -->
         </select>
-        <div class="status" id="unitreeStatus">unitree · idle</div>
+        <select id="unitreePlatformSel" class="ctl" aria-label="Unitree robot platform" hidden>
+          <option value="auto">Unitree · Auto (Go2 + G1)</option>
+          <option value="go2">Unitree · Go2 / B2 Sport + VUI</option>
+          <option value="g1">Unitree · G1 Loco + Arm + LED</option>
+          <option value="h1">Unitree · H1 Loco</option>
+        </select>
+        <div class="status" id="robotVendorStatus">vendor · idle</div>
       </div>
 
       <div class="group">
@@ -5633,8 +5636,12 @@
       } from '/engine/layers/robotEmotionDrive.js';
       import {
         emotionToUnitreeBridge,
-        unitreeBridgeSteps,
       } from '/engine/layers/unitreeBridge.js';
+      import {
+        ROBOT_VENDORS,
+        getRobotVendor,
+      } from '/engine/layers/robotVendorCatalog.js';
+      import { emotionToRobotVendorBridge } from '/engine/layers/robotVendorBridge.js';
       import {
         ensureAndroidFacePanel,
         applyAndroidFaceEmotion,
@@ -13094,8 +13101,15 @@
       let lastAndroidFaceKey = '';
       let lastAndroidBridgeJson = '';
       let lastUnitreeBridgeJson = '';
+      let lastVendorBridgeJson = '';
       /** @type {'auto'|'go2'|'g1'|'h1'|'b2'} */
       let unitreePlatform = 'auto';
+      let robotVendorId = 'unitree';
+
+      function syncUnitreePlatformVisibility() {
+        const sel = document.getElementById('unitreePlatformSel');
+        if (sel) sel.hidden = robotVendorId !== 'unitree';
+      }
 
       function populateBodyMotionClipSelect() {
         if (!mixamoClipSel) return;
@@ -13989,13 +14003,34 @@
       }
 
       const unitreePlatformSel = document.getElementById('unitreePlatformSel');
+      const robotVendorSel = document.getElementById('robotVendorSel');
+      if (robotVendorSel) {
+        for (const v of ROBOT_VENDORS) {
+          const opt = document.createElement('option');
+          opt.value = v.id;
+          opt.textContent = `${v.label} · ${v.depth}`;
+          robotVendorSel.appendChild(opt);
+        }
+        robotVendorSel.value = robotVendorId;
+        robotVendorSel.addEventListener('change', () => {
+          robotVendorId = robotVendorSel.value || 'unitree';
+          lastVendorBridgeJson = '';
+          lastUnitreeBridgeJson = '';
+          syncUnitreePlatformVisibility();
+          const el = document.getElementById('robotVendorStatus');
+          const meta = getRobotVendor(robotVendorId);
+          if (el) el.textContent = `vendor · ${meta.label} · ${meta.depth}`;
+        });
+        syncUnitreePlatformVisibility();
+      }
       if (unitreePlatformSel) {
         unitreePlatformSel.value = unitreePlatform;
         unitreePlatformSel.addEventListener('change', () => {
           unitreePlatform = /** @type {any} */ (unitreePlatformSel.value || 'auto');
           lastUnitreeBridgeJson = '';
-          const el = document.getElementById('unitreeStatus');
-          if (el) el.textContent = `unitree · platform ${unitreePlatform}`;
+          lastVendorBridgeJson = '';
+          const el = document.getElementById('robotVendorStatus');
+          if (el) el.textContent = `vendor · unitree · ${unitreePlatform}`;
         });
       }
 
@@ -16748,24 +16783,38 @@
         }
 
         if (frames % 15 === 0) {
-          const unitree = emotionToUnitreeBridge({
+          const vendorBridge = emotionToRobotVendorBridge({
+            vendorId: robotVendorId,
             emotion: displayEmo,
             intensity: shapeInt,
-            platform: unitreePlatform,
-            blink: temporalState?.blink || 0,
+            unitreePlatform,
           });
-          const ujson = JSON.stringify(unitree);
-          if (ujson !== lastUnitreeBridgeJson) {
-            lastUnitreeBridgeJson = ujson;
-            window.__amojiUnitree = unitree;
-            const steps = unitreeBridgeSteps(unitree, unitreePlatform);
-            const el = document.getElementById('unitreeStatus');
-            if (el && steps[0]) {
-              const top = steps
+          const vjson = JSON.stringify(vendorBridge);
+          if (vjson !== lastVendorBridgeJson) {
+            lastVendorBridgeJson = vjson;
+            window.__amojiRobotVendor = vendorBridge;
+            const el = document.getElementById('robotVendorStatus');
+            if (el && vendorBridge.steps?.[0]) {
+              const top = vendorBridge.steps
                 .slice(0, 3)
                 .map((s) => `${s.target}:${s.method}`)
                 .join(' · ');
-              el.textContent = `unitree · ${unitree.emotion}@${unitree.intensity.toFixed(2)} · ${top}`;
+              el.textContent = `${vendorBridge.vendor.id} · ${vendorBridge.emotion}@${vendorBridge.intensity.toFixed(2)} · ${top}`;
+            }
+          }
+
+          if (robotVendorId === 'unitree') {
+            const unitree =
+              vendorBridge.payload?.unitree ||
+              emotionToUnitreeBridge({
+                emotion: displayEmo,
+                intensity: shapeInt,
+                platform: unitreePlatform,
+              });
+            const ujson = JSON.stringify(unitree);
+            if (ujson !== lastUnitreeBridgeJson) {
+              lastUnitreeBridgeJson = ujson;
+              window.__amojiUnitree = unitree;
             }
           }
         }
