@@ -13,8 +13,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | three.js `facecap.glb` (ARKit 52) | **MIT** | `assets/reference/arkit/` |
 | ICT FaceKit Light (neutral + sample exprs) | **MIT** | `assets/reference/human-head/ict-facekit/` |
 | Filmic Worlds ARKit solve dataset | **CC0** | `assets/reference/human-head/filmic-worlds/` |
-| Rocketbox Female_Adult_01 (FBX + head maps) | **MIT** | `assets/reference/human-head/rocketbox/` |
-| VALID Asian_F_1_Busi.glb (ARKit 52) | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` |
+| Rocketbox Female_Adult_01 (FBX + head/body maps) | **MIT** | `assets/reference/human-head/rocketbox/` · Face Live picker |
+| VALID Asian_F_1_Busi.glb (ARKit 52) | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` · Face Live picker |
 | MediaPipe Tasks Vision | Apache-2.0 (npm) | Capture Studio / yt-capture |
 | three.js runtime | MIT | `package.json` |
 

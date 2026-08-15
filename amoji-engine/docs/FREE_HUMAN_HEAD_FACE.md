@@ -15,8 +15,8 @@ Prefer **CC0 / MIT / Apache-2.0 / Mixamo-style RF**. Skip **NC-only** unless dem
 | three.js `facecap.glb` | **MIT** | `assets/reference/arkit/facecap.glb` | Full **ARKit 52** blendshapes (~333 KB) — Live Link / MediaPipe target |
 | ICT Face Model Light (subset) | **MIT** | `assets/reference/human-head/ict-facekit/` | Neutral OBJ + sample expression OBJs (`eyeBlink_L`, `jawOpen`) + LICENSE |
 | Filmic Worlds ARKit solve set | **CC0** | `assets/reference/human-head/filmic-worlds/` | `colin_shape_data.zip` (FBX + 102 pose JSON → 52 ARKit weights) |
-| Rocketbox `Female_Adult_01` | **MIT** | `assets/reference/human-head/rocketbox/` | Body + facial FBX + head color/normal/specular PNGs |
-| VALID `Asian_F_1_Busi.glb` | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` | Inclusive Asian female + ARKit 52 (~64 MB); attribute |
+| Rocketbox `Female_Adult_01` | **MIT** | `assets/reference/human-head/rocketbox/` | Body + facial FBX + full head/body/opacity PNG maps · Face Live picker |
+| VALID `Asian_F_1_Busi.glb` | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` | Inclusive Asian female + ARKit 52 (~64 MB); Face Live picker · attribute |
 
 ---
 

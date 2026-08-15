@@ -2037,18 +2037,23 @@
       </div>
 
       <div class="group">
-        <div class="label">Mesh LOD</div>
+        <div class="label">Character / reference head</div>
+        <select id="headRefSel" class="ctl" aria-label="Character or open reference head">
+          <!-- filled from humanHeadCatalog -->
+        </select>
+        <div class="label">Mesh LOD <span style="text-transform:none;letter-spacing:0">(Sakura)</span></div>
         <div class="seg" id="lodSeg">
           <button type="button" data-lod="lo">Low poly</button>
           <button type="button" data-lod="hi" class="active">High poly</button>
         </div>
-        <div class="label">Texture LOD <span style="text-transform:none;letter-spacing:0">(independent)</span></div>
+        <div class="label">Texture LOD <span style="text-transform:none;letter-spacing:0">(Sakura · independent)</span></div>
         <div class="seg three" id="texSeg">
           <button type="button" data-tex="lo">512</button>
           <button type="button" data-tex="mid" class="active">1K</button>
           <button type="button" data-tex="hi">2K</button>
         </div>
         <div class="status" id="loadStatus">Loading…</div>
+        <div class="status" id="headRefStatus">Sakura hero</div>
       </div>
 
       <div class="group">
@@ -5604,6 +5609,11 @@
         estimateBodyMotionHipScale,
       } from '/engine/layers/bodyMotionRetarget.js';
       import {
+        HUMAN_HEAD_REFS,
+        getHumanHeadRef,
+        createRocketboxFbxLoader,
+      } from '/engine/layers/humanHeadCatalog.js';
+      import {
         EMOTIONS,
         INTENSITY_TIERS,
         HI_RECIPES,
@@ -6004,6 +6014,7 @@
 
       let lod = 'hi';
       let texLod = 'mid';
+      let headRefId = 'sakura';
       const hashPrefs = loadFaceLivePrefsFromHash();
       let savedPrefs = loadFaceLivePrefs().prefs;
       if (hashPrefs.ok && hashPrefs.prefs) {
@@ -13601,6 +13612,9 @@
 
       async function applyTexLod(tier) {
         if (!model) return;
+        if (headRefId !== 'sakura') {
+          return { applied: 0, skipped: true };
+        }
         texLod = tier;
         document.querySelectorAll('#texSeg button').forEach((b) => {
           b.classList.toggle('active', b.dataset.tex === texLod);
@@ -13615,34 +13629,55 @@
         return result;
       }
 
-      async function loadLod(next) {
-        stopMixamoBody();
-        if (mixamoBodyEl) mixamoBodyEl.checked = false;
-        setMixamoStatus('body motion off · free libraries');
-        loadStatus.textContent = `Loading mesh ${next.toUpperCase()}…`;
-        loadStatus.className = 'status';
-        const gltf = await loader.loadAsync(ASSETS[next]);
-        if (model) {
-          root.remove(model);
-          model.traverse((c) => {
-            if (c.isMesh) {
-              c.geometry?.dispose?.();
-              const mats = Array.isArray(c.material) ? c.material : [c.material];
-              mats.forEach((m) => m?.dispose?.());
-            }
-          });
-        }
-        model = gltf.scene;
-        improveEyeMaterials(model);
-        // Center / ground-ish
-        const box = new THREE.Box3().setFromObject(model);
+      function disposeCurrentModel() {
+        if (!model) return;
+        root.remove(model);
+        model.traverse((c) => {
+          if (c.isMesh) {
+            c.geometry?.dispose?.();
+            const mats = Array.isArray(c.material) ? c.material : [c.material];
+            mats.forEach((m) => m?.dispose?.());
+          }
+        });
+        model = null;
+        morphMeshes = [];
+        boneMap = {};
+        boneRest = {};
+        mixer = null;
+      }
+
+      function frameModelInView(obj) {
+        const box = new THREE.Box3().setFromObject(obj);
         const size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
-        model.position.x -= center.x;
-        model.position.z -= center.z;
-        model.position.y -= box.min.y;
-        root.add(model);
-        morphMeshes = collectMorphMeshes(model);
+        obj.position.x -= center.x;
+        obj.position.z -= center.z;
+        obj.position.y -= box.min.y;
+        // Rocketbox FBX is often authored in cm — normalize if huge
+        if (size.y > 10) {
+          const s = 1.7 / size.y;
+          obj.scale.multiplyScalar(s);
+          const box2 = new THREE.Box3().setFromObject(obj);
+          const size2 = box2.getSize(new THREE.Vector3());
+          obj.position.y -= box2.min.y;
+          controls.target.set(0, Math.min(size2.y * 0.72, 1.55), 0);
+          camera.position.set(
+            0.25,
+            controls.target.y + 0.1,
+            Math.max(size2.y * 1.5, 2.1),
+          );
+        } else {
+          controls.target.set(0, Math.min(size.y * 0.72, 1.55), 0);
+          camera.position.set(
+            0.25,
+            controls.target.y + 0.1,
+            Math.max(size.y * 1.5, 2.1),
+          );
+        }
+        controls.update();
+      }
+
+      function bindModelBones(obj) {
         boneMap = {};
         boneRest = {};
         const captureBone = (c) => {
@@ -13654,16 +13689,47 @@
             z: c.rotation.z,
           };
         };
-        model.traverse((c) => captureBone(c));
-        model.traverse((c) => {
+        obj.traverse((c) => captureBone(c));
+        obj.traverse((c) => {
           if (!c.isSkinnedMesh || !c.skeleton) return;
           for (const b of c.skeleton.bones) captureBone(b);
         });
-        // IdleSway clip fights Layer G arm drives — Layer I root sway covers ambience.
+      }
+
+      function syncSakuraLodUi(enabled) {
+        document.querySelectorAll('#lodSeg button, #texSeg button').forEach((b) => {
+          b.disabled = !enabled;
+          b.style.opacity = enabled ? '' : '0.45';
+        });
+      }
+
+      function setHeadRefStatus(ref, extra = '') {
+        const el = document.getElementById('headRefStatus');
+        if (!el) return;
+        el.textContent = `${ref.label} · ${ref.license}${extra ? ` · ${extra}` : ''}`;
+      }
+
+      async function loadLod(next) {
+        if (headRefId !== 'sakura') {
+          headRefId = 'sakura';
+          const sel = document.getElementById('headRefSel');
+          if (sel) sel.value = 'sakura';
+          syncSakuraLodUi(true);
+        }
+        stopMixamoBody();
+        if (mixamoBodyEl) mixamoBodyEl.checked = false;
+        setMixamoStatus('body motion off · free libraries');
+        loadStatus.textContent = `Loading mesh ${next.toUpperCase()}…`;
+        loadStatus.className = 'status';
+        const gltf = await loader.loadAsync(ASSETS[next]);
+        disposeCurrentModel();
+        model = gltf.scene;
+        improveEyeMaterials(model);
+        frameModelInView(model);
+        root.add(model);
+        morphMeshes = collectMorphMeshes(model);
+        bindModelBones(model);
         mixer = null;
-        controls.target.set(0, Math.min(size.y * 0.72, 1.55), 0);
-        camera.position.set(0.25, controls.target.y + 0.1, Math.max(size.y * 1.5, 2.1));
-        controls.update();
 
         lod = next;
         document.getElementById('hudLod').textContent = lod.toUpperCase();
@@ -13673,7 +13739,74 @@
         });
 
         const tex = await applyTexLod(texLod);
+        setHeadRefStatus(getHumanHeadRef('sakura'), `${morphMeshes.length} morph mesh(es)`);
         loadStatus.textContent = `mesh ${lod.toUpperCase()} · tex ${texLod.toUpperCase()} · ${tex.applied} maps · ${morphMeshes.length} morph mesh(es)`;
+        loadStatus.className = 'status ok';
+      }
+
+      const rocketboxFbxLoader = createRocketboxFbxLoader(THREE, FBXLoader);
+
+      async function loadHeadRef(id) {
+        const ref = getHumanHeadRef(id);
+        headRefId = ref.id;
+        stopMixamoBody();
+        if (mixamoBodyEl) mixamoBodyEl.checked = false;
+        setMixamoStatus(
+          ref.sakura
+            ? 'body motion off · free libraries'
+            : 'body motion · Sakura only (reference head)',
+        );
+        loadStatus.textContent = `Loading ${ref.label}…`;
+        loadStatus.className = 'status';
+
+        if (ref.sakura) {
+          syncSakuraLodUi(true);
+          await loadLod(lod);
+          return;
+        }
+
+        syncSakuraLodUi(false);
+        disposeCurrentModel();
+
+        /** @type {THREE.Object3D} */
+        let obj;
+        if (ref.format === 'fbx') {
+          obj = await rocketboxFbxLoader.loadAsync(ref.url);
+          // FBXLoader returns a Group; normalize materials color space
+          obj.traverse((c) => {
+            if (!c.isMesh) return;
+            const mats = Array.isArray(c.material) ? c.material : [c.material];
+            for (const m of mats) {
+              if (!m) continue;
+              if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+              m.needsUpdate = true;
+            }
+          });
+        } else {
+          const gltf = await loader.loadAsync(ref.url);
+          obj = gltf.scene;
+        }
+
+        model = obj;
+        improveEyeMaterials(model);
+        frameModelInView(model);
+        root.add(model);
+        morphMeshes = collectMorphMeshes(model);
+        bindModelBones(model);
+        mixer = null;
+
+        document.getElementById('hudLod').textContent = 'REF';
+        document.getElementById('hudTris').textContent =
+          estimateTris(model).toLocaleString();
+        document.getElementById('hudTex').textContent = ref.arkit52
+          ? 'ARKit'
+          : 'REF';
+
+        const morphHint = ref.arkit52
+          ? `${morphMeshes.length} ARKit morph mesh(es)`
+          : `${morphMeshes.length} morph mesh(es)`;
+        setHeadRefStatus(ref, morphHint);
+        loadStatus.textContent = `${ref.label} · ${morphHint} · ${ref.license}`;
         loadStatus.className = 'status ok';
       }
 
@@ -13750,6 +13883,25 @@
           loadStatus.className = 'status bad';
         }
       });
+
+      const headRefSel = document.getElementById('headRefSel');
+      if (headRefSel) {
+        for (const h of HUMAN_HEAD_REFS) {
+          const opt = document.createElement('option');
+          opt.value = h.id;
+          opt.textContent = h.label;
+          headRefSel.appendChild(opt);
+        }
+        headRefSel.value = headRefId;
+        headRefSel.addEventListener('change', async () => {
+          try {
+            await loadHeadRef(headRefSel.value);
+          } catch (err) {
+            loadStatus.textContent = String(err);
+            loadStatus.className = 'status bad';
+          }
+        });
+      }
 
       document.getElementById('texSeg').addEventListener('click', async (ev) => {
         const btn = ev.target.closest('button[data-tex]');
@@ -13953,6 +14105,11 @@
         if (!mixamoBodyEl.checked) {
           stopMixamoBody();
           setMixamoStatus('body motion off · free libraries');
+          return;
+        }
+        if (headRefId !== 'sakura') {
+          mixamoBodyEl.checked = false;
+          setMixamoStatus('body motion · Sakura only (switch Character back)');
           return;
         }
         await startMixamoBody(mixamoClipSel?.value || 'mixamo-samba');
