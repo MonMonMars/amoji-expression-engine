@@ -69,6 +69,23 @@ export const HUMAN_HEAD_REFS = [
     help: 'Body export FBX + remapped PNG maps',
     texturePack: 'rocketbox',
   },
+  {
+    id: 'quaternius-mannequin-f',
+    label: 'Quaternius · Female mannequin (full body)',
+    format: 'gltf',
+    url: '/assets/characters/jp-female-v0/full-body/quaternius-mannequin-f/Mannequin_F.glb',
+    license: 'CC0 1.0 (Quaternius UAL2 Standard)',
+    help: 'Humanoid female mannequin for retarget / body-motion tests',
+  },
+  {
+    id: 'mpfb-fullbody',
+    label: 'MPFB · full body (CC0)',
+    format: 'gltf',
+    url: '/assets/characters/jp-female-v0/full-body/mpfb/mpfb.glb',
+    license: 'CC0 — MakeHuman/MPFB via TalkingHead example',
+    help: 'Parametric human with ARKit + Oculus visemes (TalkingHead sample)',
+    arkit52: true,
+  },
 ];
 
 /** @param {string} id */

@@ -9,6 +9,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Adobe Mixamo body clips | Royalty-free commercial† | `assets/.../mixamo/` + Face Live |
 | CMU MoCap BVH samples | Free commercial†† | `body-motion/cmu/` |
 | Quaternius Universal Animation Library (free tier) | **CC0** | `body-motion/quaternius/` (~20 clips in picker) |
+| Quaternius UAL2 Standard + Female Mannequin | **CC0** | `body-motion/quaternius-ual2/` + `full-body/quaternius-mannequin-f/` |
+| MPFB full-body (TalkingHead sample) | **CC0** | `full-body/mpfb/` |
 | three.js `pirouette.bvh` | Examples redistrib | `body-motion/three-bvh/` |
 | three.js `facecap.glb` (ARKit 52) | **MIT** | `assets/reference/arkit/` |
 | ICT FaceKit Light (neutral + sample exprs) | **MIT** | `assets/reference/human-head/ict-facekit/` |

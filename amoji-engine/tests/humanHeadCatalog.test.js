@@ -13,6 +13,8 @@ describe('humanHeadCatalog', () => {
     expect(ids).toContain('valid-asian-f1');
     expect(ids).toContain('rocketbox-f01-facial');
     expect(ids).toContain('rocketbox-f01-body');
+    expect(ids).toContain('quaternius-mannequin-f');
+    expect(ids).toContain('mpfb-fullbody');
   });
 
   it('getHumanHeadRef falls back to sakura', () => {

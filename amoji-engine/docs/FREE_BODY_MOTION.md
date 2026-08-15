@@ -7,6 +7,8 @@ Shortlist for Amoji Sakura body animation beyond Adobe Mixamo.
 | [Adobe Mixamo](https://www.mixamo.com/) | Adobe Mixamo ToS | Yes (baked-in) | Yes | No raw redistribution; no ML training |
 | [CMU MoCap](http://mocap.cs.cmu.edu/) | CMU free use | Yes | Yes (BVH samples) | Do not resell raw data; cite NSF EIA-0196217 |
 | [Quaternius UAL](https://quaternius.com/) | CC0 | Yes | Yes (free-tier glTF) | Best CC0 human clip pack; PRO has more |
+| [Quaternius UAL2](https://opengameart.org/content/universal-animation-library-2) | CC0 | Yes | Yes | Extra idle/walk; Female Mannequin GLB |
+| MPFB full body (TalkingHead) | CC0 | Yes | Face Live character | ARKit + visemes |
 | [Mesh2Motion](https://github.com/Mesh2Motion/mesh2motion-app) | OSS app | Tool | Documented | Browser auto-rig; Quaternius packs |
 | [mesh2motion-assets](https://github.com/Mesh2Motion/mesh2motion-assets) | CC0 | Yes | Tooling | Source art / packs for Mesh2Motion |
 | [Bandai Namco Motiondataset](https://github.com/BandaiNamcoResearchInc/Bandai-Namco-Research-Motiondataset) | CC BY-NC 4.0 | **No** | Excluded | Non-commercial only |

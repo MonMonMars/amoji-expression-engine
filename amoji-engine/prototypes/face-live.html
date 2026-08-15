@@ -13152,14 +13152,14 @@
           setMixamoStatus('body · load a mesh first');
           return false;
         }
-        if (lod !== 'hi') {
+        if (headRefId === 'sakura' && lod !== 'hi') {
           setMixamoStatus('body · switch to High poly (skinned)');
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
         const sakuraSkinned = findSkinnedMesh(model);
         if (!sakuraSkinned) {
-          setMixamoStatus('body · Sakura HI has no skeleton');
+          setMixamoStatus('body · current model has no skinned mesh');
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
@@ -13755,7 +13755,7 @@
         setMixamoStatus(
           ref.sakura
             ? 'body motion off · free libraries'
-            : 'body motion · Sakura only (reference head)',
+            : 'body motion ready · idle/walk on this body',
         );
         loadStatus.textContent = `Loading ${ref.label}…`;
         loadStatus.className = 'status';
@@ -14108,12 +14108,7 @@
           setMixamoStatus('body motion off · free libraries');
           return;
         }
-        if (headRefId !== 'sakura') {
-          mixamoBodyEl.checked = false;
-          setMixamoStatus('body motion · Sakura only (switch Character back)');
-          return;
-        }
-        await startMixamoBody(mixamoClipSel?.value || 'mixamo-samba');
+        await startMixamoBody(mixamoClipSel?.value || 'q-idle');
       });
       mixamoClipSel?.addEventListener('change', async () => {
         cancelActiveCompoundLifecycle('mixamo_clip');
