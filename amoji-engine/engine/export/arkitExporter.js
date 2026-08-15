@@ -85,3 +85,61 @@ export function arkitNonZero(weights, eps = 0.01) {
       .sort((a, b) => b[1] - a[1]),
   );
 }
+
+/**
+ * Apple ARKit `eyeBlinkLeft` ↔ three.js facecap `eyeBlink_L` (and Right/_R).
+ * @param {string} name
+ * @returns {string | null}
+ */
+export function arkitNameAlias(name) {
+  if (!name) return null;
+  if (name.endsWith('Left')) return `${name.slice(0, -4)}_L`;
+  if (name.endsWith('Right')) return `${name.slice(0, -5)}_R`;
+  if (name.endsWith('_L')) return `${name.slice(0, -2)}Left`;
+  if (name.endsWith('_R')) return `${name.slice(0, -2)}Right`;
+  return null;
+}
+
+/**
+ * Remap an ARKit-52 weight vector onto whatever morph names a mesh exposes
+ * (Apple camelCase and/or facecap underscore L/R).
+ * @param {Record<string, number>} arkitWeights
+ * @param {string[] | Set<string>} availableMorphs
+ * @returns {Record<string, number>}
+ */
+export function remapArkitWeightsToMorphNames(arkitWeights, availableMorphs) {
+  const avail = availableMorphs instanceof Set
+    ? availableMorphs
+    : new Set(availableMorphs || []);
+  /** @type {Record<string, number>} */
+  const out = {};
+  for (const [ch, v] of Object.entries(arkitWeights || {})) {
+    if (!(v > 0.001)) continue;
+    if (avail.has(ch)) {
+      out[ch] = Math.max(out[ch] || 0, Math.min(1, v));
+      continue;
+    }
+    const alt = arkitNameAlias(ch);
+    if (alt && avail.has(alt)) {
+      out[alt] = Math.max(out[alt] || 0, Math.min(1, v));
+    }
+  }
+  return out;
+}
+
+/**
+ * Convert Sakura Expression_* / EMO_* targets → mesh morph weights for an
+ * ARKit-52 reference head (facecap underscore or VALID Apple names).
+ * @param {Record<string, number>} sakuraMorphWeights
+ * @param {string[]} availableMorphs
+ * @param {{ mapping?: typeof mappingData }} [opts]
+ */
+export function sakuraMorphsToArkitMeshWeights(
+  sakuraMorphWeights,
+  availableMorphs,
+  opts = {},
+) {
+  const arkit = morphWeightsToArkit(sakuraMorphWeights, opts);
+  return remapArkitWeightsToMorphNames(arkit, availableMorphs);
+}
+

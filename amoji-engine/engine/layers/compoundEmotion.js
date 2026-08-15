@@ -96,7 +96,7 @@ export function evaluateCompound(compoundId, intensity = 1, opts = {}) {
  * Build HI morph weights for a compound (Face Live path).
  * @param {string} compoundId
  * @param {number} intensity
- * @param {string[]} availableMorphs
+ * @param {string[] | null | undefined} availableMorphs null = unrestricted (ARKit remap path)
  */
 export function compoundToMorphWeights(compoundId, intensity, availableMorphs) {
   const def = getCompound(compoundId);
@@ -106,14 +106,16 @@ export function compoundToMorphWeights(compoundId, intensity, availableMorphs) {
   const merged = mergeByRegion(primary, secondary, def.ownership);
   /** @type {Record<string, number>} */
   const weights = {};
-  const available = new Set(availableMorphs);
+  const unrestricted = availableMorphs == null;
+  const available = unrestricted ? null : new Set(availableMorphs);
+  const has = (n) => unrestricted || available.has(n);
   for (const [k, v] of Object.entries(merged)) {
-    if (available.has(k) && typeof v === 'number') weights[k] = Math.min(1, v);
+    if (has(k) && typeof v === 'number') weights[k] = Math.min(1, v);
   }
   // Fallback EMO_ if no Expression keys matched
   if (Object.keys(weights).length === 0) {
     const peak = `EMO_${def.primary}`;
-    if (available.has(peak)) weights[peak] = intensity;
+    if (has(peak)) weights[peak] = intensity;
   }
   return weights;
 }

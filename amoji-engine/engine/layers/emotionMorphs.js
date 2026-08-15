@@ -565,7 +565,7 @@ export function recipeForIntensity(emotion, intensity) {
  * Crossfade weights across subtle / medium / peak sculpt morphs.
  * @param {string} emotion
  * @param {number} intensity 0..2
- * @param {Set<string>} available
+ * @param {Set<string> | null | undefined} available null = unrestricted (ARKit remap path)
  * @returns {Record<string, number> | null}
  */
 export function intensityTierWeights(emotion, intensity, available) {
@@ -573,10 +573,11 @@ export function intensityTierWeights(emotion, intensity, available) {
   const medium = `EMO_${emotion}_medium`;
   const peak = `EMO_${emotion}_peak`;
   const legacy = `EMO_${emotion}`;
+  const has = (n) => !available || available.has(n);
 
-  const hasTiers = available.has(subtle) && available.has(medium) && available.has(peak);
+  const hasTiers = has(subtle) && has(medium) && has(peak);
   if (!hasTiers) {
-    if (available.has(legacy)) {
+    if (has(legacy)) {
       return { [legacy]: Math.max(0, Math.min(2.0, intensity)) };
     }
     return null;
@@ -603,7 +604,7 @@ export function intensityTierWeights(emotion, intensity, available) {
     weights[peak] = u;
   } else {
     weights[peak] = 1;
-    if (available.has(legacy)) {
+    if (has(legacy)) {
       weights[legacy] = Math.min(
         DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP,
         (t - 1) * DISNEY_EXTREME_LO_LEGACY_OVERDRIVE_CAP,
@@ -611,7 +612,7 @@ export function intensityTierWeights(emotion, intensity, available) {
     }
   }
 
-  if (weights[peak] && !available.has(peak) && available.has(legacy)) {
+  if (weights[peak] && available && !available.has(peak) && available.has(legacy)) {
     weights[legacy] = (weights[legacy] || 0) + weights[peak];
     delete weights[peak];
   }
@@ -624,14 +625,15 @@ export function intensityTierWeights(emotion, intensity, available) {
  * @param {'hi'|'lo'} lod
  * @param {string} emotion
  * @param {number} intensity 0..1
- * @param {string[]} availableMorphs morphTargetDictionary keys
+ * @param {string[] | null | undefined} availableMorphs morphTargetDictionary keys; null = unrestricted
  */
 export function emotionToMorphWeights(lod, emotion, intensity, availableMorphs) {
   const t = Math.max(0, Math.min(2.0, intensity));
   /** @type {Record<string, number>} */
   const weights = {};
-  const available = new Set(availableMorphs);
-  const has = (n) => available.has(n);
+  const unrestricted = availableMorphs == null;
+  const available = unrestricted ? null : new Set(availableMorphs);
+  const has = (n) => unrestricted || available.has(n);
 
   if (emotion === 'neutral' || t <= 0.001) {
     return weights;

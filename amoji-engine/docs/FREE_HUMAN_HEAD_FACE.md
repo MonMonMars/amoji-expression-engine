@@ -62,6 +62,11 @@ Blog: https://filmicworlds.com/blog/solving-face-scans-for-arkit/
 
 ---
 
+
+## Face Live
+
+**Character / reference head** picker loads Sakura, facecap, VALID, or Rocketbox. For **ARKit 52** refs (facecap / VALID), Face Live converts Sakura emotion recipes → ARKit weights → mesh morph names (Apple or `*_L`/`*_R`). Rocketbox is textured FBX (bone facial — no ARKit morph drive yet).
+
 ## Excluded / caution
 
 | Source | Why |

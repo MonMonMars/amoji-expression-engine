@@ -7,7 +7,7 @@
 /**
  * @param {number} lookX -1..1
  * @param {number} lookY -1..1
- * @param {string[]} availableMorphs
+ * @param {string[] | null | undefined} availableMorphs null = unrestricted
  * @param {{ gain?: number }} [opts]
  * @returns {Record<string, number>}
  */
@@ -15,12 +15,15 @@ export function lookToEyeMorphWeights(lookX, lookY, availableMorphs, opts = {}) 
   const gain = opts.gain ?? 1;
   const x = Math.max(-1, Math.min(1, lookX)) * gain;
   const y = Math.max(-1, Math.min(1, lookY)) * gain;
-  const available = new Set(availableMorphs);
+  const unrestricted = availableMorphs == null;
+  const available = unrestricted ? null : new Set(availableMorphs);
   /** @type {Record<string, number>} */
   const weights = {};
 
   const set = (name, w) => {
-    if (available.has(name) && w > 0.001) weights[name] = Math.min(1, w);
+    if ((unrestricted || available.has(name)) && w > 0.001) {
+      weights[name] = Math.min(1, w);
+    }
   };
 
   if (x > 0) set('Expressions_eyesHoriz_max', x);

@@ -5788,6 +5788,7 @@
       import {
         morphWeightsToArkit,
         arkitNonZero,
+        sakuraMorphsToArkitMeshWeights,
       } from '/engine/export/arkitExporter.js';
       import {
         listRobotPacks,
@@ -15995,11 +15996,16 @@
             : 'latency idle';
 
         const morphs = availableMorphs();
+        const headRef = getHumanHeadRef(headRefId);
+        const arkitHead = !!headRef.arkit52;
+        /** null = unrestricted Sakura Expression_* recipes (then remap → ARKit) */
+        const recipeAvail = arkitHead ? null : morphs;
+        const recipeLod = arkitHead ? 'hi' : lod;
         const moodState = moodCtl.tick(dt);
         const discState = discCtl.tick(dt, {
           mood: moodState.state,
           moodBaseline: moodState.baseline,
-          availableMorphs: availableMorphs(),
+          availableMorphs: recipeAvail || morphs,
         });
         if (hasContinuityResidual(discState.continuity)) {
           if (!discContinuityResidualCompoundHandled && compoundCrossfade) {
@@ -16271,8 +16277,8 @@
           bodyMix: extremeSnap.bodyMix,
         });
         let targets = compoundId
-          ? compoundToMorphWeights(compoundId, shapeInt, morphs)
-          : emotionToMorphWeights(lod, displayEmo, shapeInt, morphs);
+          ? compoundToMorphWeights(compoundId, shapeInt, recipeAvail)
+          : emotionToMorphWeights(recipeLod, displayEmo, shapeInt, recipeAvail);
         if (moodState.morphs && Object.keys(moodState.morphs).length) {
           mergeMorphOverlays(targets, moodState.morphs);
         }
@@ -16290,10 +16296,10 @@
             },
           ).shapeInt;
           const residualMorphs = emotionToMorphWeights(
-            lod,
+            recipeLod,
             residualTune.emotion,
             residualShapeInt,
-            morphs,
+            recipeAvail,
           );
           mergeMorphOverlays(targets, residualMorphs);
         }
@@ -16302,7 +16308,7 @@
         const smileState = smileCtl.tick(dt, {
           emotion: displayEmo,
           intensity: shapeInt,
-          availableMorphs: morphs,
+          availableMorphs: recipeAvail || morphs,
         });
         if (smileState.active && smileState.morphs) {
           if (smileState.kind === 'laughter' || displayEmo === 'happy' || displayEmo === 'smile_open') {
@@ -16322,8 +16328,8 @@
           smileStatus.textContent = 'smile idle (non-happy emotion)';
         }
 
-        if (idleState.channels.softSmile > 0.01 && lod === 'hi') {
-          if (morphs.includes('Expressions_mouthSmile_max')) {
+        if (idleState.channels.softSmile > 0.01 && (recipeLod === 'hi' || arkitHead)) {
+          if (arkitHead || morphs.includes('Expressions_mouthSmile_max')) {
             targets.Expressions_mouthSmile_max = Math.max(
               targets.Expressions_mouthSmile_max || 0,
               idleState.channels.softSmile,
@@ -16332,10 +16338,10 @@
         }
         if (temporalState.residualEmotion && temporalState.residualIntensity > 0.02) {
           const residual = emotionToMorphWeights(
-            lod,
+            recipeLod,
             temporalState.residualEmotion,
             temporalState.residualIntensity,
-            morphs,
+            recipeAvail,
           );
           mergeMorphOverlays(targets, residual);
         }
@@ -16345,7 +16351,10 @@
         if (speechPlayer.playing || (speechPlayer.performance && speechPlayer.t > 0 && speechPlayer.t < speechPlayer.duration)) {
           const speechTick = speechPlayer.tick(dt);
           if (speechTick.mouth) {
-            speechMouthMorphs = mouthChannelsToMorphWeights(speechTick.mouth, morphs);
+            speechMouthMorphs = mouthChannelsToMorphWeights(
+              speechTick.mouth,
+              recipeAvail || morphs,
+            );
             mergeMorphOverlays(targets, speechMouthMorphs);
           }
           for (const hook of speechTick.hooks || []) {
@@ -16486,7 +16495,7 @@
               intensity: displayInt,
               headYaw,
               headPitch,
-              availableMorphs: morphs,
+              availableMorphs: recipeAvail || morphs,
             });
             lx = eyes.lookX;
             ly = eyes.lookY;
@@ -16571,7 +16580,7 @@
             lx = Math.max(-1, Math.min(1, lx + s.x));
             ly = Math.max(-1, Math.min(1, ly + s.y));
           }
-          mergeEyeWeights(targets, lookToEyeMorphWeights(lx, ly, morphs));
+          mergeEyeWeights(targets, lookToEyeMorphWeights(lx, ly, recipeAvail));
         }
 
         if (temporalState.blink > 0.01 || blinkT > 0) {
@@ -16584,7 +16593,7 @@
             'Expressions_eyeClosedL_max',
             'Expressions_eyeClosedR_max',
           ]) {
-            if (morphs.includes(name)) {
+            if (arkitHead || morphs.includes(name)) {
               targets[name] = Math.max(targets[name] || 0, w);
             }
           }
@@ -16601,16 +16610,22 @@
             : 1.5,
         });
 
+        const meshTargets = arkitHead
+          ? sakuraMorphsToArkitMeshWeights(targets, morphs)
+          : targets;
+
         for (const mesh of morphMeshes) {
-          applyMorphWeights(mesh, targets, 1 - Math.pow(0.001, dt));
+          applyMorphWeights(mesh, meshTargets, 1 - Math.pow(0.001, dt));
         }
 
-        const entries = Object.entries(targets)
+        const entries = Object.entries(meshTargets)
           .filter(([, v]) => v > 0.01)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10)
           .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
-        morphDebug.textContent = entries.length ? entries.join('\n') : '(neutral)';
+        morphDebug.textContent = entries.length
+          ? `${arkitHead ? 'ARKit mesh · ' : ''}${entries.join('\n')}`
+          : '(neutral)';
 
         const arkit = arkitNonZero(morphWeightsToArkit(targets));
         const arkitLines = Object.entries(arkit)
