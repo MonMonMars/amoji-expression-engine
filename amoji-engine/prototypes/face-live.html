@@ -2073,7 +2073,7 @@
         <div class="label">Body motion <span style="text-transform:none;letter-spacing:0">(Mixamo · CMU · Quaternius CC0)</span></div>
         <label class="row" style="gap:8px;align-items:center;margin:0 0 8px;">
           <input id="mixamoBody" type="checkbox" role="switch" aria-labelledby="mixamoBodyLabel" aria-describedby="mixamoStatus" />
-          <span id="mixamoBodyLabel">Play free body clip on Sakura</span>
+          <span id="mixamoBodyLabel">Play free body clip (idle / walk) on current character</span>
         </label>
         <select id="mixamoClipSel" class="ctl" aria-label="Body motion clip"></select>
         <div class="status" id="mixamoStatus">body motion off · free libraries</div>
@@ -5607,6 +5607,8 @@
         findSkinnedMesh,
         pickBodyMotionClip,
         estimateBodyMotionHipScale,
+        detectBodySkeletonProfile,
+        bodyProfileHip,
       } from '/engine/layers/bodyMotionRetarget.js';
       import {
         HUMAN_HEAD_REFS,
@@ -13163,7 +13165,9 @@
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
-        setMixamoStatus('body · loading clip…');
+        const targetProfile = detectBodySkeletonProfile(model);
+        const targetHip = bodyProfileHip(targetProfile);
+        setMixamoStatus(`body · loading clip (${targetProfile})…`);
         try {
           const { meta, root, clip, skinned, sourceSkeleton } = await loadBodyMotionSource(clipId);
           if (root && !root.parent) {
@@ -13173,17 +13177,29 @@
               scene.add(root);
             }
           }
-          const optsBase = bodyMotionRetargetOptions(meta.boneProfile);
+          const optsBase = bodyMotionRetargetOptions(meta.boneProfile, {
+            targetProfile,
+          });
           const hipSrc = skinned || sourceSkeleton;
-          const scale = estimateBodyMotionHipScale(sakuraSkinned, hipSrc, optsBase.hip);
-          const opts = bodyMotionRetargetOptions(meta.boneProfile, { scale });
+          const scale = estimateBodyMotionHipScale(
+            sakuraSkinned,
+            hipSrc,
+            optsBase.hip,
+            targetHip,
+          );
+          const opts = bodyMotionRetargetOptions(meta.boneProfile, {
+            targetProfile,
+            scale,
+          });
+          // Capture rest pose for any body bones present on this target
+          const targetBoneNames = new Set(Object.keys(opts.names));
           model.traverse((c) => {
-            if (!c?.name || !BODY_MOTION_BONE_RE.test(c.name) || boneMap[c.name]) return;
+            if (!c?.name || !targetBoneNames.has(c.name) || boneMap[c.name]) return;
             boneMap[c.name] = c;
             boneRest[c.name] = { x: c.rotation.x, y: c.rotation.y, z: c.rotation.z };
           });
           sakuraSkinned.skeleton.bones.forEach((b) => {
-            if (!b?.name || !BODY_MOTION_BONE_RE.test(b.name) || boneMap[b.name]) return;
+            if (!b?.name || !targetBoneNames.has(b.name) || boneMap[b.name]) return;
             boneMap[b.name] = b;
             boneRest[b.name] = { x: b.rotation.x, y: b.rotation.y, z: b.rotation.z };
           });
@@ -13202,7 +13218,7 @@
           mixamoActiveId = meta.id;
           mixer = null;
           setMixamoStatus(
-            `${meta.source} · ${meta.label} · ${retargeted.duration.toFixed(1)}s · scale ${scale.toFixed(3)}`,
+            `${meta.source} · ${meta.label} → ${targetProfile} · ${retargeted.duration.toFixed(1)}s · scale ${scale.toFixed(3)}`,
             true,
           );
           return true;
