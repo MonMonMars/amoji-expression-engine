@@ -11,6 +11,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Quaternius Universal Animation Library (free tier) | **CC0** | `body-motion/quaternius/` (~20 clips in picker) |
 | three.js `pirouette.bvh` | Examples redistrib | `body-motion/three-bvh/` |
 | three.js `facecap.glb` (ARKit 52) | **MIT** | `assets/reference/arkit/` |
+| ICT FaceKit Light (neutral + sample exprs) | **MIT** | `assets/reference/human-head/ict-facekit/` |
+| Filmic Worlds ARKit solve dataset | **CC0** | `assets/reference/human-head/filmic-worlds/` |
 | MediaPipe Tasks Vision | Apache-2.0 (npm) | Capture Studio / yt-capture |
 | three.js runtime | MIT | `package.json` |
 
@@ -31,10 +33,14 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | [Polygonal Mind 100 Avatars](https://github.com/PolygonalMind/initiative-opensource-release) | CC0 | Stylized avatar pack | GitHub releases |
 | [Poly Pizza](https://poly.pizza/) | Mixed (filter CC0/CC-BY) | Props / env | poly.pizza |
 | [Kenney.nl](https://kenney.nl/assets) | CC0 | UI / props / audio | kenney.nl |
-| Filmic Worlds ARKit solve dataset | CC0 | Face blendshape research | filmicworlds.com |
-| [ICT-FaceKit](https://github.com/USC-ICT/ICT-FaceKit) | MIT | Face morphable model research | GitHub |
-| [VALID → VRM ARKit](https://github.com/TLTMedia/valid-vrm-avatars) | CC BY 4.0 | Inclusive avatars + ARKit 52 | GitHub |
+| Filmic Worlds ARKit solve dataset | CC0 | Face blendshape research | **in-repo** + filmicworlds.com |
+| [ICT-FaceKit](https://github.com/USC-ICT/ICT-FaceKit) full Light OBJs | MIT | Face morphable model (full set) | GitHub (`FaceXModel/`) |
+| [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox) | **MIT** | 115 rigged humans + ARKit/FACS heads (~26 GB) | Sparse-clone |
+| [VALID → VRM ARKit](https://github.com/TLTMedia/valid-vrm-avatars) | CC BY 4.0 | Inclusive avatars + ARKit 52 | GitHub (LFS / GLB) |
+| [M3-org/base-meshes](https://github.com/M3-org/base-meshes) | CC0 | Greybox body/head | GitHub |
 | OpenGameArt Quaternius mirrors | CC0 | Backup downloads | opengameart.org |
+
+**Face/head deep-dive:** `docs/FREE_HUMAN_HEAD_FACE.md`
 
 ## Excluded / caution
 
@@ -52,7 +58,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Body motion variety | Quaternius UAL (done) + Mesh2Motion exports + more CMU BVH |
 | Hair | Quaternius Universal Base hairstyles (CC0) or VRoid hair → GLB |
 | Clothes | Quaternius modular outfits (CC0) |
-| ARKit interop face | three.js facecap (done) + Filmic Worlds / VALID for research |
+| ARKit interop face | facecap (done) + Filmic Worlds / ICT subset (done); Rocketbox / VALID for library scale |
+| Human head morph research | ICT-FaceKit Light (subset in-repo; full on GitHub) |
 | JP voice | No strong CC0 JP TTS bank found; keep Kokoro/IndexTTS HTTP adapters |
 | Eyes | Custom art still preferred (Alita iris pass); Kenney lacks hero eyes |
 
@@ -63,4 +70,4 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 3. Register clips in `engine/layers/bodyMotionCatalog.js` (or a new catalog)  
 4. Note attribution in the folder README  
 
-See also: `docs/FREE_BODY_MOTION.md`, `assets/.../body-motion/README.md`, `RESEARCH_PACK.md`.
+See also: `docs/FREE_HUMAN_HEAD_FACE.md`, `docs/FREE_BODY_MOTION.md`, `assets/.../body-motion/README.md`, `RESEARCH_PACK.md`.
