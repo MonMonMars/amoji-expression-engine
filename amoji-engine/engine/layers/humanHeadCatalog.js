@@ -56,8 +56,9 @@ export const HUMAN_HEAD_REFS = [
     format: 'fbx',
     url: `${RB}/Export/Female_Adult_01_facial.fbx`,
     license: 'MIT (Microsoft Rocketbox)',
-    help: 'Facial-rig FBX + remapped head/body PNG maps',
+    help: 'Facial FBX with AK_## ARKit 52 morphs + remapped PNG maps',
     texturePack: 'rocketbox',
+    arkit52: true,
   },
   {
     id: 'rocketbox-f01-body',

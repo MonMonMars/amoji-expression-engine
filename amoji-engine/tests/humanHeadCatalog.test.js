@@ -18,6 +18,7 @@ describe('humanHeadCatalog', () => {
   it('getHumanHeadRef falls back to sakura', () => {
     expect(getHumanHeadRef('nope').id).toBe('sakura');
     expect(getHumanHeadRef('valid-asian-f1').arkit52).toBe(true);
+    expect(getHumanHeadRef('rocketbox-f01-facial').arkit52).toBe(true);
   });
 
   it('remaps Rocketbox TGA paths to in-repo PNGs', () => {

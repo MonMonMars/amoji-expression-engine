@@ -101,35 +101,84 @@ export function arkitNameAlias(name) {
 }
 
 /**
+ * Rocketbox Headbox style: `AK_09_EyeBlinkLeft` → `eyeBlinkLeft`.
+ * @param {string} name
+ * @returns {string | null}
+ */
+export function rocketboxAkToArkitChannel(name) {
+  const m = String(name || '').match(/^AK_\d{2}_([A-Za-z]+)$/);
+  if (!m) return null;
+  const pascal = m[1];
+  const camel = pascal.charAt(0).toLowerCase() + pascal.slice(1);
+  return ARKIT_CHANNELS.includes(camel) ? camel : null;
+}
+
+/**
+ * Build channel → mesh morph name index for Apple / facecap / Rocketbox AK_*.
+ * @param {string[] | Set<string>} availableMorphs
+ * @returns {Map<string, string>}
+ */
+export function buildArkitMorphNameIndex(availableMorphs) {
+  /** @type {Map<string, string>} */
+  const index = new Map();
+  const list = availableMorphs instanceof Set
+    ? [...availableMorphs]
+    : availableMorphs || [];
+
+  for (const name of list) {
+    if (ARKIT_CHANNELS.includes(name) && !index.has(name)) {
+      index.set(name, name);
+    }
+    const fromAk = rocketboxAkToArkitChannel(name);
+    if (fromAk && !index.has(fromAk)) {
+      index.set(fromAk, name);
+    }
+  }
+
+  // Underscore facecap aliases (prefer exact Apple name if already indexed)
+  for (const name of list) {
+    if (name.includes('_') && (name.endsWith('_L') || name.endsWith('_R'))) {
+      const apple = arkitNameAlias(name);
+      if (apple && ARKIT_CHANNELS.includes(apple) && !index.has(apple)) {
+        index.set(apple, name);
+      }
+    }
+  }
+
+  // If only underscore present and Apple not in list, already handled above.
+  // Also map Apple→underscore when mesh only has underscore:
+  for (const ch of ARKIT_CHANNELS) {
+    if (index.has(ch)) continue;
+    const und = arkitNameAlias(ch);
+    if (und && list.includes(und)) index.set(ch, und);
+  }
+
+  return index;
+}
+
+/**
  * Remap an ARKit-52 weight vector onto whatever morph names a mesh exposes
- * (Apple camelCase and/or facecap underscore L/R).
+ * (Apple camelCase, facecap underscore L/R, or Rocketbox `AK_##_Pascal`).
  * @param {Record<string, number>} arkitWeights
  * @param {string[] | Set<string>} availableMorphs
  * @returns {Record<string, number>}
  */
 export function remapArkitWeightsToMorphNames(arkitWeights, availableMorphs) {
-  const avail = availableMorphs instanceof Set
-    ? availableMorphs
-    : new Set(availableMorphs || []);
+  const index = buildArkitMorphNameIndex(availableMorphs);
   /** @type {Record<string, number>} */
   const out = {};
   for (const [ch, v] of Object.entries(arkitWeights || {})) {
     if (!(v > 0.001)) continue;
-    if (avail.has(ch)) {
-      out[ch] = Math.max(out[ch] || 0, Math.min(1, v));
-      continue;
-    }
-    const alt = arkitNameAlias(ch);
-    if (alt && avail.has(alt)) {
-      out[alt] = Math.max(out[alt] || 0, Math.min(1, v));
-    }
+    const meshName = index.get(ch);
+    if (!meshName) continue;
+    out[meshName] = Math.max(out[meshName] || 0, Math.min(1, v));
   }
   return out;
 }
 
 /**
  * Convert Sakura Expression_* / EMO_* targets → mesh morph weights for an
- * ARKit-52 reference head (facecap underscore or VALID Apple names).
+ * ARKit-52 reference head (facecap / VALID / Rocketbox AK_*).
  * @param {Record<string, number>} sakuraMorphWeights
  * @param {string[]} availableMorphs
  * @param {{ mapping?: typeof mappingData }} [opts]

@@ -52,4 +52,22 @@ describe('arkit mesh remap for OSS heads', () => {
     expect(mesh.eyeBlink_L).toBeGreaterThan(0.5);
     expect(mesh.eyeBlink_R).toBeGreaterThan(0.5);
   });
+
+  it('maps Sakura Expression_* onto Rocketbox AK_## morph names', () => {
+    const sakura = {
+      Expressions_eyeClosedL_max: 1,
+      Expressions_mouthSmile_max: 0.7,
+    };
+    const mesh = sakuraMorphsToArkitMeshWeights(sakura, [
+      'AK_09_EyeBlinkLeft',
+      'AK_10_EyeBlinkRight',
+      'AK_44_MouthSmileLeft',
+      'AK_45_MouthSmileRight',
+      'AK_25_JawOpen',
+    ]);
+    expect(mesh.AK_09_EyeBlinkLeft).toBeGreaterThan(0.5);
+    expect(
+      (mesh.AK_44_MouthSmileLeft || 0) + (mesh.AK_45_MouthSmileRight || 0),
+    ).toBeGreaterThan(0.1);
+  });
 });

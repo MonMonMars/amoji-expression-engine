@@ -14,7 +14,7 @@ Vendored subset (not the full ~26 GB library):
 | `Female_Adult_01.png` | Preview |
 | `../LICENSE.md` | MIT |
 
-Face Live: **Character / reference head** → Rocketbox facial or body (FBXLoader remaps `.tga` → these PNGs).
+Face Live: **Character / reference head** → Rocketbox facial (AK_## ARKit morphs) or body (FBXLoader remaps `.tga` → these PNGs).
 
 ARKit / FACS blendshape transfer across Rocketbox: [openVRlab/Headbox](https://github.com/openVRlab/Headbox).
 
