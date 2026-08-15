@@ -2065,16 +2065,13 @@
       </div>
 
       <div class="group">
-        <div class="label">Mixamo body <span style="text-transform:none;letter-spacing:0">(Adobe · commercial OK)</span></div>
+        <div class="label">Body motion <span style="text-transform:none;letter-spacing:0">(Mixamo · CMU · Quaternius CC0)</span></div>
         <label class="row" style="gap:8px;align-items:center;margin:0 0 8px;">
           <input id="mixamoBody" type="checkbox" role="switch" aria-labelledby="mixamoBodyLabel" aria-describedby="mixamoStatus" />
-          <span id="mixamoBodyLabel">Play Mixamo clip on Sakura</span>
+          <span id="mixamoBodyLabel">Play free body clip on Sakura</span>
         </label>
-        <select id="mixamoClipSel" class="ctl" aria-label="Mixamo clip">
-          <option value="samba">Samba Dancing</option>
-          <option value="mixamoIdle">Mixamo pack</option>
-        </select>
-        <div class="status" id="mixamoStatus">mixamo off · royalty-free body library</div>
+        <select id="mixamoClipSel" class="ctl" aria-label="Body motion clip"></select>
+        <div class="status" id="mixamoStatus">body motion off · free libraries</div>
       </div>
 
       <div class="group">
@@ -5592,15 +5589,20 @@
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+      import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
       import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
       import {
-        MIXAMO_DEMO_CLIPS,
-        MIXAMO_BODY_BONE_RE,
-        mixamoRetargetOptions,
+        BODY_MOTION_CLIPS,
+        bodyMotionClipsBySource,
+        getBodyMotionClip,
+      } from '/engine/layers/bodyMotionCatalog.js';
+      import {
+        BODY_MOTION_BONE_RE,
+        bodyMotionRetargetOptions,
         findSkinnedMesh,
-        pickMixamoClip,
-        estimateMixamoHipScale,
-      } from '/engine/layers/mixamoRetarget.js';
+        pickBodyMotionClip,
+        estimateBodyMotionHipScale,
+      } from '/engine/layers/bodyMotionRetarget.js';
       import {
         EMOTIONS,
         INTENSITY_TIERS,
@@ -13033,7 +13035,7 @@
       /** @type {Record<string, { x: number, y: number, z: number }>} */
       let boneRest = {};
       const BODY_BONE_RE = /^(upperarm|lowerarm|hand)_[LR]$|^(head|neck|spine0[123]|clavicle_[LR])$/;
-      const MIXAMO_ASSET_BASE = '/assets/characters/jp-female-v0/mixamo/';
+      const BODY_MOTION_ASSET_BASE = '/assets/characters/jp-female-v0/';
       const mixamoBodyEl = document.getElementById('mixamoBody');
       const mixamoClipSel = document.getElementById('mixamoClipSel');
       const mixamoStatus = document.getElementById('mixamoStatus');
@@ -13044,8 +13046,30 @@
       /** @type {string | null} */
       let mixamoActiveId = null;
       const fbxLoader = new FBXLoader();
-      /** @type {Map<string, { root: THREE.Object3D, clip: THREE.AnimationClip, skinned: any }>} */
-      const mixamoCache = new Map();
+      const bvhLoader = new BVHLoader();
+      const gltfMotionLoader = new GLTFLoader();
+      /** @type {Map<string, any>} */
+      const bodyMotionCache = new Map();
+
+      function populateBodyMotionClipSelect() {
+        if (!mixamoClipSel) return;
+        mixamoClipSel.innerHTML = '';
+        for (const { source, clips } of bodyMotionClipsBySource()) {
+          const group = document.createElement('optgroup');
+          group.label = source;
+          for (const c of clips) {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.label;
+            group.appendChild(opt);
+          }
+          mixamoClipSel.appendChild(group);
+        }
+        if (!mixamoClipSel.value && BODY_MOTION_CLIPS[0]) {
+          mixamoClipSel.value = BODY_MOTION_CLIPS[0].id;
+        }
+      }
+      populateBodyMotionClipSelect();
 
       function setMixamoStatus(text, ok = false) {
         if (!mixamoStatus) return;
@@ -13065,79 +13089,121 @@
         mixamoActiveId = null;
       }
 
-      async function loadMixamoSource(clipId) {
-        const meta = MIXAMO_DEMO_CLIPS.find((c) => c.id === clipId) || MIXAMO_DEMO_CLIPS[0];
-        if (mixamoCache.has(meta.id)) return { meta, ...mixamoCache.get(meta.id) };
-        const root = await fbxLoader.loadAsync(MIXAMO_ASSET_BASE + meta.file);
-        root.visible = false;
-        root.traverse((o) => {
-          if (o.isMesh) o.frustumCulled = false;
-        });
-        const skinned = findSkinnedMesh(root);
-        if (!skinned) throw new Error(`Mixamo FBX has no skinned mesh: ${meta.file}`);
-        const clip = pickMixamoClip(root.animations || []);
-        if (!clip) throw new Error(`Mixamo FBX has no clip: ${meta.file}`);
-        const entry = { root, clip, skinned };
-        mixamoCache.set(meta.id, entry);
+      async function loadBodyMotionSource(clipId) {
+        const meta = getBodyMotionClip(clipId) || BODY_MOTION_CLIPS[0];
+        const cacheKey = meta.id;
+        if (bodyMotionCache.has(cacheKey)) return { meta, ...bodyMotionCache.get(cacheKey) };
+        const url = BODY_MOTION_ASSET_BASE + meta.file;
+        let root = null;
+        let skinned = null;
+        let sourceSkeleton = null;
+        let clip = null;
+
+        if (meta.format === 'fbx') {
+          root = await fbxLoader.loadAsync(url);
+          root.visible = false;
+          root.traverse((o) => {
+            if (o.isMesh) o.frustumCulled = false;
+          });
+          skinned = findSkinnedMesh(root);
+          if (!skinned) throw new Error(`FBX has no skinned mesh: ${meta.file}`);
+          sourceSkeleton = skinned.skeleton;
+          clip = pickBodyMotionClip(root.animations || [], meta.animationName);
+        } else if (meta.format === 'bvh') {
+          const result = await bvhLoader.loadAsync(url);
+          sourceSkeleton = result.skeleton;
+          clip = result.clip;
+          // Park BVH skeleton off-camera for retarget matrix updates
+          root = result.skeleton.bones[0];
+          if (root && !root.parent) {
+            root.position.set(1000, 0, 0);
+          }
+        } else if (meta.format === 'gltf') {
+          const gltf = await gltfMotionLoader.loadAsync(url);
+          root = gltf.scene;
+          root.visible = false;
+          skinned = findSkinnedMesh(root);
+          if (!skinned) throw new Error(`glTF has no skinned mesh: ${meta.file}`);
+          sourceSkeleton = skinned.skeleton;
+          clip = pickBodyMotionClip(gltf.animations || [], meta.animationName);
+        } else {
+          throw new Error(`Unsupported body motion format: ${meta.format}`);
+        }
+        if (!clip) throw new Error(`No animation clip in ${meta.file}`);
+        const entry = { root, clip, skinned, sourceSkeleton };
+        bodyMotionCache.set(cacheKey, entry);
         return { meta, ...entry };
       }
 
       async function startMixamoBody(clipId) {
         if (!model) {
-          setMixamoStatus('mixamo · load a mesh first');
+          setMixamoStatus('body · load a mesh first');
           return false;
         }
         if (lod !== 'hi') {
-          setMixamoStatus('mixamo · switch to High poly (skinned)');
+          setMixamoStatus('body · switch to High poly (skinned)');
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
         const sakuraSkinned = findSkinnedMesh(model);
         if (!sakuraSkinned) {
-          setMixamoStatus('mixamo · Sakura HI has no skeleton');
+          setMixamoStatus('body · Sakura HI has no skeleton');
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
-        setMixamoStatus('mixamo · loading clip…');
+        setMixamoStatus('body · loading clip…');
         try {
-          const { meta, root, clip, skinned } = await loadMixamoSource(clipId);
-          // Keep source in scene graph for matrix updates during retarget
-          if (!root.parent) {
-            root.position.set(1000, 0, 0); // park off-camera
-            scene.add(root);
+          const { meta, root, clip, skinned, sourceSkeleton } = await loadBodyMotionSource(clipId);
+          if (root && !root.parent) {
+            if (root.isBone) scene.add(root);
+            else {
+              root.position.set(1000, 0, 0);
+              scene.add(root);
+            }
           }
-          const scale = estimateMixamoHipScale(sakuraSkinned, skinned);
-          const opts = mixamoRetargetOptions({ scale });
-          // Expand bone capture so procedural layers can resume cleanly after stop
+          const optsBase = bodyMotionRetargetOptions(meta.boneProfile);
+          const hipSrc = skinned || sourceSkeleton;
+          const scale = estimateBodyMotionHipScale(sakuraSkinned, hipSrc, optsBase.hip);
+          const opts = bodyMotionRetargetOptions(meta.boneProfile, { scale });
           model.traverse((c) => {
-            if (!c?.name || !MIXAMO_BODY_BONE_RE.test(c.name) || boneMap[c.name]) return;
+            if (!c?.name || !BODY_MOTION_BONE_RE.test(c.name) || boneMap[c.name]) return;
             boneMap[c.name] = c;
             boneRest[c.name] = { x: c.rotation.x, y: c.rotation.y, z: c.rotation.z };
           });
           sakuraSkinned.skeleton.bones.forEach((b) => {
-            if (!b?.name || !MIXAMO_BODY_BONE_RE.test(b.name) || boneMap[b.name]) return;
+            if (!b?.name || !BODY_MOTION_BONE_RE.test(b.name) || boneMap[b.name]) return;
             boneMap[b.name] = b;
             boneRest[b.name] = { x: b.rotation.x, y: b.rotation.y, z: b.rotation.z };
           });
           stopMixamoBody();
-          const retargeted = SkeletonUtils.retargetClip(sakuraSkinned, skinned, clip, opts);
-          retargeted.name = `mixamo:${meta.id}`;
+          const sourceForRetarget = skinned || sourceSkeleton;
+          const retargeted = SkeletonUtils.retargetClip(
+            sakuraSkinned,
+            sourceForRetarget,
+            clip,
+            opts,
+          );
+          retargeted.name = `body:${meta.id}`;
           mixamoMixer = new THREE.AnimationMixer(sakuraSkinned);
           mixamoAction = mixamoMixer.clipAction(retargeted);
           mixamoAction.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.25).play();
           mixamoActiveId = meta.id;
-          // IdleSway / Layer I root sway off while Mixamo drives body
           mixer = null;
-          setMixamoStatus(`mixamo · ${meta.label} · ${retargeted.duration.toFixed(1)}s · scale ${scale.toFixed(3)}`, true);
+          setMixamoStatus(
+            `${meta.source} · ${meta.label} · ${retargeted.duration.toFixed(1)}s · scale ${scale.toFixed(3)}`,
+            true,
+          );
           return true;
         } catch (err) {
           console.error(err);
           stopMixamoBody();
-          setMixamoStatus(`mixamo · failed: ${err?.message || err}`);
+          setMixamoStatus(`body · failed: ${err?.message || err}`);
           if (mixamoBodyEl) mixamoBodyEl.checked = false;
           return false;
         }
       }
+
+
       const temporalStatus = document.getElementById('temporalStatus');
       const idleStatus = document.getElementById('idleStatus');
       const latencyStatus = document.getElementById('latencyStatus');
@@ -13552,7 +13618,7 @@
       async function loadLod(next) {
         stopMixamoBody();
         if (mixamoBodyEl) mixamoBodyEl.checked = false;
-        setMixamoStatus('mixamo off · royalty-free body library');
+        setMixamoStatus('body motion off · free libraries');
         loadStatus.textContent = `Loading mesh ${next.toUpperCase()}…`;
         loadStatus.className = 'status';
         const gltf = await loader.loadAsync(ASSETS[next]);
@@ -13886,10 +13952,10 @@
         cancelActiveCompoundLifecycle('mixamo_pick');
         if (!mixamoBodyEl.checked) {
           stopMixamoBody();
-          setMixamoStatus('mixamo off · royalty-free body library');
+          setMixamoStatus('body motion off · free libraries');
           return;
         }
-        await startMixamoBody(mixamoClipSel?.value || 'samba');
+        await startMixamoBody(mixamoClipSel?.value || 'mixamo-samba');
       });
       mixamoClipSel?.addEventListener('change', async () => {
         cancelActiveCompoundLifecycle('mixamo_clip');
@@ -16167,7 +16233,7 @@
         });
         gestureStatus.textContent = `${gestureState.lock} · ${gestureState.layer} · ${gestureState.label} · gap ${gestureState.gapSec.toFixed(1)}s`;
         document.getElementById('hudGesture').textContent = mixamoMixer
-          ? `mixamo:${mixamoActiveId || 'on'}`
+          ? `body:${mixamoActiveId || 'on'}`
           : gestureState.layer;
         if (model && Object.keys(boneMap).length && !mixamoMixer) {
           applyGestureBones(boneMap, boneRest, gestureState, 1);
