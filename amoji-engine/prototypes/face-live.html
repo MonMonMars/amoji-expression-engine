@@ -2057,6 +2057,17 @@
       </div>
 
       <div class="group">
+        <div class="label">Unitree bridge <span style="text-transform:none;letter-spacing:0">(sdk2 · dry-run JSON)</span></div>
+        <select id="unitreePlatformSel" class="ctl" aria-label="Unitree robot platform">
+          <option value="auto">Auto (Go2 + G1 bundle)</option>
+          <option value="go2">Go2 / B2 Sport + VUI</option>
+          <option value="g1">G1 Loco + Arm + LED</option>
+          <option value="h1">H1 Loco</option>
+        </select>
+        <div class="status" id="unitreeStatus">unitree · idle</div>
+      </div>
+
+      <div class="group">
         <div class="label">Emotion</div>
         <div class="emo" id="emoGrid"></div>
       </div>
@@ -5620,6 +5631,10 @@
         sakuraWeightsToRobotExpressive,
         emotionToAndroidRobotBridge,
       } from '/engine/layers/robotEmotionDrive.js';
+      import {
+        emotionToUnitreeBridge,
+        unitreeBridgeSteps,
+      } from '/engine/layers/unitreeBridge.js';
       import {
         ensureAndroidFacePanel,
         applyAndroidFaceEmotion,
@@ -13078,6 +13093,9 @@
       const robotTexLoader = new THREE.TextureLoader();
       let lastAndroidFaceKey = '';
       let lastAndroidBridgeJson = '';
+      let lastUnitreeBridgeJson = '';
+      /** @type {'auto'|'go2'|'g1'|'h1'|'b2'} */
+      let unitreePlatform = 'auto';
 
       function populateBodyMotionClipSelect() {
         if (!mixamoClipSel) return;
@@ -13967,6 +13985,17 @@
             loadStatus.textContent = String(err);
             loadStatus.className = 'status bad';
           }
+        });
+      }
+
+      const unitreePlatformSel = document.getElementById('unitreePlatformSel');
+      if (unitreePlatformSel) {
+        unitreePlatformSel.value = unitreePlatform;
+        unitreePlatformSel.addEventListener('change', () => {
+          unitreePlatform = /** @type {any} */ (unitreePlatformSel.value || 'auto');
+          lastUnitreeBridgeJson = '';
+          const el = document.getElementById('unitreeStatus');
+          if (el) el.textContent = `unitree · platform ${unitreePlatform}`;
         });
       }
 
@@ -16715,6 +16744,29 @@
           if (json !== lastAndroidBridgeJson) {
             lastAndroidBridgeJson = json;
             window.__amojiAndroidRobot = bridge;
+          }
+        }
+
+        if (frames % 15 === 0) {
+          const unitree = emotionToUnitreeBridge({
+            emotion: displayEmo,
+            intensity: shapeInt,
+            platform: unitreePlatform,
+            blink: temporalState?.blink || 0,
+          });
+          const ujson = JSON.stringify(unitree);
+          if (ujson !== lastUnitreeBridgeJson) {
+            lastUnitreeBridgeJson = ujson;
+            window.__amojiUnitree = unitree;
+            const steps = unitreeBridgeSteps(unitree, unitreePlatform);
+            const el = document.getElementById('unitreeStatus');
+            if (el && steps[0]) {
+              const top = steps
+                .slice(0, 3)
+                .map((s) => `${s.target}:${s.method}`)
+                .join(' · ');
+              el.textContent = `unitree · ${unitree.emotion}@${unitree.intensity.toFixed(2)} · ${top}`;
+            }
           }
         }
 

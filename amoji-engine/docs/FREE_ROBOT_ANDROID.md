@@ -23,11 +23,15 @@ Commercial-friendly (or clearly labeled demo) robot / android assets for Face Li
 
 Live bridge payload is exposed as `window.__amojiAndroidRobot` while a robot is selected (LED RGB + face panel + morphs).
 
+**Unitree (Go2 / G1 / H1):** see `docs/UNITREE_BRIDGE.md` — `window.__amojiUnitree` (`amoji.unitree.v1`) + `scripts/unitree_amoji_bridge.py`.
+
 ## Related OSS robot / Android stacks (not vendored)
 
 | Project | License | Fit |
 |---|---|---|
 | [ob-f/OpenBot](https://github.com/ob-f/OpenBot) | MIT | Phone-as-brain Android robot (nav / follow) — consume `__amojiAndroidRobot` in a companion app |
+| [unitree_sdk2_python](https://github.com/unitreerobotics/unitree_sdk2_python) | Unitree OSS | Go2 Sport / G1 Loco+Arm+LED — consume `__amojiUnitree` |
+| [unitree_sdk2](https://github.com/unitreerobotics/unitree_sdk2) | Unitree OSS | C++ CycloneDDS twin of the Python SDK |
 | [catprisbrey/Godot4-OpenAnimationLibraries](https://github.com/catprisbrey/Godot4-OpenAnimationLibraries) | CC0 OpenBot mannequin | Mixamo-compatible open humanoid (large `.blend`) |
 | Quaternius Sci-Fi / Cyberpunk kits | CC0 | Extra robot enemies (itch / poly.pizza) |
 | Styloo Robot Character | CC0 | Rigged GLB + anims (itch) |

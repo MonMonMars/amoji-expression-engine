@@ -74,6 +74,7 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Eyes | Custom art still preferred (Alita iris pass); Kenney lacks hero eyes |
 | Robot / android body | RobotExpressive (CC0) + Mixamo X Bot; GDBot face panel demo (NC) |
 | Android runtime bridge | `window.__amojiAndroidRobot` + OpenBot (MIT) companion path |
+| Unitree Go2 / G1 / H1 | `window.__amojiUnitree` + `scripts/unitree_amoji_bridge.py` (sdk2_python) |
 
 ## How to add a pack
 
