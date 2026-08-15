@@ -15,6 +15,8 @@ describe('humanHeadCatalog', () => {
     expect(ids).toContain('rocketbox-f01-body');
     expect(ids).toContain('quaternius-mannequin-f');
     expect(ids).toContain('mpfb-fullbody');
+    expect(ids).toContain('robot-expressive');
+    expect(ids).toContain('xbot');
   });
 
   it('getHumanHeadRef falls back to sakura', () => {

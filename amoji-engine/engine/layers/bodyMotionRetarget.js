@@ -126,6 +126,58 @@ export const JOINTS_MIXAMO_PLAIN = {
 /** Mixamo with mixamorig prefix (source clips). */
 export const JOINTS_MIXAMO = { ...SAKURA_TO_MIXAMO };
 
+/** Mixamo with colon separator (three.js Xbot.glb: mixamorig:Hips). */
+export const JOINTS_MIXAMO_COLON = Object.fromEntries(
+  Object.entries(JOINTS_MIXAMO).map(([k, v]) => [
+    k,
+    String(v).replace(/^mixamorig/, 'mixamorig:'),
+  ]),
+);
+
+/**
+ * Quaternius RobotExpressive (three.js examples).
+ * No clavicle / toe bones — core humanoid only.
+ */
+export const JOINTS_ROBOT_EXPRESSIVE = {
+  pelvis: 'Hips',
+  spine01: 'Abdomen',
+  spine02: 'Torso_1',
+  spine03: 'Torso_1',
+  neck: 'Neck',
+  head: 'Head',
+  upperarm_L: 'UpperArmL',
+  upperarm_R: 'UpperArmR',
+  lowerarm_L: 'LowerArmL',
+  lowerarm_R: 'LowerArmR',
+  hand_L: 'Palm2L',
+  hand_R: 'Palm2R',
+  thigh_L: 'UpperLegL',
+  thigh_R: 'UpperLegR',
+  calf_L: 'LowerLegL',
+  calf_R: 'LowerLegR',
+  foot_L: 'FootL',
+  foot_R: 'FootR',
+};
+
+/** Gobot (GDQuest) compact humanoid. */
+export const JOINTS_GOBOT = {
+  pelvis: 'Hips',
+  spine01: 'Body',
+  spine02: 'Body',
+  spine03: 'Body',
+  head: 'Head',
+  upperarm_L: 'UpperArm.L',
+  upperarm_R: 'UpperArm.R',
+  lowerarm_L: 'LowerArm.L',
+  lowerarm_R: 'LowerArm.R',
+  thigh_L: 'UpperLeg.L',
+  thigh_R: 'UpperLeg.R',
+  calf_L: 'LowerLeg.L',
+  calf_R: 'LowerLeg.R',
+  foot_L: 'Foot.L',
+  foot_R: 'Foot.R',
+};
+
 /** CMU / cgspeed BVH. */
 export const JOINTS_CMU = {
   pelvis: 'Hips',
@@ -223,6 +275,9 @@ const JOINT_TABLES = {
   mannequin: JOINTS_MANNEQUIN,
   mixamoPlain: JOINTS_MIXAMO_PLAIN,
   mixamo: JOINTS_MIXAMO,
+  mixamoColon: JOINTS_MIXAMO_COLON,
+  robotExpressive: JOINTS_ROBOT_EXPRESSIVE,
+  gobot: JOINTS_GOBOT,
   cmu: JOINTS_CMU,
   quaternius: JOINTS_QUATERNIUS,
   pirouette: JOINTS_PIROUETTE,
@@ -230,7 +285,10 @@ const JOINT_TABLES = {
 
 const PROFILES = {
   mixamo: { joints: JOINTS_MIXAMO, hip: 'mixamorigHips' },
+  mixamoColon: { joints: JOINTS_MIXAMO_COLON, hip: 'mixamorig:Hips' },
   mixamoPlain: { joints: JOINTS_MIXAMO_PLAIN, hip: 'Hips' },
+  robotExpressive: { joints: JOINTS_ROBOT_EXPRESSIVE, hip: 'Hips' },
+  gobot: { joints: JOINTS_GOBOT, hip: 'Hips' },
   cmu: { joints: JOINTS_CMU, hip: 'Hips' },
   quaternius: { joints: JOINTS_QUATERNIUS, hip: 'DEF-hips' },
   pirouette: { joints: JOINTS_PIROUETTE, hip: 'hip' },
@@ -279,7 +337,14 @@ export function detectBodySkeletonProfile(root) {
   });
 
   if (names.has('DEF-hips')) return 'quaternius';
+  if (names.has('mixamorig:Hips')) return 'mixamoColon';
   if (names.has('mixamorigHips')) return 'mixamo';
+  if (names.has('UpperArmL') && names.has('Abdomen') && names.has('Hips')) {
+    return 'robotExpressive';
+  }
+  if (names.has('UpperArm.L') && names.has('Body') && names.has('Hips')) {
+    return 'gobot';
+  }
   if (names.has('upperarm_l') && names.has('pelvis')) return 'mannequin';
   if (names.has('upperarm_L') && names.has('pelvis')) return 'sakura';
   if (names.has('Hips') && names.has('LeftArm') && !names.has('LowerBack')) {

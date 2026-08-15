@@ -1,7 +1,10 @@
 /**
  * Open / commercial-friendly human head & face references for Face Live.
  * Sakura stays the brand hero — these are interop / research viewers.
+ * Robot / android refs are merged from robotCharacterCatalog.
  */
+
+import { ROBOT_CHARACTER_REFS } from './robotCharacterCatalog.js';
 
 /** @typedef {'gltf'|'fbx'} HeadFormat */
 
@@ -16,6 +19,11 @@
  * @property {boolean} [arkit52] true when mesh exposes ARKit-style morph names
  * @property {boolean} [sakura] true for the brand character (uses LO/HI + tex LOD)
  * @property {'rocketbox'} [texturePack] remap FBX .tga → in-repo PNGs
+ * @property {boolean} [robot]
+ * @property {'expressive'} [robotMorphs]
+ * @property {'gdbot'|'gobot'} [androidFace]
+ * @property {boolean} [demoOnly]
+ * @property {string[]} [preferredClips]
  */
 
 const RB =
@@ -86,6 +94,7 @@ export const HUMAN_HEAD_REFS = [
     help: 'Parametric human with ARKit + Oculus visemes (TalkingHead sample)',
     arkit52: true,
   },
+  ...ROBOT_CHARACTER_REFS,
 ];
 
 /** @param {string} id */

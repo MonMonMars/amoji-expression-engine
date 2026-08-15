@@ -5616,6 +5616,15 @@
         createRocketboxFbxLoader,
       } from '/engine/layers/humanHeadCatalog.js';
       import {
+        emotionToRobotExpressiveWeights,
+        sakuraWeightsToRobotExpressive,
+        emotionToAndroidRobotBridge,
+      } from '/engine/layers/robotEmotionDrive.js';
+      import {
+        ensureAndroidFacePanel,
+        applyAndroidFaceEmotion,
+      } from '/engine/layers/androidFacePanel.js';
+      import {
         EMOTIONS,
         INTENSITY_TIERS,
         HI_RECIPES,
@@ -13064,6 +13073,11 @@
       const gltfMotionLoader = new GLTFLoader();
       /** @type {Map<string, any>} */
       const bodyMotionCache = new Map();
+      /** @type {THREE.AnimationClip[]} */
+      let robotEmbeddedClips = [];
+      const robotTexLoader = new THREE.TextureLoader();
+      let lastAndroidFaceKey = '';
+      let lastAndroidBridgeJson = '';
 
       function populateBodyMotionClipSelect() {
         if (!mixamoClipSel) return;
@@ -13768,10 +13782,14 @@
         headRefId = ref.id;
         stopMixamoBody();
         if (mixamoBodyEl) mixamoBodyEl.checked = false;
+        robotEmbeddedClips = [];
+        lastAndroidFaceKey = '';
         setMixamoStatus(
           ref.sakura
             ? 'body motion off · free libraries'
-            : 'body motion ready · idle/walk on this body',
+            : ref.robot
+              ? 'robot/android · idle/walk on this body'
+              : 'body motion ready · idle/walk on this body',
         );
         loadStatus.textContent = `Loading ${ref.label}…`;
         loadStatus.className = 'status';
@@ -13802,6 +13820,7 @@
         } else {
           const gltf = await loader.loadAsync(ref.url);
           obj = gltf.scene;
+          robotEmbeddedClips = gltf.animations || [];
         }
 
         model = obj;
@@ -13812,16 +13831,47 @@
         bindModelBones(model);
         mixer = null;
 
-        document.getElementById('hudLod').textContent = 'REF';
+        if (ref.androidFace) {
+          try {
+            await ensureAndroidFacePanel(THREE, model, ref.androidFace, robotTexLoader);
+            await applyAndroidFaceEmotion(model, emotion, { blink: 0 });
+            lastAndroidFaceKey = `${ref.androidFace}:${emotion}`;
+          } catch (faceErr) {
+            console.warn('android face panel', faceErr);
+          }
+        }
+
+        // Prefer embedded Idle when present (robots often ship clips)
+        if (robotEmbeddedClips.length) {
+          const prefer = (ref.preferredClips || ['Idle', 'idle']).map((n) =>
+            n.toLowerCase(),
+          );
+          const clip =
+            robotEmbeddedClips.find((c) => prefer.includes(c.name.toLowerCase())) ||
+            robotEmbeddedClips[0];
+          mixer = new THREE.AnimationMixer(model);
+          const action = mixer.clipAction(clip);
+          action.reset().fadeIn(0.25).play();
+        }
+
+        document.getElementById('hudLod').textContent = ref.robot ? 'BOT' : 'REF';
         document.getElementById('hudTris').textContent =
           estimateTris(model).toLocaleString();
         document.getElementById('hudTex').textContent = ref.arkit52
           ? 'ARKit'
-          : 'REF';
+          : ref.robotMorphs
+            ? 'R-MORPH'
+            : ref.androidFace
+              ? 'PANEL'
+              : 'REF';
 
         const morphHint = ref.arkit52
           ? `${morphMeshes.length} ARKit morph mesh(es)`
-          : `${morphMeshes.length} morph mesh(es)`;
+          : ref.robotMorphs
+            ? `${morphMeshes.length} robot morph mesh(es)`
+            : ref.androidFace
+              ? `android face · ${ref.androidFace}`
+              : `${morphMeshes.length} morph mesh(es)`;
         setHeadRefStatus(ref, morphHint);
         loadStatus.textContent = `${ref.label} · ${morphHint} · ${ref.license}`;
         loadStatus.className = 'status ok';
@@ -16009,9 +16059,10 @@
         const morphs = availableMorphs();
         const headRef = getHumanHeadRef(headRefId);
         const arkitHead = !!headRef.arkit52;
-        /** null = unrestricted Sakura Expression_* recipes (then remap → ARKit) */
-        const recipeAvail = arkitHead ? null : morphs;
-        const recipeLod = arkitHead ? 'hi' : lod;
+        const robotMorphHead = headRef.robotMorphs === 'expressive';
+        /** null = unrestricted Sakura Expression_* recipes (then remap → ARKit / robot) */
+        const recipeAvail = arkitHead || robotMorphHead ? null : morphs;
+        const recipeLod = arkitHead || robotMorphHead ? 'hi' : lod;
         const moodState = moodCtl.tick(dt);
         const discState = discCtl.tick(dt, {
           mood: moodState.state,
@@ -16623,10 +16674,48 @@
 
         const meshTargets = arkitHead
           ? sakuraMorphsToArkitMeshWeights(targets, morphs)
-          : targets;
+          : robotMorphHead
+            ? (() => {
+                const fromSakura = sakuraWeightsToRobotExpressive(targets);
+                const direct = emotionToRobotExpressiveWeights(displayEmo, shapeInt);
+                /** @type {Record<string, number>} */
+                const merged = { Angry: 0, Surprised: 0, Sad: 0 };
+                for (const k of Object.keys(merged)) {
+                  merged[k] = Math.min(1, Math.max(fromSakura[k] || 0, direct[k] || 0));
+                }
+                return merged;
+              })()
+            : targets;
 
         for (const mesh of morphMeshes) {
           applyMorphWeights(mesh, meshTargets, 1 - Math.pow(0.001, dt));
+        }
+
+        if (headRef.androidFace && model && frames % 4 === 0) {
+          const faceKey = `${headRef.androidFace}:${displayEmo}:${(
+            temporalState?.blink || 0
+          ).toFixed(1)}`;
+          if (faceKey !== lastAndroidFaceKey) {
+            lastAndroidFaceKey = faceKey;
+            applyAndroidFaceEmotion(model, displayEmo, {
+              blink: temporalState?.blink || (blinkT > 0 ? 1 : 0),
+            }).catch(() => {});
+          }
+        }
+
+        if (headRef.robot && frames % 15 === 0) {
+          const bridge = emotionToAndroidRobotBridge({
+            emotion: displayEmo,
+            intensity: shapeInt,
+            blink: temporalState?.blink || 0,
+            robotId: headRef.id,
+            morphs: robotMorphHead ? meshTargets : undefined,
+          });
+          const json = JSON.stringify(bridge);
+          if (json !== lastAndroidBridgeJson) {
+            lastAndroidBridgeJson = json;
+            window.__amojiAndroidRobot = bridge;
+          }
         }
 
         const entries = Object.entries(meshTargets)
@@ -16635,8 +16724,18 @@
           .slice(0, 10)
           .map(([k, v]) => `${k}: ${v.toFixed(2)}`);
         morphDebug.textContent = entries.length
-          ? `${arkitHead ? 'ARKit mesh · ' : ''}${entries.join('\n')}`
-          : '(neutral)';
+          ? `${
+              arkitHead
+                ? 'ARKit mesh · '
+                : robotMorphHead
+                  ? 'Robot morph · '
+                  : headRef.androidFace
+                    ? 'Android panel · '
+                    : ''
+            }${entries.join('\n')}`
+          : headRef.androidFace
+            ? `(android face · ${headRef.androidFace})`
+            : '(neutral)';
 
         const arkit = arkitNonZero(morphWeightsToArkit(targets));
         const arkitLines = Object.entries(arkit)

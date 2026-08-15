@@ -17,6 +17,10 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Filmic Worlds ARKit solve dataset | **CC0** | `assets/reference/human-head/filmic-worlds/` |
 | Rocketbox Female_Adult_01 (FBX + head/body maps) | **MIT** | `assets/reference/human-head/rocketbox/` · Face Live picker |
 | VALID Asian_F_1_Busi.glb (ARKit 52) | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` · Face Live picker |
+| RobotExpressive (Quaternius) | **CC0** | `assets/reference/robots/robot-expressive/` · Face Live |
+| Mixamo X Bot | Mixamo RF† | `assets/reference/robots/xbot/` · Face Live |
+| CesiumMan | **CC BY 4.0** | `assets/reference/robots/cesium-man/` · Face Live |
+| GDBot / Gobot face panels | **CC BY-NC-SA** demo | `assets/reference/robots/gdquest-*` · Face Live (non-commercial) |
 | MediaPipe Tasks Vision | Apache-2.0 (npm) | Capture Studio / yt-capture |
 | three.js runtime | MIT | `package.json` |
 
@@ -44,13 +48,15 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | [M3-org/base-meshes](https://github.com/M3-org/base-meshes) | CC0 | Greybox body/head | GitHub |
 | OpenGameArt Quaternius mirrors | CC0 | Backup downloads | opengameart.org |
 
-**Face/head deep-dive:** `docs/FREE_HUMAN_HEAD_FACE.md`
+**Face/head deep-dive:** `docs/FREE_HUMAN_HEAD_FACE.md`  
+**Robot / android deep-dive:** `docs/FREE_ROBOT_ANDROID.md`
 
 ## Excluded / caution
 
 | Content | Why |
 |---|---|
 | Bandai Namco Research Motiondataset | **CC BY-NC** — non-commercial |
+| GDQuest GDBot / Gobot art | **CC BY-NC-SA** — demo only in Face Live |
 | Ubisoft LaFAN1 | Research license — review before ship |
 | MetaHuman head redistribs marked “study only” | Not commercial-clear |
 | MB-Lab base mesh | **AGPL-3** — shipping binary may impose obligations; lawyer review |
@@ -66,6 +72,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | Human head morph research | ICT-FaceKit Light (subset in-repo; full on GitHub) |
 | JP voice | No strong CC0 JP TTS bank found; keep Kokoro/IndexTTS HTTP adapters |
 | Eyes | Custom art still preferred (Alita iris pass); Kenney lacks hero eyes |
+| Robot / android body | RobotExpressive (CC0) + Mixamo X Bot; GDBot face panel demo (NC) |
+| Android runtime bridge | `window.__amojiAndroidRobot` + OpenBot (MIT) companion path |
 
 ## How to add a pack
 
