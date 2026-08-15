@@ -27,6 +27,8 @@ Live bridge payload is exposed as `window.__amojiAndroidRobot` while a robot is 
 
 **Multi-vendor (Spot, Pepper, Misty, …):** see `docs/ROBOT_VENDOR_BRIDGES.md` — `window.__amojiRobotVendor` (`amoji.robotVendor.v1`).
 
+**Human-face robots (Furhat, Ameca, QTrobot, Sophia…):** see `docs/HUMAN_FACE_ROBOTS.md` — ARKit → Furhat FaceCore.
+
 ## Related OSS robot / Android stacks (not vendored)
 
 | Project | License | Fit |

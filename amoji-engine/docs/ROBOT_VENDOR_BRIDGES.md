@@ -28,7 +28,8 @@ on the robot network with the vendor SDK.
 Catalog: `engine/layers/robotVendorCatalog.js`  
 Mapper: `engine/layers/robotVendorBridge.js`  
 Companion: `scripts/robot_vendor_amoji_bridge.py`  
-Unitree deep-dive: `docs/UNITREE_BRIDGE.md`
+Unitree deep-dive: `docs/UNITREE_BRIDGE.md`  
+Human-face deep-dive: `docs/HUMAN_FACE_ROBOTS.md`
 
 ## Face Live
 

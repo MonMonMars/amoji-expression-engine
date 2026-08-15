@@ -2057,9 +2057,9 @@
       </div>
 
       <div class="group">
-        <div class="label">Robot vendor bridge <span style="text-transform:none;letter-spacing:0">(Spot · Pepper · Misty · Unitree…)</span></div>
+        <div class="label">Robot vendor bridge <span style="text-transform:none;letter-spacing:0">(Furhat · Ameca · Spot · Unitree…)</span></div>
         <select id="robotVendorSel" class="ctl" aria-label="Robot vendor platform">
-          <!-- filled from robotVendorCatalog -->
+          <!-- filled from robotVendorCatalog — human-face first -->
         </select>
         <select id="unitreePlatformSel" class="ctl" aria-label="Unitree robot platform" hidden>
           <option value="auto">Unitree · Auto (Go2 + G1)</option>
@@ -13104,7 +13104,7 @@
       let lastVendorBridgeJson = '';
       /** @type {'auto'|'go2'|'g1'|'h1'|'b2'} */
       let unitreePlatform = 'auto';
-      let robotVendorId = 'unitree';
+      let robotVendorId = 'furhat';
 
       function syncUnitreePlatformVisibility() {
         const sel = document.getElementById('unitreePlatformSel');
@@ -14008,7 +14008,8 @@
         for (const v of ROBOT_VENDORS) {
           const opt = document.createElement('option');
           opt.value = v.id;
-          opt.textContent = `${v.label} · ${v.depth}`;
+          const faceTag = v.humanFace ? 'face · ' : '';
+          opt.textContent = `${faceTag}${v.label} · ${v.depth}`;
           robotVendorSel.appendChild(opt);
         }
         robotVendorSel.value = robotVendorId;
@@ -16783,23 +16784,29 @@
         }
 
         if (frames % 15 === 0) {
+          const arkitLive = arkitNonZero(morphWeightsToArkit(targets));
           const vendorBridge = emotionToRobotVendorBridge({
             vendorId: robotVendorId,
             emotion: displayEmo,
             intensity: shapeInt,
             unitreePlatform,
+            arkitWeights: arkitLive,
           });
           const vjson = JSON.stringify(vendorBridge);
           if (vjson !== lastVendorBridgeJson) {
             lastVendorBridgeJson = vjson;
             window.__amojiRobotVendor = vendorBridge;
+            if (vendorBridge.payload?.humanFace) {
+              window.__amojiHumanFaceRobot = vendorBridge.payload.humanFace;
+            }
             const el = document.getElementById('robotVendorStatus');
             if (el && vendorBridge.steps?.[0]) {
+              const faceMark = vendorBridge.vendor.humanFace ? 'face · ' : '';
               const top = vendorBridge.steps
                 .slice(0, 3)
                 .map((s) => `${s.target}:${s.method}`)
                 .join(' · ');
-              el.textContent = `${vendorBridge.vendor.id} · ${vendorBridge.emotion}@${vendorBridge.intensity.toFixed(2)} · ${top}`;
+              el.textContent = `${faceMark}${vendorBridge.vendor.id} · ${vendorBridge.emotion}@${vendorBridge.intensity.toFixed(2)} · ${top}`;
             }
           }
 

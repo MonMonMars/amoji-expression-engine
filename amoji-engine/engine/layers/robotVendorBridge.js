@@ -10,6 +10,7 @@ import {
   unitreeBridgeSteps,
 } from './unitreeBridge.js';
 import { emotionToAndroidRobotBridge } from './robotEmotionDrive.js';
+import { emotionToHumanFaceRobotBridge } from './humanFaceRobotBridge.js';
 
 /**
  * @param {string} emotion
@@ -362,6 +363,7 @@ export function emotionToPartialOrStub(vendorId, emotion, intensity) {
  *   unitreePlatform?: import('./unitreeBridge.js').UnitreePlatform,
  *   allowUnsafe?: boolean,
  *   ttsText?: string | null,
+ *   arkitWeights?: Record<string, number>,
  * }} state
  */
 export function emotionToRobotVendorBridge(state) {
@@ -376,7 +378,17 @@ export function emotionToRobotVendorBridge(state) {
   /** @type {{ target: string, method: string, detail?: any }[]} */
   let steps = [];
 
-  switch (vendorId) {
+  // Dedicated human-face robots (Furhat ARKit, Ameca DOF, QTrobot, …)
+  if (vendor.humanFace && !['softbank_pepper', 'misty'].includes(vendorId)) {
+    const faceBridge = emotionToHumanFaceRobotBridge({
+      vendorId,
+      emotion,
+      intensity,
+      arkitWeights: state.arkitWeights,
+    });
+    payload = { humanFace: faceBridge };
+    steps = faceBridge.steps || [];
+  } else switch (vendorId) {
     case 'unitree': {
       const u = emotionToUnitreeBridge({
         emotion,
@@ -405,6 +417,14 @@ export function emotionToRobotVendorBridge(state) {
     case 'softbank_nao': {
       const naoqi = emotionToPepperNaoqi(emotion, intensity);
       payload = { naoqi, robot: vendorId === 'softbank_nao' ? 'NAO' : 'Pepper' };
+      if (vendorId === 'softbank_pepper') {
+        payload.humanFace = emotionToHumanFaceRobotBridge({
+          vendorId: 'softbank_pepper',
+          emotion,
+          intensity,
+          arkitWeights: state.arkitWeights,
+        });
+      }
       steps = [
         { target: 'ALAnimatedSpeech', method: 'say', detail: naoqi.animatedSpeech },
         { target: 'ALLeds', method: 'fadeRGB', detail: naoqi.leds },
@@ -413,7 +433,15 @@ export function emotionToRobotVendorBridge(state) {
     }
     case 'misty': {
       const misty = emotionToMistyRest(emotion, intensity);
-      payload = { misty };
+      payload = {
+        misty,
+        humanFace: emotionToHumanFaceRobotBridge({
+          vendorId: 'misty',
+          emotion,
+          intensity,
+          arkitWeights: state.arkitWeights,
+        }),
+      };
       steps = misty.requests.map((r) => ({
         target: r.path,
         method: r.method,
@@ -462,6 +490,8 @@ export function emotionToRobotVendorBridge(state) {
       depth: vendor.depth,
       sdk: vendor.sdk,
       docs: vendor.docs,
+      humanFace: !!vendor.humanFace,
+      faceDrive: vendor.faceDrive || null,
     },
     emotion,
     intensity,
@@ -471,6 +501,7 @@ export function emotionToRobotVendorBridge(state) {
     steps,
     executeHints: {
       python: 'scripts/robot_vendor_amoji_bridge.py',
+      facePython: 'scripts/human_face_robot_amoji_bridge.py',
       unitreePython: 'scripts/unitree_amoji_bridge.py',
       warn: 'Dry-run by default — live dispatch only on vendor SDK hosts',
     },

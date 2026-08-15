@@ -1,7 +1,10 @@
 /**
  * Big-name robot vendors and SDK readiness for Amoji emotion bridging.
+ * Human-faced platforms are listed first (from humanFaceRobotCatalog).
  * `adaptable: true` means Face Live emits a concrete `amoji.robotVendor.v1` payload.
  */
+
+import { HUMAN_FACE_ROBOT_VENDORS } from './humanFaceRobotCatalog.js';
 
 /**
  * @typedef {object} RobotVendor
@@ -15,10 +18,12 @@
  * @property {'full'|'partial'|'stub'} depth
  * @property {string} help
  * @property {boolean} [demoOnly]
+ * @property {boolean} [humanFace]
+ * @property {string} [faceDrive]
  */
 
-/** @type {RobotVendor[]} */
-export const ROBOT_VENDORS = [
+/** Body / loco platforms not already covered as human-face vendors. */
+const BODY_ROBOT_VENDORS = [
   {
     id: 'unitree',
     label: 'Unitree (Go2 / G1 / H1)',
@@ -42,17 +47,6 @@ export const ROBOT_VENDORS = [
     help: 'AudioVisualClient LEDs + buzzer; optional sit/stand',
   },
   {
-    id: 'softbank_pepper',
-    label: 'SoftBank Pepper',
-    company: 'SoftBank Robotics',
-    products: ['Pepper'],
-    sdk: 'NAOqi / QiSDK (Android)',
-    docs: 'http://doc.aldebaran.com/',
-    adaptable: true,
-    depth: 'full',
-    help: 'ALLeds + ALAnimatedSpeech / animations + TTS',
-  },
-  {
     id: 'softbank_nao',
     label: 'SoftBank NAO',
     company: 'SoftBank Robotics',
@@ -61,18 +55,7 @@ export const ROBOT_VENDORS = [
     docs: 'http://doc.aldebaran.com/',
     adaptable: true,
     depth: 'full',
-    help: 'Same NAOqi stack — LEDs, posture, animated speech',
-  },
-  {
-    id: 'misty',
-    label: 'Misty Robotics II',
-    company: 'Misty Robotics',
-    products: ['Misty II'],
-    sdk: 'HTTP REST + JS/.NET skills',
-    docs: 'https://docs.mistyrobotics.com/',
-    adaptable: true,
-    depth: 'full',
-    help: 'POST /api/led + /api/images/display + arms/head',
+    help: 'NAOqi LEDs, posture, animated speech',
   },
   {
     id: 'temi',
@@ -139,17 +122,6 @@ export const ROBOT_VENDORS = [
     adaptable: true,
     depth: 'partial',
     help: 'OP3 action modules + TurtleBot LED',
-  },
-  {
-    id: 'engineered_arts',
-    label: 'Engineered Arts Ameca',
-    company: 'Engineered Arts',
-    products: ['Ameca', 'Mesmer'],
-    sdk: 'Tritium / proprietary API',
-    docs: 'https://www.engineeredarts.co.uk/',
-    adaptable: true,
-    depth: 'partial',
-    help: 'Facial animation channels + gesture clips (partner API)',
   },
   {
     id: 'sony_aibo',
@@ -252,6 +224,14 @@ export const ROBOT_VENDORS = [
   },
 ];
 
+const FACE_IDS = new Set(HUMAN_FACE_ROBOT_VENDORS.map((v) => v.id));
+
+/** @type {RobotVendor[]} */
+export const ROBOT_VENDORS = [
+  ...HUMAN_FACE_ROBOT_VENDORS,
+  ...BODY_ROBOT_VENDORS.filter((v) => !FACE_IDS.has(v.id)),
+];
+
 /** @param {string} id */
 export function getRobotVendor(id) {
   return ROBOT_VENDORS.find((v) => v.id === id) || ROBOT_VENDORS[0];
@@ -259,4 +239,8 @@ export function getRobotVendor(id) {
 
 export function listAdaptableVendors() {
   return ROBOT_VENDORS.filter((v) => v.adaptable);
+}
+
+export function listHumanFaceVendors() {
+  return ROBOT_VENDORS.filter((v) => v.humanFace);
 }
