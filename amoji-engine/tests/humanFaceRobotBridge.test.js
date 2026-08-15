@@ -34,11 +34,18 @@ describe('humanFaceRobotBridge', () => {
       mouthSmileLeft: 0.8,
       mouthSmileRight: 0.8,
       jawOpen: 0.4,
+      eyeLookUpLeft: 0.5,
+      noseSneerLeft: 0.4,
     });
     expect(g.class).toBe('furhatos.gestures.Gesture');
     expect(g.frames[0].params.SMILE_OPEN || g.frames[0].params.SMILE_CLOSED).toBeTruthy();
+    expect(g.frames[0].params.LOOK_UP).toBeGreaterThan(0.4);
+    expect(g.frames.length).toBe(2); // includes reset
+    const stream = arkitWeightsToFurhatGesture({ mouthSmileLeft: 0.9 }, { streaming: true });
+    expect(stream.frames.length).toBe(1);
     const b = emotionToFurhatBridge('happy', 0.7, { mouthSmileLeft: 0.9 });
     expect(b.customGesture).toBeTruthy();
+    expect(b.streaming).toBe(true);
     expect(b.requests[0].path).toBe('/furhat/gesture');
   });
 

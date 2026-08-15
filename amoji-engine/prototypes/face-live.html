@@ -2061,12 +2061,20 @@
         <select id="robotVendorSel" class="ctl" aria-label="Robot vendor platform">
           <!-- filled from robotVendorCatalog — human-face first -->
         </select>
+        <label class="row" style="gap:8px;align-items:center;margin:6px 0;">
+          <input id="robotFaceOnly" type="checkbox" />
+          <span>Human-face vendors only</span>
+        </label>
         <select id="unitreePlatformSel" class="ctl" aria-label="Unitree robot platform" hidden>
           <option value="auto">Unitree · Auto (Go2 + G1)</option>
           <option value="go2">Unitree · Go2 / B2 Sport + VUI</option>
           <option value="g1">Unitree · G1 Loco + Arm + LED</option>
           <option value="h1">Unitree · H1 Loco</option>
         </select>
+        <label class="row" style="gap:8px;align-items:center;margin:6px 0;">
+          <input id="robotBridgeOn" type="checkbox" role="switch" />
+          <span>Stream to robot-bridge (ws://127.0.0.1:7880)</span>
+        </label>
         <div class="status" id="robotVendorStatus">vendor · idle</div>
       </div>
 
@@ -13105,10 +13113,88 @@
       /** @type {'auto'|'go2'|'g1'|'h1'|'b2'} */
       let unitreePlatform = 'auto';
       let robotVendorId = 'furhat';
+      let robotFaceOnly = false;
+      let robotBridgeOn = false;
+      /** @type {WebSocket | null} */
+      let robotBridgeWs = null;
+      let robotBridgeHttpOk = false;
 
       function syncUnitreePlatformVisibility() {
         const sel = document.getElementById('unitreePlatformSel');
         if (sel) sel.hidden = robotVendorId !== 'unitree';
+      }
+
+      function populateRobotVendorSelect() {
+        const robotVendorSel = document.getElementById('robotVendorSel');
+        if (!robotVendorSel) return;
+        const prev = robotVendorSel.value || robotVendorId;
+        robotVendorSel.innerHTML = '';
+        const list = robotFaceOnly
+          ? ROBOT_VENDORS.filter((v) => v.humanFace)
+          : ROBOT_VENDORS;
+        for (const v of list) {
+          const opt = document.createElement('option');
+          opt.value = v.id;
+          const faceTag = v.humanFace ? 'face · ' : '';
+          opt.textContent = `${faceTag}${v.label} · ${v.depth}`;
+          robotVendorSel.appendChild(opt);
+        }
+        if ([...robotVendorSel.options].some((o) => o.value === prev)) {
+          robotVendorSel.value = prev;
+          robotVendorId = prev;
+        } else if (robotVendorSel.options[0]) {
+          robotVendorSel.value = robotVendorSel.options[0].value;
+          robotVendorId = robotVendorSel.value;
+        }
+      }
+
+      function ensureRobotBridgeWs() {
+        if (!robotBridgeOn) {
+          if (robotBridgeWs) {
+            try {
+              robotBridgeWs.close();
+            } catch {
+              /* ignore */
+            }
+            robotBridgeWs = null;
+          }
+          return;
+        }
+        if (robotBridgeWs && robotBridgeWs.readyState <= 1) return;
+        try {
+          robotBridgeWs = new WebSocket('ws://127.0.0.1:7880');
+          robotBridgeWs.addEventListener('open', () => {
+            const el = document.getElementById('robotVendorStatus');
+            if (el) el.textContent = `${el.textContent} · bridge ws ok`;
+          });
+          robotBridgeWs.addEventListener('close', () => {
+            robotBridgeWs = null;
+          });
+          robotBridgeWs.addEventListener('error', () => {
+            robotBridgeHttpOk = true; // fall back to HTTP publish
+          });
+        } catch {
+          robotBridgeHttpOk = true;
+        }
+      }
+
+      function publishRobotBridge(payload) {
+        if (!robotBridgeOn || !payload) return;
+        ensureRobotBridgeWs();
+        const msg = JSON.stringify({ type: 'publish', payload });
+        if (robotBridgeWs && robotBridgeWs.readyState === 1) {
+          try {
+            robotBridgeWs.send(msg);
+            return;
+          } catch {
+            /* fall through */
+          }
+        }
+        fetch('http://127.0.0.1:7881/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
       }
 
       function populateBodyMotionClipSelect() {
@@ -14004,17 +14090,13 @@
 
       const unitreePlatformSel = document.getElementById('unitreePlatformSel');
       const robotVendorSel = document.getElementById('robotVendorSel');
+      const robotFaceOnlyEl = document.getElementById('robotFaceOnly');
+      const robotBridgeOnEl = document.getElementById('robotBridgeOn');
+      populateRobotVendorSelect();
       if (robotVendorSel) {
-        for (const v of ROBOT_VENDORS) {
-          const opt = document.createElement('option');
-          opt.value = v.id;
-          const faceTag = v.humanFace ? 'face · ' : '';
-          opt.textContent = `${faceTag}${v.label} · ${v.depth}`;
-          robotVendorSel.appendChild(opt);
-        }
         robotVendorSel.value = robotVendorId;
         robotVendorSel.addEventListener('change', () => {
-          robotVendorId = robotVendorSel.value || 'unitree';
+          robotVendorId = robotVendorSel.value || 'furhat';
           lastVendorBridgeJson = '';
           lastUnitreeBridgeJson = '';
           syncUnitreePlatformVisibility();
@@ -14023,6 +14105,28 @@
           if (el) el.textContent = `vendor · ${meta.label} · ${meta.depth}`;
         });
         syncUnitreePlatformVisibility();
+      }
+      if (robotFaceOnlyEl) {
+        robotFaceOnlyEl.addEventListener('change', () => {
+          robotFaceOnly = !!robotFaceOnlyEl.checked;
+          populateRobotVendorSelect();
+          lastVendorBridgeJson = '';
+          syncUnitreePlatformVisibility();
+        });
+      }
+      if (robotBridgeOnEl) {
+        robotBridgeOnEl.addEventListener('change', () => {
+          robotBridgeOn = !!robotBridgeOnEl.checked;
+          if (robotBridgeOn) ensureRobotBridgeWs();
+          else if (robotBridgeWs) {
+            try {
+              robotBridgeWs.close();
+            } catch {
+              /* ignore */
+            }
+            robotBridgeWs = null;
+          }
+        });
       }
       if (unitreePlatformSel) {
         unitreePlatformSel.value = unitreePlatform;
@@ -16791,6 +16895,7 @@
             intensity: shapeInt,
             unitreePlatform,
             arkitWeights: arkitLive,
+            streaming: true,
           });
           const vjson = JSON.stringify(vendorBridge);
           if (vjson !== lastVendorBridgeJson) {
@@ -16799,6 +16904,7 @@
             if (vendorBridge.payload?.humanFace) {
               window.__amojiHumanFaceRobot = vendorBridge.payload.humanFace;
             }
+            publishRobotBridge(vendorBridge);
             const el = document.getElementById('robotVendorStatus');
             if (el && vendorBridge.steps?.[0]) {
               const faceMark = vendorBridge.vendor.humanFace ? 'face · ' : '';
@@ -16806,7 +16912,9 @@
                 .slice(0, 3)
                 .map((s) => `${s.target}:${s.method}`)
                 .join(' · ');
-              el.textContent = `${faceMark}${vendorBridge.vendor.id} · ${vendorBridge.emotion}@${vendorBridge.intensity.toFixed(2)} · ${top}`;
+              el.textContent = `${faceMark}${vendorBridge.vendor.id} · ${vendorBridge.emotion}@${vendorBridge.intensity.toFixed(2)} · ${top}${
+                robotBridgeOn ? ' · bridging' : ''
+              }`;
             }
           }
 

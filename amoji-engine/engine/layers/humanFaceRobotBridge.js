@@ -27,16 +27,19 @@ export function emotionToFurhatNamedGesture(emotion, intensity = 0.7) {
 
 /**
  * Build a Furhat FaceCore gesture definition from ARKit (or ARKit-like) weights.
+ * Maps Apple ARKit 52 → FaceCore ARKitParams / CharParams where documented.
  * @param {Record<string, number>} arkitWeights
- * @param {{ hold?: number, name?: string }} [opts]
+ * @param {{ hold?: number, name?: string, streaming?: boolean }} [opts]
  */
 export function arkitWeightsToFurhatGesture(arkitWeights = {}, opts = {}) {
   const hold = opts.hold ?? 0.45;
+  const streaming = !!opts.streaming;
   /** @type {Record<string, number>} */
   const params = {};
 
+  /** @type {Record<string, string>} */
   const map = {
-    browInnerUp: 'BROW_UP_LEFT',
+    browInnerUp: 'BROW_IN_LEFT',
     browDownLeft: 'BROW_DOWN_LEFT',
     browDownRight: 'BROW_DOWN_RIGHT',
     browOuterUpLeft: 'BROW_UP_LEFT',
@@ -45,39 +48,93 @@ export function arkitWeightsToFurhatGesture(arkitWeights = {}, opts = {}) {
     eyeBlinkRight: 'BLINK_RIGHT',
     eyeSquintLeft: 'EYE_SQUINT_LEFT',
     eyeSquintRight: 'EYE_SQUINT_RIGHT',
+    eyeWideLeft: 'SURPRISE',
+    eyeWideRight: 'SURPRISE',
+    eyeLookUpLeft: 'LOOK_UP',
+    eyeLookUpRight: 'LOOK_UP',
+    eyeLookDownLeft: 'LOOK_DOWN',
+    eyeLookDownRight: 'LOOK_DOWN',
+    eyeLookInLeft: 'LOOK_RIGHT',
+    eyeLookInRight: 'LOOK_LEFT',
+    eyeLookOutLeft: 'LOOK_LEFT',
+    eyeLookOutRight: 'LOOK_RIGHT',
     jawOpen: 'PHONE_AAH',
+    jawForward: 'PHONE_AAH',
+    mouthClose: 'PHONE_BMP',
+    mouthPucker: 'PHONE_W_OO',
+    mouthFunnel: 'PHONE_W_OO',
     mouthSmileLeft: 'SMILE_CLOSED',
     mouthSmileRight: 'SMILE_CLOSED',
     mouthFrownLeft: 'EXPR_SAD',
     mouthFrownRight: 'EXPR_SAD',
-    mouthFunnel: 'SURPRISE',
+    mouthUpperUpLeft: 'SMILE_OPEN',
+    mouthUpperUpRight: 'SMILE_OPEN',
+    mouthLowerDownLeft: 'EXPR_SAD',
+    mouthLowerDownRight: 'EXPR_SAD',
+    mouthPressLeft: 'EXPR_ANGER',
+    mouthPressRight: 'EXPR_ANGER',
+    noseSneerLeft: 'EXPR_DISGUST',
+    noseSneerRight: 'EXPR_DISGUST',
+    cheekSquintLeft: 'SMILE_CLOSED',
+    cheekSquintRight: 'SMILE_CLOSED',
+    cheekPuff: 'PHONE_BMP',
   };
 
   for (const [arkit, furhat] of Object.entries(map)) {
     const v = arkitWeights[arkit];
-    if (v && v > 0.05) params[furhat] = Math.min(1, Math.max(params[furhat] || 0, v));
+    if (v && v > 0.04) {
+      params[furhat] = Math.min(1, Math.max(params[furhat] || 0, v));
+    }
   }
 
-  // Composite expression scalars Furhat also exposes
+  // Also mirror browInnerUp to both IN channels when only one mapped
+  if ((arkitWeights.browInnerUp || 0) > 0.04) {
+    const v = Math.min(1, arkitWeights.browInnerUp);
+    params.BROW_IN_LEFT = Math.max(params.BROW_IN_LEFT || 0, v);
+    params.BROW_IN_RIGHT = Math.max(params.BROW_IN_RIGHT || 0, v);
+  }
+
   const smile =
     Math.max(arkitWeights.mouthSmileLeft || 0, arkitWeights.mouthSmileRight || 0) ||
     params.SMILE_CLOSED ||
     0;
-  if (smile > 0.55) params.SMILE_OPEN = smile;
-  else if (smile > 0.05) params.SMILE_CLOSED = smile;
+  if (smile > 0.55) params.SMILE_OPEN = Math.max(params.SMILE_OPEN || 0, smile);
+  else if (smile > 0.05) params.SMILE_CLOSED = Math.max(params.SMILE_CLOSED || 0, smile);
 
-  const anger =
-    Math.max(arkitWeights.browDownLeft || 0, arkitWeights.browDownRight || 0) *
-    Math.max(arkitWeights.noseSneerLeft || 0.3, arkitWeights.noseSneerRight || 0.3);
-  if (anger > 0.2) params.EXPR_ANGER = Math.min(1, anger * 2);
+  const angerProxy = Math.max(
+    arkitWeights.browDownLeft || 0,
+    arkitWeights.browDownRight || 0,
+    arkitWeights.mouthPressLeft || 0,
+    arkitWeights.mouthPressRight || 0,
+  );
+  if (angerProxy > 0.25) params.EXPR_ANGER = Math.min(1, Math.max(params.EXPR_ANGER || 0, angerProxy));
+
+  const fearProxy = Math.max(
+    arkitWeights.eyeWideLeft || 0,
+    arkitWeights.eyeWideRight || 0,
+    arkitWeights.browInnerUp || 0,
+  );
+  if (fearProxy > 0.35 && (arkitWeights.mouthFrownLeft || 0) + (arkitWeights.mouthFrownRight || 0) > 0.2) {
+    params.EXPR_FEAR = Math.min(1, fearProxy);
+  }
+
+  const sadProxy = Math.max(
+    arkitWeights.mouthFrownLeft || 0,
+    arkitWeights.mouthFrownRight || 0,
+    params.EXPR_SAD || 0,
+  );
+  if (sadProxy > 0.2) params.EXPR_SAD = Math.min(1, sadProxy);
+
+  /** @type {{ time: number[], params: Record<string, any> }[]} */
+  const frames = [{ time: [hold], params }];
+  if (!streaming) {
+    frames.push({ time: [hold + 0.35], params: { reset: true } });
+  }
 
   return {
     class: 'furhatos.gestures.Gesture',
     name: opts.name || 'amoji_arkit',
-    frames: [
-      { time: [hold], params },
-      { time: [hold + 0.35], params: { reset: true } },
-    ],
+    frames,
   };
 }
 
@@ -87,20 +144,23 @@ export function arkitWeightsToFurhatGesture(arkitWeights = {}, opts = {}) {
  * @param {number} intensity
  * @param {Record<string, number>} [arkitWeights]
  */
-export function emotionToFurhatBridge(emotion, intensity = 0.7, arkitWeights) {
+export function emotionToFurhatBridge(emotion, intensity = 0.7, arkitWeights, opts = {}) {
   const named = emotionToFurhatNamedGesture(emotion, intensity);
   const nz = arkitWeights ? arkitNonZero(arkitWeights, 0.04) : {};
+  const streaming = opts.streaming !== false && Object.keys(nz).length > 0;
   const custom =
     Object.keys(nz).length > 0
       ? arkitWeightsToFurhatGesture(arkitWeights, {
-          hold: 0.35 + 0.4 * intensity,
+          hold: streaming ? 0.12 : 0.35 + 0.4 * intensity,
           name: `amoji_${emotion}`,
+          streaming,
         })
       : null;
 
   return {
     sdk: 'Furhat Remote API',
     baseUrlTemplate: 'http://{robot_ip}:54321',
+    streaming,
     requests: [
       {
         method: 'POST',
@@ -108,7 +168,9 @@ export function emotionToFurhatBridge(emotion, intensity = 0.7, arkitWeights) {
         query: custom ? undefined : { name: named },
         body: custom ? { body: JSON.stringify(custom) } : undefined,
         note: custom
-          ? 'Custom FaceCore gesture from ARKit weights'
+          ? streaming
+            ? 'Streaming FaceCore gesture from ARKit (no reset frame)'
+            : 'Custom FaceCore gesture from ARKit weights'
           : `Named gesture ${named}`,
       },
       {
@@ -306,6 +368,7 @@ export function emotionToDigitalHumanFace(emotion, intensity, arkitWeights = {})
  *   emotion: string,
  *   intensity?: number,
  *   arkitWeights?: Record<string, number>,
+ *   streaming?: boolean,
  * }} state
  */
 export function emotionToHumanFaceRobotBridge(state) {
@@ -321,7 +384,9 @@ export function emotionToHumanFaceRobotBridge(state) {
 
   switch (vendorId) {
     case 'furhat': {
-      face = emotionToFurhatBridge(emotion, intensity, arkit);
+      face = emotionToFurhatBridge(emotion, intensity, arkit, {
+        streaming: state.streaming !== false,
+      });
       steps.push({
         target: '/furhat/gesture',
         method: 'POST',

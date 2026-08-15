@@ -364,6 +364,7 @@ export function emotionToPartialOrStub(vendorId, emotion, intensity) {
  *   allowUnsafe?: boolean,
  *   ttsText?: string | null,
  *   arkitWeights?: Record<string, number>,
+ *   streaming?: boolean,
  * }} state
  */
 export function emotionToRobotVendorBridge(state) {
@@ -385,6 +386,7 @@ export function emotionToRobotVendorBridge(state) {
       emotion,
       intensity,
       arkitWeights: state.arkitWeights,
+      streaming: state.streaming,
     });
     payload = { humanFace: faceBridge };
     steps = faceBridge.steps || [];

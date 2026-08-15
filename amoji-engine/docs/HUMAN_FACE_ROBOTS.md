@@ -26,18 +26,31 @@ Companion: `scripts/human_face_robot_amoji_bridge.py`
 
 ## Best interop: Furhat ← Amoji ARKit
 
-Furhat FaceCore accepts ARKit-compatible gesture params. Face Live already computes ARKit 52 from Sakura morphs; the vendor bridge packs them into a Furhat `Gesture` definition (or a named smile/sad/anger gesture).
+Furhat FaceCore accepts ARKit-compatible gesture params. Face Live already computes ARKit 52 from Sakura morphs; the vendor bridge packs them into a **streaming** Furhat `Gesture` (no reset frame) for continuous drive.
 
 ```bash
-# From Face Live: window.__amojiRobotVendor (vendor = Furhat)
-python3 amoji-engine/scripts/human_face_robot_amoji_bridge.py \
+# Terminal A — relay
+cd amoji-engine && npm run robot-bridge
+
+# Terminal B — Face Live (enable "Stream to robot-bridge")
+npm run face-live
+
+# Terminal C — Furhat companion
+python3 scripts/human_face_robot_amoji_bridge.py --subscribe --live-furhat 192.168.1.20
+```
+
+Or one-shot:
+
+```bash
+python3 scripts/human_face_robot_amoji_bridge.py \
   --file /tmp/vendor.json --live-furhat 192.168.1.20
 ```
 
 ## Face Live
 
-1. **Robot vendor bridge** — human-face vendors are listed first (marked `face`)  
-2. Default recommendation: **Furhat** or **Ameca** / **QTrobot**  
-3. ARKit weights from the live face are passed into the payload automatically  
+1. **Robot vendor bridge** — human-face vendors listed first (`face ·`)  
+2. **Human-face vendors only** checkbox filters the list  
+3. **Stream to robot-bridge** publishes `amoji.robotVendor.v1` to `ws://127.0.0.1:7880`  
+4. ARKit weights from the live face are included automatically  
 
 See also: `docs/ROBOT_VENDOR_BRIDGES.md`, `docs/UNITREE_BRIDGE.md`.
