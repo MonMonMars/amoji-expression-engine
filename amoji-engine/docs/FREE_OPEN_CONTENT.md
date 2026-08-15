@@ -13,6 +13,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | three.js `facecap.glb` (ARKit 52) | **MIT** | `assets/reference/arkit/` |
 | ICT FaceKit Light (neutral + sample exprs) | **MIT** | `assets/reference/human-head/ict-facekit/` |
 | Filmic Worlds ARKit solve dataset | **CC0** | `assets/reference/human-head/filmic-worlds/` |
+| Rocketbox Female_Adult_01 (FBX + head maps) | **MIT** | `assets/reference/human-head/rocketbox/` |
+| VALID Asian_F_1_Busi.glb (ARKit 52) | **CC BY 4.0** | `assets/reference/human-head/valid-vrm/` |
 | MediaPipe Tasks Vision | Apache-2.0 (npm) | Capture Studio / yt-capture |
 | three.js runtime | MIT | `package.json` |
 
@@ -35,8 +37,8 @@ Master shortlist of **commercial-friendly** (or clearly licensed) free content f
 | [Kenney.nl](https://kenney.nl/assets) | CC0 | UI / props / audio | kenney.nl |
 | Filmic Worlds ARKit solve dataset | CC0 | Face blendshape research | **in-repo** + filmicworlds.com |
 | [ICT-FaceKit](https://github.com/USC-ICT/ICT-FaceKit) full Light OBJs | MIT | Face morphable model (full set) | GitHub (`FaceXModel/`) |
-| [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox) | **MIT** | 115 rigged humans + ARKit/FACS heads (~26 GB) | Sparse-clone |
-| [VALID → VRM ARKit](https://github.com/TLTMedia/valid-vrm-avatars) | CC BY 4.0 | Inclusive avatars + ARKit 52 | GitHub (LFS / GLB) |
+| [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox) more avatars | **MIT** | Extra identities beyond Female_Adult_01 | Sparse-clone (~26 GB full) |
+| [VALID → VRM ARKit](https://github.com/TLTMedia/valid-vrm-avatars) more identities | CC BY 4.0 | Extra VALID outfits / faces | GitHub LFS |
 | [M3-org/base-meshes](https://github.com/M3-org/base-meshes) | CC0 | Greybox body/head | GitHub |
 | OpenGameArt Quaternius mirrors | CC0 | Backup downloads | opengameart.org |
 
