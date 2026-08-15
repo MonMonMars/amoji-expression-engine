@@ -6,6 +6,22 @@
 import { arkitNonZero } from '../export/arkitExporter.js';
 
 /**
+ * Quantize blendshape weights for stable streaming fingerprints.
+ * @param {Record<string, number>} weights
+ * @param {number} [places=2]
+ */
+export function quantizeWeights(weights = {}, places = 2) {
+  const f = 10 ** places;
+  /** @type {Record<string, number>} */
+  const out = {};
+  for (const [k, v] of Object.entries(weights)) {
+    if (typeof v !== 'number' || !(v > 0)) continue;
+    out[k] = Math.round(v * f) / f;
+  }
+  return out;
+}
+
+/**
  * Map emotion → Furhat named gesture (when not driving custom ARKit frames).
  * @param {string} emotion
  * @param {number} intensity
@@ -146,11 +162,12 @@ export function arkitWeightsToFurhatGesture(arkitWeights = {}, opts = {}) {
  */
 export function emotionToFurhatBridge(emotion, intensity = 0.7, arkitWeights, opts = {}) {
   const named = emotionToFurhatNamedGesture(emotion, intensity);
-  const nz = arkitWeights ? arkitNonZero(arkitWeights, 0.04) : {};
+  const quantized = quantizeWeights(arkitWeights || {}, 2);
+  const nz = arkitNonZero(quantized, 0.04);
   const streaming = opts.streaming !== false && Object.keys(nz).length > 0;
   const custom =
     Object.keys(nz).length > 0
-      ? arkitWeightsToFurhatGesture(arkitWeights, {
+      ? arkitWeightsToFurhatGesture(quantized, {
           hold: streaming ? 0.12 : 0.35 + 0.4 * intensity,
           name: `amoji_${emotion}`,
           streaming,
